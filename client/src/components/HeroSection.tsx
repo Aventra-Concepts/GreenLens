@@ -164,7 +164,7 @@ export default function HeroSection() {
                 </h1>
                 <div className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed text-center">
                   <div>Upload up to 3 photos and get instant plant identification, personalized care plans, and expert</div>
-                  <div>disease diagnosis powered by advanced <span className="text-green-600 font-semibold">GreenLens AI Technology</span>.</div>
+                  <div>disease diagnosis with advanced AI analysis.</div>
                 </div>
               </div>
               
