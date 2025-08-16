@@ -11,6 +11,7 @@ import {
   reviews,
   adminSettings,
   pricingSettings,
+  pricingPlans,
   payments,
   type User,
   type UpsertUser,
@@ -34,6 +35,8 @@ import {
   type InsertAdminSettings,
   type PricingSettings,
   type InsertPricingSettings,
+  type PricingPlan,
+  type InsertPricingPlan,
   type Payment,
   type InsertPayment,
 } from "@shared/schema";
@@ -104,6 +107,13 @@ export interface IStorage {
   setAdminSetting(setting: InsertAdminSettings): Promise<AdminSettings>;
   updateAdminSetting(key: string, value: string, updatedBy?: string): Promise<AdminSettings>;
   deleteAdminSetting(key: string): Promise<void>;
+  
+  // Pricing plans operations
+  getPricingPlans(activeOnly?: boolean): Promise<PricingPlan[]>;
+  getPricingPlan(planId: string): Promise<PricingPlan | undefined>;
+  createPricingPlan(plan: InsertPricingPlan): Promise<PricingPlan>;
+  updatePricingPlan(id: string, updates: Partial<InsertPricingPlan>): Promise<PricingPlan>;
+  deletePricingPlan(id: string): Promise<boolean>;
   
   // Pricing settings operations
   getPricingSettings(): Promise<PricingSettings[]>;
@@ -582,6 +592,48 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(adminSettings)
       .where(eq(adminSettings.settingKey, key));
+  }
+
+  // Pricing plans operations
+  async getPricingPlans(activeOnly = false): Promise<PricingPlan[]> {
+    const whereClause = activeOnly ? eq(pricingPlans.isActive, true) : undefined;
+    return db
+      .select()
+      .from(pricingPlans)
+      .where(whereClause)
+      .orderBy(pricingPlans.displayOrder);
+  }
+
+  async getPricingPlan(planId: string): Promise<PricingPlan | undefined> {
+    const [plan] = await db
+      .select()
+      .from(pricingPlans)
+      .where(eq(pricingPlans.planId, planId));
+    return plan;
+  }
+
+  async createPricingPlan(plan: InsertPricingPlan): Promise<PricingPlan> {
+    const [created] = await db
+      .insert(pricingPlans)
+      .values(plan)
+      .returning();
+    return created;
+  }
+
+  async updatePricingPlan(id: string, updates: Partial<InsertPricingPlan>): Promise<PricingPlan> {
+    const [updated] = await db
+      .update(pricingPlans)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(pricingPlans.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deletePricingPlan(id: string): Promise<boolean> {
+    const result = await db
+      .delete(pricingPlans)
+      .where(eq(pricingPlans.id, id));
+    return result.rowCount > 0;
   }
 
   // Pricing settings operations

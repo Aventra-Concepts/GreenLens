@@ -556,6 +556,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Pricing plans routes
+  app.get('/api/pricing-plans', async (req, res) => {
+    try {
+      const activeOnly = req.query.activeOnly === 'true';
+      const plans = await storage.getPricingPlans(activeOnly);
+      res.json(plans);
+    } catch (error) {
+      console.error('Error fetching pricing plans:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/admin/pricing-plans', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const planData = { ...req.body, lastUpdatedBy: userId };
+      const plan = await storage.createPricingPlan(planData);
+      res.json(plan);
+    } catch (error) {
+      console.error('Error creating pricing plan:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
+  app.put('/api/admin/pricing-plans/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.claims.sub;
+      const updateData = { ...req.body, lastUpdatedBy: userId };
+      const plan = await storage.updatePricingPlan(id, updateData);
+      res.json(plan);
+    } catch (error) {
+      console.error('Error updating pricing plan:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
+  app.delete('/api/admin/pricing-plans/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deletePricingPlan(id);
+      res.json({ success });
+    } catch (error) {
+      console.error('Error deleting pricing plan:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
   // Legacy banner image endpoint for backward compatibility
   app.get("/api/admin/banner-image", async (req, res) => {
     try {

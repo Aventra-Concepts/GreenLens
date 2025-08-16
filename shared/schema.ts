@@ -225,7 +225,36 @@ export const adminSettings = pgTable("admin_settings", {
 export type AdminSettings = typeof adminSettings.$inferSelect;
 export type InsertAdminSettings = typeof adminSettings.$inferInsert;
 
-// Admin pricing settings for plant analysis fees
+// Enhanced pricing plans management
+export const pricingPlans = pgTable("pricing_plans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  planId: varchar("plan_id").unique().notNull(), // 'free', 'pro', 'premium'
+  name: varchar("name").notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default('USD'),
+  billingInterval: varchar("billing_interval").default('monthly'), // 'monthly', 'yearly'
+  description: text("description"),
+  features: jsonb("features").notNull(), // Array of feature objects
+  isPopular: boolean("is_popular").default(false),
+  isActive: boolean("is_active").default(true),
+  displayOrder: integer("display_order").default(0),
+  stripePriceId: varchar("stripe_price_id"),
+  razorpayPlanId: varchar("razorpay_plan_id"),
+  cashfreePlanId: varchar("cashfree_plan_id"),
+  lastUpdatedBy: varchar("last_updated_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type PricingPlan = typeof pricingPlans.$inferSelect;
+export const insertPricingPlanSchema = createInsertSchema(pricingPlans).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertPricingPlan = z.infer<typeof insertPricingPlanSchema>;
+
+// Admin pricing settings for individual features
 export const pricingSettings = pgTable("pricing_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   featureName: varchar("feature_name").unique().notNull(), // 'plant_analysis', 'pdf_report'
