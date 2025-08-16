@@ -8,6 +8,8 @@ import {
   userActivity,
   userPreferences,
   subscriptionReminders,
+  reviews,
+  adminSettings,
   type User,
   type UpsertUser,
   type Subscription,
@@ -26,6 +28,10 @@ import {
   type InsertUserPreferences,
   type SubscriptionReminder,
   type InsertSubscriptionReminder,
+  type Review,
+  type InsertReview,
+  type AdminSettings,
+  type InsertAdminSettings,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, sql, desc } from "drizzle-orm";
@@ -81,6 +87,19 @@ export interface IStorage {
   getCacheItem(key: string): Promise<CatalogCache | undefined>;
   setCacheItem(item: InsertCatalogCache): Promise<CatalogCache>;
   clearExpiredCache(): Promise<void>;
+
+  // Reviews operations
+  createReview(review: InsertReview): Promise<Review>;
+  getReviews(publishedOnly?: boolean): Promise<Review[]>;
+  getReviewById(id: string): Promise<Review | undefined>;
+  updateReview(id: string, updates: Partial<InsertReview>): Promise<Review>;
+  deleteReview(id: string): Promise<void>;
+
+  // Admin settings operations
+  getAdminSetting(key: string): Promise<AdminSettings | undefined>;
+  setAdminSetting(setting: InsertAdminSettings): Promise<AdminSettings>;
+  updateAdminSetting(key: string, value: string, updatedBy?: string): Promise<AdminSettings>;
+  deleteAdminSetting(key: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -440,6 +459,112 @@ export class DatabaseStorage implements IStorage {
     }
 
     await this.updateUser(userId, updates);
+  }
+
+  // Reviews operations
+  async createReview(review: InsertReview): Promise<Review> {
+    const [result] = await db
+      .insert(reviews)
+      .values(review)
+      .returning();
+    return result;
+  }
+
+  async getReviews(publishedOnly: boolean = true): Promise<Review[]> {
+    const query = db
+      .select({
+        id: reviews.id,
+        userId: reviews.userId,
+        rating: reviews.rating,
+        title: reviews.title,
+        content: reviews.content,
+        location: reviews.location,
+        platform: reviews.platform,
+        isPublished: reviews.isPublished,
+        createdAt: reviews.createdAt,
+        updatedAt: reviews.updatedAt,
+        user: {
+          firstName: users.firstName,
+          lastName: users.lastName,
+        }
+      })
+      .from(reviews)
+      .leftJoin(users, eq(reviews.userId, users.id))
+      .orderBy(desc(reviews.createdAt));
+
+    if (publishedOnly) {
+      return await query.where(eq(reviews.isPublished, true));
+    }
+    
+    return await query;
+  }
+
+  async getReviewById(id: string): Promise<Review | undefined> {
+    const [review] = await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.id, id));
+    return review;
+  }
+
+  async updateReview(id: string, updates: Partial<InsertReview>): Promise<Review> {
+    const [result] = await db
+      .update(reviews)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(reviews.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteReview(id: string): Promise<void> {
+    await db
+      .delete(reviews)
+      .where(eq(reviews.id, id));
+  }
+
+  // Admin settings operations
+  async getAdminSetting(key: string): Promise<AdminSettings | undefined> {
+    const [setting] = await db
+      .select()
+      .from(adminSettings)
+      .where(eq(adminSettings.settingKey, key));
+    return setting;
+  }
+
+  async setAdminSetting(setting: InsertAdminSettings): Promise<AdminSettings> {
+    const [result] = await db
+      .insert(adminSettings)
+      .values(setting)
+      .onConflictDoUpdate({
+        target: adminSettings.settingKey,
+        set: {
+          settingValue: setting.settingValue,
+          description: setting.description,
+          lastUpdatedBy: setting.lastUpdatedBy,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return result;
+  }
+
+  async updateAdminSetting(key: string, value: string, updatedBy?: string): Promise<AdminSettings> {
+    const [result] = await db
+      .update(adminSettings)
+      .set({
+        settingValue: value,
+        lastUpdatedBy: updatedBy,
+        updatedAt: new Date(),
+      })
+      .where(eq(adminSettings.settingKey, key))
+      .returning();
+    return result;
+  }
+
+  async deleteAdminSetting(key: string): Promise<void> {
+    await db
+      .delete(adminSettings)
+      .where(eq(adminSettings.settingKey, key));
   }
 }
 

@@ -10,7 +10,7 @@ import { carePlannerService } from "./services/carePlanner";
 import { pdfService } from "./services/pdf";
 import { paymentService } from "./services/payments";
 import { plantNamesService } from "./services/plantNames";
-import { insertPlantResultSchema, insertBlogPostSchema } from "@shared/schema";
+import { insertPlantResultSchema, insertBlogPostSchema, insertReviewSchema } from "@shared/schema";
 import { trackUserLogin, trackPlantIdentification, trackSubscriptionPurchase, trackPdfDownload } from "./middleware/activityTracker";
 
 // Configure multer for file uploads
@@ -457,6 +457,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error in health check:", error);
       res.status(500).json({ message: "Failed to check plant health" });
+    }
+  });
+
+  // Reviews endpoints
+  app.get("/api/reviews", async (req, res) => {
+    try {
+      const reviews = await storage.getReviews(true); // Only published reviews
+      res.json(reviews);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      res.status(500).json({ message: "Failed to fetch reviews" });
+    }
+  });
+
+  app.post("/api/reviews", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const reviewData = insertReviewSchema.parse({ ...req.body, userId });
+      
+      const review = await storage.createReview(reviewData);
+      res.json(review);
+    } catch (error) {
+      console.error("Error creating review:", error);
+      if (error instanceof Error && error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid review data" });
+      }
+      res.status(500).json({ message: "Failed to create review" });
+    }
+  });
+
+  // Admin banner image endpoint
+  app.get("/api/admin/banner-image", async (req, res) => {
+    try {
+      const setting = await storage.getAdminSetting('banner_image_url');
+      res.json({ imageUrl: setting?.settingValue || null });
+    } catch (error) {
+      console.error("Error fetching banner image:", error);
+      res.status(500).json({ message: "Failed to fetch banner image" });
+    }
+  });
+
+  app.post("/api/admin/banner-image", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { imageUrl } = req.body;
+      
+      if (!imageUrl) {
+        return res.status(400).json({ message: "Image URL is required" });
+      }
+
+      const setting = await storage.setAdminSetting({
+        settingKey: 'banner_image_url',
+        settingValue: imageUrl,
+        description: 'URL for the main banner background image',
+        lastUpdatedBy: userId,
+      });
+
+      res.json({ imageUrl: setting.settingValue });
+    } catch (error) {
+      console.error("Error updating banner image:", error);
+      res.status(500).json({ message: "Failed to update banner image" });
     }
   });
 

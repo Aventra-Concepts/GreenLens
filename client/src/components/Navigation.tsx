@@ -23,62 +23,7 @@ export default function Navigation() {
               <span className="text-lg font-bold text-gray-900">GreenLens</span>
             </Link>
             
-            <div className="hidden md:flex items-center space-x-6">
-              {isAuthenticated && (
-                <Link 
-                  href="/identify" 
-                  className={`font-medium transition-colors ${
-                    isActive('/identify') 
-                      ? 'text-green-600' 
-                      : 'text-gray-700 hover:text-green-600'
-                  }`}
-                >
-                  Identify
-                </Link>
-              )}
-              <Link 
-                href="/features" 
-                className={`font-medium transition-colors ${
-                  isActive('/features') 
-                    ? 'text-green-600' 
-                    : 'text-gray-700 hover:text-green-600'
-                }`}
-              >
-                Features
-              </Link>
-              <Link 
-                href="/pricing" 
-                className={`font-medium transition-colors ${
-                  isActive('/pricing') 
-                    ? 'text-green-600' 
-                    : 'text-gray-700 hover:text-green-600'
-                }`}
-              >
-                Pricing
-              </Link>
-              <Link 
-                href="/blog" 
-                className={`font-medium transition-colors ${
-                  isActive('/blog') 
-                    ? 'text-green-600' 
-                    : 'text-gray-700 hover:text-green-600'
-                }`}
-              >
-                Blog
-              </Link>
-              {isAuthenticated && (
-                <Link 
-                  href="/account" 
-                  className={`font-medium transition-colors ${
-                    isActive('/account') 
-                      ? 'text-green-600' 
-                      : 'text-gray-700 hover:text-green-600'
-                  }`}
-                >
-                  My Garden
-                </Link>
-              )}
-            </div>
+            {/* Navigation links removed from header */}
           </div>
 
           <div className="flex items-center space-x-4">

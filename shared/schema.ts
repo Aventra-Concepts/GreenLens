@@ -6,14 +6,15 @@ import {
   timestamp,
   varchar,
   text,
-  integer,
   boolean,
-  decimal,
+  integer,
+  real,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table for Replit Auth
+// Session storage table.
+// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
 export const sessions = pgTable(
   "sessions",
   {
@@ -24,214 +25,196 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table for Replit Auth
+// User storage table.
+// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
-  freeTierUsed: integer("free_tier_used").default(0), // Count of free identifications used
-  freeTierStartedAt: timestamp("free_tier_started_at"), // When free tier started (for 7-day limit)
-  preferredLanguage: varchar("preferred_language").default("en"), // User's preferred language for plant names
-  timezone: varchar("timezone").default("UTC"), // User's timezone preference
-  autoRenewalEnabled: boolean("auto_renewal_enabled").default(true), // Auto-renewal preference
-  subscriptionReminders: boolean("subscription_reminders").default(true), // Email reminders preference
-  marketingEmails: boolean("marketing_emails").default(false), // Marketing emails preference
-  lastLoginAt: timestamp("last_login_at"), // Track last login
-  loginCount: integer("login_count").default(0), // Track total logins
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  // Enhanced fields for free tier and multilingual support
+  freeTierUsed: integer("free_tier_used").default(0),
+  freeTierStartedAt: timestamp("free_tier_started_at"),
+  preferredLanguage: varchar("preferred_language", { length: 10 }).default('en'),
+  timezone: varchar("timezone", { length: 50 }).default('UTC'),
 });
 
-// Subscription table
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
+
+// Subscription management
 export const subscriptions = pgTable("subscriptions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  provider: varchar("provider").notNull(), // stripe, razorpay, cashfree
-  providerSubscriptionId: varchar("provider_subscription_id").notNull(),
-  providerCustomerId: varchar("provider_customer_id"),
-  status: varchar("status").notNull(), // active, canceled, past_due, etc.
-  currentPeriodStart: timestamp("current_period_start"),
-  currentPeriodEnd: timestamp("current_period_end"),
-  planId: varchar("plan_id"),
-  planName: varchar("plan_name"),
+  planType: varchar("plan_type").notNull(), // 'pro', 'premium'
+  status: varchar("status").notNull(), // 'active', 'cancelled', 'expired'
+  stripeSubscriptionId: varchar("stripe_subscription_id"),
+  razorpaySubscriptionId: varchar("razorpay_subscription_id"),
+  cashfreeSubscriptionId: varchar("cashfree_subscription_id"),
+  startDate: timestamp("start_date").defaultNow(),
+  endDate: timestamp("end_date"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Plant result table
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;
+
+// Plant identification results
 export const plantResults = pgTable("plant_results", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  images: jsonb("images").notNull(), // array of image URLs
-  species: jsonb("species").notNull(), // { commonName, scientificName, localizedNames, family, etc. }
-  confidence: decimal("confidence", { precision: 5, scale: 2 }),
-  careJSON: jsonb("care_json"), // AI-generated care plan
-  diseasesJSON: jsonb("diseases_json"), // AI-generated disease info
-  pdfUrl: varchar("pdf_url"),
-  isFreeIdentification: boolean("is_free_identification").default(false), // Track if this was a free tier usage
+  imageUrls: text("image_urls").array(),
+  species: jsonb("species"), // Common name, scientific name, confidence
+  careInstructions: text("care_instructions"),
+  healthAssessment: jsonb("health_assessment"),
+  diseaseInfo: jsonb("disease_info"),
+  pdfReportUrl: varchar("pdf_report_url"),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  // Enhanced fields for free tier tracking and multilingual support
+  isFreeIdentification: boolean("is_free_identification").default(false),
+  detectedLanguage: varchar("detected_language", { length: 10 }).default('en'),
+  localizedSpecies: jsonb("localized_species"), // Localized plant names
 });
 
-// User browsing history table (with indexes)
-export const userActivity = pgTable("user_activity", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  action: varchar("action").notNull(), // page_view, plant_identify, download_pdf, subscription_purchase, etc.
-  page: varchar("page"), // page or route visited
-  details: jsonb("details"), // additional action details
-  ipAddress: varchar("ip_address"),
-  userAgent: varchar("user_agent"),
-  timezone: varchar("timezone").default("UTC"),
-  createdAt: timestamp("created_at").defaultNow(),
-}, (table) => ({
-  userIdIdx: index("IDX_user_activity_user_id").on(table.userId),
-  actionIdx: index("IDX_user_activity_action").on(table.action),
-  createdAtIdx: index("IDX_user_activity_created_at").on(table.createdAt),
-}));
-
-// User preferences table (with indexes)
-export const userPreferences = pgTable("user_preferences", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  category: varchar("category").notNull(), // ui, notifications, privacy, etc.
-  key: varchar("key").notNull(), // specific preference key
-  value: jsonb("value").notNull(), // preference value
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => ({
-  userIdIdx: index("IDX_user_preferences_user_id").on(table.userId),
-  categoryIdx: index("IDX_user_preferences_category").on(table.category),
-}));
-
-// Blog post table
-export const blogPosts = pgTable("blog_posts", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  slug: varchar("slug").notNull().unique(),
-  title: varchar("title").notNull(),
-  excerpt: text("excerpt"),
-  content: text("content").notNull(),
-  category: varchar("category"),
-  published: boolean("published").default(false),
-  authorId: varchar("author_id").references(() => users.id),
-  publishedAt: timestamp("published_at"), // When the blog was published
-  readingTime: integer("reading_time"), // Estimated reading time in minutes
-  tags: jsonb("tags"), // Array of tags
-  featuredImage: varchar("featured_image"), // Featured image URL
-  viewCount: integer("view_count").default(0), // Track blog post views
-  likeCount: integer("like_count").default(0), // Track blog post likes
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-// Blog post views table for tracking individual user views (with indexes)
-export const blogViews = pgTable("blog_views", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  blogPostId: varchar("blog_post_id").notNull().references(() => blogPosts.id, { onDelete: "cascade" }),
-  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
-  ipAddress: varchar("ip_address"),
-  timezone: varchar("timezone").default("UTC"),
-  viewedAt: timestamp("viewed_at").defaultNow(),
-}, (table) => ({
-  blogPostIdIdx: index("IDX_blog_views_blog_post_id").on(table.blogPostId),
-  userIdIdx: index("IDX_blog_views_user_id").on(table.userId),
-  viewedAtIdx: index("IDX_blog_views_viewed_at").on(table.viewedAt),
-}));
-
-// Subscription reminders table (with indexes)
-export const subscriptionReminders = pgTable("subscription_reminders", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  subscriptionId: varchar("subscription_id").notNull().references(() => subscriptions.id, { onDelete: "cascade" }),
-  reminderType: varchar("reminder_type").notNull(), // renewal_due, payment_failed, trial_ending, etc.
-  sentAt: timestamp("sent_at"),
-  scheduledFor: timestamp("scheduled_for").notNull(),
-  status: varchar("status").default("pending"), // pending, sent, failed
-  emailContent: text("email_content"),
-  createdAt: timestamp("created_at").defaultNow(),
-}, (table) => ({
-  subscriptionIdIdx: index("IDX_subscription_reminders_subscription_id").on(table.subscriptionId),
-  scheduledForIdx: index("IDX_subscription_reminders_scheduled_for").on(table.scheduledFor),
-  statusIdx: index("IDX_subscription_reminders_status").on(table.status),
-}));
-
-// Catalog cache table for API responses
-export const catalogCache = pgTable("catalog_cache", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  key: varchar("key").notNull().unique(),
-  json: jsonb("json").notNull(),
-  expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
+export type PlantResult = typeof plantResults.$inferSelect;
 export const insertPlantResultSchema = createInsertSchema(plantResults).omit({
   id: true,
   createdAt: true,
-  updatedAt: true,
+});
+export type InsertPlantResult = z.infer<typeof insertPlantResultSchema>;
+
+// Blog posts for plant care tips
+export const blogPosts = pgTable("blog_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: varchar("title").notNull(),
+  content: text("content").notNull(),
+  excerpt: text("excerpt"),
+  slug: varchar("slug").unique().notNull(),
+  authorId: varchar("author_id").references(() => users.id),
+  published: boolean("published").default(false),
+  featuredImage: varchar("featured_image"),
+  tags: text("tags").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export type BlogPost = typeof blogPosts.$inferSelect;
 export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 
-export const insertCatalogCacheSchema = createInsertSchema(catalogCache).omit({
-  id: true,
-  createdAt: true,
+// Blog views tracking
+export const blogViews = pgTable("blog_views", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  blogPostId: varchar("blog_post_id").notNull().references(() => blogPosts.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  viewedAt: timestamp("viewed_at").defaultNow(),
 });
 
-export const insertUserActivitySchema = createInsertSchema(userActivity).omit({
-  id: true,
-  createdAt: true,
+export type BlogView = typeof blogViews.$inferSelect;
+
+// Plant catalog cache for external API data
+export const catalogCache = pgTable("catalog_cache", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  cacheKey: varchar("cache_key").unique().notNull(),
+  data: jsonb("data").notNull(),
+  source: varchar("source").notNull(), // 'perenual', 'trefle', etc.
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertUserPreferencesSchema = createInsertSchema(userPreferences).omit({
+export type CatalogCache = typeof catalogCache.$inferSelect;
+
+// User activity tracking for comprehensive behavior analysis
+export const userActivity = pgTable("user_activity", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  sessionId: varchar("session_id"),
+  activityType: varchar("activity_type").notNull(), // 'login', 'plant_identification', 'subscription_purchase', 'page_view', 'feature_use', 'pdf_download'
+  activityData: jsonb("activity_data"), // Flexible storage for activity-specific data
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  referrer: varchar("referrer"),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+export type UserActivity = typeof userActivity.$inferSelect;
+export type InsertUserActivity = typeof userActivity.$inferInsert;
+
+// Subscription reminder system
+export const subscriptionReminders = pgTable("subscription_reminders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  subscriptionId: varchar("subscription_id").notNull().references(() => subscriptions.id, { onDelete: "cascade" }),
+  reminderType: varchar("reminder_type").notNull(), // 'renewal_due', 'payment_failed', 'trial_ending'
+  scheduledFor: timestamp("scheduled_for").notNull(),
+  sent: boolean("sent").default(false),
+  sentAt: timestamp("sent_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type SubscriptionReminder = typeof subscriptionReminders.$inferSelect;
+export type InsertSubscriptionReminder = typeof subscriptionReminders.$inferInsert;
+
+// User preferences for enhanced customization
+export const userPreferences = pgTable("user_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  emailNotifications: boolean("email_notifications").default(true),
+  plantCareReminders: boolean("plant_care_reminders").default(true),
+  weeklyDigest: boolean("weekly_digest").default(true),
+  marketingEmails: boolean("marketing_emails").default(false),
+  theme: varchar("theme", { length: 20 }).default('light'), // 'light', 'dark', 'auto'
+  measurementUnit: varchar("measurement_unit", { length: 10 }).default('metric'), // 'metric', 'imperial'
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type InsertUserPreferences = typeof userPreferences.$inferInsert;
+
+// Reviews system for user feedback
+export const reviews = pgTable("reviews", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  rating: integer("rating").notNull(), // 1-5 stars
+  title: varchar("title").notNull(),
+  content: text("content").notNull(),
+  location: varchar("location"), // Where the review was posted from
+  platform: varchar("platform").default('web'), // 'web', 'mobile', 'api'
+  isPublished: boolean("is_published").default(false),
+  moderatorNotes: text("moderator_notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type Review = typeof reviews.$inferSelect;
+export const insertReviewSchema = createInsertSchema(reviews).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
+export type InsertReview = z.infer<typeof insertReviewSchema>;
 
-export const insertBlogViewSchema = createInsertSchema(blogViews).omit({
-  id: true,
-  viewedAt: true,
+// Admin settings for banner image management
+export const adminSettings = pgTable("admin_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  settingKey: varchar("setting_key").unique().notNull(),
+  settingValue: text("setting_value"),
+  description: text("description"),
+  lastUpdatedBy: varchar("last_updated_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertSubscriptionReminderSchema = createInsertSchema(subscriptionReminders).omit({
-  id: true,
-  createdAt: true,
-});
-
-// Types
-export type UpsertUser = typeof users.$inferInsert;
-export type User = typeof users.$inferSelect;
-export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
-export type Subscription = typeof subscriptions.$inferSelect;
-export type InsertPlantResult = z.infer<typeof insertPlantResultSchema>;
-export type PlantResult = typeof plantResults.$inferSelect;
-export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
-export type BlogPost = typeof blogPosts.$inferSelect;
-export type InsertCatalogCache = z.infer<typeof insertCatalogCacheSchema>;
-export type CatalogCache = typeof catalogCache.$inferSelect;
-export type InsertUserActivity = z.infer<typeof insertUserActivitySchema>;
-export type UserActivity = typeof userActivity.$inferSelect;
-export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
-export type UserPreferences = typeof userPreferences.$inferSelect;
-export type InsertBlogView = z.infer<typeof insertBlogViewSchema>;
-export type BlogView = typeof blogViews.$inferSelect;
-export type InsertSubscriptionReminder = z.infer<typeof insertSubscriptionReminderSchema>;
-export type SubscriptionReminder = typeof subscriptionReminders.$inferSelect;
+export type AdminSettings = typeof adminSettings.$inferSelect;
+export type InsertAdminSettings = typeof adminSettings.$inferInsert;

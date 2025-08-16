@@ -33,19 +33,19 @@ export function Layout({
             <a href="/garden" className="text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">
               My Garden
             </a>
-            <a href="/blog" className="text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">
-              Plant Care Tips
-            </a>
             <a href="/pricing" className="text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">
               Pricing
+            </a>
+            <a href="/blog" className="text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+              Blog
             </a>
           </nav>
         </div>
       </div>
 
-      {/* Image Upload Banner - Increased height by 1 inch */}
+      {/* Image Upload Banner - Increased height by 1.5 inches total */}
       {showImageBanner && (
-        <div className="h-32 sm:h-36 lg:h-40">
+        <div className="h-36 sm:h-40 lg:h-44">
           <ImageUploadBanner />
         </div>
       )}

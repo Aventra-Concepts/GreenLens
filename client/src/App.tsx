@@ -14,6 +14,7 @@ import Account from "@/pages/account";
 import Features from "@/pages/features";
 import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
+import Reviews from "@/pages/Reviews";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/features" component={Features} />
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogPost} />
+      <Route path="/reviews" component={Reviews} />
       <Route component={NotFound} />
     </Switch>
   );

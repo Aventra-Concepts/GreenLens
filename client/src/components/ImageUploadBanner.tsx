@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +13,13 @@ export function ImageUploadBanner() {
   const { toast } = useToast();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+
+  // Fetch admin-configurable banner image
+  const { data: bannerSettings } = useQuery<{ imageUrl?: string }>({
+    queryKey: ["/api/admin/banner-image"],
+    retry: false,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
 
   const identifyMutation = useMutation({
     mutationFn: async (files: File[]) => {
@@ -126,11 +134,13 @@ export function ImageUploadBanner() {
 
   return (
     <Card className="h-full bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200 dark:border-green-800 shadow-lg relative overflow-hidden">
-      {/* Background Image */}
+      {/* Background Image - Admin Configurable */}
       <div className="absolute inset-0 opacity-20 dark:opacity-10">
         <div 
           className="h-full w-full bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${botanicalBgUrl})` }}
+          style={{ 
+            backgroundImage: `url(${bannerSettings?.imageUrl || botanicalBgUrl})` 
+          }}
         ></div>
       </div>
       
