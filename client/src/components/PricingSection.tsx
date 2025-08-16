@@ -159,13 +159,13 @@ export default function PricingSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+        <div className="flex flex-col sm:flex-row gap-3 max-w-4xl mx-auto justify-center items-start">
           {sortedPlans.map((plan: PricingPlan) => (
             <Card
               key={plan.id}
-              className={`relative transition-all duration-300 hover:shadow-lg ${
+              className={`relative transition-all duration-300 hover:shadow-lg w-full sm:w-48 flex-shrink-0 ${
                 plan.isPopular
-                  ? 'ring-2 ring-primary border-primary transform scale-[1.02] shadow-xl'
+                  ? 'ring-2 ring-primary border-primary shadow-xl'
                   : 'border-gray-200 dark:border-gray-700'
               } bg-white dark:bg-gray-800 h-fit`}
               data-testid={`pricing-plan-${plan.planId}`}
@@ -179,62 +179,55 @@ export default function PricingSection() {
                 </div>
               )}
 
-              <CardHeader className="text-center space-y-3 pb-4">
-                <div className="flex items-center justify-center gap-2">
-                  {plan.isPopular && <Zap className="w-4 h-4 text-primary" />}
-                  <CardTitle className="text-lg font-bold text-gray-900 dark:text-white">
+              <CardHeader className="text-center space-y-2 pb-3 px-3">
+                <div className="flex items-center justify-center gap-1">
+                  {plan.isPopular && <Zap className="w-3 h-3 text-primary" />}
+                  <CardTitle className="text-base font-bold text-gray-900 dark:text-white">
                     {plan.name}
                   </CardTitle>
                 </div>
                 
                 <div className="space-y-1">
-                  <div className="text-3xl font-bold text-gray-900 dark:text-white">
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">
                     {plan.currency === 'USD' && '$'}
                     {plan.price}
-                    {plan.currency !== 'USD' && ` ${plan.currency}`}
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {plan.billingInterval === 'monthly' ? 'per month' : 'per year'}
+                    {plan.billingInterval === 'monthly' ? '/month' : '/year'}
                   </p>
                 </div>
-                
-                {plan.description && (
-                  <p className="text-gray-600 dark:text-gray-300 text-xs px-2">
-                    {plan.description}
-                  </p>
-                )}
               </CardHeader>
 
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  {plan.features.slice(0, 5).map((feature, index) => (
+              <CardContent className="space-y-3 px-3 pb-3">
+                <div className="space-y-1">
+                  {plan.features.slice(0, 3).map((feature, index) => (
                     <div
                       key={index}
-                      className={`flex items-start gap-2 ${
+                      className={`flex items-start gap-1 ${
                         feature.included ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400'
                       }`}
                     >
                       <CheckCircle
-                        className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
+                        className={`w-3 h-3 mt-0.5 flex-shrink-0 ${
                           feature.included ? 'text-green-500' : 'text-gray-300'
                         }`}
                       />
                       <div>
-                        <span className={`text-sm ${feature.included ? '' : 'line-through'}`}>
+                        <span className={`text-xs ${feature.included ? '' : 'line-through'}`}>
                           {feature.name}
                         </span>
                       </div>
                     </div>
                   ))}
-                  {plan.features.length > 5 && (
-                    <div className="text-xs text-gray-500 dark:text-gray-400 pl-6">
-                      +{plan.features.length - 5} more features
+                  {plan.features.length > 3 && (
+                    <div className="text-xs text-gray-500 dark:text-gray-400 pl-4">
+                      +{plan.features.length - 3} more
                     </div>
                   )}
                 </div>
 
                 <Button
-                  className={`w-full ${
+                  className={`w-full text-xs py-2 ${
                     plan.isPopular
                       ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
                       : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100'
@@ -245,7 +238,7 @@ export default function PricingSection() {
                 >
                   {checkoutMutation.isPending && selectedPlan === plan.planId ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
                       Processing...
                     </>
                   ) : (
