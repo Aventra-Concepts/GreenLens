@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { PoweredBySection } from "@/components/PoweredBySection";
-import { GardeningToolsSection } from "@/components/GardeningToolsSection";
+import GardeningToolsSection from "@/components/GardeningToolsSection";
 
 export default function Home() {
   const { toast } = useToast();

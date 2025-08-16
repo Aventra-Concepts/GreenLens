@@ -10,9 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Settings, Image, Type, Save, DollarSign, Package } from "lucide-react";
+import { Settings, Image, Type, Save, DollarSign, Package, Shovel } from "lucide-react";
 import PricingManagement from "@/components/PricingManagement";
 import PricingPlanManager from "@/components/admin/PricingPlanManager";
+import GardeningToolsManager from "@/components/admin/GardeningToolsManager";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
@@ -140,10 +141,14 @@ export default function Admin() {
           </div>
 
           <Tabs defaultValue="banner" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="banner" className="flex items-center gap-2">
                 <Image className="w-4 h-4" />
                 Banner Settings
+              </TabsTrigger>
+              <TabsTrigger value="gardening" className="flex items-center gap-2">
+                <Shovel className="w-4 h-4" />
+                Gardening Tools
               </TabsTrigger>
               <TabsTrigger value="pricing-plans" className="flex items-center gap-2">
                 <Package className="w-4 h-4" />
@@ -277,6 +282,10 @@ export default function Admin() {
               </Button>
             </div>
               </form>
+            </TabsContent>
+
+            <TabsContent value="gardening">
+              <GardeningToolsManager />
             </TabsContent>
 
             <TabsContent value="pricing-plans">

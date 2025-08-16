@@ -556,6 +556,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Gardening content routes
+  app.get('/api/admin/gardening-content', async (req, res) => {
+    try {
+      const content = await storage.getGardeningContent();
+      if (!content) {
+        // Return default content if none exists
+        res.json({
+          sectionTitle: "All you need to know about the Right Gardening Tools",
+          sectionDescription: "Everything you need for successful gardening, from essential tools to expert soil preparation techniques",
+          tools: [
+            {
+              id: "1",
+              name: "Premium Garden Spade",
+              description: "Durable stainless steel spade perfect for soil preparation and planting",
+              category: "Digging Tools",
+              price: "$34.99",
+              isRecommended: true
+            },
+            {
+              id: "2", 
+              name: "Pruning Shears",
+              description: "Sharp, ergonomic pruning shears for precise plant trimming and care",
+              category: "Cutting Tools",
+              price: "$24.99"
+            },
+            {
+              id: "3",
+              name: "Watering Can with Spout",
+              description: "2-gallon watering can with precision spout for targeted watering",
+              category: "Watering Tools",
+              price: "$19.99"
+            },
+            {
+              id: "4",
+              name: "Hand Cultivator",
+              description: "Essential tool for breaking up soil and removing weeds",
+              category: "Soil Tools",
+              price: "$16.99"
+            }
+          ],
+          soilPreparation: [
+            {
+              id: "1",
+              title: "Spring Soil Preparation",
+              description: "Get your garden ready for the growing season with proper soil preparation",
+              steps: [
+                "Test soil pH levels (ideal range: 6.0-7.0)",
+                "Remove weeds and debris from planting areas",
+                "Add 2-3 inches of compost or organic matter",
+                "Till or dig soil to 8-10 inches deep",
+                "Level the surface and create planting rows"
+              ],
+              season: "Spring"
+            },
+            {
+              id: "2",
+              title: "Fall Garden Cleanup",
+              description: "Prepare your soil for winter and next year's growing season",
+              steps: [
+                "Remove spent plants and diseased materials",
+                "Add fallen leaves as natural mulch",
+                "Plant cover crops or green manure",
+                "Apply slow-release organic fertilizer",
+                "Create winter protection for perennials"
+              ],
+              season: "Fall"
+            }
+          ]
+        });
+      } else {
+        res.json(content);
+      }
+    } catch (error) {
+      console.error('Error fetching gardening content:', error);
+      res.status(500).json({ message: 'Failed to fetch gardening content' });
+    }
+  });
+
+  app.post('/api/admin/gardening-content', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const contentData = { ...req.body, lastUpdatedBy: userId };
+      const content = await storage.updateGardeningContent(contentData);
+      res.json(content);
+    } catch (error) {
+      console.error('Error updating gardening content:', error);
+      res.status(500).json({ message: 'Failed to update gardening content' });
+    }
+  });
+
   // Pricing plans routes
   app.get('/api/pricing-plans', async (req, res) => {
     try {

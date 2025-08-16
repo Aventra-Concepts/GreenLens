@@ -299,3 +299,24 @@ export const insertPaymentSchema = createInsertSchema(payments).omit({
   updatedAt: true,
 });
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+
+// Gardening tools and content management
+export const gardeningContent = pgTable("gardening_content", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sectionTitle: varchar("section_title").notNull(),
+  sectionDescription: text("section_description"),
+  tools: jsonb("tools").notNull(), // Array of tool objects
+  soilPreparation: jsonb("soil_preparation").notNull(), // Array of soil prep guides
+  isActive: boolean("is_active").default(true),
+  lastUpdatedBy: varchar("last_updated_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type GardeningContent = typeof gardeningContent.$inferSelect;
+export const insertGardeningContentSchema = createInsertSchema(gardeningContent).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertGardeningContent = z.infer<typeof insertGardeningContentSchema>;

@@ -13,6 +13,7 @@ import {
   pricingSettings,
   pricingPlans,
   payments,
+  gardeningContent,
   type User,
   type UpsertUser,
   type Subscription,
@@ -39,6 +40,8 @@ import {
   type InsertPricingPlan,
   type Payment,
   type InsertPayment,
+  type GardeningContent,
+  type InsertGardeningContent,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, sql, desc } from "drizzle-orm";
@@ -129,6 +132,11 @@ export interface IStorage {
   getPayment(id: string): Promise<Payment | undefined>;
   updatePayment(id: string, updates: Partial<Payment>): Promise<Payment>;
   getUserPayments(userId: string): Promise<Payment[]>;
+
+  // Gardening content operations
+  getGardeningContent(): Promise<GardeningContent | undefined>;
+  updateGardeningContent(content: InsertGardeningContent): Promise<GardeningContent>;
+  createGardeningContent(content: InsertGardeningContent): Promise<GardeningContent>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -718,6 +726,34 @@ export class DatabaseStorage implements IStorage {
       .from(pricingSettings)
       .where(and(eq(pricingSettings.featureName, featureName), eq(pricingSettings.isActive, true)));
     return setting;
+  }
+
+  // Gardening content operations
+  async getGardeningContent(): Promise<GardeningContent | undefined> {
+    const [content] = await db.select().from(gardeningContent).where(eq(gardeningContent.isActive, true));
+    return content;
+  }
+
+  async updateGardeningContent(content: InsertGardeningContent): Promise<GardeningContent> {
+    const existing = await this.getGardeningContent();
+    if (existing) {
+      const [updated] = await db
+        .update(gardeningContent)
+        .set({ ...content, updatedAt: new Date() })
+        .where(eq(gardeningContent.id, existing.id))
+        .returning();
+      return updated;
+    } else {
+      return await this.createGardeningContent(content);
+    }
+  }
+
+  async createGardeningContent(content: InsertGardeningContent): Promise<GardeningContent> {
+    const [created] = await db
+      .insert(gardeningContent)
+      .values(content)
+      .returning();
+    return created;
   }
 }
 
