@@ -21,9 +21,7 @@ import {
   type BlogPost,
   type InsertBlogPost,
   type BlogView,
-  type InsertBlogView,
   type CatalogCache,
-  type InsertCatalogCache,
   type UserActivity,
   type InsertUserActivity,
   type UserPreferences,
@@ -85,13 +83,13 @@ export interface IStorage {
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
   updateBlogPost(id: string, updates: Partial<InsertBlogPost>): Promise<BlogPost>;
   incrementBlogViewCount(blogPostId: string): Promise<void>;
-  logBlogView(view: InsertBlogView): Promise<BlogView>;
+  logBlogView(view: BlogView): Promise<BlogView>;
   getBlogViewCount(blogPostId: string): Promise<number>;
   getUserBlogHistory(userId: string, limit?: number): Promise<BlogView[]>;
   
   // Cache operations
   getCacheItem(key: string): Promise<CatalogCache | undefined>;
-  setCacheItem(item: InsertCatalogCache): Promise<CatalogCache>;
+  setCacheItem(item: CatalogCache): Promise<CatalogCache>;
   clearExpiredCache(): Promise<void>;
 
   // Reviews operations
@@ -157,8 +155,6 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(users)
       .set({ 
-        lastLoginAt: new Date(),
-        loginCount: sql`${users.loginCount} + 1`,
         updatedAt: new Date()
       })
       .where(eq(users.id, userId));
@@ -178,7 +174,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(userActivity)
       .where(eq(userActivity.userId, userId))
-      .orderBy(userActivity.createdAt)
+      .orderBy(userActivity.timestamp)
       .limit(limit);
   }
 
@@ -186,8 +182,8 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(userActivity)
-      .where(and(eq(userActivity.userId, userId), eq(userActivity.action, action)))
-      .orderBy(userActivity.createdAt)
+      .where(and(eq(userActivity.userId, userId), eq(userActivity.activityType, action)))
+      .orderBy(userActivity.timestamp)
       .limit(limit);
   }
 
@@ -204,9 +200,9 @@ export class DatabaseStorage implements IStorage {
       .insert(userPreferences)
       .values(preference)
       .onConflictDoUpdate({
-        target: [userPreferences.userId, userPreferences.category, userPreferences.key],
+        target: userPreferences.userId,
         set: {
-          value: preference.value,
+          ...preference,
           updatedAt: new Date(),
         },
       })
@@ -218,7 +214,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(userPreferences)
-      .where(and(eq(userPreferences.userId, userId), eq(userPreferences.category, category)));
+      .where(eq(userPreferences.userId, userId));
   }
 
   async getUserSubscription(userId: string): Promise<Subscription | undefined> {
@@ -260,7 +256,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(subscriptionReminders)
       .where(and(
-        eq(subscriptionReminders.status, "pending"),
+        eq(subscriptionReminders.sent, false),
         gt(subscriptionReminders.scheduledFor, new Date())
       ))
       .orderBy(subscriptionReminders.scheduledFor);
@@ -270,7 +266,7 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(subscriptionReminders)
       .set({ 
-        status: "sent",
+        sent: true,
         sentAt: new Date()
       })
       .where(eq(subscriptionReminders.id, reminderId));

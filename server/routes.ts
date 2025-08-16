@@ -137,16 +137,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const plantResult = await storage.createPlantResult({
         userId,
-        images: files.map(file => ({ 
-          name: file.originalname,
-          size: file.size,
-          type: file.mimetype 
-        })),
-        species: enrichedSpecies,
+        imageUrls: files.map(file => file.originalname),
+        species: enrichedSpecies.scientificName || enrichedSpecies,
+        commonName: enrichedSpecies.commonName || '',
         confidence: identification.confidence.toString(),
-        careJSON: carePlan,
-        diseasesJSON: diseaseAdvice,
+        analysisData: carePlan,
+        healthAssessment: healthAssessment,
+        diseaseInfo: diseaseAdvice,
         isFreeIdentification: isUsingFreeTier,
+        localizedSpecies: enrichedSpecies,
       });
 
       // Get updated free tier status for response
@@ -396,7 +395,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Extract care tips from the care plan
-      const carePlan = result.careJSON as any;
+      const carePlan = result.analysisData as any;
       const careTips = {
         watering: carePlan?.watering || {},
         lighting: carePlan?.lighting || {},
@@ -670,9 +669,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId,
         species: analysisResult.species.scientific,
         commonName: analysisResult.species.common,
-        confidence: analysisResult.species.confidence,
+        confidence: analysisResult.species.confidence.toString(),
         healthStatus: analysisResult.healthAssessment.isHealthy ? 'healthy' : 'unhealthy',
-        diseaseDetected: analysisResult.healthAssessment.diseases?.length > 0,
+        diseaseDetected: (analysisResult.healthAssessment.diseases?.length || 0) > 0,
         careInstructions: analysisResult.careInstructions,
         analysisData: JSON.stringify(analysisResult),
         isFreeIdentification: true,
@@ -732,7 +731,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Parse analysis data
-      const analysisData = JSON.parse(plantResult.analysisData || '{}');
+      const analysisData = typeof plantResult.analysisData === 'string' 
+        ? JSON.parse(plantResult.analysisData) 
+        : plantResult.analysisData || {};
       
       // Get user info
       const user = await storage.getUser(userId);
@@ -744,7 +745,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: plantResult.id,
           ...analysisData
         },
-        { email: user?.email }
+        { email: user?.email || '' }
       );
 
       // Set headers for PDF download
