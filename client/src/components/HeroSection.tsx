@@ -19,7 +19,8 @@ export default function HeroSection() {
                 Precision
               </h1>
               <p className="text-sm text-gray-600 leading-relaxed text-center">
-                Upload a photo and get instant plant identification, personalized care plans, and expert disease diagnosis powered by advanced GreenLens AI Technology.
+                <div>Upload a photo and get instant plant identification, personalized care plans,</div>
+                <div>and expert disease diagnosis powered by advanced GreenLens AI Technology.</div>
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
