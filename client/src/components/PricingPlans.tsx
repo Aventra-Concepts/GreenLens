@@ -33,10 +33,15 @@ export default function PricingPlans() {
   const { isAuthenticated } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
-  const { data: plans = [], isLoading } = useQuery({
+  const { data: plans = [], isLoading, error } = useQuery({
     queryKey: ['/api/pricing-plans'],
     queryFn: () => apiRequest('GET', '/api/pricing-plans?activeOnly=true').then(res => res.json()),
+    staleTime: 0, // Force fresh data
+    retry: 1,
   });
+
+  // Debug logging
+  console.log('Pricing Plans Debug:', { plans, isLoading, error, plansLength: plans.length });
 
   const checkoutMutation = useMutation({
     mutationFn: async ({ planId }: { planId: string }) => {
@@ -110,6 +115,36 @@ export default function PricingPlans() {
           </div>
           <div className="flex justify-center">
             <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section id="pricing" className="py-16 bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+              Choose Your Plan
+            </h2>
+            <p className="text-red-500">Failed to load pricing plans: {error.message}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!plans || plans.length === 0) {
+    return (
+      <section id="pricing" className="py-16 bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+              Choose Your Plan
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300">No pricing plans available at the moment.</p>
           </div>
         </div>
       </section>
