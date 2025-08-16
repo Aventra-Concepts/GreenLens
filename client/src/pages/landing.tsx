@@ -1,6 +1,6 @@
 import { Layout } from "@/components/Layout";
 import HeroSection from "@/components/HeroSection";
-
+import TripleImageUpload from "@/components/TripleImageUpload";
 import PricingSection from "@/components/PricingSection";
 import BlogPreviewSection from "@/components/BlogPreviewSection";
 import { InArticleAd } from "@/components/AdSense";
@@ -11,7 +11,7 @@ export default function Landing() {
     <Layout showImageBanner={true} showSidebarAds={true}>
       <div className="space-y-8">
         <HeroSection />
-
+        <TripleImageUpload />
         
         {/* In-article ad between sections */}
         <InArticleAd />

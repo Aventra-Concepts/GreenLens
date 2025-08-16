@@ -43,9 +43,9 @@ export function Layout({
         </div>
       </div>
 
-      {/* Image Upload Banner - Increased height for consolidated content */}
+      {/* Image Upload Banner - Increased height by 1 inch */}
       {showImageBanner && (
-        <div className="h-48 sm:h-52 lg:h-56">
+        <div className="h-72 sm:h-80 lg:h-88">
           <ImageUploadBanner />
         </div>
       )}
