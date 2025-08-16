@@ -1,10 +1,17 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { activityTracker } from "./middleware/activityTracker";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Trust proxy for accurate IP addresses
+app.set('trust proxy', true);
+
+// Add activity tracking middleware
+app.use(activityTracker);
 
 app.use((req, res, next) => {
   const start = Date.now();

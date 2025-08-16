@@ -3,7 +3,11 @@ import {
   subscriptions,
   plantResults,
   blogPosts,
+  blogViews,
   catalogCache,
+  userActivity,
+  userPreferences,
+  subscriptionReminders,
   type User,
   type UpsertUser,
   type Subscription,
@@ -12,22 +16,46 @@ import {
   type InsertPlantResult,
   type BlogPost,
   type InsertBlogPost,
+  type BlogView,
+  type InsertBlogView,
   type CatalogCache,
   type InsertCatalogCache,
+  type UserActivity,
+  type InsertUserActivity,
+  type UserPreferences,
+  type InsertUserPreferences,
+  type SubscriptionReminder,
+  type InsertSubscriptionReminder,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gt } from "drizzle-orm";
+import { eq, and, gt, sql, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUser(id: string, updates: Partial<UpsertUser>): Promise<User>;
+  updateUserLoginActivity(userId: string): Promise<void>;
+  
+  // User Activity operations
+  logUserActivity(activity: InsertUserActivity): Promise<UserActivity>;
+  getUserActivity(userId: string, limit?: number): Promise<UserActivity[]>;
+  getUserActivityByAction(userId: string, action: string, limit?: number): Promise<UserActivity[]>;
+  
+  // User Preferences operations
+  getUserPreferences(userId: string): Promise<UserPreferences[]>;
+  setUserPreference(preference: InsertUserPreferences): Promise<UserPreferences>;
+  getUserPreferencesByCategory(userId: string, category: string): Promise<UserPreferences[]>;
   
   // Subscription operations
   getUserSubscription(userId: string): Promise<Subscription | undefined>;
   createSubscription(subscription: InsertSubscription): Promise<Subscription>;
   updateSubscription(id: string, updates: Partial<InsertSubscription>): Promise<Subscription>;
+  
+  // Subscription Reminder operations
+  createSubscriptionReminder(reminder: InsertSubscriptionReminder): Promise<SubscriptionReminder>;
+  getPendingReminders(): Promise<SubscriptionReminder[]>;
+  markReminderSent(reminderId: string): Promise<void>;
   
   // Plant result operations
   createPlantResult(result: InsertPlantResult): Promise<PlantResult>;
@@ -39,11 +67,15 @@ export interface IStorage {
   checkFreeTierEligibility(userId: string): Promise<{ eligible: boolean; remainingUses: number; daysLeft: number }>;
   incrementFreeTierUsage(userId: string): Promise<void>;
   
-  // Blog operations
+  // Enhanced Blog operations
   getBlogPosts(published?: boolean): Promise<BlogPost[]>;
   getBlogPost(slug: string): Promise<BlogPost | undefined>;
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
   updateBlogPost(id: string, updates: Partial<InsertBlogPost>): Promise<BlogPost>;
+  incrementBlogViewCount(blogPostId: string): Promise<void>;
+  logBlogView(view: InsertBlogView): Promise<BlogView>;
+  getBlogViewCount(blogPostId: string): Promise<number>;
+  getUserBlogHistory(userId: string, limit?: number): Promise<BlogView[]>;
   
   // Cache operations
   getCacheItem(key: string): Promise<CatalogCache | undefined>;
@@ -72,6 +104,83 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async updateUser(id: string, updates: Partial<UpsertUser>): Promise<User> {
+    const [result] = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return result;
+  }
+
+  async updateUserLoginActivity(userId: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ 
+        lastLoginAt: new Date(),
+        loginCount: sql`${users.loginCount} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId));
+  }
+
+  // User Activity operations
+  async logUserActivity(activity: InsertUserActivity): Promise<UserActivity> {
+    const [result] = await db
+      .insert(userActivity)
+      .values(activity)
+      .returning();
+    return result;
+  }
+
+  async getUserActivity(userId: string, limit: number = 50): Promise<UserActivity[]> {
+    return await db
+      .select()
+      .from(userActivity)
+      .where(eq(userActivity.userId, userId))
+      .orderBy(userActivity.createdAt)
+      .limit(limit);
+  }
+
+  async getUserActivityByAction(userId: string, action: string, limit: number = 20): Promise<UserActivity[]> {
+    return await db
+      .select()
+      .from(userActivity)
+      .where(and(eq(userActivity.userId, userId), eq(userActivity.action, action)))
+      .orderBy(userActivity.createdAt)
+      .limit(limit);
+  }
+
+  // User Preferences operations
+  async getUserPreferences(userId: string): Promise<UserPreferences[]> {
+    return await db
+      .select()
+      .from(userPreferences)
+      .where(eq(userPreferences.userId, userId));
+  }
+
+  async setUserPreference(preference: InsertUserPreferences): Promise<UserPreferences> {
+    const [result] = await db
+      .insert(userPreferences)
+      .values(preference)
+      .onConflictDoUpdate({
+        target: [userPreferences.userId, userPreferences.category, userPreferences.key],
+        set: {
+          value: preference.value,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return result;
+  }
+
+  async getUserPreferencesByCategory(userId: string, category: string): Promise<UserPreferences[]> {
+    return await db
+      .select()
+      .from(userPreferences)
+      .where(and(eq(userPreferences.userId, userId), eq(userPreferences.category, category)));
+  }
+
   async getUserSubscription(userId: string): Promise<Subscription | undefined> {
     const [subscription] = await db
       .select()
@@ -95,6 +204,36 @@ export class DatabaseStorage implements IStorage {
       .where(eq(subscriptions.id, id))
       .returning();
     return result;
+  }
+
+  // Subscription Reminder operations
+  async createSubscriptionReminder(reminder: InsertSubscriptionReminder): Promise<SubscriptionReminder> {
+    const [result] = await db
+      .insert(subscriptionReminders)
+      .values(reminder)
+      .returning();
+    return result;
+  }
+
+  async getPendingReminders(): Promise<SubscriptionReminder[]> {
+    return await db
+      .select()
+      .from(subscriptionReminders)
+      .where(and(
+        eq(subscriptionReminders.status, "pending"),
+        gt(subscriptionReminders.scheduledFor, new Date())
+      ))
+      .orderBy(subscriptionReminders.scheduledFor);
+  }
+
+  async markReminderSent(reminderId: string): Promise<void> {
+    await db
+      .update(subscriptionReminders)
+      .set({ 
+        status: "sent",
+        sentAt: new Date()
+      })
+      .where(eq(subscriptionReminders.id, reminderId));
   }
 
   async createPlantResult(result: InsertPlantResult): Promise<PlantResult> {
@@ -161,6 +300,41 @@ export class DatabaseStorage implements IStorage {
       .where(eq(blogPosts.id, id))
       .returning();
     return result;
+  }
+
+  // Enhanced Blog operations
+  async incrementBlogViewCount(blogPostId: string): Promise<void> {
+    await db
+      .update(blogPosts)
+      .set({ 
+        viewCount: sql`${blogPosts.viewCount} + 1`
+      })
+      .where(eq(blogPosts.id, blogPostId));
+  }
+
+  async logBlogView(view: InsertBlogView): Promise<BlogView> {
+    const [result] = await db
+      .insert(blogViews)
+      .values(view)
+      .returning();
+    return result;
+  }
+
+  async getBlogViewCount(blogPostId: string): Promise<number> {
+    const [result] = await db
+      .select({ count: blogPosts.viewCount })
+      .from(blogPosts)
+      .where(eq(blogPosts.id, blogPostId));
+    return result?.count || 0;
+  }
+
+  async getUserBlogHistory(userId: string, limit: number = 20): Promise<BlogView[]> {
+    return await db
+      .select()
+      .from(blogViews)
+      .where(eq(blogViews.userId, userId))
+      .orderBy(desc(blogViews.viewedAt))
+      .limit(limit);
   }
 
   async getCacheItem(key: string): Promise<CatalogCache | undefined> {

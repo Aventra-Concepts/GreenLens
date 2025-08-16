@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import Navigation from "@/components/Navigation";
+import { Layout } from "@/components/Layout";
 import HeroSection from "@/components/HeroSection";
 import MyGardenSection from "@/components/MyGardenSection";
+import { InArticleAd } from "@/components/AdSense";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -33,11 +34,16 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      <HeroSection />
-      <MyGardenSection />
+    <Layout showImageBanner={true} showSidebarAds={true}>
+      <div className="space-y-8">
+        <HeroSection />
+        
+        {/* In-article ad between sections */}
+        <InArticleAd />
+        
+        <MyGardenSection />
+      </div>
       <Footer />
-    </div>
+    </Layout>
   );
 }

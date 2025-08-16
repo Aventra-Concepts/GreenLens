@@ -1,19 +1,25 @@
-import Navigation from "@/components/Navigation";
+import { Layout } from "@/components/Layout";
 import HeroSection from "@/components/HeroSection";
 import PlantIdentifySection from "@/components/PlantIdentifySection";
 import PricingSection from "@/components/PricingSection";
 import BlogPreviewSection from "@/components/BlogPreviewSection";
+import { InArticleAd } from "@/components/AdSense";
 import Footer from "@/components/Footer";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      <HeroSection />
-      <PlantIdentifySection />
-      <PricingSection />
-      <BlogPreviewSection />
+    <Layout showImageBanner={true} showSidebarAds={true}>
+      <div className="space-y-8">
+        <HeroSection />
+        <PlantIdentifySection />
+        
+        {/* In-article ad between sections */}
+        <InArticleAd />
+        
+        <PricingSection />
+        <BlogPreviewSection />
+      </div>
       <Footer />
-    </div>
+    </Layout>
   );
 }

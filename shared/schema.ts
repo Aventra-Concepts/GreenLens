@@ -34,6 +34,12 @@ export const users = pgTable("users", {
   freeTierUsed: integer("free_tier_used").default(0), // Count of free identifications used
   freeTierStartedAt: timestamp("free_tier_started_at"), // When free tier started (for 7-day limit)
   preferredLanguage: varchar("preferred_language").default("en"), // User's preferred language for plant names
+  timezone: varchar("timezone").default("UTC"), // User's timezone preference
+  autoRenewalEnabled: boolean("auto_renewal_enabled").default(true), // Auto-renewal preference
+  subscriptionReminders: boolean("subscription_reminders").default(true), // Email reminders preference
+  marketingEmails: boolean("marketing_emails").default(false), // Marketing emails preference
+  lastLoginAt: timestamp("last_login_at"), // Track last login
+  loginCount: integer("login_count").default(0), // Track total logins
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -69,6 +75,37 @@ export const plantResults = pgTable("plant_results", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// User browsing history table (with indexes)
+export const userActivity = pgTable("user_activity", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  action: varchar("action").notNull(), // page_view, plant_identify, download_pdf, subscription_purchase, etc.
+  page: varchar("page"), // page or route visited
+  details: jsonb("details"), // additional action details
+  ipAddress: varchar("ip_address"),
+  userAgent: varchar("user_agent"),
+  timezone: varchar("timezone").default("UTC"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  userIdIdx: index("IDX_user_activity_user_id").on(table.userId),
+  actionIdx: index("IDX_user_activity_action").on(table.action),
+  createdAtIdx: index("IDX_user_activity_created_at").on(table.createdAt),
+}));
+
+// User preferences table (with indexes)
+export const userPreferences = pgTable("user_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  category: varchar("category").notNull(), // ui, notifications, privacy, etc.
+  key: varchar("key").notNull(), // specific preference key
+  value: jsonb("value").notNull(), // preference value
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  userIdIdx: index("IDX_user_preferences_user_id").on(table.userId),
+  categoryIdx: index("IDX_user_preferences_category").on(table.category),
+}));
+
 // Blog post table
 export const blogPosts = pgTable("blog_posts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -79,9 +116,45 @@ export const blogPosts = pgTable("blog_posts", {
   category: varchar("category"),
   published: boolean("published").default(false),
   authorId: varchar("author_id").references(() => users.id),
+  publishedAt: timestamp("published_at"), // When the blog was published
+  readingTime: integer("reading_time"), // Estimated reading time in minutes
+  tags: jsonb("tags"), // Array of tags
+  featuredImage: varchar("featured_image"), // Featured image URL
+  viewCount: integer("view_count").default(0), // Track blog post views
+  likeCount: integer("like_count").default(0), // Track blog post likes
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Blog post views table for tracking individual user views (with indexes)
+export const blogViews = pgTable("blog_views", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  blogPostId: varchar("blog_post_id").notNull().references(() => blogPosts.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  ipAddress: varchar("ip_address"),
+  timezone: varchar("timezone").default("UTC"),
+  viewedAt: timestamp("viewed_at").defaultNow(),
+}, (table) => ({
+  blogPostIdIdx: index("IDX_blog_views_blog_post_id").on(table.blogPostId),
+  userIdIdx: index("IDX_blog_views_user_id").on(table.userId),
+  viewedAtIdx: index("IDX_blog_views_viewed_at").on(table.viewedAt),
+}));
+
+// Subscription reminders table (with indexes)
+export const subscriptionReminders = pgTable("subscription_reminders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  subscriptionId: varchar("subscription_id").notNull().references(() => subscriptions.id, { onDelete: "cascade" }),
+  reminderType: varchar("reminder_type").notNull(), // renewal_due, payment_failed, trial_ending, etc.
+  sentAt: timestamp("sent_at"),
+  scheduledFor: timestamp("scheduled_for").notNull(),
+  status: varchar("status").default("pending"), // pending, sent, failed
+  emailContent: text("email_content"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  subscriptionIdIdx: index("IDX_subscription_reminders_subscription_id").on(table.subscriptionId),
+  scheduledForIdx: index("IDX_subscription_reminders_scheduled_for").on(table.scheduledFor),
+  statusIdx: index("IDX_subscription_reminders_status").on(table.status),
+}));
 
 // Catalog cache table for API responses
 export const catalogCache = pgTable("catalog_cache", {
@@ -122,6 +195,27 @@ export const insertCatalogCacheSchema = createInsertSchema(catalogCache).omit({
   createdAt: true,
 });
 
+export const insertUserActivitySchema = createInsertSchema(userActivity).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserPreferencesSchema = createInsertSchema(userPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertBlogViewSchema = createInsertSchema(blogViews).omit({
+  id: true,
+  viewedAt: true,
+});
+
+export const insertSubscriptionReminderSchema = createInsertSchema(subscriptionReminders).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -133,3 +227,11 @@ export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type InsertCatalogCache = z.infer<typeof insertCatalogCacheSchema>;
 export type CatalogCache = typeof catalogCache.$inferSelect;
+export type InsertUserActivity = z.infer<typeof insertUserActivitySchema>;
+export type UserActivity = typeof userActivity.$inferSelect;
+export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type InsertBlogView = z.infer<typeof insertBlogViewSchema>;
+export type BlogView = typeof blogViews.$inferSelect;
+export type InsertSubscriptionReminder = z.infer<typeof insertSubscriptionReminderSchema>;
+export type SubscriptionReminder = typeof subscriptionReminders.$inferSelect;

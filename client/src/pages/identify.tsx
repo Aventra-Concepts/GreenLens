@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useLocation } from "wouter";
-import Navigation from "@/components/Navigation";
+import { Layout } from "@/components/Layout";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -117,14 +117,12 @@ export default function Identify() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
+    <Layout showImageBanner={false} showSidebarAds={false}>
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-12">
-            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">Identify Your Plant</h1>
-            <p className="text-lg text-gray-600">Upload up to 3 photos for the most accurate identification</p>
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">Identify Your Plant</h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300">Upload up to 3 photos for the most accurate identification</p>
           </div>
 
           <Card className="mb-8">
@@ -257,8 +255,7 @@ export default function Identify() {
           </div>
         </div>
       </section>
-
       <Footer />
-    </div>
+    </Layout>
   );
 }

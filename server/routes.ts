@@ -11,6 +11,7 @@ import { pdfService } from "./services/pdf";
 import { paymentService } from "./services/payments";
 import { plantNamesService } from "./services/plantNames";
 import { insertPlantResultSchema, insertBlogPostSchema } from "@shared/schema";
+import { trackUserLogin, trackPlantIdentification, trackSubscriptionPurchase, trackPdfDownload } from "./middleware/activityTracker";
 
 // Configure multer for file uploads
 const upload = multer({
