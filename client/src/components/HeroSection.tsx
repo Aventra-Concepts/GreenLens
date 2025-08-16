@@ -23,21 +23,21 @@ export default function HeroSection() {
                 <div>disease diagnosis powered by advanced <span className="text-green-600 font-semibold">GreenLens AI Technology</span>.</div>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href={isAuthenticated ? "/identify" : "/api/login"}>
                 <Button 
-                  size="lg"
-                  className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform"
+                  size="default"
+                  className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium text-base transition-colors shadow-md hover:shadow-lg transform hover:scale-105 transition-transform"
                   data-testid="upload-plant-photo-button"
                 >
-                  <Upload className="w-5 h-5 mr-2" />
+                  <Upload className="w-4 h-4 mr-2" />
                   Upload Plant Photo
                 </Button>
               </Link>
               <Button 
                 variant="outline"
-                size="lg"
-                className="border-green-500 text-green-600 hover:bg-green-50 px-8 py-4 rounded-xl font-semibold text-lg transition-colors"
+                size="default"
+                className="border-green-500 text-green-600 hover:bg-green-50 px-6 py-3 rounded-lg font-medium text-base transition-colors"
                 data-testid="view-sample-report-button"
               >
                 View Sample Report
