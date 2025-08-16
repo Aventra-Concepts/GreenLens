@@ -6,6 +6,13 @@ GreenLens is a production-grade web application that leverages AI technology to 
 
 ## Recent Updates (August 2025)
 
+### UI/UX Redesign (August 16, 2025)
+- **Enhanced Banner Transparency**: Increased background image opacity for better visual appeal
+- **Streamlined Banner Interface**: Simplified banner text from "AI Plant Identification" to "Quick Upload"
+- **Redesigned Plant Identification Section**: Complete overhaul with modern gradient backgrounds, improved layout, and enhanced user experience
+- **Visual Benefits Showcase**: Added feature cards highlighting 99% accuracy, personalized care guides, and instant results
+- **Multiple Image Upload Emphasis**: Clear messaging encouraging 2-3 photos for optimal accuracy
+
 ### Free Tier System
 - **3 Free Identifications**: New users get 3 free plant identifications
 - **7-Day Validity**: Free tier expires after 7 days from first use

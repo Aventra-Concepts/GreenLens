@@ -135,7 +135,7 @@ export function ImageUploadBanner() {
   return (
     <Card className="h-full bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200 dark:border-green-800 shadow-lg relative overflow-hidden">
       {/* Background Image - Admin Configurable */}
-      <div className="absolute inset-0 opacity-20 dark:opacity-10">
+      <div className="absolute inset-0 opacity-30 dark:opacity-15">
         <div 
           className="h-full w-full bg-cover bg-center bg-no-repeat"
           style={{ 
@@ -178,7 +178,7 @@ export function ImageUploadBanner() {
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-green-900 dark:text-green-100">
-                    AI Plant Identification
+                    Quick Upload
                   </h3>
                   <p className="text-xs text-green-700 dark:text-green-300">
                     Upload up to 3 photos for 99% accuracy
