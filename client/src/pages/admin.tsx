@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,8 +14,18 @@ import { Settings, Image, Type, Save, DollarSign } from "lucide-react";
 import PricingManagement from "@/components/PricingManagement";
 
 export default function Admin() {
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Check admin authentication
+  useEffect(() => {
+    const isAdminAuthenticated = sessionStorage.getItem("adminAuthenticated");
+    if (!isAdminAuthenticated) {
+      setLocation("/admin-login");
+      return;
+    }
+  }, [setLocation]);
   const [formData, setFormData] = useState({
     imageUrl: "",
     heading: "",

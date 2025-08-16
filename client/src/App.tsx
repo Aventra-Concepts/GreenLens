@@ -12,6 +12,7 @@ import Result from "@/pages/result";
 import Pricing from "@/pages/pricing";
 import Account from "@/pages/account";
 import Admin from "@/pages/admin";
+import AdminLogin from "@/pages/admin-login";
 import Features from "@/pages/features";
 import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/reviews" component={Reviews} />
+      <Route path="/admin-login" component={AdminLogin} />
       <Route component={NotFound} />
     </Switch>
   );

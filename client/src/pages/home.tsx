@@ -6,6 +6,8 @@ import { InArticleAd } from "@/components/AdSense";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { PoweredBySection } from "@/components/PoweredBySection";
+import { GardeningToolsSection } from "@/components/GardeningToolsSection";
 
 export default function Home() {
   const { toast } = useToast();
@@ -38,8 +40,14 @@ export default function Home() {
       <div className="space-y-8">
         <HeroSection />
         
+        {/* Powered by GreenLens AI Technology section */}
+        <PoweredBySection />
+        
         {/* In-article ad between sections */}
         <InArticleAd />
+        
+        {/* Gardening tools and soil preparation section */}
+        <GardeningToolsSection />
         
         <MyGardenSection />
       </div>

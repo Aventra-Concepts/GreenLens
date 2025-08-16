@@ -591,6 +591,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Powered by section settings
+  app.get("/api/admin/powered-by-settings", async (req, res) => {
+    try {
+      const [title, description, features] = await Promise.all([
+        storage.getAdminSetting('powered_by_title'),
+        storage.getAdminSetting('powered_by_description'),
+        storage.getAdminSetting('powered_by_features')
+      ]);
+      
+      res.json({
+        title: title?.settingValue || "Powered by GreenLens AI Technology",
+        description: description?.settingValue || "Experience the future of plant identification with our cutting-edge artificial intelligence system",
+        features: features?.settingValue ? JSON.parse(features.settingValue) : [
+          "Advanced AI Plant Recognition",
+          "99.5% Accuracy Rate", 
+          "Real-time Disease Detection",
+          "Personalized Care Plans"
+        ],
+      });
+    } catch (error) {
+      console.error("Error fetching powered by settings:", error);
+      res.status(500).json({ error: "Failed to fetch powered by settings" });
+    }
+  });
+
+  // Gardening content settings
+  app.get("/api/admin/gardening-content", async (req, res) => {
+    try {
+      const [sectionTitle, sectionDescription, tools, soilPreparation] = await Promise.all([
+        storage.getAdminSetting('gardening_section_title'),
+        storage.getAdminSetting('gardening_section_description'),
+        storage.getAdminSetting('gardening_tools'),
+        storage.getAdminSetting('soil_preparation')
+      ]);
+      
+      res.json({
+        sectionTitle: sectionTitle?.settingValue || "Gardening Tools & Soil Preparation",
+        sectionDescription: sectionDescription?.settingValue || "Everything you need for successful gardening, from essential tools to expert soil preparation techniques",
+        tools: tools?.settingValue ? JSON.parse(tools.settingValue) : null,
+        soilPreparation: soilPreparation?.settingValue ? JSON.parse(soilPreparation.settingValue) : null,
+      });
+    } catch (error) {
+      console.error("Error fetching gardening content:", error);
+      res.status(500).json({ error: "Failed to fetch gardening content" });
+    }
+  });
+
   // Plant analysis routes
   app.post("/api/plant-analysis/analyze", isAuthenticated, upload.array('images', 3), async (req: any, res) => {
     try {
