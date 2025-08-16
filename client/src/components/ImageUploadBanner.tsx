@@ -135,9 +135,9 @@ export function ImageUploadBanner() {
   return (
     <Card className="h-full bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200 dark:border-green-800 shadow-lg">
       <div className="h-full flex flex-col justify-center items-center px-6 py-8">
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white text-center mb-4 leading-tight">
-          <div>Accurately Identify Your Plant</div>
-          <div>With our <span className="text-green-600">GreenLens-Powered AI</span> System</div>
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white text-center mb-4 leading-tight">
+          <div>Accurately Identify Your Plant With Our</div>
+          <div><span className="text-green-600">GreenLens-Powered AI</span> System</div>
         </h2>
         <h4 className="text-sm sm:text-base text-gray-700 dark:text-gray-300 text-center max-w-4xl">
           Upload a plant photo and get Instant Plant Identification
