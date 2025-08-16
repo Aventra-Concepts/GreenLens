@@ -144,15 +144,32 @@ export function ImageUploadBanner() {
         ></div>
       </div>
       
-      <div className="h-full flex items-center justify-between px-4 py-3 relative z-10">
-        {/* Left Section - Upload Area */}
-        <div className="flex-1">
+      <div className="h-full flex flex-col justify-center px-6 py-4 relative z-10">
+        {/* Main Header Section */}
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-2 bg-green-200/80 text-green-800 px-3 py-1 rounded-full text-xs font-medium mb-3">
+            <span className="w-1.5 h-1.5 bg-green-600 rounded-full animate-pulse"></span>
+            AI-Powered Plant Recognition
+          </div>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 dark:text-gray-100 leading-tight mb-2">
+            Discover Your Plant's
+            <span className="block text-green-700 dark:text-green-400">Identity & Care Needs</span>
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Upload multiple photos from different angles for the most accurate identification. 
+            Our advanced AI analyzes your plant and provides personalized care recommendations.
+          </p>
+        </div>
+
+        {/* Upload Section */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          {/* Upload Area */}
           <div 
             className={`
-              relative border-2 border-dashed rounded-lg transition-all duration-200 h-20 
+              relative border-2 border-dashed rounded-lg transition-all duration-200 px-6 py-3 cursor-pointer
               ${isDragging 
-                ? 'border-green-400 bg-green-100 dark:bg-green-900' 
-                : 'border-green-300 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900'
+                ? 'border-green-400 bg-green-100/80 dark:bg-green-900/50' 
+                : 'border-green-300 hover:border-green-400 hover:bg-green-50/80 dark:hover:bg-green-900/30'
               }
             `}
             onDrop={handleDrop}
@@ -171,60 +188,56 @@ export function ImageUploadBanner() {
               data-testid="banner-file-input"
             />
             
-            <div className="h-full flex items-center justify-center space-x-3 cursor-pointer">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                  <Camera className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-green-900 dark:text-green-100">
-                    Quick Upload
-                  </h3>
-                  <p className="text-xs text-green-700 dark:text-green-300">
-                    Upload up to 3 photos for 99% accuracy
-                  </p>
-                </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                <Camera className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                  Quick Upload
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Upload up to 3 photos for 99% accuracy
+                </p>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Middle Section - Uploaded Files Preview */}
-        {uploadedFiles.length > 0 && (
-          <div className="flex items-center space-x-2 mx-4">
-            <div className="flex space-x-1">
-              {uploadedFiles.slice(0, 3).map((file, index) => (
-                <div key={index} className="relative group">
-                  <div className="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-md border border-green-300 dark:border-green-600 flex items-center justify-center">
-                    <Upload className="w-3 h-3 text-green-600 dark:text-green-300" />
+          {/* File Preview */}
+          {uploadedFiles.length > 0 && (
+            <div className="flex items-center space-x-2">
+              <div className="flex space-x-1">
+                {uploadedFiles.slice(0, 3).map((file, index) => (
+                  <div key={index} className="relative group">
+                    <div className="w-8 h-8 bg-green-100 dark:bg-green-800 rounded-md border border-green-300 dark:border-green-600 flex items-center justify-center">
+                      <Upload className="w-3 h-3 text-green-600 dark:text-green-300" />
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFile(index);
+                      }}
+                      className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      data-testid={`remove-file-${index}`}
+                    >
+                      <X className="w-1.5 h-1.5 text-white" />
+                    </button>
                   </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFile(index);
-                    }}
-                    className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    data-testid={`remove-file-${index}`}
-                  >
-                    <X className="w-1.5 h-1.5 text-white" />
-                  </button>
-                </div>
-              ))}
+                ))}
+              </div>
+              <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                {uploadedFiles.length} image{uploadedFiles.length !== 1 ? 's' : ''} ready
+              </span>
             </div>
-            <span className="text-xs text-green-700 dark:text-green-300 font-medium">
-              {uploadedFiles.length} image{uploadedFiles.length !== 1 ? 's' : ''} ready
-            </span>
-          </div>
-        )}
+          )}
 
-        {/* Right Section - Action Button */}
-        <div className="flex items-center space-x-3">
+          {/* Action Button */}
           {uploadedFiles.length > 0 && (
             <Button
               onClick={handleQuickAnalyze}
               disabled={identifyMutation.isPending}
               size="sm"
-              className="bg-green-500 hover:bg-green-600 text-white text-xs font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-200 hover:shadow-md"
+              className="bg-green-600 hover:bg-green-700 text-white text-xs font-medium px-3 py-2 rounded-md shadow-sm transition-all duration-200 hover:shadow-md"
               data-testid="quick-analyze-button"
             >
               {identifyMutation.isPending ? (
@@ -240,6 +253,22 @@ export function ImageUploadBanner() {
               )}
             </Button>
           )}
+        </div>
+
+        {/* Benefits Section */}
+        <div className="flex flex-wrap justify-center gap-4 mt-4">
+          <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
+            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+            99% Accuracy Rate
+          </div>
+          <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
+            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+            Personalized Care Guide
+          </div>
+          <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
+            <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+            Instant Results
+          </div>
         </div>
       </div>
     </Card>
