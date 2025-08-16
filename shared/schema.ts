@@ -9,6 +9,7 @@ import {
   boolean,
   integer,
   real,
+  decimal,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -68,8 +69,13 @@ export const plantResults = pgTable("plant_results", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   imageUrls: text("image_urls").array(),
-  species: jsonb("species"), // Common name, scientific name, confidence
+  species: text("species"), // Scientific name
+  commonName: text("common_name"), // Common name
+  confidence: decimal("confidence", { precision: 5, scale: 4 }),
+  healthStatus: varchar("health_status", { length: 50 }),
+  diseaseDetected: boolean("disease_detected"),
   careInstructions: text("care_instructions"),
+  analysisData: jsonb("analysis_data"), // Full analysis result JSON
   healthAssessment: jsonb("health_assessment"),
   diseaseInfo: jsonb("disease_info"),
   pdfReportUrl: varchar("pdf_report_url"),
@@ -218,3 +224,49 @@ export const adminSettings = pgTable("admin_settings", {
 
 export type AdminSettings = typeof adminSettings.$inferSelect;
 export type InsertAdminSettings = typeof adminSettings.$inferInsert;
+
+// Admin pricing settings for plant analysis fees
+export const pricingSettings = pgTable("pricing_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  featureName: varchar("feature_name").unique().notNull(), // 'plant_analysis', 'pdf_report'
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default('USD'),
+  description: text("description"),
+  isActive: boolean("is_active").default(true),
+  lastUpdatedBy: varchar("last_updated_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type PricingSettings = typeof pricingSettings.$inferSelect;
+export const insertPricingSettingsSchema = createInsertSchema(pricingSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertPricingSettings = z.infer<typeof insertPricingSettingsSchema>;
+
+// Payment transactions for plant analysis
+export const payments = pgTable("payments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  plantResultId: varchar("plant_result_id").references(() => plantResults.id, { onDelete: "cascade" }),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default('USD'),
+  paymentProvider: varchar("payment_provider").notNull(), // 'stripe', 'razorpay', 'cashfree'
+  transactionId: varchar("transaction_id").unique(),
+  status: varchar("status").notNull().default('pending'), // 'pending', 'completed', 'failed', 'refunded'
+  featureType: varchar("feature_type").notNull(), // 'plant_analysis', 'pdf_report'
+  paymentData: jsonb("payment_data"), // Provider-specific data
+  analysisId: varchar("analysis_id"), // Link to plant analysis
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type Payment = typeof payments.$inferSelect;
+export const insertPaymentSchema = createInsertSchema(payments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;

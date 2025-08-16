@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Settings, Image, Type, Save } from "lucide-react";
+import { Settings, Image, Type, Save, DollarSign } from "lucide-react";
+import PricingManagement from "@/components/PricingManagement";
 
 export default function Admin() {
   const { toast } = useToast();
@@ -121,11 +123,24 @@ export default function Admin() {
               </h1>
             </div>
             <p className="text-gray-600 dark:text-gray-400">
-              Manage banner content and appearance settings
+              Manage banner content, pricing, and system settings
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <Tabs defaultValue="banner" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="banner" className="flex items-center gap-2">
+                <Image className="w-4 h-4" />
+                Banner Settings
+              </TabsTrigger>
+              <TabsTrigger value="pricing" className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4" />
+                Pricing Management
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="banner">
+              <form onSubmit={handleSubmit} className="space-y-6">
             {/* Banner Image Settings */}
             <Card>
               <CardHeader>
@@ -245,7 +260,13 @@ export default function Admin() {
                 )}
               </Button>
             </div>
-          </form>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="pricing">
+              <PricingManagement />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </Layout>

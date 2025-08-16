@@ -10,6 +10,8 @@ import {
   subscriptionReminders,
   reviews,
   adminSettings,
+  pricingSettings,
+  payments,
   type User,
   type UpsertUser,
   type Subscription,
@@ -32,6 +34,10 @@ import {
   type InsertReview,
   type AdminSettings,
   type InsertAdminSettings,
+  type PricingSettings,
+  type InsertPricingSettings,
+  type Payment,
+  type InsertPayment,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, sql, desc } from "drizzle-orm";
@@ -100,6 +106,21 @@ export interface IStorage {
   setAdminSetting(setting: InsertAdminSettings): Promise<AdminSettings>;
   updateAdminSetting(key: string, value: string, updatedBy?: string): Promise<AdminSettings>;
   deleteAdminSetting(key: string): Promise<void>;
+  
+  // Pricing settings operations
+  getPricingSettings(): Promise<PricingSettings[]>;
+  getAllPricingSettings(): Promise<PricingSettings[]>;
+  getPricingSetting(featureName: string): Promise<PricingSettings | undefined>;
+  createPricingSetting(setting: InsertPricingSettings): Promise<PricingSettings>;
+  updatePricingSetting(id: string, updates: Partial<PricingSettings>): Promise<PricingSettings>;
+  deletePricingSetting(id: string): Promise<boolean>;
+  getPricingByFeature(featureName: string): Promise<PricingSettings | undefined>;
+  
+  // Payment operations
+  createPayment(payment: InsertPayment): Promise<Payment>;
+  getPayment(id: string): Promise<Payment | undefined>;
+  updatePayment(id: string, updates: Partial<Payment>): Promise<Payment>;
+  getUserPayments(userId: string): Promise<Payment[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -565,6 +586,90 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(adminSettings)
       .where(eq(adminSettings.settingKey, key));
+  }
+
+  // Pricing settings operations
+  async getPricingSettings(): Promise<PricingSettings[]> {
+    return await db.select().from(pricingSettings).orderBy(pricingSettings.featureName);
+  }
+
+  async getPricingSetting(featureName: string): Promise<PricingSettings | undefined> {
+    const [setting] = await db
+      .select()
+      .from(pricingSettings)
+      .where(eq(pricingSettings.featureName, featureName));
+    return setting;
+  }
+
+  async createPricingSetting(setting: InsertPricingSettings): Promise<PricingSettings> {
+    const [result] = await db
+      .insert(pricingSettings)
+      .values(setting)
+      .returning();
+    return result;
+  }
+
+  async updatePricingSetting(id: string, updates: Partial<PricingSettings>): Promise<PricingSettings> {
+    const [result] = await db
+      .update(pricingSettings)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(pricingSettings.id, id))
+      .returning();
+    return result;
+  }
+
+  // Payment operations
+  async createPayment(payment: InsertPayment): Promise<Payment> {
+    const [result] = await db
+      .insert(payments)
+      .values(payment)
+      .returning();
+    return result;
+  }
+
+  async getPayment(id: string): Promise<Payment | undefined> {
+    const [payment] = await db
+      .select()
+      .from(payments)
+      .where(eq(payments.id, id));
+    return payment;
+  }
+
+  async updatePayment(id: string, updates: Partial<Payment>): Promise<Payment> {
+    const [result] = await db
+      .update(payments)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(payments.id, id))
+      .returning();
+    return result;
+  }
+
+  async getUserPayments(userId: string): Promise<Payment[]> {
+    return await db
+      .select()
+      .from(payments)
+      .where(eq(payments.userId, userId))
+      .orderBy(desc(payments.createdAt));
+  }
+
+  // Missing pricing setting methods
+  async deletePricingSetting(id: string): Promise<boolean> {
+    const result = await db
+      .delete(pricingSettings)
+      .where(eq(pricingSettings.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getAllPricingSettings(): Promise<PricingSettings[]> {
+    return db.select().from(pricingSettings).orderBy(pricingSettings.createdAt);
+  }
+
+  async getPricingByFeature(featureName: string): Promise<PricingSettings | undefined> {
+    const [setting] = await db
+      .select()
+      .from(pricingSettings)
+      .where(and(eq(pricingSettings.featureName, featureName), eq(pricingSettings.isActive, true)));
+    return setting;
   }
 }
 

@@ -10,6 +10,8 @@ import { carePlannerService } from "./services/carePlanner";
 import { pdfService } from "./services/pdf";
 import { paymentService } from "./services/payments";
 import { plantNamesService } from "./services/plantNames";
+import { PlantAnalysisService } from "./services/plantAnalysisService";
+import { PDFReportService } from "./services/pdfReportService";
 import { insertPlantResultSchema, insertBlogPostSchema, insertReviewSchema } from "@shared/schema";
 import { trackUserLogin, trackPlantIdentification, trackSubscriptionPurchase, trackPdfDownload } from "./middleware/activityTracker";
 
@@ -586,6 +588,249 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating banner image:", error);
       res.status(500).json({ message: "Failed to update banner image" });
+    }
+  });
+
+  // Plant analysis routes
+  app.post("/api/plant-analysis/analyze", isAuthenticated, upload.array('images', 3), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const files = req.files as Express.Multer.File[];
+      
+      if (!files || files.length === 0) {
+        return res.status(400).json({ error: "No images provided" });
+      }
+
+      // Check free tier eligibility
+      const eligibility = await storage.checkFreeTierEligibility(userId);
+      if (!eligibility.eligible) {
+        return res.status(402).json({ 
+          error: "Free tier limit reached",
+          message: "You have used all 3 free plant identifications. Please upgrade to continue.",
+          upgradRequired: true
+        });
+      }
+
+      // Convert images to base64
+      const imageBase64Array = files.map(file => file.buffer.toString('base64'));
+      
+      // Use PlantAnalysisService to analyze the plant
+      const analysisService = new PlantAnalysisService();
+      const analysisResult = await analysisService.analyzeImages(imageBase64Array);
+      
+      // Save analysis result to database
+      const plantResult = await storage.createPlantResult({
+        userId,
+        species: analysisResult.species.scientific,
+        commonName: analysisResult.species.common,
+        confidence: analysisResult.species.confidence,
+        healthStatus: analysisResult.healthAssessment.isHealthy ? 'healthy' : 'unhealthy',
+        diseaseDetected: analysisResult.healthAssessment.diseases?.length > 0,
+        careInstructions: analysisResult.careInstructions,
+        analysisData: JSON.stringify(analysisResult),
+        isFreeIdentification: true,
+      });
+
+      // Increment free tier usage
+      await storage.incrementFreeTierUsage(userId);
+
+      res.json({
+        success: true,
+        analysisId: plantResult.id,
+        ...analysisResult
+      });
+
+    } catch (error) {
+      console.error("Plant analysis error:", error);
+      res.status(500).json({ 
+        error: "Analysis failed", 
+        message: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  // PDF download route
+  app.post("/api/plant-analysis/download-pdf", isAuthenticated, async (req: any, res) => {
+    try {
+      const { analysisId } = req.body;
+      const userId = req.user.claims.sub;
+      
+      if (!analysisId) {
+        return res.status(400).json({ error: "Analysis ID required" });
+      }
+
+      // Get the analysis result
+      const plantResult = await storage.getPlantResult(analysisId);
+      if (!plantResult || plantResult.userId !== userId) {
+        return res.status(404).json({ error: "Analysis not found" });
+      }
+
+      // Check if user needs to pay for PDF (not for free tier users initially)
+      const pdfPricing = await storage.getPricingSetting("PDF_REPORT");
+      if (pdfPricing && pdfPricing.isActive && parseFloat(pdfPricing.price) > 0) {
+        // For paid PDF reports, check if user has already paid
+        const existingPayment = await storage.getUserPayments(userId);
+        const pdfPayment = existingPayment.find(p => 
+          p.analysisId === analysisId && p.status === 'completed'
+        );
+        
+        if (!pdfPayment) {
+          return res.status(402).json({
+            error: "Payment required",
+            message: `PDF report costs ${pdfPricing.currency} ${pdfPricing.price}`,
+            pricing: pdfPricing,
+            paymentRequired: true
+          });
+        }
+      }
+
+      // Parse analysis data
+      const analysisData = JSON.parse(plantResult.analysisData || '{}');
+      
+      // Get user info
+      const user = await storage.getUser(userId);
+      
+      // Generate PDF
+      const pdfService = new PDFReportService();
+      const pdfBuffer = await pdfService.generatePlantAnalysisReport(
+        {
+          id: plantResult.id,
+          ...analysisData
+        },
+        { email: user?.email }
+      );
+
+      // Set headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="plant-analysis-${plantResult.id}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      
+      res.send(pdfBuffer);
+
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      res.status(500).json({ 
+        error: "PDF generation failed", 
+        message: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  // Admin pricing management routes
+  app.get("/api/admin/pricing-settings", isAuthenticated, async (req: any, res) => {
+    try {
+      const settings = await storage.getPricingSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching pricing settings:", error);
+      res.status(500).json({ error: "Failed to fetch pricing settings" });
+    }
+  });
+
+  app.put("/api/admin/pricing-settings/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      const userId = req.user.claims.sub;
+      
+      const updatedSetting = await storage.updatePricingSetting(id, {
+        ...updates,
+        lastUpdatedBy: userId,
+      });
+      
+      res.json(updatedSetting);
+    } catch (error) {
+      console.error("Error updating pricing setting:", error);
+      res.status(500).json({ error: "Failed to update pricing setting" });
+    }
+  });
+
+  app.post("/api/admin/pricing-settings", isAuthenticated, async (req: any, res) => {
+    try {
+      const settingData = req.body;
+      const userId = req.user.claims.sub;
+      
+      const newSetting = await storage.createPricingSetting({
+        ...settingData,
+        lastUpdatedBy: userId,
+      });
+      
+      res.json(newSetting);
+    } catch (error) {
+      console.error("Error creating pricing setting:", error);
+      res.status(500).json({ error: "Failed to create pricing setting" });
+    }
+  });
+
+  // Admin pricing management routes
+  app.get("/api/admin/pricing", isAuthenticated, async (req: any, res) => {
+    try {
+      const pricingSettings = await storage.getAllPricingSettings();
+      res.json(pricingSettings);
+    } catch (error) {
+      console.error("Error fetching pricing settings:", error);
+      res.status(500).json({ message: "Failed to fetch pricing settings" });
+    }
+  });
+
+  app.post("/api/admin/pricing", isAuthenticated, async (req: any, res) => {
+    try {
+      const { featureName, price, currency, description, isActive } = req.body;
+      
+      if (!featureName || !price) {
+        return res.status(400).json({ message: "Feature name and price are required" });
+      }
+
+      const pricingSetting = await storage.createPricingSetting({
+        featureName,
+        price,
+        currency: currency || 'USD',
+        description,
+        isActive: isActive !== undefined ? isActive : true,
+        lastUpdatedBy: req.user.claims.sub,
+      });
+
+      res.json(pricingSetting);
+    } catch (error) {
+      console.error("Error creating pricing setting:", error);
+      res.status(500).json({ message: "Failed to create pricing setting" });
+    }
+  });
+
+  app.put("/api/admin/pricing/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = {
+        ...req.body,
+        lastUpdatedBy: req.user.claims.sub,
+      };
+
+      const pricingSetting = await storage.updatePricingSetting(id, updateData);
+      
+      if (!pricingSetting) {
+        return res.status(404).json({ message: "Pricing setting not found" });
+      }
+
+      res.json(pricingSetting);
+    } catch (error) {
+      console.error("Error updating pricing setting:", error);
+      res.status(500).json({ message: "Failed to update pricing setting" });
+    }
+  });
+
+  app.delete("/api/admin/pricing/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await storage.deletePricingSetting(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Pricing setting not found" });
+      }
+
+      res.json({ message: "Pricing setting deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting pricing setting:", error);
+      res.status(500).json({ message: "Failed to delete pricing setting" });
     }
   });
 
