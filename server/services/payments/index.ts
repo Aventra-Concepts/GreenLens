@@ -1,7 +1,3 @@
-import { stripePayment } from './stripe';
-import { razorpayPayment } from './razorpay';
-import { cashfreePayment } from './cashfree';
-
 export interface PaymentProvider {
   createCheckout(params: {
     userId: string;
@@ -21,9 +17,39 @@ class PaymentService {
   private providers: Map<string, PaymentProvider> = new Map();
 
   constructor() {
-    this.providers.set('stripe', stripePayment);
-    this.providers.set('razorpay', razorpayPayment);
-    this.providers.set('cashfree', cashfreePayment);
+    // Providers are loaded lazily when needed
+  }
+
+  private async getProvider(providerName: string): Promise<PaymentProvider> {
+    if (this.providers.has(providerName)) {
+      return this.providers.get(providerName)!;
+    }
+
+    let provider: PaymentProvider;
+    
+    try {
+      switch (providerName) {
+        case 'stripe':
+          const { stripePayment } = await import('./stripe');
+          provider = stripePayment;
+          break;
+        case 'razorpay':
+          const { razorpayPayment } = await import('./razorpay');
+          provider = razorpayPayment;
+          break;
+        case 'cashfree':
+          const { cashfreePayment } = await import('./cashfree');
+          provider = cashfreePayment;
+          break;
+        default:
+          throw new Error(`Payment provider ${providerName} not supported`);
+      }
+
+      this.providers.set(providerName, provider);
+      return provider;
+    } catch (error) {
+      throw new Error(`Failed to load payment provider ${providerName}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   async createCheckout(providerName: string, params: {
@@ -31,29 +57,17 @@ class PaymentService {
     userEmail: string;
     planId: string;
   }): Promise<string> {
-    const provider = this.providers.get(providerName);
-    if (!provider) {
-      throw new Error(`Payment provider ${providerName} not supported`);
-    }
-
+    const provider = await this.getProvider(providerName);
     return provider.createCheckout(params);
   }
 
   async handleWebhook(providerName: string, body: any, headers: any): Promise<void> {
-    const provider = this.providers.get(providerName);
-    if (!provider) {
-      throw new Error(`Payment provider ${providerName} not supported`);
-    }
-
+    const provider = await this.getProvider(providerName);
     return provider.handleWebhook(body, headers);
   }
 
   async getSubscriptionStatus(providerName: string, subscriptionId: string) {
-    const provider = this.providers.get(providerName);
-    if (!provider) {
-      throw new Error(`Payment provider ${providerName} not supported`);
-    }
-
+    const provider = await this.getProvider(providerName);
     return provider.getSubscriptionStatus(subscriptionId);
   }
 
@@ -61,7 +75,7 @@ class PaymentService {
     // Return the first available provider based on environment variables
     if (process.env.STRIPE_SECRET_KEY) return 'stripe';
     if (process.env.RAZORPAY_KEY_SECRET) return 'razorpay';
-    if (process.env.CASHFREE_SECRET_KEY) return 'cashfree';
+    if (process.env.CASHFREE_CLIENT_SECRET) return 'cashfree';
     
     throw new Error('No payment providers configured');
   }

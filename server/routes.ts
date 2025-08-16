@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { plantIdService } from "./services/plantId";
+// plantIdService imported lazily when needed
 import { plantsCatalogService } from "./services/plantsCatalog";
 import { geminiService } from "./services/gemini";
 import { carePlannerService } from "./services/carePlanner";
@@ -88,6 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Step 2: Plant identification with Plant.id
+      const { plantIdService } = await import("./services/plantId");
       const identification = await plantIdService.identifyPlant(images);
       if (!identification.species || identification.confidence < 0.1) {
         return res.status(400).json({ 
