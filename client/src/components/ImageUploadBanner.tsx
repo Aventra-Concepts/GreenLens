@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { Camera, Upload, Zap, X } from "lucide-react";
-import botanicalBgUrl from "@assets/generated_images/Bright_botanical_banner_background_7e35e959.png";
+import botanicalBgUrl from "@assets/generated_images/Cool_minimal_botanical_background_3aaa9e09.png";
 
 export function ImageUploadBanner() {
   const [, setLocation] = useLocation();
@@ -148,22 +148,11 @@ export function ImageUploadBanner() {
       
       <div className="h-full flex flex-col justify-center items-center px-6 py-8 relative z-10">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-4 leading-tight drop-shadow-lg">
-          {bannerSettings?.heading ? (
-            <div dangerouslySetInnerHTML={{ 
-              __html: bannerSettings.heading.replace(
-                /GreenLens-Powered AI/g, 
-                '<span class="text-green-300">GreenLens-Powered AI</span>'
-              )
-            }} />
-          ) : (
-            <>
-              <div>Accurately Identify Your Plant With Our</div>
-              <div><span className="text-green-300">GreenLens-Powered AI</span> System</div>
-            </>
-          )}
+          <div>Accurately Identify Your Plant With Our</div>
+          <div><span className="text-green-300">GreenLens-Powered AI</span> System</div>
         </h2>
         <h4 className="text-sm sm:text-base text-white text-center max-w-4xl drop-shadow-md">
-          {bannerSettings?.subheading || "Upload a plant photo and get Instant Plant Identification"}
+          Upload a plant photo and get Instant Plant Identification
         </h4>
       </div>
     </Card>
