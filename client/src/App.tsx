@@ -34,12 +34,13 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
-          <Route path="/identify" component={Identify} />
-          <Route path="/result/:id" component={Result} />
           <Route path="/account" component={Account} />
           {user.isAdmin && <Route path="/admin" component={Admin} />}
         </>
       )}
+      {/* Public routes available to all users */}
+      <Route path="/identify" component={Identify} />
+      <Route path="/result/:id" component={Result} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/features" component={Features} />
       <Route path="/blog" component={Blog} />
