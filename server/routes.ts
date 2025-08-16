@@ -16,6 +16,7 @@ import { PlantAnalysisService } from "./services/plantAnalysisService";
 import { PDFReportService } from "./services/pdfReportService";
 import { insertPlantResultSchema, insertBlogPostSchema, insertReviewSchema } from "@shared/schema";
 import { trackUserLogin, trackPlantIdentification, trackSubscriptionPurchase, trackPdfDownload } from "./middleware/activityTracker";
+import { registerEcommerceRoutes } from "./routes/ecommerce";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -36,6 +37,9 @@ const upload = multer({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   setupAuth(app);
+
+  // Register e-commerce routes
+  registerEcommerceRoutes(app);
 
   // Admin user management routes
   app.get('/api/admin/users', requireAdmin, async (req: any, res) => {

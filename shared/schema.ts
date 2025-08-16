@@ -73,6 +73,157 @@ export const loginUserSchema = z.object({
   password: z.string().min(1),
 });
 
+// E-commerce Product Management Schema
+export const products = pgTable("products", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  description: text("description"),
+  shortDescription: varchar("short_description"),
+  category: varchar("category").notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  compareAtPrice: decimal("compare_at_price", { precision: 10, scale: 2 }),
+  sku: varchar("sku").unique(),
+  stockQuantity: integer("stock_quantity").default(0),
+  trackQuantity: boolean("track_quantity").default(true),
+  weight: decimal("weight", { precision: 8, scale: 2 }),
+  dimensions: jsonb("dimensions"), // {length, width, height}
+  images: jsonb("images").default("[]"), // Array of image URLs
+  tags: jsonb("tags").default("[]"), // Array of tags
+  features: jsonb("features").default("[]"), // Array of feature strings
+  isActive: boolean("is_active").default(true),
+  isFeatured: boolean("is_featured").default(false),
+  metaTitle: varchar("meta_title"),
+  metaDescription: text("meta_description"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type Product = typeof products.$inferSelect;
+export const insertProductSchema = createInsertSchema(products).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertProduct = z.infer<typeof insertProductSchema>;
+
+// Shopping Cart Schema
+export const cartItems = pgTable("cart_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id").notNull(), // For guest users
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  productId: varchar("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  quantity: integer("quantity").notNull().default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type CartItem = typeof cartItems.$inferSelect;
+export const insertCartItemSchema = createInsertSchema(cartItems).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertCartItem = z.infer<typeof insertCartItemSchema>;
+
+// Orders Schema
+export const orders = pgTable("orders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  orderNumber: varchar("order_number").unique().notNull(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  guestEmail: varchar("guest_email"),
+  status: varchar("status").notNull().default('pending'), // pending, processing, shipped, delivered, cancelled
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).default('0'),
+  shippingAmount: decimal("shipping_amount", { precision: 10, scale: 2 }).default('0'),
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).default('0'),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default('USD'),
+  paymentStatus: varchar("payment_status").default('pending'), // pending, paid, failed, refunded
+  paymentProvider: varchar("payment_provider"), // stripe, paypal, cashfree, razorpay
+  paymentIntentId: varchar("payment_intent_id"),
+  shippingAddress: jsonb("shipping_address"),
+  billingAddress: jsonb("billing_address"),
+  notes: text("notes"),
+  trackingNumber: varchar("tracking_number"),
+  shippedAt: timestamp("shipped_at"),
+  deliveredAt: timestamp("delivered_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type Order = typeof orders.$inferSelect;
+export const insertOrderSchema = createInsertSchema(orders).omit({
+  id: true,
+  orderNumber: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertOrder = z.infer<typeof insertOrderSchema>;
+
+// Order Items Schema
+export const orderItems = pgTable("order_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  orderId: varchar("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  productId: varchar("product_id").notNull().references(() => products.id),
+  productName: varchar("product_name").notNull(), // Store name at time of order
+  productImage: varchar("product_image"),
+  sku: varchar("sku"),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  quantity: integer("quantity").notNull(),
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type OrderItem = typeof orderItems.$inferSelect;
+export const insertOrderItemSchema = createInsertSchema(orderItems).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
+
+// Product Categories Schema
+export const categories = pgTable("categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull().unique(),
+  slug: varchar("slug").notNull().unique(),
+  description: text("description"),
+  image: varchar("image"),
+  parentId: varchar("parent_id").references(() => categories.id),
+  isActive: boolean("is_active").default(true),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type Category = typeof categories.$inferSelect;
+export const insertCategorySchema = createInsertSchema(categories).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertCategory = z.infer<typeof insertCategorySchema>;
+
+// Shipping Rates Schema
+export const shippingRates = pgTable("shipping_rates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  description: text("description"),
+  rate: decimal("rate", { precision: 10, scale: 2 }).notNull(),
+  freeShippingThreshold: decimal("free_shipping_threshold", { precision: 10, scale: 2 }),
+  estimatedDays: varchar("estimated_days"), // "3-5 business days"
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type ShippingRate = typeof shippingRates.$inferSelect;
+export const insertShippingRateSchema = createInsertSchema(shippingRates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertShippingRate = z.infer<typeof insertShippingRateSchema>;
+
 export type LoginUser = z.infer<typeof loginUserSchema>;
 
 // Subscription management

@@ -18,6 +18,8 @@ import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
 import Reviews from "@/pages/Reviews";
 import AuthPage from "@/pages/auth-page";
+import ShopPage from "@/pages/shop";
+import CheckoutPage from "@/pages/checkout";
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -43,6 +45,8 @@ function Router() {
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/reviews" component={Reviews} />
+      <Route path="/shop" component={ShopPage} />
+      <Route path="/checkout" component={CheckoutPage} />
       <Route path="/admin-login" component={AdminLogin} />
       <Route component={NotFound} />
     </Switch>
