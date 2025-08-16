@@ -4,6 +4,27 @@
 
 GreenLens is a production-grade web application that leverages AI technology to identify plants through photo uploads and provide comprehensive care recommendations. The platform combines multiple AI services and plant databases to deliver accurate species identification, personalized care plans, disease diagnosis, and generates detailed PDF reports for users to track their plant collection.
 
+## Recent Updates (August 2025)
+
+### Free Tier System
+- **3 Free Identifications**: New users get 3 free plant identifications
+- **7-Day Validity**: Free tier expires after 7 days from first use
+- **Usage Tracking**: Database tracks free tier usage with timestamps
+- **Automatic Upgrade Prompts**: Smart messaging when limits are reached
+
+### Multilingual Plant Names
+- **12 Language Support**: English, Spanish, French, German, Italian, Portuguese, Chinese, Japanese, Korean, Arabic, Hindi, Russian
+- **Localized Plant Names**: Users see plant names in their preferred language
+- **Scientific Name Display**: Always shows scientific names alongside common names
+- **Regional Variations**: Support for regional name variations
+
+### Enhanced Features
+- **Plant Health Monitoring**: Dedicated health check endpoint for existing plants
+- **Language Preferences**: User-configurable language settings
+- **Care Tips API**: Detailed care information extraction
+- **Feature Showcase Page**: Comprehensive overview of all platform capabilities
+- **Free Tier Status Dashboard**: Real-time tracking of remaining uses and validity
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -28,6 +49,8 @@ Preferred communication style: Simple, everyday language.
 ### Database Design
 - **PostgreSQL with Neon**: Cloud-hosted database with connection pooling
 - **Core entities**: Users, Subscriptions, PlantResults, BlogPosts, CatalogCache, Sessions
+- **Free Tier Tracking**: User table includes freeTierUsed, freeTierStartedAt, preferredLanguage fields
+- **Enhanced Plant Data**: PlantResults includes isFreeIdentification flag and localized species information
 - **Caching strategy**: TTL-based catalog cache to reduce external API calls
 - **Data relationships**: User → Subscription (1:1), User → PlantResults (1:many)
 
@@ -39,13 +62,16 @@ Preferred communication style: Simple, everyday language.
 
 ### Payment Processing
 - **Multi-provider support**: Stripe, Razorpay, Cashfree with adapter pattern
+- **Lazy loading**: Payment providers loaded only when needed to prevent startup errors
 - **Subscription management**: Recurring billing with webhook handling for status updates
-- **Plan tiers**: Pro ($9/month), Premium ($19/month) with different feature sets
+- **Plan tiers**: Free (3 identifications/7 days), Pro ($9/month), Premium ($19/month) with different feature sets
 
 ### Content Management
 - **Markdown-based blog system**: Simple CMS for plant care articles and tips
 - **PDF generation**: Puppeteer-based report creation with custom templates
 - **File storage**: Google Cloud Storage for uploaded images and generated PDFs
+- **Multilingual Content**: PlantNamesService provides localized plant names
+- **Feature Documentation**: Comprehensive feature showcase with interactive components
 
 ## External Dependencies
 

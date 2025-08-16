@@ -9,6 +9,7 @@ import { geminiService } from "./services/gemini";
 import { carePlannerService } from "./services/carePlanner";
 import { pdfService } from "./services/pdf";
 import { paymentService } from "./services/payments";
+import { plantNamesService } from "./services/plantNames";
 import { insertPlantResultSchema, insertBlogPostSchema } from "@shared/schema";
 
 // Configure multer for file uploads
@@ -53,23 +54,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No images provided" });
       }
 
-      // Check subscription limits for free users
+      // Get user for language preference
+      const user = await storage.getUser(userId);
+      const preferredLanguage = user?.preferredLanguage || 'en';
+
+      // Check subscription and free tier limits
       const subscription = await storage.getUserSubscription(userId);
-      if (!subscription || subscription.status !== 'active') {
-        const userResults = await storage.getUserPlantResults(userId);
-        const thisMonth = new Date();
-        thisMonth.setDate(1);
-        thisMonth.setHours(0, 0, 0, 0);
+      const isSubscribed = subscription && subscription.status === 'active';
+      let isUsingFreeTier = false;
+
+      if (!isSubscribed) {
+        // Check free tier eligibility
+        const freeTierStatus = await storage.checkFreeTierEligibility(userId);
         
-        const monthlyCount = userResults.filter(result => 
-          result.createdAt && result.createdAt >= thisMonth
-        ).length;
-        
-        if (monthlyCount >= 5) {
+        if (!freeTierStatus.eligible) {
           return res.status(402).json({ 
-            message: "Monthly limit reached. Please upgrade to Pro for unlimited identifications." 
+            message: freeTierStatus.remainingUses === 0 && freeTierStatus.daysLeft > 0 
+              ? `Free tier limit reached (3 identifications). Please upgrade to Pro for unlimited access or wait ${freeTierStatus.daysLeft} days for reset.`
+              : "Free tier expired. Please upgrade to Pro for unlimited plant identifications.",
+            freeTierStatus
           });
         }
+        
+        isUsingFreeTier = true;
       }
 
       // Convert files to base64 for API calls
@@ -96,12 +103,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // Step 2.5: Enhance species information with localized names
+      const enrichedSpecies = await plantNamesService.enrichPlantSpecies(
+        identification.species, 
+        preferredLanguage
+      );
+
       // Step 3: Get catalog information
       const catalogInfo = await plantsCatalogService.getPlantInfo(identification.species.scientificName);
 
       // Step 4: Generate care plan
       const carePlan = await carePlannerService.generateCarePlan({
-        identification,
+        identification: { ...identification, species: enrichedSpecies },
         catalogInfo,
       });
 
@@ -114,7 +127,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Step 6: Save to database
+      // Step 6: Save to database and update usage tracking
+      if (isUsingFreeTier) {
+        await storage.incrementFreeTierUsage(userId);
+      }
+
       const plantResult = await storage.createPlantResult({
         userId,
         images: files.map(file => ({ 
@@ -122,19 +139,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           size: file.size,
           type: file.mimetype 
         })),
-        species: identification.species,
+        species: enrichedSpecies,
         confidence: identification.confidence.toString(),
         careJSON: carePlan,
         diseasesJSON: diseaseAdvice,
+        isFreeIdentification: isUsingFreeTier,
       });
+
+      // Get updated free tier status for response
+      let freeTierStatus = null;
+      if (isUsingFreeTier) {
+        freeTierStatus = await storage.checkFreeTierEligibility(userId);
+      }
 
       res.json({
         id: plantResult.id,
-        species: identification.species,
+        species: enrichedSpecies,
         confidence: identification.confidence,
         carePlan,
         diseases: diseaseAdvice,
         createdAt: plantResult.createdAt,
+        freeTierStatus,
       });
 
     } catch (error) {
@@ -314,6 +339,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching subscription:", error);
       res.status(500).json({ message: "Failed to fetch subscription" });
+    }
+  });
+
+  // Free tier status endpoint
+  app.get("/api/free-tier-status", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const freeTierStatus = await storage.checkFreeTierEligibility(userId);
+      res.json(freeTierStatus);
+    } catch (error) {
+      console.error("Error fetching free tier status:", error);
+      res.status(500).json({ message: "Failed to fetch free tier status" });
+    }
+  });
+
+  // Language preferences endpoint
+  app.get("/api/languages", async (req, res) => {
+    try {
+      const supportedLanguages = plantNamesService.getSupportedLanguages();
+      res.json(supportedLanguages);
+    } catch (error) {
+      console.error("Error fetching supported languages:", error);
+      res.status(500).json({ message: "Failed to fetch supported languages" });
+    }
+  });
+
+  app.put("/api/user/language", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { language } = req.body;
+      
+      if (!language) {
+        return res.status(400).json({ message: "Language code is required" });
+      }
+
+      const user = await storage.updateUser(userId, { preferredLanguage: language });
+      res.json({ message: "Language preference updated", language: user.preferredLanguage });
+    } catch (error) {
+      console.error("Error updating language preference:", error);
+      res.status(500).json({ message: "Failed to update language preference" });
+    }
+  });
+
+  // Plant care tips endpoint
+  app.get("/api/care-tips/:speciesId", async (req, res) => {
+    try {
+      const { speciesId } = req.params;
+      const result = await storage.getPlantResult(speciesId);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Plant not found" });
+      }
+
+      // Extract care tips from the care plan
+      const carePlan = result.careJSON as any;
+      const careTips = {
+        watering: carePlan?.watering || {},
+        lighting: carePlan?.lighting || {},
+        soil: carePlan?.soil || {},
+        temperature: carePlan?.temperature || {},
+        humidity: carePlan?.humidity || {},
+        fertilizing: carePlan?.fertilizing || {},
+        seasonal: carePlan?.seasonal || {},
+      };
+
+      res.json(careTips);
+    } catch (error) {
+      console.error("Error fetching care tips:", error);
+      res.status(500).json({ message: "Failed to fetch care tips" });
+    }
+  });
+
+  // Plant health monitoring endpoint
+  app.post("/api/health-check/:plantId", isAuthenticated, upload.array('images', 3), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { plantId } = req.params;
+      const files = req.files as Express.Multer.File[];
+      
+      if (!files || files.length === 0) {
+        return res.status(400).json({ message: "No images provided" });
+      }
+
+      // Verify plant ownership
+      const plant = await storage.getPlantResult(plantId);
+      if (!plant || plant.userId !== userId) {
+        return res.status(404).json({ message: "Plant not found" });
+      }
+
+      // Convert files to base64 for API calls
+      const images = files.map(file => ({
+        data: file.buffer.toString('base64'),
+        mimeType: file.mimetype,
+      }));
+
+      // Assess plant health
+      const { plantIdService } = await import("./services/plantId");
+      const healthAssessment = await plantIdService.assessPlantHealth(images);
+      
+      let advice = null;
+      if (healthAssessment.diseases && healthAssessment.diseases.length > 0) {
+        advice = await geminiService.diseaseAdvice({
+          diseaseFindings: healthAssessment.diseases
+        });
+      }
+
+      res.json({
+        plantId,
+        isHealthy: healthAssessment.isHealthy,
+        diseases: healthAssessment.diseases,
+        advice,
+        checkedAt: new Date(),
+      });
+
+    } catch (error) {
+      console.error("Error in health check:", error);
+      res.status(500).json({ message: "Failed to check plant health" });
     }
   });
 

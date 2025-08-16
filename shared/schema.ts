@@ -31,6 +31,9 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  freeTierUsed: integer("free_tier_used").default(0), // Count of free identifications used
+  freeTierStartedAt: timestamp("free_tier_started_at"), // When free tier started (for 7-day limit)
+  preferredLanguage: varchar("preferred_language").default("en"), // User's preferred language for plant names
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -56,11 +59,12 @@ export const plantResults = pgTable("plant_results", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   images: jsonb("images").notNull(), // array of image URLs
-  species: jsonb("species").notNull(), // { commonName, scientificName, family, etc. }
+  species: jsonb("species").notNull(), // { commonName, scientificName, localizedNames, family, etc. }
   confidence: decimal("confidence", { precision: 5, scale: 2 }),
   careJSON: jsonb("care_json"), // AI-generated care plan
   diseasesJSON: jsonb("diseases_json"), // AI-generated disease info
   pdfUrl: varchar("pdf_url"),
+  isFreeIdentification: boolean("is_free_identification").default(false), // Track if this was a free tier usage
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

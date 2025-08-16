@@ -37,6 +37,16 @@ export default function Navigation() {
                 </Link>
               )}
               <Link 
+                href="/features" 
+                className={`font-medium transition-colors ${
+                  isActive('/features') 
+                    ? 'text-green-600' 
+                    : 'text-gray-700 hover:text-green-600'
+                }`}
+              >
+                Features
+              </Link>
+              <Link 
                 href="/pricing" 
                 className={`font-medium transition-colors ${
                   isActive('/pricing') 
@@ -134,6 +144,13 @@ export default function Navigation() {
                   Identify
                 </Link>
               )}
+              <Link 
+                href="/features" 
+                className="text-gray-700 hover:text-green-600 font-medium transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Features
+              </Link>
               <Link 
                 href="/pricing" 
                 className="text-gray-700 hover:text-green-600 font-medium transition-colors"

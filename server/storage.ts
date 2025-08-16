@@ -22,6 +22,7 @@ export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  updateUser(id: string, updates: Partial<UpsertUser>): Promise<User>;
   
   // Subscription operations
   getUserSubscription(userId: string): Promise<Subscription | undefined>;
@@ -33,6 +34,10 @@ export interface IStorage {
   getPlantResult(id: string): Promise<PlantResult | undefined>;
   getUserPlantResults(userId: string): Promise<PlantResult[]>;
   updatePlantResult(id: string, updates: Partial<InsertPlantResult>): Promise<PlantResult>;
+  
+  // Free tier operations
+  checkFreeTierEligibility(userId: string): Promise<{ eligible: boolean; remainingUses: number; daysLeft: number }>;
+  incrementFreeTierUsage(userId: string): Promise<void>;
   
   // Blog operations
   getBlogPosts(published?: boolean): Promise<BlogPost[]>;
@@ -184,7 +189,83 @@ export class DatabaseStorage implements IStorage {
   async clearExpiredCache(): Promise<void> {
     await db
       .delete(catalogCache)
-      .where(gt(new Date(), catalogCache.expiresAt));
+      .where(gt(catalogCache.expiresAt, new Date()));
+  }
+
+  async updateUser(id: string, updates: Partial<UpsertUser>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async checkFreeTierEligibility(userId: string): Promise<{ eligible: boolean; remainingUses: number; daysLeft: number }> {
+    const user = await this.getUser(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const now = new Date();
+    const freeTierUsed = user.freeTierUsed || 0;
+    const freeTierStartedAt = user.freeTierStartedAt;
+
+    // If free tier never started, user is eligible
+    if (!freeTierStartedAt) {
+      return {
+        eligible: true,
+        remainingUses: 3,
+        daysLeft: 7,
+      };
+    }
+
+    // Check if 7 days have passed since free tier started
+    const daysSinceStart = Math.floor((now.getTime() - freeTierStartedAt.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (daysSinceStart >= 7) {
+      // Free tier expired
+      return {
+        eligible: false,
+        remainingUses: 0,
+        daysLeft: 0,
+      };
+    }
+
+    // Check if user has used all 3 free identifications
+    if (freeTierUsed >= 3) {
+      return {
+        eligible: false,
+        remainingUses: 0,
+        daysLeft: Math.max(0, 7 - daysSinceStart),
+      };
+    }
+
+    // User still has free tier eligibility
+    return {
+      eligible: true,
+      remainingUses: Math.max(0, 3 - freeTierUsed),
+      daysLeft: Math.max(0, 7 - daysSinceStart),
+    };
+  }
+
+  async incrementFreeTierUsage(userId: string): Promise<void> {
+    const user = await this.getUser(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const now = new Date();
+    const updates: Partial<UpsertUser> = {
+      freeTierUsed: (user.freeTierUsed || 0) + 1,
+    };
+
+    // If this is the first free tier usage, set the start date
+    if (!user.freeTierStartedAt) {
+      updates.freeTierStartedAt = now;
+    }
+
+    await this.updateUser(userId, updates);
   }
 }
 

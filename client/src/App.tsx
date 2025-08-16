@@ -11,6 +11,7 @@ import Identify from "@/pages/identify";
 import Result from "@/pages/result";
 import Pricing from "@/pages/pricing";
 import Account from "@/pages/account";
+import Features from "@/pages/features";
 import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
 
@@ -30,6 +31,7 @@ function Router() {
         </>
       )}
       <Route path="/pricing" component={Pricing} />
+      <Route path="/features" component={Features} />
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route component={NotFound} />
