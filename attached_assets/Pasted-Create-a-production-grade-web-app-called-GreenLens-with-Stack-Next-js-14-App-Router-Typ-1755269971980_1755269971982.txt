@@ -1,0 +1,39 @@
+Create a production-grade web app called “GreenLens” with:
+
+Stack
+- Next.js 14 (App Router) + TypeScript + Tailwind + shadcn/ui
+- API routes in /app/api/*
+- Services in /server/services/*
+- DB: Prisma + Replit Postgres (@neondatabase/serverless)
+- Auth: NextAuth (email magic link placeholder)
+
+Providers (create modules)
+- /server/services/plantId.ts — Plant.id v3 identify + health endpoints (Bearer ${PLANTID_API_KEY})
+- /server/services/plantsCatalog.ts — Perenual (primary) + Trefle (fallback) with a small TTL cache table
+- /server/services/gemini.ts — Google GenAI SDK (@google/genai); functions:
+   assessImageQuality(images), synthesizeCarePlan({identification,catalog}), diseaseAdvice({diseaseFindings})
+   Use Structured Output (responseSchema) for STRICT JSON, and support thinkingBudget env.
+- /server/services/carePlanner.ts — merges identification + catalog and calls gemini to produce care JSON + disease guidance JSON
+- /server/services/pdf.ts — Puppeteer HTML→PDF from a report template
+- /server/services/payments/{index,stripe,razorpay,cashfree}.ts — provider adapter with createCheckout, webhook handler, getSubscriptionStatus
+
+Pages
+- / (landing) — “Upload Plant” CTA, pricing cards (Monthly/Yearly), blog preview
+- /identify — drag/drop up to 3 images, preview, “Analyze”
+- /result/[id] — tabs: Care Plan (responsive table), Diseases & Treatment, Gallery, Raw; Download PDF
+- /pricing — paywall with Stripe + Razorpay + Cashfree buttons (choose by env)
+- /account — subscription status, saved plants (“My Garden”)
+- /blog, /blog/[slug], /admin/blog — simple markdown CMS
+
+API routes
+- /api/identify (POST multipart): image QA (Gemini) → Plant.id identify + health → Perenual/Trefle → carePlanner → persist PlantResult → JSON back
+- /api/generate-pdf (POST): entitlement check → render PDF → stream
+- /api/checkout (POST): provider create-checkout
+- /api/webhooks/{stripe|razorpay|cashfree}
+
+DB models (Prisma)
+- User, Subscription { provider, status, currentPeriodEnd }, PlantResult { images[], species, confidence, careJSON, diseasesJSON, pdfUrl }, BlogPost, CatalogCache { key, json, expiresAt }
+
+Acceptance
+- App compiles and runs; placeholder UIs in place
+- Env variables read from process.env only; include README with required envs
