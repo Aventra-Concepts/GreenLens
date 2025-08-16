@@ -18,8 +18,8 @@ export default function HeroSection() {
                 <span className="text-green-500">AI-Powered</span>{" "}
                 Precision
               </h1>
-              <p className="text-lg text-gray-600 leading-relaxed text-center">
-                Upload a photo and get instant plant identification, personalized care plans, and expert disease diagnosis powered by advanced AI technology.
+              <p className="text-sm text-gray-600 leading-relaxed text-center">
+                Upload a photo and get instant plant identification, personalized care plans, and expert disease diagnosis powered by advanced GreenLens AI Technology.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
