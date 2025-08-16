@@ -163,11 +163,11 @@ export default function PricingSection() {
           {sortedPlans.map((plan: PricingPlan) => (
             <Card
               key={plan.id}
-              className={`relative transition-all duration-300 hover:shadow-lg w-full sm:w-48 flex-shrink-0 ${
+              className={`relative transition-all duration-300 hover:shadow-lg w-full sm:w-48 flex-shrink-0 h-80 flex flex-col ${
                 plan.isPopular
                   ? 'ring-2 ring-primary border-primary shadow-xl'
                   : 'border-gray-200 dark:border-gray-700'
-              } bg-white dark:bg-gray-800 h-fit`}
+              } bg-white dark:bg-gray-800`}
               data-testid={`pricing-plan-${plan.planId}`}
             >
               {plan.isPopular && (
@@ -198,8 +198,8 @@ export default function PricingSection() {
                 </div>
               </CardHeader>
 
-              <CardContent className="space-y-3 px-3 pb-3">
-                <div className="space-y-1">
+              <CardContent className="flex-1 flex flex-col px-3 pb-3">
+                <div className="space-y-1 flex-1">
                   {plan.features.slice(0, 3).map((feature, index) => (
                     <div
                       key={index}
@@ -226,25 +226,27 @@ export default function PricingSection() {
                   )}
                 </div>
 
-                <Button
-                  className={`w-full text-xs py-2 ${
-                    plan.isPopular
-                      ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                      : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100'
-                  }`}
-                  onClick={() => handleChoosePlan(plan.planId)}
-                  disabled={checkoutMutation.isPending && selectedPlan === plan.planId}
-                  data-testid={`choose-plan-${plan.planId}`}
-                >
-                  {checkoutMutation.isPending && selectedPlan === plan.planId ? (
-                    <>
-                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    `Choose ${plan.name}`
-                  )}
-                </Button>
+                <div className="mt-4">
+                  <Button
+                    className={`w-full text-xs py-2 ${
+                      plan.isPopular
+                        ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                        : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100'
+                    }`}
+                    onClick={() => handleChoosePlan(plan.planId)}
+                    disabled={checkoutMutation.isPending && selectedPlan === plan.planId}
+                    data-testid={`choose-plan-${plan.planId}`}
+                  >
+                    {checkoutMutation.isPending && selectedPlan === plan.planId ? (
+                      <>
+                        <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      `Choose ${plan.name}`
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
