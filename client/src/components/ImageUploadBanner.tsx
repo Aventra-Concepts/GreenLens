@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { Camera, Upload, Zap, X } from "lucide-react";
-import botanicalBgUrl from "@assets/generated_images/Tropical_greenhouse_plants_ad3dfb74.png";
+import botanicalBgUrl from "@assets/generated_images/Bright_botanical_banner_background_7e35e959.png";
 
 export function ImageUploadBanner() {
   const [, setLocation] = useLocation();
@@ -133,13 +133,21 @@ export function ImageUploadBanner() {
   };
 
   return (
-    <Card className="h-full bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200 dark:border-green-800 shadow-lg">
-      <div className="h-full flex flex-col justify-center items-center px-6 py-8">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white text-center mb-4 leading-tight">
+    <Card className="h-full border-green-200 dark:border-green-800 shadow-lg relative overflow-hidden">
+      {/* Bright Background Image - No Overlay */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ 
+          backgroundImage: `url(${bannerSettings?.imageUrl || botanicalBgUrl})` 
+        }}
+      ></div>
+      
+      <div className="h-full flex flex-col justify-center items-center px-6 py-8 relative z-10">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-4 leading-tight drop-shadow-lg">
           <div>Accurately Identify Your Plant With Our</div>
-          <div><span className="text-green-600">GreenLens-Powered AI</span> System</div>
+          <div><span className="text-green-300">GreenLens-Powered AI</span> System</div>
         </h2>
-        <h4 className="text-sm sm:text-base text-gray-700 dark:text-gray-300 text-center max-w-4xl">
+        <h4 className="text-sm sm:text-base text-white text-center max-w-4xl drop-shadow-md">
           Upload a plant photo and get Instant Plant Identification
         </h4>
       </div>
