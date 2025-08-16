@@ -121,8 +121,8 @@ export default function Identify() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-12">
-            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">Identify Your Plant</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300">Upload up to 3 photos for the most accurate identification</p>
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">AI Plant Identification</h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300">Upload up to 3 photos for 99% accurate identification</p>
           </div>
 
           <Card className="mb-8">
@@ -149,9 +149,9 @@ export default function Identify() {
                     <Upload className="w-8 h-8 text-green-600" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-xl font-semibold text-gray-900">Drop your plant photos here</h3>
-                    <p className="text-gray-600">or click to browse your files</p>
-                    <p className="text-sm text-gray-500">Supports JPG, PNG up to 10MB • Maximum 3 images</p>
+                    <h3 className="text-xl font-semibold text-gray-900">Upload up to 3 photos for best results</h3>
+                    <p className="text-gray-600">Drop images here or click to browse your files</p>
+                    <p className="text-sm text-gray-500">Multiple angles improve accuracy • JPG, PNG up to 10MB each</p>
                   </div>
                   <Button className="bg-green-500 hover:bg-green-600" data-testid="choose-files-button">
                     Choose Files

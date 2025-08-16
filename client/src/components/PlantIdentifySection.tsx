@@ -87,7 +87,7 @@ export default function PlantIdentifySection() {
     <section id="identify" className="py-16 bg-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-4 mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">Identify Your Plant</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">AI Plant Identification</h2>
           <p className="text-lg text-gray-600">Upload up to 3 photos for the most accurate identification</p>
         </div>
 

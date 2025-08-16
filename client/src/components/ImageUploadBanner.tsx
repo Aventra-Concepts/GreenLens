@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { Camera, Upload, Zap, X } from "lucide-react";
-import botanicalBgUrl from "@assets/generated_images/Elegant_botanical_banner_background_63fb35df.png";
+import botanicalBgUrl from "@assets/generated_images/Tropical_greenhouse_plants_ad3dfb74.png";
 
 export function ImageUploadBanner() {
   const [, setLocation] = useLocation();
@@ -178,10 +178,10 @@ export function ImageUploadBanner() {
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-green-900 dark:text-green-100">
-                    Quick Plant ID
+                    AI Plant Identification
                   </h3>
                   <p className="text-xs text-green-700 dark:text-green-300">
-                    Drop photos or click to browse
+                    Upload up to 3 photos for 99% accuracy
                   </p>
                 </div>
               </div>
@@ -240,16 +240,6 @@ export function ImageUploadBanner() {
               )}
             </Button>
           )}
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setLocation('/identify')}
-            className="border-green-500 text-green-700 hover:bg-green-50 dark:text-green-300 dark:hover:bg-green-900 text-xs px-3 py-2"
-            data-testid="full-identify-button"
-          >
-            Full Identify Page
-          </Button>
         </div>
       </div>
     </Card>
