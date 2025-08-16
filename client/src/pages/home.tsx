@@ -4,28 +4,28 @@ import HeroSection from "@/components/HeroSection";
 import MyGardenSection from "@/components/MyGardenSection";
 import { InArticleAd } from "@/components/AdSense";
 import Footer from "@/components/Footer";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { PoweredBySection } from "@/components/PoweredBySection";
 import GardeningToolsSection from "@/components/GardeningToolsSection";
 
 export default function Home() {
   const { toast } = useToast();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isLoading && !user) {
       toast({
         title: "Unauthorized",
         description: "You are logged out. Logging in again...",
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/api/login";
+        window.location.href = "/auth";
       }, 500);
       return;
     }
-  }, [isAuthenticated, isLoading, toast]);
+  }, [user, isLoading, toast]);
 
   if (isLoading) {
     return (

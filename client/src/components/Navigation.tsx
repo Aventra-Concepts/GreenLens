@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { Leaf, Menu, X } from "lucide-react";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [location] = useLocation();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
 
   const isActive = (path: string) => location === path;
 
@@ -29,7 +29,7 @@ export default function Navigation() {
           <div className="flex items-center space-x-4">
             {!isLoading && (
               <>
-                {isAuthenticated ? (
+                {user ? (
                   <Button 
                     variant="outline"
                     onClick={() => window.location.href = '/api/logout'}
@@ -41,14 +41,14 @@ export default function Navigation() {
                   <>
                     <Button 
                       variant="ghost"
-                      onClick={() => window.location.href = '/api/login'}
+                      onClick={() => window.location.href = '/auth'}
                       data-testid="sign-in-button"
                     >
                       Sign In
                     </Button>
                     <Button 
                       className="bg-green-500 hover:bg-green-600"
-                      onClick={() => window.location.href = '/api/login'}
+                      onClick={() => window.location.href = '/auth'}
                       data-testid="get-started-button"
                     >
                       Get Started
@@ -80,7 +80,7 @@ export default function Navigation() {
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4">
             <div className="flex flex-col space-y-4">
-              {isAuthenticated && (
+              {user && (
                 <Link 
                   href="/identify" 
                   className="text-gray-700 hover:text-green-600 font-medium transition-colors"
@@ -110,7 +110,7 @@ export default function Navigation() {
               >
                 Blog
               </Link>
-              {isAuthenticated && (
+              {user && (
                 <Link 
                   href="/account" 
                   className="text-gray-700 hover:text-green-600 font-medium transition-colors"
