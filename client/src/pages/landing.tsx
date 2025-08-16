@@ -10,14 +10,6 @@ export default function Landing() {
     <Layout showImageBanner={true} showSidebarAds={true}>
       <div className="space-y-8">
         <HeroSection />
-        
-        {/* Google AdSense space - placed after upload section */}
-        <div className="py-8 bg-gray-50 dark:bg-gray-800">
-          <div className="max-w-4xl mx-auto px-4">
-            <InArticleAd />
-          </div>
-        </div>
-        
         <PricingSection />
         <BlogPreviewSection />
       </div>
