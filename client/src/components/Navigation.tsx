@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { Leaf, Menu, X } from "lucide-react";
+import { ShoppingCart } from "@/components/ecommerce/ShoppingCart";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,6 +28,16 @@ export default function Navigation() {
           </div>
 
           <div className="flex items-center space-x-4">
+            {/* Shopping Cart - Available for all users */}
+            <ShoppingCart />
+            
+            {/* Shop Link */}
+            <Link href="/shop">
+              <Button variant="ghost" data-testid="shop-link">
+                Shop
+              </Button>
+            </Link>
+            
             {!isLoading && (
               <>
                 {user ? (
@@ -109,6 +120,13 @@ export default function Navigation() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Blog
+              </Link>
+              <Link 
+                href="/shop" 
+                className="text-gray-700 hover:text-green-600 font-medium transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Shop
               </Link>
               {user && (
                 <Link 
