@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { Camera, Upload, Zap, X } from "lucide-react";
+import botanicalBgUrl from "@assets/generated_images/Elegant_botanical_banner_background_63fb35df.png";
 
 export function ImageUploadBanner() {
   const [, setLocation] = useLocation();
@@ -124,13 +125,21 @@ export function ImageUploadBanner() {
   };
 
   return (
-    <Card className="h-full bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200 dark:border-green-800 shadow-lg">
-      <div className="h-full flex items-center justify-between px-6 py-4">
+    <Card className="h-full bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200 dark:border-green-800 shadow-lg relative overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 opacity-20 dark:opacity-10">
+        <div 
+          className="h-full w-full bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${botanicalBgUrl})` }}
+        ></div>
+      </div>
+      
+      <div className="h-full flex items-center justify-between px-4 py-3 relative z-10">
         {/* Left Section - Upload Area */}
         <div className="flex-1">
           <div 
             className={`
-              relative border-2 border-dashed rounded-xl transition-all duration-200 h-16 
+              relative border-2 border-dashed rounded-lg transition-all duration-200 h-20 
               ${isDragging 
                 ? 'border-green-400 bg-green-100 dark:bg-green-900' 
                 : 'border-green-300 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900'
@@ -152,16 +161,16 @@ export function ImageUploadBanner() {
               data-testid="banner-file-input"
             />
             
-            <div className="h-full flex items-center justify-center space-x-4 cursor-pointer">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                  <Camera className="w-5 h-5 text-white" />
+            <div className="h-full flex items-center justify-center space-x-3 cursor-pointer">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <Camera className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-green-900 dark:text-green-100">
+                  <h3 className="text-sm font-medium text-green-900 dark:text-green-100">
                     Quick Plant ID
                   </h3>
-                  <p className="text-sm text-green-700 dark:text-green-300">
+                  <p className="text-xs text-green-700 dark:text-green-300">
                     Drop photos or click to browse
                   </p>
                 </div>
@@ -172,49 +181,50 @@ export function ImageUploadBanner() {
 
         {/* Middle Section - Uploaded Files Preview */}
         {uploadedFiles.length > 0 && (
-          <div className="flex items-center space-x-3 mx-6">
-            <div className="flex space-x-2">
+          <div className="flex items-center space-x-2 mx-4">
+            <div className="flex space-x-1">
               {uploadedFiles.slice(0, 3).map((file, index) => (
                 <div key={index} className="relative group">
-                  <div className="w-12 h-12 bg-green-100 dark:bg-green-800 rounded-lg border-2 border-green-300 dark:border-green-600 flex items-center justify-center">
-                    <Upload className="w-4 h-4 text-green-600 dark:text-green-300" />
+                  <div className="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-md border border-green-300 dark:border-green-600 flex items-center justify-center">
+                    <Upload className="w-3 h-3 text-green-600 dark:text-green-300" />
                   </div>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       removeFile(index);
                     }}
-                    className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     data-testid={`remove-file-${index}`}
                   >
-                    <X className="w-2 h-2 text-white" />
+                    <X className="w-1.5 h-1.5 text-white" />
                   </button>
                 </div>
               ))}
             </div>
-            <span className="text-sm text-green-700 dark:text-green-300 font-medium">
+            <span className="text-xs text-green-700 dark:text-green-300 font-medium">
               {uploadedFiles.length} image{uploadedFiles.length !== 1 ? 's' : ''} ready
             </span>
           </div>
         )}
 
         {/* Right Section - Action Button */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           {uploadedFiles.length > 0 && (
             <Button
               onClick={handleQuickAnalyze}
               disabled={identifyMutation.isPending}
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg"
+              size="sm"
+              className="bg-green-500 hover:bg-green-600 text-white text-xs font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-200 hover:shadow-md"
               data-testid="quick-analyze-button"
             >
               {identifyMutation.isPending ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin mr-1" />
                   Analyzing...
                 </>
               ) : (
                 <>
-                  <Zap className="w-4 h-4 mr-2" />
+                  <Zap className="w-3 h-3 mr-1" />
                   Quick Analyze
                 </>
               )}
@@ -223,8 +233,9 @@ export function ImageUploadBanner() {
           
           <Button
             variant="outline"
+            size="sm"
             onClick={() => setLocation('/identify')}
-            className="border-green-500 text-green-700 hover:bg-green-50 dark:text-green-300 dark:hover:bg-green-900"
+            className="border-green-500 text-green-700 hover:bg-green-50 dark:text-green-300 dark:hover:bg-green-900 text-xs px-3 py-2"
             data-testid="full-identify-button"
           >
             Full Identify Page

@@ -20,9 +20,32 @@ export function Layout({
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
       <Navigation />
       
-      {/* Image Upload Banner - 3-4 inch height as requested */}
+      {/* Top Menu Bar */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <nav className="flex items-center justify-center space-x-8">
+            <a href="/" className="text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+              Home
+            </a>
+            <a href="/identify" className="text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+              Identify Plant
+            </a>
+            <a href="/garden" className="text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+              My Garden
+            </a>
+            <a href="/blog" className="text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+              Plant Care Tips
+            </a>
+            <a href="/pricing" className="text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+              Pricing
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      {/* Image Upload Banner - Increased height by 1 inch */}
       {showImageBanner && (
-        <div className="h-24 sm:h-28 lg:h-32">
+        <div className="h-32 sm:h-36 lg:h-40">
           <ImageUploadBanner />
         </div>
       )}

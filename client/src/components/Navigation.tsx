@@ -20,7 +20,7 @@ export default function Navigation() {
               <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
                 <Leaf className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">GreenLens</span>
+              <span className="text-lg font-bold text-gray-900">GreenLens</span>
             </Link>
             
             <div className="hidden md:flex items-center space-x-6">

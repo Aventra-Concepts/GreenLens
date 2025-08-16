@@ -76,6 +76,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.875rem; /* Reduced overall font size by ~50% */
   }
   
   /* Custom utility classes for the green theme */
