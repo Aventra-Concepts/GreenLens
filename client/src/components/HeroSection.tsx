@@ -13,12 +13,12 @@ export default function HeroSection() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <div className="space-y-4">
-              <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-2xl lg:text-4xl font-bold text-gray-900 leading-tight text-center">
                 Identify Any Plant with{" "}
                 <span className="text-green-500">AI-Powered</span>{" "}
                 Precision
               </h1>
-              <p className="text-xl text-gray-600 leading-relaxed">
+              <p className="text-lg text-gray-600 leading-relaxed text-center">
                 Upload a photo and get instant plant identification, personalized care plans, and expert disease diagnosis powered by advanced AI technology.
               </p>
             </div>
