@@ -1,0 +1,166 @@
+import { useState } from "react";
+import { Link, useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { Leaf, Menu, X } from "lucide-react";
+
+export default function Navigation() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [location] = useLocation();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  const isActive = (path: string) => location === path;
+
+  return (
+    <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center space-x-8">
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                <Leaf className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold text-gray-900">GreenLens</span>
+            </Link>
+            
+            <div className="hidden md:flex items-center space-x-6">
+              {isAuthenticated && (
+                <Link 
+                  href="/identify" 
+                  className={`font-medium transition-colors ${
+                    isActive('/identify') 
+                      ? 'text-green-600' 
+                      : 'text-gray-700 hover:text-green-600'
+                  }`}
+                >
+                  Identify
+                </Link>
+              )}
+              <Link 
+                href="/pricing" 
+                className={`font-medium transition-colors ${
+                  isActive('/pricing') 
+                    ? 'text-green-600' 
+                    : 'text-gray-700 hover:text-green-600'
+                }`}
+              >
+                Pricing
+              </Link>
+              <Link 
+                href="/blog" 
+                className={`font-medium transition-colors ${
+                  isActive('/blog') 
+                    ? 'text-green-600' 
+                    : 'text-gray-700 hover:text-green-600'
+                }`}
+              >
+                Blog
+              </Link>
+              {isAuthenticated && (
+                <Link 
+                  href="/account" 
+                  className={`font-medium transition-colors ${
+                    isActive('/account') 
+                      ? 'text-green-600' 
+                      : 'text-gray-700 hover:text-green-600'
+                  }`}
+                >
+                  My Garden
+                </Link>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            {!isLoading && (
+              <>
+                {isAuthenticated ? (
+                  <Button 
+                    variant="outline"
+                    onClick={() => window.location.href = '/api/logout'}
+                    data-testid="sign-out-button"
+                  >
+                    Sign Out
+                  </Button>
+                ) : (
+                  <>
+                    <Button 
+                      variant="ghost"
+                      onClick={() => window.location.href = '/api/login'}
+                      data-testid="sign-in-button"
+                    >
+                      Sign In
+                    </Button>
+                    <Button 
+                      className="bg-green-500 hover:bg-green-600"
+                      onClick={() => window.location.href = '/api/login'}
+                      data-testid="get-started-button"
+                    >
+                      Get Started
+                    </Button>
+                  </>
+                )}
+              </>
+            )}
+
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                data-testid="mobile-menu-button"
+              >
+                {isMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        {isMenuOpen && (
+          <div className="md:hidden border-t border-gray-200 py-4">
+            <div className="flex flex-col space-y-4">
+              {isAuthenticated && (
+                <Link 
+                  href="/identify" 
+                  className="text-gray-700 hover:text-green-600 font-medium transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Identify
+                </Link>
+              )}
+              <Link 
+                href="/pricing" 
+                className="text-gray-700 hover:text-green-600 font-medium transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Pricing
+              </Link>
+              <Link 
+                href="/blog" 
+                className="text-gray-700 hover:text-green-600 font-medium transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Blog
+              </Link>
+              {isAuthenticated && (
+                <Link 
+                  href="/account" 
+                  className="text-gray-700 hover:text-green-600 font-medium transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  My Garden
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+}

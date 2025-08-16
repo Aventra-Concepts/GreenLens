@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(240 10% 3.9%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(240 10% 3.9%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(240 10% 3.9%);
+  --primary: hsl(142.1 76.2% 36.3%);
+  --primary-foreground: hsl(355.7 100% 97.3%);
+  --secondary: hsl(240 4.8% 95.9%);
+  --secondary-foreground: hsl(240 5.9% 10%);
+  --muted: hsl(240 4.8% 95.9%);
+  --muted-foreground: hsl(240 3.8% 46.1%);
+  --accent: hsl(240 4.8% 95.9%);
+  --accent-foreground: hsl(240 5.9% 10%);
+  --destructive: hsl(0 84.2% 60.2%);
+  --destructive-foreground: hsl(0 0% 98%);
+  --border: hsl(240 5.9% 90%);
+  --input: hsl(240 5.9% 90%);
+  --ring: hsl(142.1 76.2% 36.3%);
+  --chart-1: hsl(142.1 76.2% 36.3%);
+  --chart-2: hsl(173 58% 39%);
+  --chart-3: hsl(197 37% 24%);
+  --chart-4: hsl(43 74% 66%);
+  --chart-5: hsl(27 87% 67%);
+  --radius: 0.5rem;
+
+  /* Custom GreenLens colors based on design */
+  --green-50: hsl(120 60% 97%);
+  --green-100: hsl(120 50% 94%);
+  --green-500: hsl(142.1 71% 45%);
+  --green-600: hsl(142.1 76% 36%);
+  --green-700: hsl(142.1 85% 28%);
+  --green-800: hsl(142.1 90% 20%);
+  --green-900: hsl(142.1 95% 15%);
+  
+  --earth-400: hsl(32 47% 63%);
+  --earth-600: hsl(32 51% 35%);
+}
+
+.dark {
+  --background: hsl(20 14.3% 4.1%);
+  --foreground: hsl(0 0% 95%);
+  --card: hsl(24 9.8% 10%);
+  --card-foreground: hsl(0 0% 95%);
+  --popover: hsl(0 0% 9%);
+  --popover-foreground: hsl(0 0% 95%);
+  --primary: hsl(142.1 70% 45%);
+  --primary-foreground: hsl(144 76% 13%);
+  --secondary: hsl(240 3.7% 15.9%);
+  --secondary-foreground: hsl(0 0% 98%);
+  --muted: hsl(0 0% 15%);
+  --muted-foreground: hsl(240 5% 64.9%);
+  --accent: hsl(12 6.5% 15.1%);
+  --accent-foreground: hsl(0 0% 98%);
+  --destructive: hsl(0 62.8% 30.6%);
+  --destructive-foreground: hsl(0 85.7% 97.3%);
+  --border: hsl(240 3.7% 15.9%);
+  --input: hsl(240 3.7% 15.9%);
+  --ring: hsl(142.1 70% 45%);
+  --chart-1: hsl(220 70% 50%);
+  --chart-2: hsl(160 60% 45%);
+  --chart-3: hsl(30 80% 55%);
+  --chart-4: hsl(280 65% 60%);
+  --chart-5: hsl(340 75% 55%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  /* Custom utility classes for the green theme */
+  .text-green-50 { color: var(--green-50); }
+  .text-green-100 { color: var(--green-100); }
+  .text-green-500 { color: var(--green-500); }
+  .text-green-600 { color: var(--green-600); }
+  .text-green-700 { color: var(--green-700); }
+  .text-green-800 { color: var(--green-800); }
+  .text-green-900 { color: var(--green-900); }
+  
+  .bg-green-50 { background-color: var(--green-50); }
+  .bg-green-100 { background-color: var(--green-100); }
+  .bg-green-500 { background-color: var(--green-500); }
+  .bg-green-600 { background-color: var(--green-600); }
+  .bg-green-700 { background-color: var(--green-700); }
+  .bg-green-800 { background-color: var(--green-800); }
+  .bg-green-900 { background-color: var(--green-900); }
+  
+  .border-green-100 { border-color: var(--green-100); }
+  .border-green-200 { border-color: hsl(120 45% 89%); }
+  .border-green-300 { border-color: hsl(120 40% 78%); }
+  .border-green-400 { border-color: hsl(120 35% 67%); }
+  .border-green-500 { border-color: var(--green-500); }
+  .border-green-600 { border-color: var(--green-600); }
+
+  /* Earth tones */
+  .text-earth-400 { color: var(--earth-400); }
+  .text-earth-600 { color: var(--earth-600); }
+  .bg-earth-400 { background-color: var(--earth-400); }
+  .bg-earth-600 { background-color: var(--earth-600); }
+}
+
+/* Custom animations for plant-themed interactions */
+@keyframes grow {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.animate-grow {
+  animation: grow 2s ease-in-out infinite;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Smooth transitions for interactive elements */
+.transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-shadow {
+  transition-property: box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
