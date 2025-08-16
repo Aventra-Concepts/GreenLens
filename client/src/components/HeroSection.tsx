@@ -23,6 +23,26 @@ export default function HeroSection() {
                 <div>disease diagnosis powered by advanced <span className="text-green-600 font-semibold">GreenLens AI Technology</span>.</div>
               </div>
             </div>
+            
+            {/* Image upload boxes */}
+            <div className="flex justify-center gap-4">
+              <div className="w-20 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 hover:border-green-400 hover:bg-green-50 transition-colors cursor-pointer">
+                <Upload className="w-6 h-6 text-gray-400 mb-1" />
+                <span className="text-xs text-gray-500">Image 1</span>
+                <span className="text-xs text-gray-400">≤100KB</span>
+              </div>
+              <div className="w-20 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 hover:border-green-400 hover:bg-green-50 transition-colors cursor-pointer">
+                <Upload className="w-6 h-6 text-gray-400 mb-1" />
+                <span className="text-xs text-gray-500">Image 2</span>
+                <span className="text-xs text-gray-400">≤100KB</span>
+              </div>
+              <div className="w-20 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 hover:border-green-400 hover:bg-green-50 transition-colors cursor-pointer">
+                <Upload className="w-6 h-6 text-gray-400 mb-1" />
+                <span className="text-xs text-gray-500">Image 3</span>
+                <span className="text-xs text-gray-400">≤100KB</span>
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href={isAuthenticated ? "/identify" : "/api/login"}>
                 <Button 
