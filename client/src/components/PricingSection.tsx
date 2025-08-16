@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { CheckCircle, Loader2, Star, Zap } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -30,7 +30,7 @@ interface PricingPlan {
 
 export default function PricingSection() {
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
   const { data: plans = [], isLoading, error } = useQuery({
@@ -42,8 +42,8 @@ export default function PricingSection() {
 
   const checkoutMutation = useMutation({
     mutationFn: async ({ planId }: { planId: string }) => {
-      if (!isAuthenticated) {
-        window.location.href = '/api/login';
+      if (!user) {
+        window.location.href = '/auth';
         return;
       }
 
@@ -79,8 +79,8 @@ export default function PricingSection() {
 
   const handleChoosePlan = (planId: string) => {
     if (planId === 'free') {
-      if (!isAuthenticated) {
-        window.location.href = '/api/login';
+      if (!user) {
+        window.location.href = '/auth';
       } else {
         toast({
           title: "Already on Free Plan",

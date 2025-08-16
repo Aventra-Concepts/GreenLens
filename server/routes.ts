@@ -2,7 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, requireAuth, requireAdmin } from "./auth";
+import { z } from "zod";
+import { insertUserSchema, loginUserSchema } from "@shared/schema";
 // plantIdService imported lazily when needed
 import { plantsCatalogService } from "./services/plantsCatalog";
 import { geminiService } from "./services/gemini";
@@ -33,24 +35,54 @@ const upload = multer({
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
-  await setupAuth(app);
+  setupAuth(app);
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Admin user management routes
+  app.get('/api/admin/users', requireAdmin, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      const users = await storage.getAllUsers();
+      // Remove passwords from response
+      const safeUsers = users.map(user => {
+        const { password, ...safeUser } = user;
+        return safeUser;
+      });
+      res.json(safeUsers);
     } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  app.put('/api/admin/users/:id/admin', requireAdmin, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { isAdmin } = req.body;
+      const user = await storage.updateUserAdminStatus(id, isAdmin);
+      const { password, ...safeUser } = user;
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error updating user admin status:", error);
+      res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+
+  app.put('/api/admin/users/:id/active', requireAdmin, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { isActive } = req.body;
+      const user = await storage.updateUserActiveStatus(id, isActive);
+      const { password, ...safeUser } = user;
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      res.status(500).json({ message: "Failed to update user" });
     }
   });
 
   // Plant identification endpoint
-  app.post("/api/identify", isAuthenticated, upload.array('images', 3), async (req: any, res) => {
+  app.post("/api/identify", requireAuth, upload.array('images', 3), async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const files = req.files as Express.Multer.File[];
       
       if (!files || files.length === 0) {
@@ -171,10 +203,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generate PDF report
-  app.post("/api/generate-pdf", isAuthenticated, async (req: any, res) => {
+  app.post("/api/generate-pdf", requireAuth, async (req: any, res) => {
     try {
       const { resultId } = req.body;
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
 
       const result = await storage.getPlantResult(resultId);
       if (!result || result.userId !== userId) {
@@ -202,10 +234,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Payment endpoints
-  app.post("/api/checkout", isAuthenticated, async (req: any, res) => {
+  app.post("/api/checkout", requireAuth, async (req: any, res) => {
     try {
       const { provider, planId } = req.body;
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
 
       if (!user) {
@@ -258,10 +290,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Plant results endpoints
-  app.get("/api/results/:id", isAuthenticated, async (req: any, res) => {
+  app.get("/api/results/:id", requireAuth, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
 
       const result = await storage.getPlantResult(id);
       if (!result || result.userId !== userId) {
@@ -275,9 +307,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/my-garden", isAuthenticated, async (req: any, res) => {
+  app.get("/api/my-garden", requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const results = await storage.getUserPlantResults(userId);
       res.json(results);
     } catch (error) {
@@ -314,9 +346,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin blog endpoints (basic implementation)
-  app.post("/api/admin/blog", isAuthenticated, async (req: any, res) => {
+  app.post("/api/admin/blog", requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const data = insertBlogPostSchema.parse({ ...req.body, authorId: userId });
       
       const post = await storage.createBlogPost(data);
@@ -328,9 +360,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Subscription status endpoint
-  app.get("/api/subscription", isAuthenticated, async (req: any, res) => {
+  app.get("/api/subscription", requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const subscription = await storage.getUserSubscription(userId);
       
       if (!subscription) {
@@ -345,9 +377,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Free tier status endpoint
-  app.get("/api/free-tier-status", isAuthenticated, async (req: any, res) => {
+  app.get("/api/free-tier-status", requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const freeTierStatus = await storage.checkFreeTierEligibility(userId);
       res.json(freeTierStatus);
     } catch (error) {
@@ -367,9 +399,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/user/language", isAuthenticated, async (req: any, res) => {
+  app.put("/api/user/language", requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { language } = req.body;
       
       if (!language) {
@@ -414,9 +446,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Plant health monitoring endpoint
-  app.post("/api/health-check/:plantId", isAuthenticated, upload.array('images', 3), async (req: any, res) => {
+  app.post("/api/health-check/:plantId", requireAuth, upload.array('images', 3), async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { plantId } = req.params;
       const files = req.files as Express.Multer.File[];
       
@@ -472,9 +504,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/reviews", isAuthenticated, async (req: any, res) => {
+  app.post("/api/reviews", requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const reviewData = insertReviewSchema.parse({ ...req.body, userId });
       
       const review = await storage.createReview(reviewData);
@@ -509,9 +541,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/banner-settings", isAuthenticated, async (req: any, res) => {
+  app.post("/api/admin/banner-settings", requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { imageUrl, heading, subheading } = req.body;
       
       const updates = [];
@@ -634,9 +666,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/admin/gardening-content', isAuthenticated, async (req: any, res) => {
+  app.post('/api/admin/gardening-content', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const contentData = { ...req.body, lastUpdatedBy: userId };
       const content = await storage.updateGardeningContent(contentData);
       res.json(content);
@@ -658,9 +690,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/admin/pricing-plans', isAuthenticated, async (req: any, res) => {
+  app.post('/api/admin/pricing-plans', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const planData = { ...req.body, lastUpdatedBy: userId };
       const plan = await storage.createPricingPlan(planData);
       res.json(plan);
@@ -670,10 +702,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/admin/pricing-plans/:id', isAuthenticated, async (req: any, res) => {
+  app.put('/api/admin/pricing-plans/:id', requireAuth, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const updateData = { ...req.body, lastUpdatedBy: userId };
       const plan = await storage.updatePricingPlan(id, updateData);
       res.json(plan);
@@ -683,7 +715,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/admin/pricing-plans/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/admin/pricing-plans/:id', requireAuth, async (req, res) => {
     try {
       const { id } = req.params;
       const success = await storage.deletePricingPlan(id);
@@ -705,9 +737,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/banner-image", isAuthenticated, async (req: any, res) => {
+  app.post("/api/admin/banner-image", requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { imageUrl } = req.body;
       
       if (!imageUrl) {
@@ -776,9 +808,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Plant analysis routes
-  app.post("/api/plant-analysis/analyze", isAuthenticated, upload.array('images', 3), async (req: any, res) => {
+  app.post("/api/plant-analysis/analyze", requireAuth, upload.array('images', 3), async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const files = req.files as Express.Multer.File[];
       
       if (!files || files.length === 0) {
@@ -834,10 +866,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PDF download route
-  app.post("/api/plant-analysis/download-pdf", isAuthenticated, async (req: any, res) => {
+  app.post("/api/plant-analysis/download-pdf", requireAuth, async (req: any, res) => {
     try {
       const { analysisId } = req.body;
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       if (!analysisId) {
         return res.status(400).json({ error: "Analysis ID required" });
@@ -903,7 +935,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin pricing management routes
-  app.get("/api/admin/pricing-settings", isAuthenticated, async (req: any, res) => {
+  app.get("/api/admin/pricing-settings", requireAuth, async (req: any, res) => {
     try {
       const settings = await storage.getPricingSettings();
       res.json(settings);
@@ -913,11 +945,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/admin/pricing-settings/:id", isAuthenticated, async (req: any, res) => {
+  app.put("/api/admin/pricing-settings/:id", requireAuth, async (req: any, res) => {
     try {
       const { id } = req.params;
       const updates = req.body;
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       const updatedSetting = await storage.updatePricingSetting(id, {
         ...updates,
@@ -931,10 +963,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/pricing-settings", isAuthenticated, async (req: any, res) => {
+  app.post("/api/admin/pricing-settings", requireAuth, async (req: any, res) => {
     try {
       const settingData = req.body;
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       const newSetting = await storage.createPricingSetting({
         ...settingData,
@@ -949,7 +981,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin pricing management routes
-  app.get("/api/admin/pricing", isAuthenticated, async (req: any, res) => {
+  app.get("/api/admin/pricing", requireAuth, async (req: any, res) => {
     try {
       const pricingSettings = await storage.getAllPricingSettings();
       res.json(pricingSettings);
@@ -959,7 +991,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/pricing", isAuthenticated, async (req: any, res) => {
+  app.post("/api/admin/pricing", requireAuth, async (req: any, res) => {
     try {
       const { featureName, price, currency, description, isActive } = req.body;
       
@@ -973,7 +1005,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currency: currency || 'USD',
         description,
         isActive: isActive !== undefined ? isActive : true,
-        lastUpdatedBy: req.user.claims.sub,
+        lastUpdatedBy: req.user.id,
       });
 
       res.json(pricingSetting);
@@ -983,12 +1015,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/admin/pricing/:id", isAuthenticated, async (req: any, res) => {
+  app.put("/api/admin/pricing/:id", requireAuth, async (req: any, res) => {
     try {
       const { id } = req.params;
       const updateData = {
         ...req.body,
-        lastUpdatedBy: req.user.claims.sub,
+        lastUpdatedBy: req.user.id,
       };
 
       const pricingSetting = await storage.updatePricingSetting(id, updateData);
@@ -1004,7 +1036,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/admin/pricing/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/admin/pricing/:id", requireAuth, async (req: any, res) => {
     try {
       const { id } = req.params;
       const deleted = await storage.deletePricingSetting(id);

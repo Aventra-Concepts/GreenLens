@@ -6,6 +6,15 @@ GreenLens is a production-grade web application that leverages AI technology to 
 
 ## Recent Updates (August 2025)
 
+### Custom Authentication System Implementation (August 16, 2025)
+- **Complete Auth Overhaul**: Replaced Replit Auth with custom email/password authentication system
+- **Registration Template**: Implemented comprehensive registration form with name, location, email, password fields
+- **Admin Controls**: Added admin-only user management dashboard with user status controls
+- **Database Schema Updates**: Enhanced users table with admin flags, location, and authentication fields
+- **Session Management**: Secure session-based authentication with PostgreSQL storage
+- **Password Security**: Implemented bcrypt-based password hashing and validation
+- **Auth Routes Integration**: Updated all protected routes to use custom authentication middleware
+
 ### UI/UX Redesign (August 16, 2025)
 - **Complete Banner Overhaul**: Removed overlay, simplified to clean text-only design with "GreenLens-Powered Precision" branding
 - **Increased Banner Height**: Extended banner by 1 inch for better visual prominence
@@ -49,16 +58,19 @@ Preferred communication style: Simple, everyday language.
 
 ### Backend Architecture
 - **Express.js with TypeScript**: RESTful API server with type safety
+- **Custom Authentication**: Email/password based auth with bcrypt hashing and session management
 - **Drizzle ORM**: Type-safe database queries with PostgreSQL
 - **Service-oriented architecture**: Modular services for external API integrations
 - **Multer**: File upload handling for plant images (up to 3 images, 10MB limit)
-- **Session-based authentication**: Secure user sessions with PostgreSQL storage
+- **Admin Management**: Role-based access control with admin-only endpoints
 
 ### Database Design
 - **PostgreSQL with Neon**: Cloud-hosted database with connection pooling
 - **Core entities**: Users, Subscriptions, PlantResults, BlogPosts, CatalogCache, Sessions
+- **Authentication Schema**: Users table with email, password hash, admin flags, and location
 - **Free Tier Tracking**: User table includes freeTierUsed, freeTierStartedAt, preferredLanguage fields
 - **Enhanced Plant Data**: PlantResults includes isFreeIdentification flag and localized species information
+- **Admin Controls**: User management with isAdmin, isActive, emailVerified flags
 - **Caching strategy**: TTL-based catalog cache to reduce external API calls
 - **Data relationships**: User → Subscription (1:1), User → PlantResults (1:many)
 

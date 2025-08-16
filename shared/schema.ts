@@ -27,13 +27,19 @@ export const sessions = pgTable(
 );
 
 // User storage table.
-// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
+// Enhanced for custom authentication with admin management
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").unique(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
+  email: varchar("email").unique().notNull(),
+  firstName: varchar("first_name").notNull(),
+  lastName: varchar("last_name").notNull(),
+  location: varchar("location"),
+  password: varchar("password").notNull(), // Hashed password
   profileImageUrl: varchar("profile_image_url"),
+  isAdmin: boolean("is_admin").default(false),
+  isActive: boolean("is_active").default(true),
+  emailVerified: boolean("email_verified").default(false),
+  lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   // Enhanced fields for free tier and multilingual support
@@ -45,6 +51,29 @@ export const users = pgTable("users", {
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+
+// Auth schemas for registration and login
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  isAdmin: true,
+  isActive: true,
+  emailVerified: true,
+  lastLoginAt: true,
+  createdAt: true,
+  updatedAt: true,
+  freeTierUsed: true,
+  freeTierStartedAt: true,
+});
+
+export type InsertUser = z.infer<typeof insertUserSchema>;
+
+// Login schema
+export const loginUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
+export type LoginUser = z.infer<typeof loginUserSchema>;
 
 // Subscription management
 export const subscriptions = pgTable("subscriptions", {

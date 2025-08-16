@@ -3,7 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, AuthProvider } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
@@ -17,21 +17,25 @@ import Features from "@/pages/features";
 import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
 import Reviews from "@/pages/Reviews";
+import AuthPage from "@/pages/auth-page";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
 
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
+      {isLoading || !user ? (
+        <>
+          <Route path="/" component={Landing} />
+          <Route path="/auth" component={AuthPage} />
+        </>
       ) : (
         <>
           <Route path="/" component={Home} />
           <Route path="/identify" component={Identify} />
           <Route path="/result/:id" component={Result} />
           <Route path="/account" component={Account} />
-          <Route path="/admin" component={Admin} />
+          {user.isAdmin && <Route path="/admin" component={Admin} />}
         </>
       )}
       <Route path="/pricing" component={Pricing} />
@@ -49,8 +53,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Router />
+        <AuthProvider>
+          <Toaster />
+          <Router />
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

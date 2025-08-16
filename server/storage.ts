@@ -49,9 +49,15 @@ import { eq, and, gt, sql, desc } from "drizzle-orm";
 export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'isAdmin' | 'isActive' | 'emailVerified' | 'lastLoginAt' | 'freeTierUsed' | 'freeTierStartedAt'>): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUser(id: string, updates: Partial<UpsertUser>): Promise<User>;
   updateUserLoginActivity(userId: string): Promise<void>;
+  updateUserLastLogin(userId: string): Promise<void>;
+  getAllUsers(): Promise<User[]>;
+  updateUserAdminStatus(userId: string, isAdmin: boolean): Promise<User>;
+  updateUserActiveStatus(userId: string, isActive: boolean): Promise<User>;
   
   // User Activity operations
   logUserActivity(activity: InsertUserActivity): Promise<UserActivity>;
@@ -169,6 +175,25 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'isAdmin' | 'isActive' | 'emailVerified' | 'lastLoginAt' | 'freeTierUsed' | 'freeTierStartedAt'>): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...userData,
+        isAdmin: false,
+        isActive: true,
+        emailVerified: false,
+        freeTierUsed: 0,
+      })
+      .returning();
+    return user;
+  }
+
   async updateUserLoginActivity(userId: string): Promise<void> {
     await db
       .update(users)
@@ -176,6 +201,38 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date()
       })
       .where(eq(users.id, userId));
+  }
+
+  async updateUserLastLogin(userId: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ 
+        lastLoginAt: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users).orderBy(desc(users.createdAt));
+  }
+
+  async updateUserAdminStatus(userId: string, isAdmin: boolean): Promise<User> {
+    const [result] = await db
+      .update(users)
+      .set({ isAdmin, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return result;
+  }
+
+  async updateUserActiveStatus(userId: string, isActive: boolean): Promise<User> {
+    const [result] = await db
+      .update(users)
+      .set({ isActive, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return result;
   }
 
   // User Activity operations
