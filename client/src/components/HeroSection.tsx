@@ -272,11 +272,6 @@ export default function HeroSection() {
                   className="w-full h-96 object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6">
-                  <p className="text-white text-lg font-medium">
-                    Powered by <span className="text-green-400 font-bold">GreenLens AI Technology</span>
-                  </p>
-                </div>
               </div>
             </div>
           </div>
