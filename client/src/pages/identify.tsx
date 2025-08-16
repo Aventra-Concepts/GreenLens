@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, Camera } from "lucide-react";
+import { CameraCapture } from "@/components/CameraCapture";
 
 export default function Identify() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [showCamera, setShowCamera] = useState(false);
 
   const identifyMutation = useMutation({
     mutationFn: async (files: File[]) => {
@@ -103,6 +105,15 @@ export default function Identify() {
     setPreviews(newPreviews);
   }, [uploadedFiles, previews]);
 
+  const handleCameraCapture = useCallback((file: File) => {
+    handleFiles([file]);
+    setShowCamera(false);
+  }, [handleFiles]);
+
+  const openCamera = useCallback(() => {
+    setShowCamera(true);
+  }, []);
+
   const handleAnalyze = () => {
     if (uploadedFiles.length === 0) {
       toast({
@@ -153,9 +164,24 @@ export default function Identify() {
                     <p className="text-gray-600">Drop images here or click to browse your files</p>
                     <p className="text-sm text-gray-500">Multiple angles improve accuracy • JPG, PNG up to 10MB each</p>
                   </div>
-                  <Button className="bg-green-500 hover:bg-green-600" data-testid="choose-files-button">
-                    Choose Files
-                  </Button>
+                  <div className="flex gap-4 justify-center items-center">
+                    <Button className="bg-green-500 hover:bg-green-600" data-testid="choose-files-button">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Choose Files
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openCamera();
+                      }}
+                      className="border-green-500 text-green-600 hover:bg-green-50"
+                      data-testid="camera-button"
+                    >
+                      <Camera className="w-4 h-4 mr-2" />
+                      Take Photo
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -201,17 +227,34 @@ export default function Identify() {
               
               {/* Add more images slots */}
               {uploadedFiles.length < 3 && (
-                <Card 
-                  className="border-2 border-dashed border-gray-300 hover:border-green-400 transition-colors cursor-pointer"
-                  onClick={() => document.getElementById('file-input')?.click()}
-                >
+                <Card className="border-2 border-dashed border-gray-300 hover:border-green-400 transition-colors">
                   <CardContent className="p-4">
                     <div className="h-full flex flex-col items-center justify-center text-center">
                       <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mb-4">
                         <Upload className="w-6 h-6 text-gray-400" />
                       </div>
                       <h3 className="font-medium text-gray-900 mb-2">Add Image</h3>
-                      <p className="text-sm text-gray-600">Upload another photo</p>
+                      <p className="text-sm text-gray-600 mb-4">Upload another photo</p>
+                      <div className="flex gap-2 justify-center">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => document.getElementById('file-input')?.click()}
+                          data-testid="add-file-button"
+                        >
+                          <Upload className="w-3 h-3 mr-1" />
+                          File
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={openCamera}
+                          data-testid="add-camera-button"
+                        >
+                          <Camera className="w-3 h-3 mr-1" />
+                          Camera
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -256,6 +299,13 @@ export default function Identify() {
         </div>
       </section>
       <Footer />
+      
+      {/* Camera Capture Modal */}
+      <CameraCapture
+        isOpen={showCamera}
+        onCapture={handleCameraCapture}
+        onClose={() => setShowCamera(false)}
+      />
     </Layout>
   );
 }

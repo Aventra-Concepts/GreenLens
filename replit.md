@@ -6,6 +6,21 @@ GreenLens is a production-grade web application that leverages AI technology to 
 
 ## Recent Updates (August 2025)
 
+### E-commerce Platform Integration (August 16, 2025)
+- **Complete E-commerce System**: Integrated full-featured gardening tools shop with product catalog, shopping cart, and order management
+- **Database Schema**: Added products, cart_items, orders, order_items, categories, and shipping_rates tables
+- **Navigation Integration**: Added shopping cart button with item badge and shop link to main navigation
+- **Sample Product Catalog**: Populated shop with 6 essential gardening tools and supplies
+- **PayPal Payment Ready**: Payment infrastructure prepared for PayPal integration (API keys needed)
+- **Guest Cart Support**: Anonymous users can add items to cart using session-based storage
+
+### Mobile Camera Functionality (August 16, 2025)
+- **Direct Camera Capture**: Mobile users can now take photos directly within the app using device camera
+- **Dual Interface Options**: Users can choose between file upload or camera capture for plant identification
+- **Camera Controls**: Front/back camera switching and intuitive capture interface
+- **Seamless Integration**: Camera functionality integrated into existing upload workflow without disrupting current features
+- **Mobile-Optimized**: Responsive camera interface designed specifically for mobile plant photography
+
 ### Custom Authentication System Implementation (August 16, 2025)
 - **Complete Auth Overhaul**: Replaced Replit Auth with custom email/password authentication system
 - **Registration Template**: Implemented comprehensive registration form with name, location, email, password fields
