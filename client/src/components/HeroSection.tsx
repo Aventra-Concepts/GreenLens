@@ -18,10 +18,10 @@ export default function HeroSection() {
                 <span className="text-green-500">AI-Powered</span>{" "}
                 Precision
               </h1>
-              <p className="text-sm text-gray-600 leading-relaxed text-center">
-                <div>Upload a photo and get instant plant identification, personalized care plans,</div>
-                <div>and expert disease diagnosis powered by advanced GreenLens AI Technology.</div>
-              </p>
+              <div className="text-sm text-gray-600 leading-relaxed text-center">
+                <div>Upload a photo and get instant plant identification, personalized care plans, and expert</div>
+                <div>disease diagnosis powered by advanced <span className="text-green-600 font-semibold">GreenLens AI Technology</span>.</div>
+              </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href={isAuthenticated ? "/identify" : "/api/login"}>
