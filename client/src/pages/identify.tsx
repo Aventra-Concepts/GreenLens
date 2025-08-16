@@ -160,13 +160,9 @@ export default function Identify() {
   };
 
   return (
-    <Layout showImageBanner={false} showSidebarAds={false}>
+    <Layout showImageBanner={true} showSidebarAds={false}>
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-4 mb-12">
-            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">AI Plant Identification</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300">Upload up to 3 photos for 99% accurate identification</p>
-          </div>
 
           <div className="text-center space-y-4 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Upload Plant Images</h2>
@@ -175,11 +171,11 @@ export default function Identify() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             {Array.from({ length: 3 }, (_, index) => (
-              <Card key={index} className="relative border-2 border-dashed border-gray-300 hover:border-green-400 transition-colors">
+              <Card key={index} className="relative border-2 border-dashed border-green-300 hover:border-green-500 transition-colors bg-green-50 dark:bg-green-900/20">
                 <CardContent className="p-6">
                   {uploadedFiles[index] ? (
                     <div className="relative">
-                      <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3">
+                      <div className="aspect-square bg-green-100 dark:bg-green-800/20 rounded-lg overflow-hidden mb-3">
                         {previews[index] ? (
                           <img 
                             src={previews[index]} 
@@ -188,11 +184,11 @@ export default function Identify() {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+                            <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
                           </div>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 text-center truncate mb-2">
+                      <p className="text-sm text-green-700 dark:text-green-300 text-center truncate mb-2">
                         {uploadedFiles[index].name}
                       </p>
                       <Button
@@ -218,16 +214,15 @@ export default function Identify() {
                         className="hidden"
                         data-testid={`file-input-${index}`}
                       />
-                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-100 transition-colors">
-                        <Upload className="w-8 h-8 text-gray-400 group-hover:text-green-500" />
+                      <div className="w-16 h-16 bg-green-200 dark:bg-green-700 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-300 dark:group-hover:bg-green-600 transition-colors">
+                        <Upload className="w-8 h-8 text-green-600 dark:text-green-300 group-hover:text-green-700 dark:group-hover:text-green-200" />
                       </div>
-                      <h3 className="font-medium text-gray-900 mb-2">Image {index + 1}</h3>
-                      <p className="text-sm text-gray-600 mb-4">JPEG/PNG • Max 100KB</p>
+                      <h3 className="font-medium text-green-900 dark:text-green-100 mb-2">Image {index + 1}</h3>
+                      <p className="text-sm text-green-700 dark:text-green-300 mb-4">JPEG/PNG • Max 100KB</p>
                       <div className="flex gap-2 justify-center">
                         <Button
                           size="sm"
-                          variant="outline"
-                          className="text-xs"
+                          className="text-xs bg-green-500 hover:bg-green-600 text-white"
                           data-testid={`upload-file-${index}`}
                         >
                           <Upload className="w-3 h-3 mr-1" />
@@ -235,12 +230,11 @@ export default function Identify() {
                         </Button>
                         <Button
                           size="sm"
-                          variant="outline"
                           onClick={(e) => {
                             e.stopPropagation();
                             openCamera(index);
                           }}
-                          className="text-xs"
+                          className="text-xs bg-green-700 hover:bg-green-800 text-white"
                           data-testid={`camera-${index}`}
                         >
                           <Camera className="w-3 h-3 mr-1" />
@@ -269,10 +263,23 @@ export default function Identify() {
             </Card>
           )}
 
-          <div className="text-center">
+          <div className="text-center space-y-4">
+            {uploadedFiles.length > 0 && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={clearAllImages}
+                className="border-green-300 text-green-700 hover:bg-green-50 dark:border-green-600 dark:text-green-300 dark:hover:bg-green-900/20"
+                data-testid="clear-all-button"
+              >
+                <X className="w-4 h-4 mr-2" />
+                Clear All
+              </Button>
+            )}
+            
             <Button
               size="lg"
-              className="bg-green-500 hover:bg-green-600 px-8 py-4 text-lg"
+              className="bg-green-600 hover:bg-green-700 px-8 py-4 text-lg text-white shadow-lg"
               disabled={uploadedFiles.length === 0 || identifyMutation.isPending}
               onClick={handleAnalyze}
               data-testid="analyze-button"
