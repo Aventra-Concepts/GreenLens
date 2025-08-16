@@ -488,6 +488,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin banner image endpoint
+  // Admin banner settings endpoints
+  app.get("/api/admin/banner-settings", async (req, res) => {
+    try {
+      const [imageUrl, heading, subheading] = await Promise.all([
+        storage.getAdminSetting('banner_image_url'),
+        storage.getAdminSetting('banner_heading'),
+        storage.getAdminSetting('banner_subheading')
+      ]);
+      
+      res.json({ 
+        imageUrl: imageUrl?.settingValue || null,
+        heading: heading?.settingValue || "Accurately Identify Your Plant With Our GreenLens-Powered AI System",
+        subheading: subheading?.settingValue || "Upload a plant photo and get Instant Plant Identification"
+      });
+    } catch (error) {
+      console.error("Error fetching banner settings:", error);
+      res.status(500).json({ message: "Failed to fetch banner settings" });
+    }
+  });
+
+  app.post("/api/admin/banner-settings", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { imageUrl, heading, subheading } = req.body;
+      
+      const updates = [];
+      
+      if (imageUrl !== undefined) {
+        updates.push(storage.setAdminSetting({
+          settingKey: 'banner_image_url',
+          settingValue: imageUrl,
+          description: 'URL for the main banner background image',
+          lastUpdatedBy: userId,
+        }));
+      }
+      
+      if (heading !== undefined) {
+        updates.push(storage.setAdminSetting({
+          settingKey: 'banner_heading',
+          settingValue: heading,
+          description: 'Main heading text for the banner',
+          lastUpdatedBy: userId,
+        }));
+      }
+      
+      if (subheading !== undefined) {
+        updates.push(storage.setAdminSetting({
+          settingKey: 'banner_subheading',
+          settingValue: subheading,
+          description: 'Subheading text for the banner',
+          lastUpdatedBy: userId,
+        }));
+      }
+
+      await Promise.all(updates);
+
+      res.json({ 
+        imageUrl: imageUrl || null,
+        heading: heading || null,
+        subheading: subheading || null
+      });
+    } catch (error) {
+      console.error("Error updating banner settings:", error);
+      res.status(500).json({ message: "Failed to update banner settings" });
+    }
+  });
+
+  // Legacy banner image endpoint for backward compatibility
   app.get("/api/admin/banner-image", async (req, res) => {
     try {
       const setting = await storage.getAdminSetting('banner_image_url');

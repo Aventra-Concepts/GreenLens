@@ -14,9 +14,13 @@ export function ImageUploadBanner() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Fetch admin-configurable banner image
-  const { data: bannerSettings } = useQuery<{ imageUrl?: string }>({
-    queryKey: ["/api/admin/banner-image"],
+  // Fetch admin-configurable banner settings
+  const { data: bannerSettings } = useQuery<{ 
+    imageUrl?: string; 
+    heading?: string; 
+    subheading?: string; 
+  }>({
+    queryKey: ["/api/admin/banner-settings"],
     retry: false,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
@@ -144,11 +148,22 @@ export function ImageUploadBanner() {
       
       <div className="h-full flex flex-col justify-center items-center px-6 py-8 relative z-10">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-4 leading-tight drop-shadow-lg">
-          <div>Accurately Identify Your Plant With Our</div>
-          <div><span className="text-green-300">GreenLens-Powered AI</span> System</div>
+          {bannerSettings?.heading ? (
+            <div dangerouslySetInnerHTML={{ 
+              __html: bannerSettings.heading.replace(
+                /GreenLens-Powered AI/g, 
+                '<span class="text-green-300">GreenLens-Powered AI</span>'
+              )
+            }} />
+          ) : (
+            <>
+              <div>Accurately Identify Your Plant With Our</div>
+              <div><span className="text-green-300">GreenLens-Powered AI</span> System</div>
+            </>
+          )}
         </h2>
         <h4 className="text-sm sm:text-base text-white text-center max-w-4xl drop-shadow-md">
-          Upload a plant photo and get Instant Plant Identification
+          {bannerSettings?.subheading || "Upload a plant photo and get Instant Plant Identification"}
         </h4>
       </div>
     </Card>

@@ -11,6 +11,7 @@ import Identify from "@/pages/identify";
 import Result from "@/pages/result";
 import Pricing from "@/pages/pricing";
 import Account from "@/pages/account";
+import Admin from "@/pages/admin";
 import Features from "@/pages/features";
 import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
@@ -29,6 +30,7 @@ function Router() {
           <Route path="/identify" component={Identify} />
           <Route path="/result/:id" component={Result} />
           <Route path="/account" component={Account} />
+          <Route path="/admin" component={Admin} />
         </>
       )}
       <Route path="/pricing" component={Pricing} />
