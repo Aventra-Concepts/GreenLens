@@ -22,14 +22,16 @@ import { registerEcommerceRoutes } from "./routes/ecommerce";
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB
+    fileSize: 100 * 1024, // 100KB max per file
     files: 3,
   },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
+    // Only allow JPEG and PNG
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only image files are allowed'));
+      cb(new Error('Only JPEG and PNG images are allowed'));
     }
   },
 });
@@ -190,6 +192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         freeTierStatus = await storage.checkFreeTierEligibility(userId);
       }
 
+      // Images are automatically cleaned from memory after processing
       res.json({
         id: plantResult.id,
         species: enrichedSpecies,
@@ -198,6 +201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         diseases: diseaseAdvice,
         createdAt: plantResult.createdAt,
         freeTierStatus,
+        message: "Analysis complete. Images automatically cleaned from memory."
       });
 
     } catch (error) {

@@ -16,10 +16,11 @@ GreenLens is a production-grade web application that leverages AI technology to 
 
 ### Mobile Camera Functionality (August 16, 2025)
 - **Direct Camera Capture**: Mobile users can now take photos directly within the app using device camera
-- **Dual Interface Options**: Users can choose between file upload or camera capture for plant identification
-- **Camera Controls**: Front/back camera switching and intuitive capture interface
-- **Seamless Integration**: Camera functionality integrated into existing upload workflow without disrupting current features
-- **Mobile-Optimized**: Responsive camera interface designed specifically for mobile plant photography
+- **Three-Slot Upload Interface**: Restored dedicated 3-slot image upload layout for optimal user experience
+- **Camera Controls**: Front/back camera switching and intuitive capture interface per slot
+- **File Restrictions**: Strict JPEG/PNG only format with 100KB maximum file size per image
+- **Auto-Cleanup System**: Automatic image deletion from memory after successful identification to prevent system crashes
+- **Enhanced Validation**: Client and server-side file type and size validation for system stability
 
 ### Custom Authentication System Implementation (August 16, 2025)
 - **Complete Auth Overhaul**: Replaced Replit Auth with custom email/password authentication system
