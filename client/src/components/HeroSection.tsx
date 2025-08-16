@@ -25,35 +25,57 @@ export default function HeroSection() {
             </div>
             
             {/* Image upload boxes */}
-            <div className="flex justify-center gap-4">
-              <div className="w-20 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 hover:border-green-400 hover:bg-green-50 transition-colors cursor-pointer">
-                <Upload className="w-6 h-6 text-gray-400 mb-1" />
-                <span className="text-xs text-gray-500">Image 1</span>
-                <span className="text-xs text-gray-400">≤100KB</span>
+            <div className="flex justify-center gap-8">
+              <div className="flex flex-col items-center">
+                <div className="w-40 h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 hover:border-green-400 hover:bg-green-50 transition-colors cursor-pointer">
+                  <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                  <span className="text-sm text-gray-500 mb-1">Image 1</span>
+                  <span className="text-xs text-gray-400">≤100KB</span>
+                </div>
+                <Button 
+                  size="sm"
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md font-medium text-sm mt-3 transition-colors"
+                  data-testid="upload-image-1-button"
+                >
+                  <Upload className="w-3 h-3 mr-1" />
+                  Upload
+                </Button>
               </div>
-              <div className="w-20 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 hover:border-green-400 hover:bg-green-50 transition-colors cursor-pointer">
-                <Upload className="w-6 h-6 text-gray-400 mb-1" />
-                <span className="text-xs text-gray-500">Image 2</span>
-                <span className="text-xs text-gray-400">≤100KB</span>
+              
+              <div className="flex flex-col items-center">
+                <div className="w-40 h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 hover:border-green-400 hover:bg-green-50 transition-colors cursor-pointer">
+                  <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                  <span className="text-sm text-gray-500 mb-1">Image 2</span>
+                  <span className="text-xs text-gray-400">≤100KB</span>
+                </div>
+                <Button 
+                  size="sm"
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md font-medium text-sm mt-3 transition-colors"
+                  data-testid="upload-image-2-button"
+                >
+                  <Upload className="w-3 h-3 mr-1" />
+                  Upload
+                </Button>
               </div>
-              <div className="w-20 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 hover:border-green-400 hover:bg-green-50 transition-colors cursor-pointer">
-                <Upload className="w-6 h-6 text-gray-400 mb-1" />
-                <span className="text-xs text-gray-500">Image 3</span>
-                <span className="text-xs text-gray-400">≤100KB</span>
+              
+              <div className="flex flex-col items-center">
+                <div className="w-40 h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 hover:border-green-400 hover:bg-green-50 transition-colors cursor-pointer">
+                  <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                  <span className="text-sm text-gray-500 mb-1">Image 3</span>
+                  <span className="text-xs text-gray-400">≤100KB</span>
+                </div>
+                <Button 
+                  size="sm"
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md font-medium text-sm mt-3 transition-colors"
+                  data-testid="upload-image-3-button"
+                >
+                  <Upload className="w-3 h-3 mr-1" />
+                  Upload
+                </Button>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href={isAuthenticated ? "/identify" : "/api/login"}>
-                <Button 
-                  size="default"
-                  className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium text-base transition-colors shadow-md hover:shadow-lg transform hover:scale-105 transition-transform"
-                  data-testid="upload-plant-photo-button"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Upload Plant Photo
-                </Button>
-              </Link>
+            <div className="flex justify-center">
               <Button 
                 variant="outline"
                 size="default"
