@@ -154,7 +154,7 @@ export default function HeroSection() {
     <>
       <section className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="max-w-4xl mx-auto">
             <div className="space-y-8">
               <div className="space-y-6">
                 <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight text-center">
@@ -263,17 +263,7 @@ export default function HeroSection() {
               )}
             </div>
 
-            {/* Right side - Image */}
-            <div className="relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src={gardenImage}
-                  alt="Beautiful garden with various plants"
-                  className="w-full h-96 object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-              </div>
-            </div>
+
           </div>
         </div>
       </section>
