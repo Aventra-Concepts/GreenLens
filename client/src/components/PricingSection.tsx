@@ -148,9 +148,9 @@ export default function PricingSection() {
   const sortedPlans = plans.sort((a: PricingPlan, b: PricingPlan) => a.displayOrder - b.displayOrder);
 
   return (
-    <section id="pricing" className="py-16 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-4 mb-12">
+    <section id="pricing" className="py-12 bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center space-y-3 mb-8">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
             Choose Your Plan
           </h2>
@@ -159,78 +159,78 @@ export default function PricingSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
           {sortedPlans.map((plan: PricingPlan) => (
             <Card
               key={plan.id}
               className={`relative transition-all duration-300 hover:shadow-lg ${
                 plan.isPopular
-                  ? 'ring-2 ring-primary border-primary scale-105 shadow-xl'
+                  ? 'ring-2 ring-primary border-primary transform scale-[1.02] shadow-xl'
                   : 'border-gray-200 dark:border-gray-700'
-              } bg-white dark:bg-gray-800`}
+              } bg-white dark:bg-gray-800 h-fit`}
               data-testid={`pricing-plan-${plan.planId}`}
             >
               {plan.isPopular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-primary text-primary-foreground px-4 py-1 flex items-center gap-1">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <Badge className="bg-primary text-primary-foreground px-3 py-1 flex items-center gap-1 text-xs">
                     <Star className="w-3 h-3" />
                     Most Popular
                   </Badge>
                 </div>
               )}
 
-              <CardHeader className="text-center space-y-4 pb-8">
+              <CardHeader className="text-center space-y-3 pb-4">
                 <div className="flex items-center justify-center gap-2">
-                  {plan.isPopular && <Zap className="w-5 h-5 text-primary" />}
-                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">
+                  {plan.isPopular && <Zap className="w-4 h-4 text-primary" />}
+                  <CardTitle className="text-lg font-bold text-gray-900 dark:text-white">
                     {plan.name}
                   </CardTitle>
                 </div>
                 
                 <div className="space-y-1">
-                  <div className="text-4xl font-bold text-gray-900 dark:text-white">
+                  <div className="text-3xl font-bold text-gray-900 dark:text-white">
                     {plan.currency === 'USD' && '$'}
                     {plan.price}
                     {plan.currency !== 'USD' && ` ${plan.currency}`}
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     {plan.billingInterval === 'monthly' ? 'per month' : 'per year'}
                   </p>
                 </div>
                 
                 {plan.description && (
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  <p className="text-gray-600 dark:text-gray-300 text-xs px-2">
                     {plan.description}
                   </p>
                 )}
               </CardHeader>
 
-              <CardContent className="space-y-6">
-                <div className="space-y-3">
-                  {plan.features.map((feature, index) => (
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  {plan.features.slice(0, 5).map((feature, index) => (
                     <div
                       key={index}
-                      className={`flex items-start gap-3 ${
+                      className={`flex items-start gap-2 ${
                         feature.included ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400'
                       }`}
                     >
                       <CheckCircle
-                        className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
+                        className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
                           feature.included ? 'text-green-500' : 'text-gray-300'
                         }`}
                       />
                       <div>
-                        <span className={feature.included ? '' : 'line-through'}>
+                        <span className={`text-sm ${feature.included ? '' : 'line-through'}`}>
                           {feature.name}
                         </span>
-                        {feature.description && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {feature.description}
-                          </p>
-                        )}
                       </div>
                     </div>
                   ))}
+                  {plan.features.length > 5 && (
+                    <div className="text-xs text-gray-500 dark:text-gray-400 pl-6">
+                      +{plan.features.length - 5} more features
+                    </div>
+                  )}
                 </div>
 
                 <Button
@@ -239,7 +239,6 @@ export default function PricingSection() {
                       ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
                       : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100'
                   }`}
-                  size="lg"
                   onClick={() => handleChoosePlan(plan.planId)}
                   disabled={checkoutMutation.isPending && selectedPlan === plan.planId}
                   data-testid={`choose-plan-${plan.planId}`}
