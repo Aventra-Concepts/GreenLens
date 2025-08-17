@@ -194,7 +194,7 @@ export default function PricingSection() {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 max-w-4xl mx-auto justify-center items-start">
+        <div className="flex flex-col sm:flex-row gap-3 max-w-4xl mx-auto justify-center items-start mt-6">
           {sortedPlans.map((plan: PricingPlan) => (
             <Card
               key={plan.id}
