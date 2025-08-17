@@ -29,7 +29,7 @@ interface PlantAnalysisResultsProps {
         description: string;
       }>;
     };
-    careInstructions: string;
+    careInstructions: any; // Can be string or object
     pdfReportUrl?: string;
   };
   onClose: () => void;
@@ -220,9 +220,86 @@ export default function PlantAnalysisResults({
             </CardHeader>
             <CardContent>
               <div className="prose prose-sm max-w-none dark:prose-invert">
-                <div className="whitespace-pre-line text-gray-700 dark:text-gray-300">
-                  {careInstructions}
-                </div>
+                {typeof careInstructions === 'string' ? (
+                  <div className="whitespace-pre-line text-gray-700 dark:text-gray-300">
+                    {careInstructions}
+                  </div>
+                ) : careInstructions && typeof careInstructions === 'object' ? (
+                  <div className="space-y-4">
+                    {/* Watering */}
+                    {careInstructions.watering && (
+                      <div className="border-l-4 border-blue-500 pl-4">
+                        <h4 className="font-semibold text-blue-600 mb-2">💧 Watering</h4>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm">
+                          <strong>Method:</strong> {careInstructions.watering.method || 'Standard watering'}
+                        </p>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm">
+                          <strong>Frequency:</strong> {careInstructions.watering.frequency || 'As needed'}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Lighting */}
+                    {careInstructions.lighting && (
+                      <div className="border-l-4 border-yellow-500 pl-4">
+                        <h4 className="font-semibold text-yellow-600 mb-2">☀️ Lighting</h4>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm">
+                          <strong>Requirement:</strong> {careInstructions.lighting.requirement || 'Bright indirect light'}
+                        </p>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm">
+                          <strong>Positioning:</strong> {careInstructions.lighting.positioning || 'Near a window'}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Temperature */}
+                    {careInstructions.temperature && (
+                      <div className="border-l-4 border-red-500 pl-4">
+                        <h4 className="font-semibold text-red-600 mb-2">🌡️ Temperature</h4>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm">
+                          <strong>Optimal:</strong> {careInstructions.temperature.optimal || '65-75°F'}
+                        </p>
+                        {careInstructions.temperature.seasonalVariations && (
+                          <p className="text-gray-700 dark:text-gray-300 text-sm">
+                            <strong>Seasonal Notes:</strong> {careInstructions.temperature.seasonalVariations}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Humidity */}
+                    {careInstructions.humidity && (
+                      <div className="border-l-4 border-teal-500 pl-4">
+                        <h4 className="font-semibold text-teal-600 mb-2">💨 Humidity</h4>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm">
+                          <strong>Level:</strong> {careInstructions.humidity.level || '40-60%'}
+                        </p>
+                        {careInstructions.humidity.methods && careInstructions.humidity.methods.length > 0 && (
+                          <p className="text-gray-700 dark:text-gray-300 text-sm">
+                            <strong>Methods:</strong> {careInstructions.humidity.methods.join(', ')}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Soil */}
+                    {careInstructions.soil && (
+                      <div className="border-l-4 border-amber-500 pl-4">
+                        <h4 className="font-semibold text-amber-600 mb-2">🌱 Soil</h4>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm">
+                          <strong>Type:</strong> {careInstructions.soil.type || 'Well-draining potting mix'}
+                        </p>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm">
+                          <strong>pH:</strong> {careInstructions.soil.pH || '6.0-7.0'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-gray-700 dark:text-gray-300">
+                    <p>Care instructions will be provided after analysis.</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
