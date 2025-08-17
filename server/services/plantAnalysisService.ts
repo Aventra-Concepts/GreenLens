@@ -195,6 +195,16 @@ export class PlantAnalysisService {
       };
     } catch (error) {
       console.error("Plant analysis error:", error);
+      
+      // Handle rate limit errors specifically
+      if (error instanceof Error && error.message.includes('quota exceeded')) {
+        throw new Error('Our AI service has reached its daily limit. Please try again tomorrow or upgrade to a paid plan for unlimited analysis.');
+      }
+      
+      if (error instanceof Error && error.message.includes('429')) {
+        throw new Error('Too many requests to our AI service. Please wait a moment and try again.');
+      }
+      
       throw new Error(`Analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

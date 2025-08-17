@@ -5,8 +5,54 @@ const genAI = new GoogleGenerativeAI(
 );
 
 export class GeminiService {
+  private requestCount = 0;
+  private readonly MAX_REQUESTS_PER_DAY = 45; // Conservative limit under 50 free tier limit
+  private lastResetDate = new Date().toDateString();
+  private requestTimes: number[] = [];
+  private readonly MIN_REQUEST_INTERVAL = 2000; // 2 seconds between requests
+
+  private async waitForRateLimit(): Promise<void> {
+    // Reset daily counter
+    const today = new Date().toDateString();
+    if (this.lastResetDate !== today) {
+      this.requestCount = 0;
+      this.lastResetDate = today;
+      this.requestTimes = [];
+    }
+
+    // Check daily limit
+    if (this.requestCount >= this.MAX_REQUESTS_PER_DAY) {
+      throw new Error('Daily API quota limit reached. Please try again tomorrow.');
+    }
+
+    // Check rate limiting (minimum interval between requests)
+    const now = Date.now();
+    const lastRequestTime = this.requestTimes[this.requestTimes.length - 1] || 0;
+    const timeSinceLastRequest = now - lastRequestTime;
+
+    if (timeSinceLastRequest < this.MIN_REQUEST_INTERVAL) {
+      const waitTime = this.MIN_REQUEST_INTERVAL - timeSinceLastRequest;
+      console.log(`Rate limiting: waiting ${waitTime}ms before next request`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+  }
+
+  private updateRateLimit(): void {
+    this.requestCount++;
+    this.requestTimes.push(Date.now());
+    
+    // Keep only last 10 request times for memory efficiency
+    if (this.requestTimes.length > 10) {
+      this.requestTimes = this.requestTimes.slice(-10);
+    }
+    
+    console.log(`Gemini API requests today: ${this.requestCount}/${this.MAX_REQUESTS_PER_DAY}`);
+  }
   async generateStructuredContent(prompt: string, schema: Record<string, string>): Promise<any> {
     try {
+      // Check rate limit before making request
+      await this.waitForRateLimit();
+      
       const model = this.getModel();
       
       const structuredPrompt = `${prompt}
@@ -17,6 +63,10 @@ ${JSON.stringify(schema, null, 2)}
 Ensure the response is properly formatted JSON that can be parsed.`;
 
       const result = await model.generateContent(structuredPrompt);
+      
+      // Update rate limit tracker
+      this.updateRateLimit();
+      
       const response = result.response;
       const text = response.text();
       
@@ -29,12 +79,21 @@ Ensure the response is properly formatted JSON that can be parsed.`;
       return JSON.parse(jsonMatch[0]);
     } catch (error) {
       console.error('Error generating structured content:', error);
+      
+      // Handle rate limit errors specifically
+      if (error instanceof Error && error.message.includes('429')) {
+        throw new Error('Google Gemini API quota exceeded. Please upgrade to a paid plan or try again tomorrow.');
+      }
+      
       throw error;
     }
   }
 
   async analyzeWithImages(prompt: string, imageBase64Array: string[], options?: { type?: "json_object" }): Promise<string> {
     try {
+      // Check rate limit before making request
+      await this.waitForRateLimit();
+      
       // Convert base64 images to the format Gemini expects
       const imageContents = imageBase64Array.map(base64 => ({
         inlineData: {
@@ -58,6 +117,9 @@ Ensure the response is properly formatted JSON that can be parsed.`;
       const model = genAI.getGenerativeModel(modelConfig);
       const result = await model.generateContent(contents);
 
+      // Update rate limit tracker
+      this.updateRateLimit();
+
       const response = result.response;
       const text = response.text();
       
@@ -80,6 +142,12 @@ Ensure the response is properly formatted JSON that can be parsed.`;
       return text;
     } catch (error) {
       console.error('Error analyzing images with Gemini:', error);
+      
+      // Handle rate limit errors specifically
+      if (error instanceof Error && error.message.includes('429')) {
+        throw new Error('Google Gemini API quota exceeded. Please upgrade to a paid plan or try again tomorrow.');
+      }
+      
       throw error;
     }
   }
@@ -90,6 +158,9 @@ Ensure the response is properly formatted JSON that can be parsed.`;
 
   async analyzeText(prompt: string, options?: { type?: "json_object" }): Promise<string> {
     try {
+      // Check rate limit before making request
+      await this.waitForRateLimit();
+      
       let modelConfig: any = { model: "gemini-1.5-flash" };
       if (options?.type === "json_object") {
         modelConfig.generationConfig = {
@@ -99,6 +170,9 @@ Ensure the response is properly formatted JSON that can be parsed.`;
 
       const model = genAI.getGenerativeModel(modelConfig);
       const result = await model.generateContent(prompt);
+
+      // Update rate limit tracker
+      this.updateRateLimit();
 
       const response = result.response;
       const text = response.text();
@@ -122,6 +196,12 @@ Ensure the response is properly formatted JSON that can be parsed.`;
       return text;
     } catch (error) {
       console.error('Error analyzing text with Gemini:', error);
+      
+      // Handle rate limit errors specifically
+      if (error instanceof Error && error.message.includes('429')) {
+        throw new Error('Google Gemini API quota exceeded. Please upgrade to a paid plan or try again tomorrow.');
+      }
+      
       throw error;
     }
   }

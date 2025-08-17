@@ -55,9 +55,21 @@ export default function Identify() {
       setLocation(`/result/${data.id}`);
     },
     onError: (error: Error) => {
+      let title = "Identification Failed";
+      let description = error.message;
+      
+      // Handle specific API quota errors with more helpful messages
+      if (error.message.includes('quota exceeded') || error.message.includes('daily limit')) {
+        title = "Daily Limit Reached";
+        description = "Our AI service has reached its daily limit. Please try again tomorrow or contact support for unlimited access.";
+      } else if (error.message.includes('Too many requests')) {
+        title = "Please Wait";
+        description = "Too many requests. Please wait a moment and try again.";
+      }
+      
       toast({
-        title: "Identification Failed",
-        description: error.message,
+        title,
+        description,
         variant: "destructive",
       });
     },
@@ -183,6 +195,12 @@ export default function Identify() {
           <div className="text-center space-y-4 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Upload Plant Images</h2>
             <p className="text-gray-600 dark:text-gray-300">Add up to 3 photos for the most accurate identification</p>
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-4">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                <strong>Free Tier:</strong> Limited to 45 AI analysis requests per day. 
+                <a href="/pricing" className="underline hover:no-underline ml-1">Upgrade for unlimited access</a>
+              </p>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
