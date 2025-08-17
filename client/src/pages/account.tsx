@@ -21,6 +21,24 @@ export default function Account() {
 
   const { data: subscription, isLoading: subscriptionLoading } = useQuery({
     queryKey: ['/api/subscription'],
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/subscription', {
+          credentials: 'include',
+        });
+        
+        // Handle errors gracefully - return null for subscription if API fails
+        if (!response.ok) {
+          console.warn('Subscription API error:', response.status);
+          return null;
+        }
+        
+        return response.json();
+      } catch (error) {
+        console.warn('Subscription fetch error:', error);
+        return null; // Return null on error instead of throwing
+      }
+    },
     retry: false,
   });
 
