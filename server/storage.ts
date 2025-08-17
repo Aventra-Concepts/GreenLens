@@ -1299,10 +1299,10 @@ export class DatabaseStorage implements IStorage {
     // Apply sorting
     switch (filters.sortBy) {
       case 'newest':
-        query = query.orderBy(desc(ebooks.publishedAt));
+        query = query.orderBy(desc(ebooks.publicationDate));
         break;
       case 'rating':
-        query = query.orderBy(desc(ebooks.averageRating));
+        query = query.orderBy(desc(ebooks.ratingAverage));
         break;
       case 'price_low':
         query = query.orderBy(asc(ebooks.basePrice));
@@ -1312,7 +1312,7 @@ export class DatabaseStorage implements IStorage {
         break;
       case 'popularity':
       default:
-        query = query.orderBy(desc(ebooks.downloadCount), desc(ebooks.averageRating));
+        query = query.orderBy(desc(ebooks.downloadCount), desc(ebooks.ratingAverage));
         break;
     }
 
@@ -1327,7 +1327,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(ebooks)
       .where(and(eq(ebooks.isFeatured, true), eq(ebooks.status, 'published')))
-      .orderBy(desc(ebooks.averageRating), desc(ebooks.downloadCount))
+      .orderBy(desc(ebooks.ratingAverage), desc(ebooks.downloadCount))
       .limit(limit);
   }
 
@@ -1411,14 +1411,14 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(platformSettings)
-      .orderBy(platformSettings.category, platformSettings.key);
+      .orderBy(platformSettings.category, platformSettings.settingKey);
   }
 
   async getPlatformSetting(key: string): Promise<PlatformSetting | undefined> {
     const [setting] = await db
       .select()
       .from(platformSettings)
-      .where(eq(platformSettings.key, key));
+      .where(eq(platformSettings.settingKey, key));
     return setting;
   }
 

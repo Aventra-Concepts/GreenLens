@@ -835,8 +835,8 @@ export const ebooks = pgTable("ebooks", {
   
   // Analytics
   downloadCount: integer("download_count").default(0),
-  rating: decimal("rating", { precision: 3, scale: 2 }),
-  reviewCount: integer("review_count").default(0),
+  ratingAverage: decimal("rating_average", { precision: 3, scale: 2 }),
+  ratingCount: integer("rating_count").default(0),
   
   isActive: boolean("is_active").default(true),
   isFeatured: boolean("is_featured").default(false),
@@ -849,8 +849,8 @@ export const insertEbookSchema = createInsertSchema(ebooks).omit({
   id: true,
   authorName: true,
   downloadCount: true,
-  rating: true,
-  reviewCount: true,
+  ratingAverage: true,
+  ratingCount: true,
   status: true,
   adminNotes: true,
   approvedBy: true,

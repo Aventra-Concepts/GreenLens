@@ -17,6 +17,30 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowLeft, CheckCircle, Clock, XCircle, Upload, FileText, User, Briefcase, CreditCard } from "lucide-react";
 
+// Author profile interface
+interface AuthorProfile {
+  id?: string;
+  userId?: string;
+  displayName?: string;
+  bio?: string;
+  websiteUrl?: string;
+  expertise?: string;
+  experience?: string;
+  applicationStatus?: 'pending' | 'approved' | 'rejected' | 'under_review' | 'suspended';
+  adminNotes?: string;
+  createdAt?: string;
+  hasPublishingExperience?: boolean;
+  publishingExperienceDetails?: string;
+  bankAccountHolderName?: string;
+  bankAccountNumber?: string;
+  bankName?: string;
+  branchName?: string;
+  ifscCode?: string;
+  routingNumber?: string;
+  swiftCode?: string;
+  paypalEmail?: string;
+}
+
 // Author registration form schema
 const authorRegistrationSchema = z.object({
   displayName: z.string().min(2, "Display name must be at least 2 characters"),
@@ -52,7 +76,7 @@ export default function AuthorRegistration() {
   const totalSteps = 4;
 
   // Check if user already has an author profile
-  const { data: authorProfile, isLoading: isLoadingProfile } = useQuery({
+  const { data: authorProfile, isLoading: isLoadingProfile } = useQuery<AuthorProfile>({
     queryKey: ["/api/author/profile"],
     enabled: !!user,
   });
@@ -197,7 +221,7 @@ export default function AuthorRegistration() {
               Author Application Status
             </CardTitle>
             <CardDescription>
-              Application submitted on {new Date(authorProfile.createdAt).toLocaleDateString()}
+              Application submitted on {authorProfile.createdAt ? new Date(authorProfile.createdAt).toLocaleDateString() : 'Unknown date'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -224,7 +248,7 @@ export default function AuthorRegistration() {
                   </div>
                   <div>
                     <span className="text-muted-foreground">Expertise:</span>
-                    <span className="ml-2">{authorProfile.expertise?.join(", ")}</span>
+                    <span className="ml-2">{authorProfile.expertise}</span>
                   </div>
                 </div>
               </div>
