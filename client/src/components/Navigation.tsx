@@ -38,17 +38,19 @@ export default function Navigation() {
               </Button>
             </Link>
             
+            {/* Talk to Our Expert - Available for all users */}
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => window.location.href = '/talk-to-expert'}
+              data-testid="talk-to-expert-button"
+            >
+              Talk to Our Expert
+            </Button>
+            
             {!isLoading && (
               <>
                 {user ? (
                   <>
-                    <Button 
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
-                      onClick={() => window.location.href = '/talk-to-expert'}
-                      data-testid="talk-to-expert-button"
-                    >
-                      Talk to Our Expert
-                    </Button>
                     <Button 
                       variant="ghost"
                       onClick={() => window.location.href = '/account'}
@@ -153,6 +155,19 @@ export default function Navigation() {
               >
                 Shop
               </Link>
+              
+              {/* Talk to Our Expert - Mobile Menu */}
+              <Button 
+                className="bg-blue-600 hover:bg-blue-700 text-white w-full justify-start"
+                onClick={() => {
+                  window.location.href = '/talk-to-expert';
+                  setIsMenuOpen(false);
+                }}
+                data-testid="mobile-talk-to-expert-button"
+              >
+                Talk to Our Expert
+              </Button>
+              
               {user && (
                 <Link 
                   href="/account" 

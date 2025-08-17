@@ -57,7 +57,7 @@ export default function TalkToExpert() {
   const form = useForm<ConsultationRequestForm>({
     resolver: zodResolver(consultationRequestSchema),
     defaultValues: {
-      name: user ? `${user.firstName} ${user.lastName}` : "",
+      name: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : "",
       email: user?.email || "",
       address: "",
       problemDescription: "",
