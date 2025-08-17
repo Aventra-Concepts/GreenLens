@@ -38,6 +38,9 @@ export default function Identify() {
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('AUTHENTICATION_REQUIRED');
+        }
         const error = await response.json();
         throw new Error(error.message || 'Failed to identify plant');
       }
@@ -57,6 +60,21 @@ export default function Identify() {
     onError: (error: Error) => {
       let title = "Identification Failed";
       let description = "Unable to analyze your plant right now. Please try again later.";
+      
+      // Handle authentication errors first
+      if (error.message === 'AUTHENTICATION_REQUIRED' || error.message.includes('401') || error.message.includes('Unauthorized')) {
+        title = "Login Required";
+        description = "Please sign in to identify plants and track your garden collection.";
+        toast({
+          title,
+          description,
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          setLocation('/auth');
+        }, 1500);
+        return;
+      }
       
       // Handle sanitized error codes from backend
       if (error.message.includes('SERVICE_QUOTA_EXCEEDED')) {
@@ -204,12 +222,22 @@ export default function Identify() {
           <div className="text-center space-y-4 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Upload Plant Images</h2>
             <p className="text-gray-600 dark:text-gray-300">Add up to 3 photos for the most accurate identification</p>
-            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-4">
-              <p className="text-sm text-amber-800 dark:text-amber-200">
-                <strong>Free Tier:</strong> Limited to 45 AI analysis requests per day. 
-                <a href="/pricing" className="underline hover:no-underline ml-1">Upgrade for unlimited access</a>
-              </p>
-            </div>
+            {!isAuthenticated && !isAuthLoading && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  <strong>Login Required:</strong> Please sign in to identify plants and track your garden collection.
+                  <a href="/auth" className="underline hover:no-underline ml-1">Sign In Now</a>
+                </p>
+              </div>
+            )}
+            {isAuthenticated && (
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-4">
+                <p className="text-sm text-amber-800 dark:text-amber-200">
+                  <strong>Free Tier:</strong> Limited to 45 AI analysis requests per day. 
+                  <a href="/pricing" className="underline hover:no-underline ml-1">Upgrade for unlimited access</a>
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">

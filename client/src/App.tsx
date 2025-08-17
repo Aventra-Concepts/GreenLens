@@ -58,21 +58,17 @@ function Router() {
 
   return (
     <Switch>
+      {/* Landing/Home page - different based on auth status */}
+      {isLoading || !user ? (
+        <Route path="/" component={Landing} />
+      ) : (
+        <Route path="/" component={Home} />
+      )}
+      
       {/* Auth page is always available */}
       <Route path="/auth" component={AuthPage} />
       
-      {isLoading || !user ? (
-        <>
-          <Route path="/" component={Landing} />
-        </>
-      ) : (
-        <>
-          <Route path="/" component={Home} />
-          <Route path="/account" component={Account} />
-          {user.isAdmin && <Route path="/admin" component={Admin} />}
-        </>
-      )}
-      {/* Public routes available to all users */}
+      {/* Public routes available to all users regardless of auth status */}
       <Route path="/identify" component={Identify} />
       <Route path="/result/:id" component={Result} />
       <Route path="/pricing" component={Pricing} />
@@ -96,10 +92,6 @@ function Router() {
           return id ? <ConsultationSuccess consultationId={id} /> : <NotFound />;
         }}
       </Route>
-      <Route path="/admin-login" component={AdminLogin} />
-      <Route path="/admin/dashboard" component={AdminDashboard} />
-      <Route path="/admin/blog" component={AdminBlogManager} />
-      <Route path="/admin/social-media" component={AdminSocialMedia} />
       <Route path="/ebook-marketplace" component={EbookMarketplace} />
       <Route path="/ebooks/:id">
         {(params) => <EbookDetail id={params.id} />}
@@ -125,6 +117,23 @@ function Router() {
       <Route path="/student-verification" component={StudentVerification} />
       <Route path="/student-dashboard" component={StudentDashboard} />
       <Route path="/experts-register" component={ExpertsRegister} />
+      
+      {/* Protected routes that require authentication */}
+      {user && (
+        <>
+          <Route path="/account" component={Account} />
+          {user.isAdmin && (
+            <>
+              <Route path="/admin" component={Admin} />
+              <Route path="/admin-login" component={AdminLogin} />
+              <Route path="/admin/dashboard" component={AdminDashboard} />
+              <Route path="/admin/blog" component={AdminBlogManager} />
+              <Route path="/admin/social-media" component={AdminSocialMedia} />
+            </>
+          )}
+        </>
+      )}
+      
       <Route component={NotFound} />
     </Switch>
   );
