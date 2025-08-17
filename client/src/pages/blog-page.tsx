@@ -271,7 +271,7 @@ export default function BlogPage() {
         )}
 
         {/* Organized Categories Overview Section */}
-        <div className="mt-16 space-y-12">
+        <div className="mt-4 space-y-12">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               Explore Our Expert Content Categories
