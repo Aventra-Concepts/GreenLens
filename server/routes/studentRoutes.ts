@@ -231,4 +231,28 @@ router.post("/api/admin/convert-expired-students", isAuthenticated, async (req, 
   }
 });
 
+// Get student profile for marketplace discount
+router.get("/api/student-profile", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user!.id;
+    const profile = await storage.getStudentProfileByUserId(userId);
+    
+    if (!profile) {
+      return res.json(null);
+    }
+
+    // Return only necessary fields for marketplace
+    res.json({
+      id: profile.id,
+      verificationStatus: profile.verificationStatus,
+      discountPercentage: profile.discountPercentage,
+      accessLevel: profile.accessLevel,
+      expiresAt: profile.expiresAt,
+    });
+  } catch (error) {
+    console.error("Error fetching student profile:", error);
+    res.status(500).json({ error: "Failed to fetch student profile" });
+  }
+});
+
 export default router;

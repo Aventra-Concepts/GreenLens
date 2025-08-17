@@ -73,10 +73,21 @@ export default function EbookMarketplace() {
     },
   });
 
+  // Get student discount info
+  const { data: studentProfile } = useQuery({
+    queryKey: ['/api/student-profile'],
+    queryFn: async () => {
+      const response = await fetch('/api/student-profile');
+      return response.json();
+    },
+    enabled: !!user,
+  });
+
   const formatPrice = (basePrice: string) => {
     const price = parseFloat(basePrice);
-    if (user?.userType === 'student' && user?.studentStatus === 'verified') {
-      const discountedPrice = price * 0.8; // 20% student discount
+    if (studentProfile?.verificationStatus === 'verified') {
+      const discountPercentage = parseFloat(studentProfile.discountPercentage) / 100;
+      const discountedPrice = price * (1 - discountPercentage);
       return (
         <div className="flex flex-col">
           <span className="text-lg font-bold text-green-600">${discountedPrice.toFixed(2)}</span>
@@ -199,20 +210,20 @@ export default function EbookMarketplace() {
 
       <div className="container mx-auto px-4 py-8">
         {/* Student Benefits Banner */}
-        {user?.userType === 'student' && (
+        {studentProfile && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
             <div className="flex items-center gap-3">
               <Users className="h-6 w-6 text-blue-600" />
               <div>
                 <h3 className="font-semibold text-blue-900">Student Benefits Active</h3>
                 <p className="text-blue-700">
-                  {user.studentStatus === 'verified' 
-                    ? 'Enjoy 20% discount on all e-books as a verified student!'
-                    : 'Complete your student verification to unlock 20% discounts on all e-books.'
+                  {studentProfile.verificationStatus === 'verified' 
+                    ? `Enjoy ${studentProfile.discountPercentage}% discount on all e-books as a verified student!`
+                    : 'Complete your student verification to unlock discounts on all e-books.'
                   }
                 </p>
               </div>
-              {user.studentStatus !== 'verified' && (
+              {studentProfile.verificationStatus !== 'verified' && (
                 <Link href="/student-verification">
                   <Button variant="outline" size="sm">Complete Verification</Button>
                 </Link>
