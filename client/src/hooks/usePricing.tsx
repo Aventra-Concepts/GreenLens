@@ -28,8 +28,13 @@ export function usePricing(initialCurrency = 'USD', userLocation?: string) {
       if (!response.ok) {
         throw new Error('Failed to fetch pricing');
       }
-      return response.json();
+      const rawData = await response.json();
+      console.log('🚨 RAW API RESPONSE:', rawData);
+      console.log('🚨 Plans type:', typeof rawData.plans, Array.isArray(rawData.plans) ? 'ARRAY' : 'OBJECT');
+      return rawData;
     },
+    staleTime: 0, // Force fresh data
+    gcTime: 0, // Don't cache at all
   });
 
   // Auto-update selected currency if location-based detection differs

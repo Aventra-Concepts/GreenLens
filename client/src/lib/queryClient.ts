@@ -56,3 +56,5 @@ export const queryClient = new QueryClient({
     },
   },
 });
+// Clear cache
+queryClient.clear();
