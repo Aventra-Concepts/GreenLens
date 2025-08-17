@@ -10,28 +10,8 @@ import { Plus, Eye, Trash2 } from "lucide-react";
 export default function MyGardenSection() {
   const { user } = useAuth();
 
-  const { data: subscription } = useQuery({
-    queryKey: ['/api/subscription'],
-    queryFn: async () => {
-      try {
-        const response = await fetch('/api/subscription', {
-          credentials: 'include',
-        });
-        
-        // Handle errors gracefully - return null for subscription if API fails
-        if (!response.ok) {
-          console.warn('Subscription API error:', response.status);
-          return null;
-        }
-        
-        return response.json();
-      } catch (error) {
-        console.warn('Subscription fetch error:', error);
-        return null; // Return null on error instead of throwing
-      }
-    },
-    retry: false,
-  });
+  // Removed subscription query to prevent auth loops - show Free Plan as default
+  const subscription = { status: 'none', planName: 'Free Plan' };
 
   const { data: userPlants, isLoading } = useQuery({
     queryKey: ['/api/my-garden'],

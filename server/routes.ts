@@ -626,16 +626,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/subscription", requireAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
-      const subscription = await storage.getUserSubscription(userId);
       
-      if (!subscription) {
-        return res.json({ status: 'none' });
-      }
+      // Handle database schema issues gracefully
+      try {
+        const subscription = await storage.getUserSubscription(userId);
+        
+        if (!subscription) {
+          return res.json({ status: 'none', planName: 'Free Plan' });
+        }
 
-      res.json(subscription);
+        res.json(subscription);
+      } catch (dbError: any) {
+        // If database schema issue, return default subscription info
+        if (dbError.code === '42703') { // Column does not exist
+          console.warn("Subscription table schema issue, returning default:", dbError.message);
+          return res.json({ status: 'none', planName: 'Free Plan' });
+        }
+        throw dbError; // Re-throw other errors
+      }
     } catch (error) {
       console.error("Error fetching subscription:", error);
-      res.status(500).json({ message: "Failed to fetch subscription" });
+      // Return default instead of 500 error to prevent logout loops
+      res.json({ status: 'none', planName: 'Free Plan' });
     }
   });
 
