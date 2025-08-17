@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
@@ -47,85 +47,93 @@ export default function Footer() {
             </div>
           </div>
 
-          <div>
-            <h3 className="font-semibold text-lg mb-4">Product</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li>
-                <Link href="/identify" className="hover:text-white transition-colors">
-                  Plant Identification
-                </Link>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Care Plans</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Disease Diagnosis</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">API Access</a>
-              </li>
-            </ul>
-          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <h3 className="font-semibold text-sm mb-3">Product</h3>
+              <ul className="space-y-1 text-gray-400 text-xs">
+                <li>
+                  <Link href="/identify" className="hover:text-white transition-colors">
+                    Plant Identification
+                  </Link>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">Care Plans</a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">Disease Diagnosis</a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">API Access</a>
+                </li>
+              </ul>
+            </div>
 
-          <div>
-            <h3 className="font-semibold text-lg mb-4">Resources</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li>
-                <Link href="/blog" className="hover:text-white transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="/reviews" className="hover:text-white transition-colors">
-                  Reviews
-                </Link>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Plant Database</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Help Center</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Community</a>
-              </li>
-            </ul>
-          </div>
+            <div>
+              <h3 className="font-semibold text-sm mb-3">Resources</h3>
+              <ul className="space-y-1 text-gray-400 text-xs">
+                <li>
+                  <Link href="/blog" className="hover:text-white transition-colors">
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/reviews" className="hover:text-white transition-colors">
+                    Reviews
+                  </Link>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">Plant Database</a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">Help Center</a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">Community</a>
+                </li>
+              </ul>
+            </div>
 
-          <div>
-            <h3 className="font-semibold text-lg mb-4">Company</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li>
-                <a href="#" className="hover:text-white transition-colors">About Us</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Contact</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              </li>
-              <li>
-                <Link 
-                  href="/student-registration" 
-                  className="text-blue-400 hover:text-blue-300 font-bold transition-colors border-b border-blue-400 hover:border-blue-300"
-                  data-testid="footer-student-registration"
-                >
-                  🎓 Students Register
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  href="/author-registration" 
-                  className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors border-b border-yellow-400 hover:border-yellow-300"
-                  data-testid="footer-author-registration"
-                >
-                  ✍️ Author Registration
-                </Link>
-              </li>
-            </ul>
+            <div>
+              <h3 className="font-semibold text-sm mb-3">Company</h3>
+              <ul className="space-y-1 text-gray-400 text-xs">
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">About Us</a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">Contact</a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-sm mb-3">Registration</h3>
+              <ul className="space-y-2 text-gray-400 text-xs">
+                <li>
+                  <Link 
+                    href="/student-registration" 
+                    className="text-blue-400 hover:text-blue-300 font-bold transition-colors border-b border-blue-400 hover:border-blue-300 block"
+                    data-testid="footer-student-registration"
+                  >
+                    🎓 Students Register
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/author-registration" 
+                    className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors border-b border-yellow-400 hover:border-yellow-300 block"
+                    data-testid="footer-author-registration"
+                  >
+                    ✍️ Author Registration
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
 
 
