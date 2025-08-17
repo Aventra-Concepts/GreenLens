@@ -14,6 +14,7 @@ import Account from "@/pages/account";
 import Admin from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
+import AdminBlogManager from "@/pages/admin-blog-manager";
 import ExpertsRegister from "@/pages/experts-register";
 import Features from "@/pages/features";
 import BlogPage from "@/pages/blog-page";
@@ -68,6 +69,7 @@ function Router() {
       </Route>
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/admin/blog" component={AdminBlogManager} />
       <Route path="/experts-register" component={ExpertsRegister} />
       <Route component={NotFound} />
     </Switch>

@@ -106,6 +106,7 @@ export interface IStorage {
   getBlogPostsByCategory(categorySlug: string): Promise<BlogPost[]>;
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
   updateBlogPost(id: string, updates: Partial<InsertBlogPost>): Promise<BlogPost>;
+  deleteBlogPost(id: string): Promise<void>;
   incrementBlogViewCount(blogPostId: string): Promise<void>;
   logBlogView(view: BlogView): Promise<BlogView>;
   getBlogViewCount(blogPostId: string): Promise<number>;
@@ -441,6 +442,12 @@ export class DatabaseStorage implements IStorage {
       .where(eq(blogPosts.id, id))
       .returning();
     return result;
+  }
+
+  async deleteBlogPost(id: string): Promise<void> {
+    await db
+      .delete(blogPosts)
+      .where(eq(blogPosts.id, id));
   }
 
   // Enhanced Blog operations

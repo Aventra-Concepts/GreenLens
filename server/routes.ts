@@ -56,13 +56,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register blog routes
   app.use('/api/blog', blogRoutes);
   
-  // Initialize blog categories on startup
+  // Initialize blog categories and auto-blog service on startup
   (async () => {
     try {
       const { seedBlogCategories } = await import('./services/blogSeeder');
       await seedBlogCategories();
+      
+      // Initialize auto-blog service (will start scheduling)
+      await import('./services/autoBlogService');
+      console.log('Auto-blog system initialized successfully');
     } catch (error) {
-      console.error('Failed to seed blog categories:', error);
+      console.error('Failed to seed blog categories or initialize auto-blog:', error);
     }
   })();
 

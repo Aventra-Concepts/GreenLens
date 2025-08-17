@@ -5,6 +5,34 @@ const ai = new GoogleGenAI({
 });
 
 export class GeminiService {
+  async generateStructuredContent(prompt: string, schema: Record<string, string>): Promise<any> {
+    try {
+      const model = this.getModel();
+      
+      const structuredPrompt = `${prompt}
+
+Please provide your response as a valid JSON object matching this schema:
+${JSON.stringify(schema, null, 2)}
+
+Ensure the response is properly formatted JSON that can be parsed.`;
+
+      const result = await model.generateContent(structuredPrompt);
+      const response = result.response;
+      const text = response.text();
+      
+      // Extract JSON from the response
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('No valid JSON found in response');
+      }
+      
+      return JSON.parse(jsonMatch[0]);
+    } catch (error) {
+      console.error('Error generating structured content:', error);
+      throw error;
+    }
+  }
+
   constructor() {
     if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_GENAI_API_KEY) {
       throw new Error('GEMINI_API_KEY or GOOGLE_GENAI_API_KEY environment variable is required');
