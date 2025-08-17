@@ -28,16 +28,6 @@ export default function Navigation() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* Shopping Cart - Available for all users */}
-            <ShoppingCart />
-            
-            {/* Shop Link */}
-            <Link href="/shop">
-              <Button variant="ghost" data-testid="shop-link">
-                Shop
-              </Button>
-            </Link>
-            
             {/* Talk to Our Expert - Available for all users */}
             <Button 
               className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -167,6 +157,20 @@ export default function Navigation() {
               >
                 Talk to Our Expert
               </Button>
+              
+              {/* Experts Register - Mobile Menu */}
+              <Link 
+                href="/experts-register" 
+                className="text-gray-700 hover:text-green-600 font-medium transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Experts Register
+              </Link>
+              
+              {/* Shopping Cart - Mobile Menu */}
+              <div className="pt-2">
+                <ShoppingCart />
+              </div>
               
               {user && (
                 <Link 
