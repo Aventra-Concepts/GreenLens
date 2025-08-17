@@ -123,7 +123,7 @@ export default function BlogPage() {
                   <h4 className="text-sm font-semibold text-green-700 dark:text-green-300 mb-3 flex items-center">
                     <span className="mr-2">🌱</span>Plant Care & Gardening
                   </h4>
-                  <TabsList className="grid grid-cols-2 gap-1 h-auto p-1 bg-white/50 dark:bg-gray-800/50">
+                  <TabsList className="grid grid-cols-2 gap-0.5 h-auto p-1 bg-white/50 dark:bg-gray-800/50">
                     {categories
                       .filter(cat => ['indoor-plants', 'outdoor-plants', 'fruiting-plants', 'flowering-plants', 'decorative-plants', 'non-flowering-plants'].includes(cat.slug))
                       .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -131,7 +131,7 @@ export default function BlogPage() {
                         <TabsTrigger
                           key={category.id}
                           value={category.slug}
-                          className="text-xs flex items-center gap-1 p-2 data-[state=active]:bg-green-100 data-[state=active]:text-green-800 dark:data-[state=active]:bg-green-800 dark:data-[state=active]:text-green-100"
+                          className="text-xs flex items-center gap-1 p-1.5 data-[state=active]:bg-green-100 data-[state=active]:text-green-800 dark:data-[state=active]:bg-green-800 dark:data-[state=active]:text-green-100"
                           data-testid={`tab-category-${category.slug}`}
                         >
                           <span>{category.icon}</span>
@@ -146,7 +146,7 @@ export default function BlogPage() {
                   <h4 className="text-sm font-semibold text-amber-700 dark:text-amber-300 mb-3 flex items-center">
                     <span className="mr-2">🌾</span>Agriculture & Farming
                   </h4>
-                  <TabsList className="flex flex-col gap-2 h-auto p-2 bg-white/50 dark:bg-gray-800/50">
+                  <TabsList className="flex flex-col gap-1 h-auto p-1.5 bg-white/50 dark:bg-gray-800/50">
                     {categories
                       .filter(cat => ['agri-crops', 'seeds', 'agri-tools', 'fertilizers', 'disinfectants'].includes(cat.slug))
                       .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -154,10 +154,10 @@ export default function BlogPage() {
                         <TabsTrigger
                           key={category.id}
                           value={category.slug}
-                          className="text-xs flex items-center justify-start gap-3 p-3 w-full min-h-[50px] data-[state=active]:bg-amber-100 data-[state=active]:text-amber-800 dark:data-[state=active]:bg-amber-800 dark:data-[state=active]:text-amber-100"
+                          className="text-xs flex items-center justify-start gap-2.5 p-2.5 w-full min-h-[44px] data-[state=active]:bg-amber-100 data-[state=active]:text-amber-800 dark:data-[state=active]:bg-amber-800 dark:data-[state=active]:text-amber-100"
                           data-testid={`tab-category-${category.slug}`}
                         >
-                          <span className="text-lg">{category.icon}</span>
+                          <span className="text-base">{category.icon}</span>
                           <span className="text-sm font-medium">{category.name.replace('Agricultural ', '')}</span>
                         </TabsTrigger>
                       ))}
@@ -169,7 +169,7 @@ export default function BlogPage() {
                   <h4 className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-3 flex items-center">
                     <span className="mr-2">🛡️</span>Health & Safety
                   </h4>
-                  <TabsList className="flex flex-col gap-2 h-auto p-2 bg-white/50 dark:bg-gray-800/50">
+                  <TabsList className="flex flex-col gap-1 h-auto p-1.5 bg-white/50 dark:bg-gray-800/50">
                     {categories
                       .filter(cat => ['first-aid-toxicity'].includes(cat.slug))
                       .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -177,10 +177,10 @@ export default function BlogPage() {
                         <TabsTrigger
                           key={category.id}
                           value={category.slug}
-                          className="text-xs flex items-center justify-start gap-3 p-3 w-full min-h-[50px] data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800 dark:data-[state=active]:bg-blue-800 dark:data-[state=active]:text-blue-100"
+                          className="text-xs flex items-center justify-start gap-2.5 p-2.5 w-full min-h-[44px] data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800 dark:data-[state=active]:bg-blue-800 dark:data-[state=active]:text-blue-100"
                           data-testid={`tab-category-${category.slug}`}
                         >
-                          <span className="text-lg">{category.icon}</span>
+                          <span className="text-base">{category.icon}</span>
                           <span className="text-sm font-medium">
                             {category.slug === 'first-aid-toxicity' ? 'First Aid & Toxicity' : category.name}
                           </span>
