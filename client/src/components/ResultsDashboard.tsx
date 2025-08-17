@@ -27,10 +27,10 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
 
   const downloadMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch('/api/generate-pdf', {
+      const response = await fetch('/api/plant-analysis/download-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resultId: result.id }),
+        body: JSON.stringify({ analysisId: result.id }),
         credentials: 'include',
       });
 
