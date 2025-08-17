@@ -109,6 +109,15 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
+                  href="/student-registration" 
+                  className="text-blue-400 hover:text-blue-300 font-bold transition-colors border-b border-blue-400 hover:border-blue-300"
+                  data-testid="footer-student-registration"
+                >
+                  🎓 Students Register
+                </Link>
+              </li>
+              <li>
+                <Link 
                   href="/author-registration" 
                   className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors border-b border-yellow-400 hover:border-yellow-300"
                   data-testid="footer-author-registration"
