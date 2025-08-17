@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
-import { ArrowLeft, CheckCircle, Clock, XCircle, Upload, FileText, User, Briefcase, CreditCard } from "lucide-react";
+import { ArrowLeft, CheckCircle, Clock, XCircle, Upload, FileText, User, Briefcase, CreditCard, Home } from "lucide-react";
 
 // Author profile interface
 interface AuthorProfile {
@@ -295,34 +295,42 @@ export default function AuthorRegistration() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* Breadcrumb Navigation */}
-      <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-        <Link 
-          href="/" 
-          className="hover:text-green-600 transition-colors"
-          data-testid="link-home"
-        >
-          <span>Home</span>
-        </Link>
-        <span>/</span>
-        <Link 
-          href="/ebook-marketplace" 
-          className="hover:text-green-600 transition-colors"
-          data-testid="link-marketplace"
-        >
-          <span>E-Book Marketplace</span>
-        </Link>
-        <span>/</span>
-        <span className="text-gray-900 font-medium">Author Registration</span>
-      </nav>
+      {/* Navigation Bar */}
+      <div className="flex items-center justify-between mb-8">
+        <nav className="flex items-center space-x-2 text-sm text-gray-600">
+          <Link 
+            href="/" 
+            className="hover:text-green-600 transition-colors"
+            data-testid="link-home"
+          >
+            <span>Home</span>
+          </Link>
+          <span>/</span>
+          <Link 
+            href="/ebook-marketplace" 
+            className="hover:text-green-600 transition-colors"
+            data-testid="link-marketplace"
+          >
+            <span>E-Book Marketplace</span>
+          </Link>
+          <span>/</span>
+          <span className="text-gray-900 font-medium">Author Registration</span>
+        </nav>
 
-      <div className="mb-8">
-        <Link href="/ebook-marketplace">
-          <Button variant="ghost" size="sm" data-testid="button-back-marketplace">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Marketplace
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/">
+            <Button variant="outline" size="sm" className="flex items-center gap-2" data-testid="button-back-home">
+              <Home className="h-4 w-4" />
+              Back to Home
+            </Button>
+          </Link>
+          <Link href="/ebook-marketplace">
+            <Button variant="ghost" size="sm" data-testid="button-back-marketplace">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Marketplace
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <Card>

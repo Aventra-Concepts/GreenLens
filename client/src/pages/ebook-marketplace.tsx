@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Filter, BookOpen, Star, Download, Globe, Users, Award } from "lucide-react";
+import { Search, Filter, BookOpen, Star, Download, Globe, Users, Award, ArrowLeft, Home } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 interface Ebook {
@@ -181,20 +181,29 @@ export default function EbookMarketplace() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumb Navigation */}
+      {/* Navigation Bar */}
       <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-3">
-          <nav className="flex items-center space-x-2 text-sm text-gray-600">
-            <Link 
-              href="/" 
-              className="hover:text-green-600 transition-colors flex items-center"
-              data-testid="link-home"
-            >
-              <span>Home</span>
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <nav className="flex items-center space-x-2 text-sm text-gray-600">
+              <Link 
+                href="/" 
+                className="hover:text-green-600 transition-colors flex items-center"
+                data-testid="link-home"
+              >
+                <span>Home</span>
+              </Link>
+              <span>/</span>
+              <span className="text-gray-900 font-medium">E-Book Marketplace</span>
+            </nav>
+            
+            <Link href="/">
+              <Button variant="outline" size="sm" className="flex items-center gap-2" data-testid="button-back-home">
+                <Home className="h-4 w-4" />
+                Back to Home
+              </Button>
             </Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium">E-Book Marketplace</span>
-          </nav>
+          </div>
         </div>
       </div>
 
