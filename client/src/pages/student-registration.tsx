@@ -293,24 +293,6 @@ export default function StudentRegistration() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="studentId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Student ID *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            placeholder="Enter your student ID"
-                            data-testid="input-student-id"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
                     name="yearOfJoining"
                     render={({ field }) => (
                       <FormItem>
@@ -333,9 +315,7 @@ export default function StudentRegistration() {
                       </FormItem>
                     )}
                   />
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="graduationYear"
@@ -419,6 +399,27 @@ export default function StudentRegistration() {
                     )}
                   />
                 </div>
+              </div>
+
+              {/* Student ID */}
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="studentId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Student ID *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field} 
+                          placeholder="Enter your student ID"
+                          data-testid="input-student-id"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               {/* Document Upload */}
