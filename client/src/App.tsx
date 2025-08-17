@@ -73,13 +73,10 @@ function Router() {
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/blog" component={AdminBlogManager} />
-      <Route path="/ebooks" component={EbookMarketplace} />
+      <Route path="/ebook-marketplace" component={EbookMarketplace} />
       <Route path="/author-registration" component={AuthorRegistration} />
       <Route path="/student-verification" component={StudentVerification} />
       <Route path="/experts-register" component={ExpertsRegister} />
-      <Route path="/ebooks" component={EbookMarketplace} />
-      <Route path="/author-registration" component={AuthorRegistration} />
-      <Route path="/student-verification" component={StudentVerification} />
       <Route component={NotFound} />
     </Switch>
   );

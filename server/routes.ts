@@ -22,6 +22,7 @@ import { registerEbookRoutes } from "./routes/ebookRoutes";
 import expertRoutes from "./routes/expertRoutes";
 import consultationRoutes from "./routes/consultationRoutes";
 import blogRoutes from "./routes/blogRoutes";
+import { registerAuthorRoutes } from "./routes/authorRoutes";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -50,6 +51,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register e-book marketplace routes
   registerEbookRoutes(app);
+  
+  // Register author registration routes
+  registerAuthorRoutes(app);
   
   // Register expert onboarding routes
   app.use('/api', expertRoutes);

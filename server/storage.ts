@@ -23,6 +23,7 @@ import {
   ebookCategories,
   platformSettings,
   ebookReviews,
+  authorProfiles,
   type User,
   type UpsertUser,
   type Subscription,
@@ -69,6 +70,8 @@ import {
   type InsertPlatformSetting,
   type EbookReview,
   type InsertEbookReview,
+  type AuthorProfile,
+  type InsertAuthorProfile,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, sql, desc } from "drizzle-orm";
@@ -222,6 +225,14 @@ export interface IStorage {
   // E-book Category operations
   createEbookCategory(category: InsertEbookCategory): Promise<EbookCategory>;
   getEbookCategories(): Promise<EbookCategory[]>;
+
+  // Author Profile operations
+  createAuthorProfile(profile: InsertAuthorProfile): Promise<AuthorProfile>;
+  getAuthorProfile(id: string): Promise<AuthorProfile | undefined>;
+  getAuthorProfileByUserId(userId: string): Promise<AuthorProfile | undefined>;
+  updateAuthorProfile(id: string, updates: Partial<AuthorProfile>): Promise<AuthorProfile>;
+  getAuthorProfiles(status?: string, limit?: number, offset?: number): Promise<AuthorProfile[]>;
+  updateAuthorApplicationStatus(id: string, status: string, adminNotes?: string, reviewedBy?: string): Promise<AuthorProfile>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1228,6 +1239,89 @@ export class DatabaseStorage implements IStorage {
       .from(ebookCategories)
       .where(eq(ebookCategories.isActive, true))
       .orderBy(ebookCategories.sortOrder, ebookCategories.name);
+  }
+
+  // Author Profile operations
+  async createAuthorProfile(profile: InsertAuthorProfile): Promise<AuthorProfile> {
+    const [result] = await db
+      .insert(authorProfiles)
+      .values({
+        ...profile,
+        termsAcceptedAt: new Date(),
+        privacyPolicyAcceptedAt: new Date(),
+        authorAgreementAcceptedAt: new Date(),
+      })
+      .returning();
+    return result;
+  }
+
+  async getAuthorProfile(id: string): Promise<AuthorProfile | undefined> {
+    const [profile] = await db
+      .select()
+      .from(authorProfiles)
+      .where(eq(authorProfiles.id, id))
+      .limit(1);
+    return profile;
+  }
+
+  async getAuthorProfileByUserId(userId: string): Promise<AuthorProfile | undefined> {
+    const [profile] = await db
+      .select()
+      .from(authorProfiles)
+      .where(eq(authorProfiles.userId, userId))
+      .limit(1);
+    return profile;
+  }
+
+  async updateAuthorProfile(id: string, updates: Partial<AuthorProfile>): Promise<AuthorProfile> {
+    const [result] = await db
+      .update(authorProfiles)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(authorProfiles.id, id))
+      .returning();
+    return result;
+  }
+
+  async getAuthorProfiles(status?: string, limit: number = 50, offset: number = 0): Promise<AuthorProfile[]> {
+    let query = db.select().from(authorProfiles);
+    
+    if (status) {
+      query = query.where(eq(authorProfiles.applicationStatus, status));
+    }
+    
+    return await query
+      .orderBy(desc(authorProfiles.createdAt))
+      .limit(limit)
+      .offset(offset);
+  }
+
+  async updateAuthorApplicationStatus(id: string, status: string, adminNotes?: string, reviewedBy?: string): Promise<AuthorProfile> {
+    const updateData: any = {
+      applicationStatus: status,
+      reviewedAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    if (adminNotes) {
+      updateData.adminNotes = adminNotes;
+    }
+
+    if (reviewedBy) {
+      updateData.reviewedBy = reviewedBy;
+    }
+
+    // If approved, set verification flags
+    if (status === 'approved') {
+      updateData.isVerified = true;
+      updateData.canPublish = true;
+    }
+
+    const [result] = await db
+      .update(authorProfiles)
+      .set(updateData)
+      .where(eq(authorProfiles.id, id))
+      .returning();
+    return result;
   }
 }
 

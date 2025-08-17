@@ -975,3 +975,91 @@ export const insertEbookCategorySchema = createInsertSchema(ebookCategories).omi
   updatedAt: true,
 });
 export type InsertEbookCategory = z.infer<typeof insertEbookCategorySchema>;
+
+// Author Profiles Schema for E-book Marketplace
+export const authorProfiles = pgTable("author_profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Basic Information
+  displayName: varchar("display_name").notNull(),
+  bio: text("bio"),
+  profileImageUrl: varchar("profile_image_url"),
+  websiteUrl: varchar("website_url"),
+  socialLinks: jsonb("social_links"), // {twitter, linkedin, facebook, etc.}
+  
+  // Professional Information
+  expertise: text("expertise").array(), // Areas of expertise
+  publications: text("publications").array(), // Previous publications
+  qualifications: text("qualifications").array(), // Academic/professional qualifications
+  experience: text("experience"), // Professional experience description
+  
+  // Publishing Standards Compliance
+  hasPublishingExperience: boolean("has_publishing_experience").default(false),
+  publishingExperienceDetails: text("publishing_experience_details"),
+  copyrightAgreement: boolean("copyright_agreement").default(false),
+  qualityStandardsAgreement: boolean("quality_standards_agreement").default(false),
+  exclusivityAgreement: boolean("exclusivity_agreement").default(false),
+  
+  // Document Verification
+  identityDocumentUrl: varchar("identity_document_url"), // ID verification
+  portfolioDocumentUrl: varchar("portfolio_document_url"), // Writing samples
+  qualificationDocumentUrl: varchar("qualification_document_url"), // Academic credentials
+  
+  // Bank Details for Payments
+  bankAccountHolderName: varchar("bank_account_holder_name"),
+  bankAccountNumber: varchar("bank_account_number"),
+  bankName: varchar("bank_name"),
+  branchName: varchar("branch_name"),
+  routingNumber: varchar("routing_number"), // For US accounts
+  ifscCode: varchar("ifsc_code"), // For Indian accounts
+  swiftCode: varchar("swift_code"), // For international transfers
+  
+  // Alternative Payment Methods
+  paypalEmail: varchar("paypal_email"),
+  stripeAccountId: varchar("stripe_account_id"),
+  
+  // Application Status
+  applicationStatus: varchar("application_status").default('pending'), // pending, under_review, approved, rejected, suspended
+  adminNotes: text("admin_notes"),
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  
+  // Profile Status
+  isActive: boolean("is_active").default(true),
+  isVerified: boolean("is_verified").default(false),
+  canPublish: boolean("can_publish").default(false),
+  
+  // Terms and Agreements
+  termsAcceptedAt: timestamp("terms_accepted_at"),
+  privacyPolicyAcceptedAt: timestamp("privacy_policy_accepted_at"),
+  authorAgreementAcceptedAt: timestamp("author_agreement_accepted_at"),
+  
+  // Performance Metrics
+  totalEbooks: integer("total_ebooks").default(0),
+  totalSales: integer("total_sales").default(0),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default(0),
+  totalEarnings: decimal("total_earnings", { precision: 12, scale: 2 }).default(0),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type AuthorProfile = typeof authorProfiles.$inferSelect;
+export const insertAuthorProfileSchema = createInsertSchema(authorProfiles).omit({
+  id: true,
+  applicationStatus: true,
+  adminNotes: true,
+  reviewedBy: true,
+  reviewedAt: true,
+  isActive: true,
+  isVerified: true,
+  canPublish: true,
+  totalEbooks: true,
+  totalSales: true,
+  averageRating: true,
+  totalEarnings: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertAuthorProfile = z.infer<typeof insertAuthorProfileSchema>;
