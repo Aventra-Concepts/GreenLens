@@ -69,26 +69,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      // Clear user data optimistically first
-      queryClient.setQueryData(["/api/user"], null);
-      try {
-        await apiRequest("POST", "/api/logout");
-      } catch (error) {
-        // Even if logout fails on server, we clear client state
-        console.warn("Logout request failed, but clearing client state:", error);
-      }
+      console.log("🔄 Starting logout...");
+      await apiRequest("POST", "/api/logout");
+      console.log("✅ Logout API call completed");
     },
-    onSuccess: () => {
-      // Ensure user is cleared and force a complete state reset
+    onMutate: () => {
+      console.log("🔥 Optimistically clearing user data");
+      // Optimistically clear user data immediately
       queryClient.setQueryData(["/api/user"], null);
-      queryClient.removeQueries({ queryKey: ["/api/user"] });
-      queryClient.clear();
     },
-    onError: () => {
-      // Always clear state regardless of server response
-      queryClient.setQueryData(["/api/user"], null);
-      queryClient.removeQueries({ queryKey: ["/api/user"] });
+    onSettled: () => {
+      console.log("🧹 Clearing all queries and reloading page");
+      // Always clear everything after logout attempt (success or failure)
       queryClient.clear();
+      
+      // Force a page reload to completely reset state
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     },
   });
 
