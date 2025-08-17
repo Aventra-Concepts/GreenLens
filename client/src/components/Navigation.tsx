@@ -104,54 +104,6 @@ export default function Navigation() {
           </div>
         </div>
 
-        {/* Desktop Navigation Menu Bar */}
-        <div className="hidden md:flex border-t border-gray-200 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex space-x-8 py-2">
-              <Link 
-                href="/" 
-                className="text-gray-700 hover:text-green-600 font-medium transition-colors py-2"
-              >
-                Home
-              </Link>
-              {user && (
-                <Link 
-                  href="/identify" 
-                  className="text-gray-700 hover:text-green-600 font-medium transition-colors py-2"
-                >
-                  Identify Plant
-                </Link>
-              )}
-              {user && (
-                <Link 
-                  href="/account" 
-                  className="text-gray-700 hover:text-green-600 font-medium transition-colors py-2"
-                >
-                  My Garden
-                </Link>
-              )}
-              <Link 
-                href="/pricing" 
-                className="text-gray-700 hover:text-green-600 font-medium transition-colors py-2"
-              >
-                Pricing
-              </Link>
-              <Link 
-                href="/blog" 
-                className="text-gray-700 hover:text-green-600 font-medium transition-colors py-2"
-              >
-                Blog
-              </Link>
-              <Link 
-                href="/shop" 
-                className="text-gray-700 hover:text-green-600 font-medium transition-colors py-2"
-              >
-                Shop
-              </Link>
-            </div>
-          </div>
-        </div>
-
         {/* Mobile menu */}
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4">
