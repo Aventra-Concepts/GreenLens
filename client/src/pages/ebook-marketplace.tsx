@@ -181,6 +181,23 @@ export default function EbookMarketplace() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Breadcrumb Navigation */}
+      <div className="bg-white border-b">
+        <div className="container mx-auto px-4 py-3">
+          <nav className="flex items-center space-x-2 text-sm text-gray-600">
+            <Link 
+              href="/" 
+              className="hover:text-green-600 transition-colors flex items-center"
+              data-testid="link-home"
+            >
+              <span>Home</span>
+            </Link>
+            <span>/</span>
+            <span className="text-gray-900 font-medium">E-Book Marketplace</span>
+          </nav>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-green-600 to-green-800 text-white py-16">
         <div className="container mx-auto px-4">

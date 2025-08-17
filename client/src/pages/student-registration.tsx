@@ -129,6 +129,27 @@ export default function StudentRegistration() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-2xl">
+      {/* Breadcrumb Navigation */}
+      <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
+        <Link 
+          href="/" 
+          className="hover:text-green-600 transition-colors"
+          data-testid="link-home"
+        >
+          <span>Home</span>
+        </Link>
+        <span>/</span>
+        <Link 
+          href="/ebook-marketplace" 
+          className="hover:text-green-600 transition-colors"
+          data-testid="link-marketplace"
+        >
+          <span>E-Book Marketplace</span>
+        </Link>
+        <span>/</span>
+        <span className="text-gray-900 font-medium">Student Registration</span>
+      </nav>
+
       <div className="mb-8 text-center">
         <GraduationCap className="mx-auto h-16 w-16 text-green-600 mb-4" />
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">

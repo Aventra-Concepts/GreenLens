@@ -295,6 +295,27 @@ export default function AuthorRegistration() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+      {/* Breadcrumb Navigation */}
+      <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
+        <Link 
+          href="/" 
+          className="hover:text-green-600 transition-colors"
+          data-testid="link-home"
+        >
+          <span>Home</span>
+        </Link>
+        <span>/</span>
+        <Link 
+          href="/ebook-marketplace" 
+          className="hover:text-green-600 transition-colors"
+          data-testid="link-marketplace"
+        >
+          <span>E-Book Marketplace</span>
+        </Link>
+        <span>/</span>
+        <span className="text-gray-900 font-medium">Author Registration</span>
+      </nav>
+
       <div className="mb-8">
         <Link href="/ebook-marketplace">
           <Button variant="ghost" size="sm" data-testid="button-back-marketplace">
