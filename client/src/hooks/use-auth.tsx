@@ -70,16 +70,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
+      // Clear user data immediately
       queryClient.setQueryData(["/api/user"], null);
       // Clear all cached queries
       queryClient.clear();
-      // Navigate to home page without forced reload
-      window.location.href = "/";
+      // Force reload to completely reset app state
+      window.location.reload();
     },
     onError: (error: Error) => {
       console.error("Logout error:", error);
-      // Still redirect on error to ensure UI state clears
-      window.location.href = "/";
+      // Clear local state even on error and force reload
+      queryClient.setQueryData(["/api/user"], null);
+      queryClient.clear();
+      window.location.reload();
     },
   });
 
