@@ -164,7 +164,10 @@ export default function Account() {
                 <Button 
                   variant="outline" 
                   className="w-full"
-                  onClick={() => window.location.href = '/api/logout'}
+                  onClick={() => {
+                    fetch('/api/logout', { method: 'POST' })
+                      .then(() => window.location.reload());
+                  }}
                 >
                   Sign Out
                 </Button>

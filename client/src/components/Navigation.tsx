@@ -62,7 +62,10 @@ export default function Navigation() {
                     )}
                     <Button 
                       variant="outline"
-                      onClick={() => window.location.href = '/api/logout'}
+                      onClick={() => {
+                        fetch('/api/logout', { method: 'POST' })
+                          .then(() => window.location.reload());
+                      }}
                       data-testid="sign-out-button"
                     >
                       Sign Out
