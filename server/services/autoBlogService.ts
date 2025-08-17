@@ -1,5 +1,5 @@
 import { storage } from "../storage";
-import { geminiService } from "./gemini";
+import openaiService from "./openai";
 import type { InsertBlogPost, BlogCategory } from "@shared/schema";
 import { BLOG_CATEGORIES } from "./blogSeeder";
 
@@ -148,20 +148,14 @@ Focus on providing valuable, accurate information that helps readers succeed wit
 `;
 
     try {
-      const response = await geminiService.generateStructuredContent(prompt, {
-        title: "string",
-        excerpt: "string", 
-        content: "string",
-        tags: "array",
-        featuredImagePrompt: "string"
-      });
+      const response = await openaiService.generateStructuredContent(prompt);
 
       return {
-        title: response.title,
-        excerpt: response.excerpt,
-        content: this.formatArticleContent(response.content),
-        tags: response.tags || [],
-        featuredImagePrompt: response.featuredImagePrompt
+        title: (response as any).title,
+        excerpt: (response as any).excerpt,
+        content: this.formatArticleContent((response as any).content),
+        tags: (response as any).tags || [],
+        featuredImagePrompt: (response as any).featuredImagePrompt
       };
     } catch (error) {
       console.error("Error generating content structure:", error);

@@ -1,4 +1,4 @@
-import { geminiService } from "./gemini";
+import openaiService from "./openai";
 
 interface PlantSpecies {
   scientific: string;
@@ -242,38 +242,9 @@ export class PlantAnalysisService {
       Be conservative with confidence levels - only use high confidence (>0.9) when very certain.
     `;
 
-    const analysisResult = await geminiService.analyzeWithImages(
-      prompt,
-      imageBase64Array,
-      { type: "json_object" }
-    );
+    const analysisResult = await openaiService.generateStructuredContent(prompt + "\n\nAnalyze these plant images to identify the species.");
 
-    let speciesData;
-    try {
-      speciesData = JSON.parse(analysisResult);
-    } catch (e) {
-      console.error("Raw Gemini response:", analysisResult);
-      console.error("Parse error:", e);
-      
-      // Try to extract JSON if it's embedded in text
-      const jsonMatch = analysisResult.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        try {
-          speciesData = JSON.parse(jsonMatch[0]);
-          console.log("Successfully extracted JSON from response");
-        } catch (extractError) {
-          throw new Error(`Failed to extract valid JSON from response: ${analysisResult.substring(0, 200)}...`);
-        }
-      } else {
-        // Fallback to a basic response if no JSON found
-        console.warn("No JSON found in Gemini response, using fallback");
-        speciesData = {
-          scientific: "Unknown species",
-          common: "Unidentified plant",
-          confidence: 0.5
-        };
-      }
-    }
+    const speciesData = analysisResult;
 
     return {
       scientific: speciesData.scientific || "Unknown species",
@@ -334,41 +305,7 @@ export class PlantAnalysisService {
       Analyze thoroughly for all aspects of plant health.
     `;
 
-    const healthResult = await geminiService.analyzeWithImages(
-      prompt,
-      imageBase64Array,
-      { type: "json_object" }
-    );
-
-    let healthData;
-    try {
-      healthData = JSON.parse(healthResult);
-    } catch (e) {
-      console.error("Raw health analysis response:", healthResult);
-      console.error("Health parse error:", e);
-      
-      // Try to extract JSON if it's embedded in text
-      const jsonMatch = healthResult.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        try {
-          healthData = JSON.parse(jsonMatch[0]);
-        } catch (extractError) {
-          // Fallback to healthy status if parsing fails
-          healthData = {
-            isHealthy: true,
-            diseases: [],
-            issues: []
-          };
-        }
-      } else {
-        // Fallback to healthy status
-        healthData = {
-          isHealthy: true,
-          diseases: [],
-          issues: []
-        };
-      }
-    }
+    const healthData = await openaiService.generateStructuredContent(prompt + "\n\nAnalyze these plant images for health assessment.");
 
     return {
       overallHealth: healthData.overallHealth || "good",
@@ -451,11 +388,9 @@ export class PlantAnalysisService {
       }
     `;
 
-    const careResult = await geminiService.analyzeText(prompt, { type: "json_object" });
-
     let careData;
     try {
-      careData = JSON.parse(careResult);
+      careData = await openaiService.generateStructuredContent(prompt);
     } catch (e) {
       // Provide comprehensive fallback data
       careData = {
@@ -535,9 +470,7 @@ export class PlantAnalysisService {
     `;
 
     try {
-      const result = await geminiService.analyzeText(prompt, { type: "json_object" });
-      const data = JSON.parse(result);
-      return data;
+      return await openaiService.generateStructuredContent(prompt);
     } catch (e) {
       return {
         methods: [
@@ -572,9 +505,7 @@ export class PlantAnalysisService {
     `;
 
     try {
-      const result = await geminiService.analyzeText(prompt, { type: "json_object" });
-      const data = JSON.parse(result);
-      return data;
+      return await openaiService.generateStructuredContent(prompt);
     } catch (e) {
       return {
         matureSize: { height: "Varies", width: "Varies" },
@@ -601,8 +532,7 @@ export class PlantAnalysisService {
     `;
 
     try {
-      const result = await geminiService.analyzeText(prompt, { type: "json_object" });
-      const data = JSON.parse(result);
+      const data = await openaiService.generateStructuredContent(prompt);
       return data.calendar || [];
     } catch (e) {
       return [
@@ -648,8 +578,7 @@ export class PlantAnalysisService {
     `;
 
     try {
-      const result = await geminiService.analyzeText(prompt, { type: "json_object" });
-      const data = JSON.parse(result);
+      const data = await openaiService.generateStructuredContent(prompt);
       return data.recommendations || [];
     } catch (e) {
       return [
@@ -681,8 +610,7 @@ export class PlantAnalysisService {
     `;
 
     try {
-      const result = await geminiService.analyzeText(prompt, { type: "json_object" });
-      const data = JSON.parse(result);
+      const data = await openaiService.generateStructuredContent(prompt);
       return data.toxicity;
     } catch (e) {
       return undefined;
@@ -700,8 +628,7 @@ export class PlantAnalysisService {
     `;
 
     try {
-      const result = await geminiService.analyzeText(prompt, { type: "json_object" });
-      const data = JSON.parse(result);
+      const data = await openaiService.generateStructuredContent(prompt);
       return data.companions || [];
     } catch (e) {
       return [];
@@ -725,8 +652,7 @@ export class PlantAnalysisService {
     `;
 
     try {
-      const result = await geminiService.analyzeText(prompt, { type: "json_object" });
-      const data = JSON.parse(result);
+      const data = await openaiService.generateStructuredContent(prompt);
       return data.problems || [];
     } catch (e) {
       return [

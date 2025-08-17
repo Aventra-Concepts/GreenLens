@@ -1,17 +1,20 @@
-import { geminiService } from "./gemini";
+import openaiService from "./openai";
 
 export class CarePlannerService {
   async generateCarePlan({ identification, catalogInfo }: any) {
     try {
-      // Merge identification and catalog data, then use Gemini to synthesize comprehensive care plan
-      const carePlan = await geminiService.synthesizeCarePlan({
-        identification,
-        catalog: catalogInfo,
-      });
+      // Merge identification and catalog data, then use OpenAI to synthesize comprehensive care plan
+      const carePlan = await openaiService.generateStructuredContent(`
+        Create a comprehensive care plan for this plant using the identification and catalog data:
+        Identification: ${JSON.stringify(identification)}
+        Catalog Info: ${JSON.stringify(catalogInfo)}
+        
+        Generate detailed care instructions including watering, lighting, soil, fertilizing, and seasonal care.
+      `);
 
       // Add additional metadata
       const enrichedCarePlan = {
-        ...carePlan,
+        ...(carePlan as object),
         plant_info: {
           commonName: identification.species.commonName,
           scientificName: identification.species.scientificName,

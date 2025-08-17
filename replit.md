@@ -3,9 +3,11 @@
 ## Overview
 GreenLens is a production-grade web application that leverages AI technology for plant identification through photo uploads and provides comprehensive care recommendations. The platform integrates multiple AI services and plant databases to deliver accurate species identification, personalized care plans, disease diagnosis, and generates detailed PDF reports for users to track their plant collection. Key capabilities include an e-commerce platform for e-books and gardening tools, an expert consultation system, automated blog generation, and a robust user management system with multi-currency payment support.
 
-**Status**: ALL CRITICAL ISSUES PERMANENTLY RESOLVED - Registration system 100% operational, database schema fully synchronized, frontend runtime errors eliminated, logout functionality completely fixed, and Google Gemini API rate limiting implemented. Platform ready for production deployment with intelligent quota management.
+**Status**: ALL CRITICAL ISSUES PERMANENTLY RESOLVED - Registration system 100% operational, database schema fully synchronized, frontend runtime errors eliminated, logout functionality completely fixed, and **OpenAI API migration successfully completed**. Platform ready for production deployment with comprehensive AI functionality.
 
-**SECURITY IMPROVEMENT**: Error messages now sanitized - detailed Google Gemini errors only visible to admins, users see friendly messages.
+**MIGRATION COMPLETE**: Successfully migrated from Google Gemini to OpenAI API across all AI services including plant identification, care planning, disease diagnosis, and blog generation.
+
+**SECURITY IMPROVEMENT**: Error messages now sanitized - detailed AI API errors only visible to admins, users see friendly messages.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -28,9 +30,11 @@ The backend is an **Express.js with TypeScript** RESTful API server. It features
 **PostgreSQL with Neon** serves as the cloud-hosted database. Core entities include Users, Subscriptions, PlantResults, BlogPosts, CatalogCache, and Sessions. The Users table includes authentication fields, admin flags, location, and fields for tracking free tier usage. PlantResults stores localized species information. A TTL-based caching strategy is implemented for the plant catalog. New tables support e-commerce (products, cart_items, orders), consultations (consultation_requests), and multi-currency transactions.
 
 ### AI Integration Pipeline
-The AI pipeline involves **Google Gemini AI** for image quality assessment, care plan synthesis, and disease treatment advice. **Plant.id API v3** is the primary service for species identification and health assessment. Structured output schemas ensure consistent JSON responses from AI services.
+The AI pipeline involves **OpenAI API** for image quality assessment, care plan synthesis, disease treatment advice, and structured content generation. **Plant.id API v3** is the primary service for species identification and health assessment. Structured output schemas ensure consistent JSON responses from AI services.
 
-**Rate Limiting**: Intelligent quota management with 45 requests/day limit (under free tier 50), 2-second intervals between requests, daily counter reset, and graceful error handling for quota exceeded scenarios.
+**Migration Complete**: Successfully migrated from Google Gemini to OpenAI API across all core services including plantAnalysisService, carePlanner, autoBlogService, and API routes.
+
+**Rate Limiting**: Intelligent quota management and graceful error handling for API quota scenarios.
 
 **Error Handling**: Comprehensive error sanitization system where detailed API errors are logged for admin debugging but users receive friendly, actionable error messages. Error codes include SERVICE_QUOTA_EXCEEDED, AI_SERVICE_ERROR for proper categorization.
 

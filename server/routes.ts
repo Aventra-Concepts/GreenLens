@@ -7,7 +7,7 @@ import { z } from "zod";
 import { insertUserSchema, loginUserSchema } from "@shared/schema";
 // plantIdService imported lazily when needed
 import { plantsCatalogService } from "./services/plantsCatalog";
-import { geminiService } from "./services/gemini";
+import openaiService from "./services/openai";
 import { carePlannerService } from "./services/carePlanner";
 import { pdfService } from "./services/pdf";
 import { paymentService } from "./services/payments";
@@ -278,12 +278,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         mimeType: file.mimetype,
       }));
 
-      // Step 1: Quality assessment with Gemini
-      const qualityCheck = await geminiService.assessImageQuality(images);
-      if (!qualityCheck.suitable) {
+      // Step 1: Quality assessment with OpenAI
+      const qualityCheck = await openaiService.generateStructuredContent(`
+        Assess image quality for plant identification:
+        ${images.length} images provided.
+        Return JSON with: {"suitable": boolean, "suggestions": [array of suggestions if not suitable]}
+      `);
+      if (!(qualityCheck as any).suitable) {
         return res.status(400).json({ 
           message: "Image quality insufficient for identification",
-          suggestions: qualityCheck.suggestions 
+          suggestions: (qualityCheck as any).suggestions 
         });
       }
 
@@ -315,9 +319,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const healthAssessment = await plantIdService.assessPlantHealth(images);
       let diseaseAdvice = null;
       if (healthAssessment.diseases && healthAssessment.diseases.length > 0) {
-        diseaseAdvice = await geminiService.diseaseAdvice({
-          diseaseFindings: healthAssessment.diseases
-        });
+        diseaseAdvice = await openaiService.generateStructuredContent(`
+          Provide disease advice for these plant diseases:
+          ${JSON.stringify(healthAssessment.diseases)}
+        `);
       }
 
       // Step 6: Save to database and update usage tracking
@@ -333,7 +338,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         confidence: identification.confidence.toString(),
         analysisData: carePlan,
         healthAssessment: healthAssessment,
-        diseaseInfo: diseaseAdvice,
+        diseaseInfo: diseaseAdvice as any,
         isFreeIdentification: isUsingFreeTier,
         localizedSpecies: enrichedSpecies,
       });
@@ -435,7 +440,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Auto-select provider if not specified
-      const selectedProvider = provider || pricingService.getOptimalProvider(currency, user.location);
+      const selectedProvider = provider || pricingService.getOptimalProvider(currency, user.location || undefined);
       
       // Verify provider supports the currency
       if (!pricing.supportedProviders.includes(selectedProvider)) {
@@ -489,26 +494,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Create payment intent using Stripe
-      const paymentIntent = await paymentService.createPaymentIntent(
-        Math.round(amount * 100), // Convert to cents
+      // Create payment checkout URL using payment service
+      const checkoutUrl = await paymentService.createCheckout('stripe', {
+        userId: req.user.id,
+        userEmail: req.user.email || '',
+        planId: 'consultation',
         currency,
-        {
-          consultation_id: consultationId,
-          user_id: req.user.id,
-          service_type: 'consultation'
-        }
-      );
+        amount: amount,
+      });
 
       // Update consultation with payment intent ID
       await storage.updateConsultationRequest(consultationId, {
-        paymentIntentId: paymentIntent.id,
+        paymentIntentId: consultationId,
         status: 'payment_pending'
       });
 
       res.json({ 
         success: true,
-        clientSecret: paymentIntent.client_secret 
+        checkoutUrl: checkoutUrl
       });
     } catch (error: any) {
       console.error('Error creating consultation payment intent:', error);
@@ -734,9 +737,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let advice = null;
       if (healthAssessment.diseases && healthAssessment.diseases.length > 0) {
-        advice = await geminiService.diseaseAdvice({
-          diseaseFindings: healthAssessment.diseases
-        });
+        advice = await openaiService.generateStructuredContent(`
+          Provide disease advice for these plant diseases:
+          ${JSON.stringify(healthAssessment.diseases)}
+        `);
       }
 
       res.json({
