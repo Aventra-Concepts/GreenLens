@@ -27,6 +27,139 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
+// Enhanced Admin Roles and Permissions
+export const adminRoles = pgTable("admin_roles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull().unique(),
+  description: text("description"),
+  permissions: jsonb("permissions").default("[]"), // Array of permission strings
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type AdminRole = typeof adminRoles.$inferSelect;
+export const insertAdminRoleSchema = createInsertSchema(adminRoles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Employee Management System
+export const employees = pgTable("employees", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  employeeId: varchar("employee_id").unique().notNull(),
+  department: varchar("department").notNull(),
+  position: varchar("position").notNull(),
+  roleId: varchar("role_id").references(() => adminRoles.id),
+  salary: decimal("salary", { precision: 10, scale: 2 }),
+  hireDate: date("hire_date").notNull(),
+  terminationDate: date("termination_date"),
+  isActive: boolean("is_active").default(true),
+  managerId: varchar("manager_id").references(() => employees.id),
+  phoneNumber: varchar("phone_number"),
+  emergencyContact: jsonb("emergency_contact"),
+  skills: jsonb("skills").default("[]"),
+  certifications: jsonb("certifications").default("[]"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type Employee = typeof employees.$inferSelect;
+export const insertEmployeeSchema = createInsertSchema(employees).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Two-Factor Authentication for Admin
+export const adminTwoFactor = pgTable("admin_two_factor", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  secret: varchar("secret").notNull(), // TOTP secret
+  backupCodes: jsonb("backup_codes").default("[]"), // Array of backup codes
+  isEnabled: boolean("is_enabled").default(false),
+  lastUsed: timestamp("last_used"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type AdminTwoFactor = typeof adminTwoFactor.$inferSelect;
+
+// Admin Session Management
+export const adminSessions = pgTable("admin_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  token: varchar("token").notNull().unique(),
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  isActive: boolean("is_active").default(true),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type AdminSession = typeof adminSessions.$inferSelect;
+
+// Analytics and Data Tracking
+export const analyticsEvents = pgTable("analytics_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  eventType: varchar("event_type").notNull(),
+  entityType: varchar("entity_type"), // user, plant, order, etc.
+  entityId: varchar("entity_id"),
+  userId: varchar("user_id").references(() => users.id),
+  properties: jsonb("properties").default("{}"),
+  timestamp: timestamp("timestamp").defaultNow(),
+  sessionId: varchar("session_id"),
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+});
+
+export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
+export const insertAnalyticsEventSchema = createInsertSchema(analyticsEvents).omit({
+  id: true,
+  timestamp: true,
+});
+
+// Brand and Design Management
+export const brandSettings = pgTable("brand_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  key: varchar("key").notNull().unique(),
+  value: text("value"),
+  category: varchar("category").notNull().default("general"),
+  description: text("description"),
+  dataType: varchar("data_type").notNull().default("string"), // string, number, boolean, json, file
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type BrandSetting = typeof brandSettings.$inferSelect;
+export const insertBrandSettingSchema = createInsertSchema(brandSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Content Moderation System
+export const moderationQueue = pgTable("moderation_queue", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  entityType: varchar("entity_type").notNull(), // blog_post, ebook, review, comment
+  entityId: varchar("entity_id").notNull(),
+  status: varchar("status").notNull().default("pending"), // pending, approved, rejected
+  moderatorId: varchar("moderator_id").references(() => users.id),
+  reason: text("reason"),
+  notes: text("notes"),
+  automatedFlags: jsonb("automated_flags").default("[]"),
+  priority: varchar("priority").default("normal"), // low, normal, high, urgent
+  submittedAt: timestamp("submitted_at").defaultNow(),
+  reviewedAt: timestamp("reviewed_at"),
+});
+
+export type ModerationItem = typeof moderationQueue.$inferSelect;
+export const insertModerationItemSchema = createInsertSchema(moderationQueue).omit({
+  id: true,
+  submittedAt: true,
+});
+
 // User storage table.
 // Enhanced for custom authentication with admin management
 export const users = pgTable("users", {
@@ -39,11 +172,15 @@ export const users = pgTable("users", {
   profileImageUrl: varchar("profile_image_url"),
   country: varchar("country"),
   isAdmin: boolean("is_admin").default(false),
+  isSuperAdmin: boolean("is_super_admin").default(false), // Enhanced admin levels
   isActive: boolean("is_active").default(true),
   isAuthor: boolean("is_author").default(false),
   authorVerified: boolean("author_verified").default(false),
   emailVerified: boolean("email_verified").default(false),
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
   lastLoginAt: timestamp("last_login_at"),
+  failedLoginAttempts: integer("failed_login_attempts").default(0),
+  lockedUntil: timestamp("locked_until"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   // Enhanced fields for free tier and multilingual support
