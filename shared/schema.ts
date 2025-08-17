@@ -27,6 +27,62 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
+// User storage table - Define first to avoid circular references
+// Enhanced for custom authentication with admin management
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email").unique().notNull(),
+  firstName: varchar("first_name").notNull(),
+  lastName: varchar("last_name").notNull(),
+  location: varchar("location"),
+  password: varchar("password").notNull(), // Hashed password
+  profileImageUrl: varchar("profile_image_url"),
+  country: varchar("country"),
+  isAdmin: boolean("is_admin").default(false),
+  isSuperAdmin: boolean("is_super_admin").default(false), // Enhanced admin levels
+  isActive: boolean("is_active").default(true),
+  isAuthor: boolean("is_author").default(false),
+  authorVerified: boolean("author_verified").default(false),
+  emailVerified: boolean("email_verified").default(false),
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
+  lastLoginAt: timestamp("last_login_at"),
+  failedLoginAttempts: integer("failed_login_attempts").default(0),
+  lockedUntil: timestamp("locked_until"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  // Enhanced fields for free tier and multilingual support
+  freeTierUsed: integer("free_tier_used").default(0),
+  freeTierStartedAt: timestamp("free_tier_started_at"),
+  preferredLanguage: varchar("preferred_language", { length: 10 }).default('en'),
+  timezone: varchar("timezone", { length: 50 }).default('UTC'),
+});
+
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
+
+// Auth schemas for registration and login
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  isAdmin: true,
+  isActive: true,
+  emailVerified: true,
+  lastLoginAt: true,
+  createdAt: true,
+  updatedAt: true,
+  freeTierUsed: true,
+  freeTierStartedAt: true,
+});
+
+export type InsertUser = z.infer<typeof insertUserSchema>;
+
+// Login schema
+export const loginUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
+export type LoginUser = z.infer<typeof loginUserSchema>;
+
 // Enhanced Admin Roles and Permissions
 export const adminRoles = pgTable("admin_roles", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -56,7 +112,7 @@ export const employees = pgTable("employees", {
   hireDate: date("hire_date").notNull(),
   terminationDate: date("termination_date"),
   isActive: boolean("is_active").default(true),
-  managerId: varchar("manager_id").references(() => employees.id),
+  managerId: varchar("manager_id"), // Remove self-reference for now
   phoneNumber: varchar("phone_number"),
   emergencyContact: jsonb("emergency_contact"),
   skills: jsonb("skills").default("[]"),
@@ -158,60 +214,6 @@ export type ModerationItem = typeof moderationQueue.$inferSelect;
 export const insertModerationItemSchema = createInsertSchema(moderationQueue).omit({
   id: true,
   submittedAt: true,
-});
-
-// User storage table.
-// Enhanced for custom authentication with admin management
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").unique().notNull(),
-  firstName: varchar("first_name").notNull(),
-  lastName: varchar("last_name").notNull(),
-  location: varchar("location"),
-  password: varchar("password").notNull(), // Hashed password
-  profileImageUrl: varchar("profile_image_url"),
-  country: varchar("country"),
-  isAdmin: boolean("is_admin").default(false),
-  isSuperAdmin: boolean("is_super_admin").default(false), // Enhanced admin levels
-  isActive: boolean("is_active").default(true),
-  isAuthor: boolean("is_author").default(false),
-  authorVerified: boolean("author_verified").default(false),
-  emailVerified: boolean("email_verified").default(false),
-  twoFactorEnabled: boolean("two_factor_enabled").default(false),
-  lastLoginAt: timestamp("last_login_at"),
-  failedLoginAttempts: integer("failed_login_attempts").default(0),
-  lockedUntil: timestamp("locked_until"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-  // Enhanced fields for free tier and multilingual support
-  freeTierUsed: integer("free_tier_used").default(0),
-  freeTierStartedAt: timestamp("free_tier_started_at"),
-  preferredLanguage: varchar("preferred_language", { length: 10 }).default('en'),
-  timezone: varchar("timezone", { length: 50 }).default('UTC'),
-});
-
-export type UpsertUser = typeof users.$inferInsert;
-export type User = typeof users.$inferSelect;
-
-// Auth schemas for registration and login
-export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
-  isAdmin: true,
-  isActive: true,
-  emailVerified: true,
-  lastLoginAt: true,
-  createdAt: true,
-  updatedAt: true,
-  freeTierUsed: true,
-  freeTierStartedAt: true,
-});
-
-export type InsertUser = z.infer<typeof insertUserSchema>;
-
-// Login schema
-export const loginUserSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
 });
 
 // E-commerce Product Management Schema
@@ -329,7 +331,7 @@ export const categories = pgTable("categories", {
   slug: varchar("slug").notNull().unique(),
   description: text("description"),
   image: varchar("image"),
-  parentId: varchar("parent_id").references(() => categories.id),
+  parentId: varchar("parent_id"), // Remove self-reference for now
   isActive: boolean("is_active").default(true),
   sortOrder: integer("sort_order").default(0),
   createdAt: timestamp("created_at").defaultNow(),
@@ -364,8 +366,6 @@ export const insertShippingRateSchema = createInsertSchema(shippingRates).omit({
   updatedAt: true,
 });
 export type InsertShippingRate = z.infer<typeof insertShippingRateSchema>;
-
-export type LoginUser = z.infer<typeof loginUserSchema>;
 
 // Subscription management with multi-currency support
 export const subscriptions = pgTable("subscriptions", {
