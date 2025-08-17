@@ -57,12 +57,12 @@ export default function PricingSection() {
       billingInterval: 'forever',
       description: 'Get started with basic plant identification',
       features: [
-        { text: '3 plant identifications', isIncluded: true },
-        { text: 'Basic care recommendations', isIncluded: true },
-        { text: 'Community access', isIncluded: true },
-        { text: 'Health assessment', isIncluded: false },
-        { text: 'PDF reports', isIncluded: false },
-        { text: 'Priority support', isIncluded: false }
+        { name: '3 plant identifications', included: true },
+        { name: 'Basic care recommendations', included: true },
+        { name: 'Community access', included: true },
+        { name: 'Health assessment', included: false },
+        { name: 'PDF reports', included: false },
+        { name: 'Priority support', included: false }
       ],
       isPopular: false,
       isActive: true,
@@ -77,12 +77,12 @@ export default function PricingSection() {
       billingInterval: 'month',
       description: 'Perfect for gardening enthusiasts',
       features: [
-        { text: 'Unlimited plant identifications', isIncluded: true },
-        { text: 'Advanced care plans', isIncluded: true },
-        { text: 'Health assessment', isIncluded: true },
-        { text: 'PDF reports', isIncluded: true },
-        { text: 'Priority support', isIncluded: true },
-        { text: 'Advanced features', isIncluded: false }
+        { name: 'Unlimited plant identifications', included: true },
+        { name: 'Advanced care plans', included: true },
+        { name: 'Health assessment', included: true },
+        { name: 'PDF reports', included: true },
+        { name: 'Priority support', included: true },
+        { name: 'Advanced features', included: false }
       ],
       isPopular: true,
       isActive: true,
@@ -97,12 +97,12 @@ export default function PricingSection() {
       billingInterval: 'month',
       description: 'For professional gardeners and landscapers',
       features: [
-        { text: 'Everything in Pro', isIncluded: true },
-        { text: 'Expert consultations', isIncluded: true },
-        { text: 'Advanced plant database', isIncluded: true },
-        { text: 'Commercial license', isIncluded: true },
-        { text: 'Custom integrations', isIncluded: true },
-        { text: 'White-label options', isIncluded: true }
+        { name: 'Everything in Pro', included: true },
+        { name: 'Expert consultations', included: true },
+        { name: 'Advanced plant database', included: true },
+        { name: 'Commercial license', included: true },
+        { name: 'Custom integrations', included: true },
+        { name: 'White-label options', included: true }
       ],
       isPopular: false,
       isActive: true,

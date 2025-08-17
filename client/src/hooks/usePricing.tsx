@@ -24,13 +24,40 @@ export function usePricing(initialCurrency = 'USD', userLocation?: string) {
       params.append('currency', selectedCurrency);
       if (userLocation) params.append('location', userLocation);
       
-      const response = await fetch(`/api/pricing?${params}`);
+      const url = `/api/pricing?${params}`;
+      console.log('🚨 FETCHING URL:', url);
+      const response = await fetch(url, {
+        credentials: 'include',
+        cache: 'no-cache', // Force fresh request
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch pricing');
       }
       const rawData = await response.json();
       console.log('🚨 RAW API RESPONSE:', rawData);
       console.log('🚨 Plans type:', typeof rawData.plans, Array.isArray(rawData.plans) ? 'ARRAY' : 'OBJECT');
+      console.log('🚨 Response URL was:', response.url);
+      
+      // FORCE TRANSFORM IF STILL GETTING ARRAY
+      if (Array.isArray(rawData.plans)) {
+        console.log('🔧 FORCING ARRAY TO OBJECT TRANSFORMATION');
+        const transformedPlans = rawData.plans.reduce((acc: any, plan: any) => {
+          acc[plan.planId] = {
+            planId: plan.planId,
+            amount: plan.amount,
+            formattedPrice: plan.formattedPrice || `$${plan.amount}`,
+            supportedProviders: plan.supportedProviders || ['stripe']
+          };
+          return acc;
+        }, {});
+        rawData.plans = transformedPlans;
+        console.log('🔧 TRANSFORMED TO OBJECT:', rawData.plans);
+      }
+      
       return rawData;
     },
     staleTime: 0, // Force fresh data

@@ -1049,9 +1049,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Pricing plans routes
   app.get('/api/pricing-plans', async (req, res) => {
+    console.log('🚨 LEGACY ENDPOINT CALLED: /api/pricing-plans - This should not be called for pricing display!');
     try {
       const activeOnly = req.query.activeOnly === 'true';
       const plans = await storage.getPricingPlans(activeOnly);
+      console.log('🚨 Returning ARRAY format:', plans.length, 'plans');
       res.json(plans);
     } catch (error) {
       console.error('Error fetching pricing plans:', error);

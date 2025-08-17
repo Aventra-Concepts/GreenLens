@@ -20,9 +20,21 @@ export function CurrencySelector({ value, onChange, userLocation }: CurrencySele
   const { data: pricingData } = useQuery<PricingResponse>({
     queryKey: ['/api/pricing', 'USD'], // Use USD to get supported currencies list only
     queryFn: async () => {
-      const response = await fetch('/api/pricing?currency=USD');
-      return response.json();
+      console.log('🟡 CurrencySelector fetching currency data');
+      const response = await fetch('/api/pricing?currency=USD', {
+        credentials: 'include',
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      const data = await response.json();
+      console.log('🟡 CurrencySelector received data:', data);
+      return data;
     },
+    staleTime: 0, // Force fresh data
+    gcTime: 0, // Don't cache
   });
 
   useEffect(() => {
