@@ -166,7 +166,9 @@ export default function Account() {
                   className="w-full"
                   onClick={() => {
                     fetch('/api/logout', { method: 'POST' })
-                      .then(() => window.location.reload());
+                      .then(() => {
+                        window.location.href = '/auth';
+                      });
                   }}
                 >
                   Sign Out

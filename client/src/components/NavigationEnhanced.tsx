@@ -61,7 +61,10 @@ export default function NavigationEnhanced() {
   const handleLogout = async () => {
     try {
       await fetch("/api/logout", { method: "POST" });
-      window.location.href = "/";
+      // Clear any cached user data
+      queryClient.setQueryData(["/api/user"], null);
+      // Force redirect to auth page
+      window.location.href = "/auth";
     } catch (error) {
       console.error("Logout failed:", error);
     }
