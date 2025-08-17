@@ -79,11 +79,11 @@ export class StudentConversionService {
         firstName: student.firstName,
         lastName: student.lastName,
         location: student.universityName || 'Not specified',
-        password: student.password, // Use existing hashed password
+        password: 'temp_password_' + Math.random().toString(36), // Generate temporary password
         profileImageUrl: null,
         isAuthor: false,
         authorVerified: false,
-        emailVerified: student.emailVerified,
+        // emailVerified: student.emailVerified, // Field not available in users table
         preferredLanguage: 'en',
         timezone: 'UTC',
       });
@@ -200,7 +200,7 @@ export class StudentConversionService {
         student.isActive &&
         !student.isConverted &&
         student.verificationStatus === 'approved' &&
-        student.discountApplied
+        student.discountApplied === true
       );
     } catch (error) {
       console.error('Error checking student discount eligibility:', error);
@@ -223,7 +223,7 @@ export class StudentConversionService {
 
       for (const student of activeStudents) {
         const conversionDate = this.calculateConversionDate(
-          student.createdAt,
+          student.createdAt || new Date(),
           student.expectedGraduation || '',
           student.adminExtensionCount || 0
         );
@@ -261,8 +261,8 @@ export class StudentConversionService {
 
       return { convertedCount, errors };
     } catch (error) {
-      console.error('Error running automatic conversion:', error);
-      return { convertedCount: 0, errors: [error.message] };
+      console.error('Error running automatic conversion:', (error as Error).message);
+      return { convertedCount: 0, errors: [(error as Error).message] };
     }
   }
 }

@@ -35,7 +35,7 @@ export const compressionMiddleware = compression({
 });
 
 // Rate limiting for API endpoints
-export const apiRateLimit = (maxRequests: number = 100, windowMs: number = 15 * 60 * 1000) => {
+export const apiRateLimit = (maxRequests: number = 500, windowMs: number = 15 * 60 * 1000) => {
   const requests = new Map<string, { count: number; resetTime: number }>();
   
   return (req: Request, res: Response, next: NextFunction) => {

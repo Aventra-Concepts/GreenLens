@@ -17,7 +17,7 @@ const app = express();
 
 // Security middleware
 app.use(securityHeaders);
-app.use(rateLimiter(200, 15 * 60 * 1000)); // 200 requests per 15 minutes
+app.use(rateLimiter(1000, 15 * 60 * 1000)); // 1000 requests per 15 minutes
 app.use(validateInput);
 
 // Performance middleware
@@ -29,7 +29,7 @@ app.use('/assets', staticAssetCache);
 app.use('/uploads', staticAssetCache);
 
 // API rate limiting and caching
-app.use('/api', apiRateLimit(100, 15 * 60 * 1000)); // 100 requests per 15 minutes for API
+app.use('/api', apiRateLimit(500, 15 * 60 * 1000)); // 500 requests per 15 minutes for API
 app.use('/api', apiCache);
 
 app.use(express.json({ limit: '10mb' }));

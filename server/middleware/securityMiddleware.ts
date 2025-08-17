@@ -26,7 +26,7 @@ export function securityHeaders(req: Request, res: Response, next: NextFunction)
 // Rate limiting middleware for API endpoints
 const requestCounts = new Map<string, { count: number; resetTime: number }>();
 
-export function rateLimiter(maxRequests: number = 100, windowMs: number = 15 * 60 * 1000) {
+export function rateLimiter(maxRequests: number = 500, windowMs: number = 15 * 60 * 1000) {
   return (req: Request, res: Response, next: NextFunction) => {
     const clientId = req.ip || 'unknown';
     const now = Date.now();
