@@ -28,18 +28,6 @@ export default function Navigation() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* Shopping Cart - Desktop */}
-            <div className="hidden md:block">
-              <ShoppingCart />
-            </div>
-            
-            {/* Shop Link - Desktop */}
-            <Link href="/shop" className="hidden md:block">
-              <Button variant="ghost" data-testid="shop-link">
-                Shop
-              </Button>
-            </Link>
-            
             {/* Talk to Our Expert - Available for all users */}
             <Button 
               className="bg-blue-600 hover:bg-blue-700 text-white"
