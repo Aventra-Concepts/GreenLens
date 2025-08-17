@@ -111,19 +111,21 @@ export function CurrencySelector({ value, onChange, userLocation }: CurrencySele
   };
 
   // Sort currencies: priority first, then others alphabetically
-  const sortedCurrencies = availableCurrencies.sort((a, b) => {
-    const aIsPriority = priorityCurrencies.includes(a);
-    const bIsPriority = priorityCurrencies.includes(b);
-    
-    if (aIsPriority && !bIsPriority) return -1;
-    if (!aIsPriority && bIsPriority) return 1;
-    
-    if (aIsPriority && bIsPriority) {
-      return priorityCurrencies.indexOf(a) - priorityCurrencies.indexOf(b);
-    }
-    
-    return a.localeCompare(b);
-  });
+  const sortedCurrencies = availableCurrencies
+    .filter(currency => typeof currency === 'string' && currency)
+    .sort((a, b) => {
+      const aIsPriority = priorityCurrencies.includes(a);
+      const bIsPriority = priorityCurrencies.includes(b);
+      
+      if (aIsPriority && !bIsPriority) return -1;
+      if (!aIsPriority && bIsPriority) return 1;
+      
+      if (aIsPriority && bIsPriority) {
+        return priorityCurrencies.indexOf(a) - priorityCurrencies.indexOf(b);
+      }
+      
+      return a.localeCompare(b);
+    });
 
   return (
     <div className="space-y-2">
@@ -135,9 +137,9 @@ export function CurrencySelector({ value, onChange, userLocation }: CurrencySele
           <SelectValue placeholder="Select currency" />
         </SelectTrigger>
         <SelectContent className="max-h-96 overflow-y-auto">
-          {sortedCurrencies.filter(currency => typeof currency === 'string' && currency).map((currency, index) => {
+          {sortedCurrencies.map((currency, index) => {
             const isPriority = priorityCurrencies.includes(currency);
-            const showSeparator = index > 0 && isPriority && !priorityCurrencies.includes(sortedCurrencies[index - 1]);
+            const showSeparator = index > 0 && !isPriority && priorityCurrencies.includes(sortedCurrencies[index - 1]);
             
             return (
               <div key={currency}>
