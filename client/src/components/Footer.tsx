@@ -117,7 +117,7 @@ export default function Footer() {
                 <li>
                   <Link 
                     href="/student-registration" 
-                    className="text-blue-400 hover:text-blue-300 font-bold transition-colors border-b border-blue-400 hover:border-blue-300 block"
+                    className="text-blue-400 hover:text-blue-300 font-bold transition-colors block"
                     data-testid="footer-student-registration"
                   >
                     🎓 Students Register
@@ -126,7 +126,7 @@ export default function Footer() {
                 <li>
                   <Link 
                     href="/author-registration" 
-                    className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors border-b border-yellow-400 hover:border-yellow-300 block"
+                    className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors block"
                     data-testid="footer-author-registration"
                   >
                     ✍️ Author Registration
