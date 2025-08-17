@@ -53,6 +53,13 @@ export function Layout({
                   <a href="/ebook-marketplace?sortBy=rating" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900 hover:text-green-600" data-testid="link-top-rated-ebooks">
                     Top Rated
                   </a>
+                  <div className="border-t border-gray-200 dark:border-gray-600 my-2"></div>
+                  <a href="/student-registration" className="block px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 font-medium" data-testid="link-student-registration">
+                    🎓 Student Registration
+                  </a>
+                  <a href="/author-registration" className="block px-4 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900 font-medium" data-testid="link-author-registration">
+                    ✍️ Author Registration
+                  </a>
                 </div>
               </div>
             </div>
@@ -65,6 +72,9 @@ export function Layout({
             </a>
             <a href="/blog" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors" data-testid="link-blog">
               Blog
+            </a>
+            <a href="/student-registration" className="bg-blue-600 text-white px-3 py-1 rounded-full hover:bg-blue-700 transition-colors font-medium" data-testid="link-student-register">
+              🎓 Student Register
             </a>
             <a href="/expert-onboarding" className="bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition-colors font-medium" data-testid="link-expert-register">
               Experts Register
