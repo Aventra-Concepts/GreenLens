@@ -30,7 +30,11 @@ export function CurrencySelector({ value, onChange, userLocation }: CurrencySele
 
   useEffect(() => {
     if (pricingData?.supportedCurrencies) {
-      setAvailableCurrencies(pricingData.supportedCurrencies);
+      // Check if the data is an array of objects or strings
+      const currencyCodes = pricingData.supportedCurrencies.map(currency => 
+        typeof currency === 'string' ? currency : currency.code
+      );
+      setAvailableCurrencies(currencyCodes);
       // Auto-detect currency if available
       if (pricingData.currency && pricingData.currency !== value) {
         onChange(pricingData.currency);

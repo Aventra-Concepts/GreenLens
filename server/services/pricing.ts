@@ -511,8 +511,8 @@ export class MultiCurrencyPricingService {
     }
   }
 
-  public getSupportedCurrencies(): CurrencyConfig[] {
-    return Object.values(this.currencies);
+  public getSupportedCurrencies(): string[] {
+    return Object.keys(this.currencies);
   }
 
   public getCurrencyInfo(currencyCode: string): CurrencyConfig | null {
