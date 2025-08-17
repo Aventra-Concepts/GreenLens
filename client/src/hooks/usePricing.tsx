@@ -25,10 +25,9 @@ export function usePricing(initialCurrency = 'USD', userLocation?: string) {
       if (userLocation) params.append('location', userLocation);
       
       const url = `/api/pricing?${params}`;
-      console.log('🚨 FETCHING URL:', url);
       const response = await fetch(url, {
         credentials: 'include',
-        cache: 'no-cache', // Force fresh request
+        cache: 'no-cache',
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
@@ -38,13 +37,9 @@ export function usePricing(initialCurrency = 'USD', userLocation?: string) {
         throw new Error('Failed to fetch pricing');
       }
       const rawData = await response.json();
-      console.log('🚨 RAW API RESPONSE:', rawData);
-      console.log('🚨 Plans type:', typeof rawData.plans, Array.isArray(rawData.plans) ? 'ARRAY' : 'OBJECT');
-      console.log('🚨 Response URL was:', response.url);
       
-      // FORCE TRANSFORM IF STILL GETTING ARRAY
+      // Handle proxy serving array format vs local serving object format
       if (Array.isArray(rawData.plans)) {
-        console.log('🔧 FORCING ARRAY TO OBJECT TRANSFORMATION');
         const transformedPlans = rawData.plans.reduce((acc: any, plan: any) => {
           acc[plan.planId] = {
             planId: plan.planId,
@@ -55,7 +50,6 @@ export function usePricing(initialCurrency = 'USD', userLocation?: string) {
           return acc;
         }, {});
         rawData.plans = transformedPlans;
-        console.log('🔧 TRANSFORMED TO OBJECT:', rawData.plans);
       }
       
       return rawData;
