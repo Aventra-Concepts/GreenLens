@@ -103,7 +103,7 @@ export default function TripleImageUpload() {
 
   const handleAnalyze = () => {
     if (!isAuthenticated) {
-      window.location.href = '/api/login';
+      window.location.href = '/auth';
       return;
     }
     

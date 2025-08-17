@@ -67,7 +67,7 @@ export default function PlantIdentifySection() {
 
   const handleAnalyze = () => {
     if (!isAuthenticated) {
-      window.location.href = '/api/login';
+      window.location.href = '/auth';
       return;
     }
     

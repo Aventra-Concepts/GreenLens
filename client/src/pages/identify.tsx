@@ -18,7 +18,7 @@ import { useAuth } from "@/hooks/use-auth";
 export default function Identify() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [showCamera, setShowCamera] = useState(false);
@@ -153,7 +153,7 @@ export default function Identify() {
   }, []);
 
   const handleAnalyze = () => {
-    if (!user) {
+    if (!isAuthenticated || !user) {
       toast({
         title: "Login Required",
         description: "Please log in to analyze plants",
@@ -296,7 +296,7 @@ export default function Identify() {
             <Button
               size="lg"
               className="bg-green-600 hover:bg-green-700 px-8 py-4 text-lg text-white shadow-lg"
-              disabled={uploadedFiles.length === 0 || identifyMutation.isPending || !user}
+              disabled={uploadedFiles.length === 0 || identifyMutation.isPending || !isAuthenticated}
               onClick={handleAnalyze}
               data-testid="analyze-button"
             >
@@ -313,9 +313,16 @@ export default function Identify() {
               )}
             </Button>
             
-            {!user && (
+            {!isAuthenticated && (
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
-                <span className="text-orange-600 dark:text-orange-400 font-medium">Login required:</span> Please log in to analyze your plants
+                <span className="text-orange-600 dark:text-orange-400 font-medium">Login required:</span> Please{" "}
+                <button 
+                  onClick={() => setLocation("/auth")}
+                  className="text-green-600 dark:text-green-400 underline hover:text-green-700 dark:hover:text-green-300"
+                >
+                  log in
+                </button>
+                {" "}to analyze your plants
               </p>
             )}
           </div>
