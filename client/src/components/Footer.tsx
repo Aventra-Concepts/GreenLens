@@ -107,6 +107,15 @@ export default function Footer() {
               <li>
                 <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
               </li>
+              <li>
+                <Link 
+                  href="/author-registration" 
+                  className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors border-b border-yellow-400 hover:border-yellow-300"
+                  data-testid="footer-author-registration"
+                >
+                  ✍️ Author Registration
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

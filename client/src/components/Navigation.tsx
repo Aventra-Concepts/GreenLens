@@ -165,24 +165,6 @@ export default function Navigation() {
                 📚 E-books
               </Link>
               
-              {/* Student Registration - Mobile Menu */}
-              <Link 
-                href="/student-registration" 
-                className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                🎓 Student Registration
-              </Link>
-              
-              {/* Author Registration - Mobile Menu */}
-              <Link 
-                href="/author-registration" 
-                className="text-purple-600 hover:text-purple-700 font-medium transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                ✍️ Author Registration
-              </Link>
-              
               {/* Talk to Our Expert - Mobile Menu */}
               <Button 
                 className="bg-blue-600 hover:bg-blue-700 text-white w-full justify-start"
