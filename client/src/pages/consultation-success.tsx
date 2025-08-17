@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +14,7 @@ interface ConsultationSuccessProps {
 
 export default function ConsultationSuccess({ consultationId }: ConsultationSuccessProps) {
   const { user, isLoading } = useAuth();
+  const [, setLocation] = useLocation();
 
   // Fetch consultation details
   const { data: consultation, isLoading: isLoadingConsultation } = useQuery({
@@ -22,7 +24,7 @@ export default function ConsultationSuccess({ consultationId }: ConsultationSucc
 
   // Redirect if not logged in
   if (!isLoading && !user) {
-    window.location.href = '/auth';
+    setLocation('/auth');
     return null;
   }
 

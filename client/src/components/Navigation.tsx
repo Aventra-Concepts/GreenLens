@@ -7,7 +7,7 @@ import { ShoppingCart } from "@/components/ecommerce/ShoppingCart";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { user, isLoading } = useAuth();
 
   const isActive = (path: string) => location === path;
@@ -46,7 +46,7 @@ export default function Navigation() {
                   <>
                     <Button 
                       variant="ghost"
-                      onClick={() => window.location.href = '/account'}
+                      onClick={() => setLocation('/account')}
                       data-testid="account-button"
                     >
                       Account
@@ -54,7 +54,7 @@ export default function Navigation() {
                     {user.isAdmin && (
                       <Button 
                         variant="ghost"
-                        onClick={() => window.location.href = '/admin/dashboard'}
+                        onClick={() => setLocation('/admin/dashboard')}
                         data-testid="admin-dashboard-button"
                       >
                         Admin
@@ -65,7 +65,7 @@ export default function Navigation() {
                       onClick={() => {
                         fetch('/api/logout', { method: 'POST' })
                           .then(() => {
-                            window.location.href = '/auth';
+                            setLocation('/auth');
                           });
                       }}
                       data-testid="sign-out-button"
@@ -77,14 +77,14 @@ export default function Navigation() {
                   <>
                     <Button 
                       variant="ghost"
-                      onClick={() => window.location.href = '/auth'}
+                      onClick={() => setLocation('/auth')}
                       data-testid="sign-in-button"
                     >
                       Sign In
                     </Button>
                     <Button 
                       className="bg-green-500 hover:bg-green-600"
-                      onClick={() => window.location.href = '/auth'}
+                      onClick={() => setLocation('/auth')}
                       data-testid="get-started-button"
                     >
                       Get Started

@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { Upload, X, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
@@ -103,7 +103,7 @@ export default function TripleImageUpload() {
 
   const handleAnalyze = () => {
     if (!isAuthenticated) {
-      window.location.href = '/auth';
+      setLocation('/auth');
       return;
     }
     

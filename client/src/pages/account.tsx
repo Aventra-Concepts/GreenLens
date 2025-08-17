@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
 import MyGardenSection from "@/components/MyGardenSection";
 import Footer from "@/components/Footer";
@@ -7,15 +8,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import { MessageSquare, Calendar, Clock, CheckCircle, DollarSign, User } from "lucide-react";
 import { format } from "date-fns";
 
 export default function Account() {
   const { toast } = useToast();
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const [, setLocation] = useLocation();
 
   const { data: subscription, isLoading: subscriptionLoading } = useQuery({
     queryKey: ['/api/subscription'],
@@ -41,18 +42,18 @@ export default function Account() {
   };
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isLoading && !user) {
       toast({
         title: "Unauthorized",
         description: "You are logged out. Logging in again...",
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/api/login";
+        setLocation('/auth');
       }, 500);
       return;
     }
-  }, [isAuthenticated, isLoading, toast]);
+  }, [user, isLoading, toast, setLocation]);
 
   if (isLoading) {
     return (
@@ -119,18 +120,18 @@ export default function Account() {
                   <div className="text-center py-4">
                     <div className="animate-spin w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full mx-auto" />
                   </div>
-                ) : subscription && subscription.status !== 'none' ? (
+                ) : subscription && (subscription as any)?.status !== 'none' ? (
                   <>
                     <div className="flex items-center justify-between">
-                      <span className="font-medium">{subscription.planName}</span>
-                      <Badge className={getStatusColor(subscription.status)}>
-                        {subscription.status}
+                      <span className="font-medium">{(subscription as any)?.planName}</span>
+                      <Badge className={getStatusColor((subscription as any)?.status)}>
+                        {(subscription as any)?.status}
                       </Badge>
                     </div>
-                    {subscription.currentPeriodEnd && (
+                    {(subscription as any)?.currentPeriodEnd && (
                       <p className="text-sm text-gray-600">
-                        {subscription.status === 'active' ? 'Renews' : 'Expires'} on{' '}
-                        {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                        {(subscription as any)?.status === 'active' ? 'Renews' : 'Expires'} on{' '}
+                        {new Date((subscription as any)?.currentPeriodEnd).toLocaleDateString()}
                       </p>
                     )}
                     <Button variant="outline" className="w-full">
@@ -167,7 +168,7 @@ export default function Account() {
                   onClick={() => {
                     fetch('/api/logout', { method: 'POST' })
                       .then(() => {
-                        window.location.href = '/auth';
+                        setLocation('/auth');
                       });
                   }}
                 >
@@ -194,7 +195,7 @@ export default function Account() {
                   <div className="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full mx-auto" />
                   <p className="text-sm text-gray-600 mt-2">Loading consultations...</p>
                 </div>
-              ) : !consultations || consultations.length === 0 ? (
+              ) : !consultations || (consultations as any[])?.length === 0 ? (
                 <div className="text-center py-8 space-y-4">
                   <MessageSquare className="h-12 w-12 text-gray-400 mx-auto" />
                   <div>
@@ -204,7 +205,7 @@ export default function Account() {
                     </p>
                     <Button 
                       className="bg-blue-600 hover:bg-blue-700"
-                      onClick={() => window.location.href = '/talk-to-expert'}
+                      onClick={() => setLocation('/talk-to-expert')}
                     >
                       Book Expert Consultation
                     </Button>
@@ -212,7 +213,7 @@ export default function Account() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {consultations.map((consultation: any) => (
+                  {(consultations as any[])?.map((consultation: any) => (
                     <Card key={consultation.id} className="border-l-4 border-l-blue-500">
                       <CardContent className="p-4">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -82,7 +83,7 @@ const PaymentForm = ({ consultationId, consultation }: { consultationId: string;
             Processing Payment...
           </div>
         ) : (
-          `Pay $${consultation?.amount || 29.99} - Confirm Consultation`
+          `Pay $${(consultation as any)?.amount || 29.99} - Confirm Consultation`
         )}
       </Button>
     </form>
@@ -92,6 +93,7 @@ const PaymentForm = ({ consultationId, consultation }: { consultationId: string;
 export default function ConsultationPayment({ consultationId }: ConsultationPaymentPageProps) {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [clientSecret, setClientSecret] = useState("");
 
   // Fetch consultation details
@@ -105,8 +107,8 @@ export default function ConsultationPayment({ consultationId }: ConsultationPaym
     mutationFn: async () => {
       const response = await apiRequest("POST", "/api/create-consultation-payment-intent", {
         consultationId,
-        amount: consultation?.amount || 29.99,
-        currency: consultation?.currency || 'USD',
+        amount: (consultation as any)?.amount || 29.99,
+        currency: (consultation as any)?.currency || 'USD',
       });
       return response.json();
     },
@@ -130,7 +132,7 @@ export default function ConsultationPayment({ consultationId }: ConsultationPaym
 
   // Redirect if not logged in
   if (!isLoading && !user) {
-    window.location.href = '/auth';
+    setLocation('/auth');
     return null;
   }
 
@@ -190,8 +192,8 @@ export default function ConsultationPayment({ consultationId }: ConsultationPaym
                 <div className="flex items-start gap-3">
                   <User className="h-4 w-4 text-gray-500 mt-1" />
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">{consultation.name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{consultation.email}</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{(consultation as any)?.name}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{(consultation as any)?.email}</p>
                   </div>
                 </div>
 
@@ -199,10 +201,10 @@ export default function ConsultationPayment({ consultationId }: ConsultationPaym
                   <Calendar className="h-4 w-4 text-gray-500 mt-1" />
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {format(new Date(consultation.preferredDate), 'EEEE, MMMM d, yyyy')}
+                      {format(new Date((consultation as any)?.preferredDate), 'EEEE, MMMM d, yyyy')}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {consultation.preferredTimeSlot}
+                      {(consultation as any)?.preferredTimeSlot}
                     </p>
                   </div>
                 </div>
@@ -212,7 +214,7 @@ export default function ConsultationPayment({ consultationId }: ConsultationPaym
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">Problem Description</p>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {consultation.problemDescription}
+                      {(consultation as any)?.problemDescription}
                     </p>
                   </div>
                 </div>
@@ -250,11 +252,11 @@ export default function ConsultationPayment({ consultationId }: ConsultationPaym
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Consultation fee</span>
-                  <span className="text-sm">${consultation.amount}</span>
+                  <span className="text-sm">${(consultation as any)?.amount}</span>
                 </div>
                 <div className="flex items-center justify-between font-semibold text-lg">
                   <span>Total</span>
-                  <span className="text-blue-600">${consultation.amount} {consultation.currency}</span>
+                  <span className="text-blue-600">${(consultation as any)?.amount} {(consultation as any)?.currency}</span>
                 </div>
               </div>
             </CardContent>

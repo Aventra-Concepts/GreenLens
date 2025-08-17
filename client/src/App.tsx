@@ -90,9 +90,9 @@ function Router() {
         {(params) => <ConsultationPayment consultationId={params.id} />}
       </Route>
       <Route path="/consultation-success">
-        {({ search }) => {
-          const params = new URLSearchParams(search);
-          const id = params.get('id');
+        {() => {
+          const urlParams = new URLSearchParams(window.location.search);
+          const id = urlParams.get('id');
           return id ? <ConsultationSuccess consultationId={id} /> : <NotFound />;
         }}
       </Route>

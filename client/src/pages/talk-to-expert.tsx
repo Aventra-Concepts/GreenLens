@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,6 +53,7 @@ const timeSlots = [
 export default function TalkToExpert() {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const form = useForm<ConsultationRequestForm>({
@@ -76,7 +78,7 @@ export default function TalkToExpert() {
         description: "Redirecting to payment...",
       });
       // Redirect to payment page with consultation ID
-      window.location.href = `/payment/consultation/${data.id}`;
+      setLocation(`/payment/consultation/${data.id}`);
     },
     onError: (error: Error) => {
       toast({
@@ -93,7 +95,7 @@ export default function TalkToExpert() {
 
   // Redirect to auth if not logged in
   if (!isLoading && !user) {
-    window.location.href = '/auth';
+    setLocation('/auth');
     return null;
   }
 

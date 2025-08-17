@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +34,7 @@ interface PricingPlan {
 export default function PricingSection() {
   const { toast } = useToast();
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const { 
     pricing, 
@@ -54,8 +56,7 @@ export default function PricingSection() {
   const checkoutMutation = useMutation({
     mutationFn: async ({ planId }: { planId: string }) => {
       if (!user) {
-        window.location.href = '/auth';
-        return;
+        throw new Error('Please sign in to subscribe to a plan');
       }
 
       const planPricing = getPlanPrice(planId);
@@ -102,7 +103,7 @@ export default function PricingSection() {
   const handleChoosePlan = (planId: string) => {
     if (planId === 'free') {
       if (!user) {
-        window.location.href = '/auth';
+        setLocation('/auth');
       } else {
         toast({
           title: "Already on Free Plan",
