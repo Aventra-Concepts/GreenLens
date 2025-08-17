@@ -67,6 +67,9 @@ export function Layout({
               Blog
             </a>
 
+            <a href="/talk-to-expert" className="bg-blue-600 text-white px-3 py-1 rounded-full hover:bg-blue-700 transition-colors font-medium mr-3" data-testid="link-talk-to-expert">
+              Talk to Expert
+            </a>
             <a href="/expert-onboarding" className="bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition-colors font-medium" data-testid="link-expert-register">
               Experts Register
             </a>

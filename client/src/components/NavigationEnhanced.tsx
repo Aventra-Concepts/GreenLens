@@ -42,7 +42,6 @@ export default function NavigationEnhanced() {
     { name: "Shop", href: "/shop", icon: Store },
     { name: "Pricing", href: "/pricing", icon: DollarSign },
     { name: "Reviews", href: "/reviews", icon: Star },
-    { name: "Talk to Expert", href: "/talk-to-expert", icon: MessageCircle },
   ];
 
   const authorItems = [
