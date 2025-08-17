@@ -31,6 +31,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
 
+  // Debug logging
+  console.log("Auth state:", { user, isLoading, isAuthenticated: !!user && !isLoading });
+
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginUser) => {
       const res = await apiRequest("POST", "/api/login", credentials);
@@ -67,21 +70,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", "/api/logout");
+      // Clear user data optimistically first
+      queryClient.setQueryData(["/api/user"], null);
+      try {
+        await apiRequest("POST", "/api/logout");
+      } catch (error) {
+        // Even if logout fails on server, we clear client state
+        console.warn("Logout request failed, but clearing client state:", error);
+      }
     },
     onSuccess: () => {
-      // Clear user data and all cached queries immediately
+      // Ensure user is cleared and force a complete state reset
       queryClient.setQueryData(["/api/user"], null);
+      queryClient.removeQueries({ queryKey: ["/api/user"] });
       queryClient.clear();
-      // Navigate to home page
-      window.location.href = "/";
     },
-    onError: (error: Error) => {
-      console.error("Logout error:", error);
-      // Clear local state even on error
+    onError: () => {
+      // Always clear state regardless of server response
       queryClient.setQueryData(["/api/user"], null);
+      queryClient.removeQueries({ queryKey: ["/api/user"] });
       queryClient.clear();
-      window.location.href = "/";
     },
   });
 
@@ -89,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user: user ?? null,
-        isAuthenticated: !!user,
+        isAuthenticated: !!user && !isLoading,
         isLoading,
         error,
         loginMutation,
