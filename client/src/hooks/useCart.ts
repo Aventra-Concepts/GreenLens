@@ -23,8 +23,25 @@ export function useCart() {
   const { data: items = [], isLoading, error } = useQuery<CartItemWithProduct[]>({
     queryKey: ['/api/cart', sessionId],
     queryFn: async () => {
-      const response = await apiRequest('GET', `/api/cart?sessionId=${sessionId}`);
-      return response.json();
+      try {
+        const response = await fetch(`/api/cart?sessionId=${sessionId}`, {
+          credentials: 'include',
+        });
+        
+        // Handle 401 errors gracefully - return empty cart instead of throwing
+        if (response.status === 401) {
+          return [];
+        }
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch cart: ${response.statusText}`);
+        }
+        
+        return response.json();
+      } catch (error) {
+        console.warn('Cart fetch error:', error);
+        return []; // Return empty cart on error
+      }
     },
     retry: 1,
   });
