@@ -71,17 +71,43 @@ export function CameraCapture({ onCapture, onClose, isOpen }: CameraCaptureProps
     // Draw the video frame to canvas
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Convert canvas to blob and create file
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const file = new File([blob], `plant-photo-${Date.now()}.jpg`, {
-          type: "image/jpeg",
-        });
-        onCapture(file);
-        handleClose();
-      }
-      setIsCapturing(false);
-    }, "image/jpeg", 0.9);
+    // Convert canvas to blob with compression for 100KB limit
+    const compressImage = (quality: number) => {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          // Check if file size is under 100KB
+          const maxSize = 100 * 1024; // 100KB
+          if (blob.size <= maxSize) {
+            const file = new File([blob], `plant-photo-${Date.now()}.jpg`, {
+              type: "image/jpeg",
+            });
+            onCapture(file);
+            handleClose();
+            setIsCapturing(false);
+          } else if (quality > 0.1) {
+            // Reduce quality and try again
+            compressImage(quality - 0.1);
+          } else {
+            // Even at lowest quality, still too large - resize canvas
+            const scaleFactor = Math.sqrt(maxSize / blob.size);
+            const newWidth = Math.floor(canvas.width * scaleFactor);
+            const newHeight = Math.floor(canvas.height * scaleFactor);
+            
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+            
+            // Redraw at smaller size
+            context.drawImage(video, 0, 0, newWidth, newHeight);
+            compressImage(0.8); // Try again with smaller size
+          }
+        } else {
+          setIsCapturing(false);
+        }
+      }, "image/jpeg", quality);
+    };
+
+    // Start compression process
+    compressImage(0.9);
   }, [onCapture]);
 
   const handleClose = useCallback(() => {
