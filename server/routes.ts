@@ -18,6 +18,7 @@ import { PDFReportService } from "./services/pdfReportService";
 import { insertPlantResultSchema, insertBlogPostSchema, insertReviewSchema } from "@shared/schema";
 import { trackUserLogin, trackPlantIdentification, trackSubscriptionPurchase, trackPdfDownload } from "./middleware/activityTracker";
 import { registerEcommerceRoutes } from "./routes/ecommerce";
+import expertRoutes from "./routes/expertRoutes";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -43,6 +44,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register e-commerce routes
   registerEcommerceRoutes(app);
+  
+  // Register expert onboarding routes
+  app.use('/api', expertRoutes);
 
   // Admin user management routes
   app.get('/api/admin/users', requireAdmin, async (req: any, res) => {

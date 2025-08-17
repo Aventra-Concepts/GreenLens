@@ -504,3 +504,149 @@ export const insertGardeningContentSchema = createInsertSchema(gardeningContent)
   updatedAt: true,
 });
 export type InsertGardeningContent = z.infer<typeof insertGardeningContentSchema>;
+
+// Expert onboarding system for plant specialists
+export const expertApplications = pgTable("expert_applications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Personal Information
+  firstName: varchar("first_name").notNull(),
+  middleName: varchar("middle_name"),
+  lastName: varchar("last_name").notNull(),
+  age: integer("age").notNull(),
+  gender: varchar("gender").notNull(), // 'male', 'female', 'other', 'prefer_not_to_say'
+  email: varchar("email").unique().notNull(),
+  phone: varchar("phone"),
+  
+  // Address Information
+  houseNumber: varchar("house_number").notNull(),
+  buildingName: varchar("building_name"),
+  roadName: varchar("road_name").notNull(),
+  colonyName: varchar("colony_name"),
+  areaName: varchar("area_name").notNull(),
+  cityName: varchar("city_name").notNull(),
+  stateName: varchar("state_name").notNull(),
+  countryName: varchar("country_name").notNull(),
+  postalCode: varchar("postal_code"),
+  
+  // Professional Information
+  qualifications: jsonb("qualifications").notNull(), // Array of qualification objects
+  specialization: varchar("specialization"), // Plant specialty area
+  experience: integer("experience"), // Years of experience
+  
+  // Documents (stored as object storage paths)
+  profilePhotoPath: varchar("profile_photo_path"),
+  qualificationDocuments: text("qualification_documents").array(), // Array of document paths
+  
+  // Bank Details
+  bankAccountHolderName: varchar("bank_account_holder_name"),
+  bankAccountNumber: varchar("bank_account_number"),
+  bankName: varchar("bank_name"),
+  branchName: varchar("branch_name"),
+  ifscCode: varchar("ifsc_code"),
+  swiftCode: varchar("swift_code"),
+  
+  // Alternative Payment Details
+  paypalEmail: varchar("paypal_email"),
+  skydoDetails: text("skydo_details"),
+  
+  // Application Status and Review
+  applicationStatus: varchar("application_status").default('pending'), // 'pending', 'under_review', 'approved', 'rejected'
+  reviewNotes: text("review_notes"),
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  
+  // Terms and Conditions
+  termsAccepted: boolean("terms_accepted").default(false),
+  termsAcceptedAt: timestamp("terms_accepted_at"),
+  
+  // Contact Preferences
+  availableHours: varchar("available_hours"), // When expert is available for consultations
+  timeZone: varchar("time_zone").default('UTC'),
+  consultationRate: decimal("consultation_rate", { precision: 10, scale: 2 }), // Per hour rate
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type ExpertApplication = typeof expertApplications.$inferSelect;
+export const insertExpertApplicationSchema = createInsertSchema(expertApplications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  reviewedBy: true,
+  reviewedAt: true,
+});
+export type InsertExpertApplication = z.infer<typeof insertExpertApplicationSchema>;
+
+// Approved experts for consultation services
+export const experts = pgTable("experts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  applicationId: varchar("application_id").notNull().references(() => expertApplications.id),
+  expertCode: varchar("expert_code").unique().notNull(), // Unique identifier for experts
+  
+  // Active Status
+  isActive: boolean("is_active").default(true),
+  isAvailable: boolean("is_available").default(true), // Currently available for consultations
+  
+  // Performance Metrics
+  totalConsultations: integer("total_consultations").default(0),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default(0),
+  responseTime: integer("response_time"), // Average response time in minutes
+  
+  // Profile Information (copied from application for quick access)
+  displayName: varchar("display_name").notNull(),
+  specialization: varchar("specialization"),
+  bio: text("bio"),
+  profileImagePath: varchar("profile_image_path"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type Expert = typeof experts.$inferSelect;
+export const insertExpertSchema = createInsertSchema(experts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertExpert = z.infer<typeof insertExpertSchema>;
+
+// Expert consultations for user interactions
+export const expertConsultations = pgTable("expert_consultations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  expertId: varchar("expert_id").notNull().references(() => experts.id),
+  
+  // Consultation Details
+  subject: varchar("subject").notNull(),
+  description: text("description").notNull(),
+  plantImages: text("plant_images").array(), // Array of image paths
+  
+  // Session Information
+  sessionType: varchar("session_type").notNull(), // 'chat', 'video', 'email'
+  status: varchar("status").default('pending'), // 'pending', 'active', 'completed', 'cancelled'
+  scheduledAt: timestamp("scheduled_at"),
+  duration: integer("duration"), // Duration in minutes
+  
+  // Feedback and Rating
+  userRating: integer("user_rating"), // 1-5 stars
+  userFeedback: text("user_feedback"),
+  expertNotes: text("expert_notes"),
+  
+  // Payment Information
+  amount: decimal("amount", { precision: 10, scale: 2 }),
+  currency: varchar("currency", { length: 3 }).default('USD'),
+  paymentStatus: varchar("payment_status").default('pending'), // 'pending', 'paid', 'refunded'
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type ExpertConsultation = typeof expertConsultations.$inferSelect;
+export const insertExpertConsultationSchema = createInsertSchema(expertConsultations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertExpertConsultation = z.infer<typeof insertExpertConsultationSchema>;

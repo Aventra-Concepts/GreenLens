@@ -42,6 +42,9 @@ import {
   type InsertPayment,
   type GardeningContent,
   type InsertGardeningContent,
+  expertApplications,
+  type ExpertApplication,
+  type InsertExpertApplication,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, sql, desc } from "drizzle-orm";
@@ -143,6 +146,12 @@ export interface IStorage {
   getGardeningContent(): Promise<GardeningContent | undefined>;
   updateGardeningContent(content: InsertGardeningContent): Promise<GardeningContent>;
   createGardeningContent(content: InsertGardeningContent): Promise<GardeningContent>;
+  
+  // Expert application operations
+  createExpertApplication(application: InsertExpertApplication): Promise<ExpertApplication>;
+  getExpertApplication(id: string): Promise<ExpertApplication | undefined>;
+  getExpertApplications(status?: string, limit?: number, offset?: number): Promise<ExpertApplication[]>;
+  updateExpertApplicationStatus(id: string, status: string, reviewNotes?: string): Promise<ExpertApplication>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -811,6 +820,52 @@ export class DatabaseStorage implements IStorage {
       .values(content)
       .returning();
     return created;
+  }
+
+  // Expert application operations
+  async createExpertApplication(application: InsertExpertApplication): Promise<ExpertApplication> {
+    const [created] = await db
+      .insert(expertApplications)
+      .values(application)
+      .returning();
+    return created;
+  }
+
+  async getExpertApplication(id: string): Promise<ExpertApplication | undefined> {
+    const [application] = await db
+      .select()
+      .from(expertApplications)
+      .where(eq(expertApplications.id, id));
+    return application;
+  }
+
+  async getExpertApplications(status?: string, limit = 10, offset = 0): Promise<ExpertApplication[]> {
+    let query = db.select().from(expertApplications);
+    
+    if (status) {
+      query = query.where(eq(expertApplications.applicationStatus, status));
+    }
+    
+    const applications = await query
+      .limit(limit)
+      .offset(offset)
+      .orderBy(desc(expertApplications.createdAt));
+    
+    return applications;
+  }
+
+  async updateExpertApplicationStatus(id: string, status: string, reviewNotes?: string): Promise<ExpertApplication> {
+    const [updated] = await db
+      .update(expertApplications)
+      .set({
+        applicationStatus: status,
+        reviewNotes: reviewNotes || null,
+        reviewedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(expertApplications.id, id))
+      .returning();
+    return updated;
   }
 }
 

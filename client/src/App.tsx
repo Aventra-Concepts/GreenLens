@@ -20,6 +20,7 @@ import Reviews from "@/pages/Reviews";
 import AuthPage from "@/pages/auth-page";
 import ShopPage from "@/pages/shop";
 import CheckoutPage from "@/pages/checkout";
+import ExpertOnboarding from "@/pages/expert-onboarding";
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/reviews" component={Reviews} />
       <Route path="/shop" component={ShopPage} />
       <Route path="/checkout" component={CheckoutPage} />
+      <Route path="/expert-onboarding" component={ExpertOnboarding} />
       <Route path="/admin-login" component={AdminLogin} />
       <Route component={NotFound} />
     </Switch>

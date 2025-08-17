@@ -39,6 +39,9 @@ export function Layout({
             <a href="/blog" className="text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors">
               Blog
             </a>
+            <a href="/expert-onboarding" className="text-sm bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition-colors font-medium">
+              Become an Expert
+            </a>
           </nav>
         </div>
       </div>
