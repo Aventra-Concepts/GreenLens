@@ -64,7 +64,8 @@ export default function NavigationEnhanced() {
       await fetch("/api/logout", { method: "POST" });
       // Clear any cached user data
       queryClient.setQueryData(["/api/user"], null);
-      // Force redirect to auth page
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      // Force redirect to auth page using window.location to ensure full refresh
       window.location.href = "/auth";
     } catch (error) {
       console.error("Logout failed:", error);

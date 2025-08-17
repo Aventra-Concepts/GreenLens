@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { Link } from 'wouter';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, Camera, Sparkles, Loader2, X, CheckCircle } from "lucide-react";
@@ -254,9 +255,11 @@ export default function HeroSection() {
               {!isAuthenticated && (
                 <div className="text-center">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    <a href="/api/login" className="text-green-600 hover:text-green-700 font-medium">
-                      Log in
-                    </a>{" "}
+                    <Link href="/auth">
+                      <span className="text-green-600 hover:text-green-700 font-medium cursor-pointer">
+                        Log in
+                      </span>
+                    </Link>{" "}
                     to get 3 free plant identifications
                   </p>
                 </div>
