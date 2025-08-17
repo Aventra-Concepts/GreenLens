@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 export default function Landing() {
   return (
     <Layout showImageBanner={true} showSidebarAds={true}>
-      <div className="space-y-8">
+      <div className="space-y-4">
         <HeroSection />
         <PricingSection />
         <GardeningToolsSection />
