@@ -16,7 +16,7 @@ import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import ExpertsRegister from "@/pages/experts-register";
 import Features from "@/pages/features";
-import Blog from "@/pages/blog";
+import BlogPage from "@/pages/blog-page";
 import BlogPost from "@/pages/blog-post";
 import Reviews from "@/pages/Reviews";
 import AuthPage from "@/pages/auth-page";
@@ -49,7 +49,7 @@ function Router() {
       <Route path="/result/:id" component={Result} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/features" component={Features} />
-      <Route path="/blog" component={Blog} />
+      <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/reviews" component={Reviews} />
       <Route path="/shop" component={ShopPage} />

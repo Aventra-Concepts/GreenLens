@@ -277,6 +277,27 @@ export const insertPlantResultSchema = createInsertSchema(plantResults).omit({
 });
 export type InsertPlantResult = z.infer<typeof insertPlantResultSchema>;
 
+// Blog categories for organized content
+export const blogCategories = pgTable("blog_categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  slug: varchar("slug").notNull().unique(),
+  description: text("description"),
+  icon: varchar("icon"), // For UI representation
+  isActive: boolean("is_active").default(true),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type BlogCategory = typeof blogCategories.$inferSelect;
+export const insertBlogCategorySchema = createInsertSchema(blogCategories).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertBlogCategory = z.infer<typeof insertBlogCategorySchema>;
+
 // Blog posts for plant care tips
 export const blogPosts = pgTable("blog_posts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -285,6 +306,7 @@ export const blogPosts = pgTable("blog_posts", {
   excerpt: text("excerpt"),
   slug: varchar("slug").unique().notNull(),
   authorId: varchar("author_id").references(() => users.id),
+  categoryId: varchar("category_id").references(() => blogCategories.id),
   published: boolean("published").default(false),
   featuredImage: varchar("featured_image"),
   tags: text("tags").array(),

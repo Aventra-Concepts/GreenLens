@@ -20,6 +20,7 @@ import { trackUserLogin, trackPlantIdentification, trackSubscriptionPurchase, tr
 import { registerEcommerceRoutes } from "./routes/ecommerce";
 import expertRoutes from "./routes/expertRoutes";
 import consultationRoutes from "./routes/consultationRoutes";
+import blogRoutes from "./routes/blogRoutes";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -51,6 +52,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register consultation routes
   app.use('/api', consultationRoutes);
+  
+  // Register blog routes
+  app.use('/api/blog', blogRoutes);
+  
+  // Initialize blog categories on startup
+  (async () => {
+    try {
+      const { seedBlogCategories } = await import('./services/blogSeeder');
+      await seedBlogCategories();
+    } catch (error) {
+      console.error('Failed to seed blog categories:', error);
+    }
+  })();
 
   // Admin user management routes
   app.get('/api/admin/users', requireAdmin, async (req: any, res) => {

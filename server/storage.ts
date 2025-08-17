@@ -3,6 +3,7 @@ import {
   subscriptions,
   plantResults,
   blogPosts,
+  blogCategories,
   blogViews,
   catalogCache,
   userActivity,
@@ -22,6 +23,8 @@ import {
   type InsertPlantResult,
   type BlogPost,
   type InsertBlogPost,
+  type BlogCategory,
+  type InsertBlogCategory,
   type BlogView,
   type CatalogCache,
   type UserActivity,
@@ -97,13 +100,22 @@ export interface IStorage {
   
   // Enhanced Blog operations
   getBlogPosts(published?: boolean): Promise<BlogPost[]>;
+  getAllBlogPosts(): Promise<BlogPost[]>;
   getBlogPost(slug: string): Promise<BlogPost | undefined>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  getBlogPostsByCategory(categorySlug: string): Promise<BlogPost[]>;
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
   updateBlogPost(id: string, updates: Partial<InsertBlogPost>): Promise<BlogPost>;
   incrementBlogViewCount(blogPostId: string): Promise<void>;
   logBlogView(view: BlogView): Promise<BlogView>;
   getBlogViewCount(blogPostId: string): Promise<number>;
   getUserBlogHistory(userId: string, limit?: number): Promise<BlogView[]>;
+  
+  // Blog Category operations
+  getBlogCategories(): Promise<BlogCategory[]>;
+  getBlogCategory(slug: string): Promise<BlogCategory | undefined>;
+  createBlogCategory(category: InsertBlogCategory): Promise<BlogCategory>;
+  updateBlogCategory(id: string, updates: Partial<InsertBlogCategory>): Promise<BlogCategory>;
   
   // Cache operations
   getCacheItem(key: string): Promise<CatalogCache | undefined>;
@@ -464,6 +476,77 @@ export class DatabaseStorage implements IStorage {
       .where(eq(blogViews.userId, userId))
       .orderBy(desc(blogViews.viewedAt))
       .limit(limit);
+  }
+
+  async getAllBlogPosts(): Promise<BlogPost[]> {
+    return await db
+      .select()
+      .from(blogPosts)
+      .orderBy(desc(blogPosts.createdAt));
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const [post] = await db
+      .select()
+      .from(blogPosts)
+      .where(eq(blogPosts.slug, slug));
+    return post;
+  }
+
+  async getBlogPostsByCategory(categorySlug: string): Promise<BlogPost[]> {
+    return await db
+      .select({
+        id: blogPosts.id,
+        title: blogPosts.title,
+        content: blogPosts.content,
+        excerpt: blogPosts.excerpt,
+        slug: blogPosts.slug,
+        authorId: blogPosts.authorId,
+        categoryId: blogPosts.categoryId,
+        published: blogPosts.published,
+        featuredImage: blogPosts.featuredImage,
+        tags: blogPosts.tags,
+        createdAt: blogPosts.createdAt,
+        updatedAt: blogPosts.updatedAt,
+      })
+      .from(blogPosts)
+      .leftJoin(blogCategories, eq(blogPosts.categoryId, blogCategories.id))
+      .where(eq(blogCategories.slug, categorySlug))
+      .orderBy(desc(blogPosts.createdAt));
+  }
+
+  // Blog Category operations
+  async getBlogCategories(): Promise<BlogCategory[]> {
+    return await db
+      .select()
+      .from(blogCategories)
+      .where(eq(blogCategories.isActive, true))
+      .orderBy(blogCategories.sortOrder, blogCategories.name);
+  }
+
+  async getBlogCategory(slug: string): Promise<BlogCategory | undefined> {
+    const [category] = await db
+      .select()
+      .from(blogCategories)
+      .where(eq(blogCategories.slug, slug));
+    return category;
+  }
+
+  async createBlogCategory(category: InsertBlogCategory): Promise<BlogCategory> {
+    const [result] = await db
+      .insert(blogCategories)
+      .values(category)
+      .returning();
+    return result;
+  }
+
+  async updateBlogCategory(id: string, updates: Partial<InsertBlogCategory>): Promise<BlogCategory> {
+    const [result] = await db
+      .update(blogCategories)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(blogCategories.id, id))
+      .returning();
+    return result;
   }
 
   async getCacheItem(key: string): Promise<CatalogCache | undefined> {
