@@ -411,6 +411,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const pricingArray = pricingService.getAllPlanPricing(detectedCurrency);
       const supportedCurrencies = pricingService.getSupportedCurrencies();
       
+      console.log('🔧 Pricing API Debug:', {
+        requestedCurrency: currency,
+        detectedCurrency,
+        pricingArrayLength: pricingArray.length,
+        pricingArraySample: pricingArray[0],
+        supportedCurrenciesLength: supportedCurrencies.length
+      });
+      
       // Convert plans array to object format expected by frontend
       const plansObject = pricingArray.reduce((acc, plan) => {
         acc[plan.planId] = {
@@ -426,6 +434,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
         return acc;
       }, {} as Record<string, any>);
+      
+      console.log('🔧 Final Response:', {
+        currency: detectedCurrency,
+        plansObject,
+        supportedCurrencies: supportedCurrencies.slice(0, 5) + '...'
+      });
       
       res.json({
         currency: detectedCurrency,

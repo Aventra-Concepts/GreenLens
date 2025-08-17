@@ -79,14 +79,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(["/api/user"], null);
     },
     onSettled: () => {
-      console.log("🧹 Clearing all queries and reloading page");
+      console.log("🧹 Clearing all queries and redirecting to home");
       // Always clear everything after logout attempt (success or failure)
       queryClient.clear();
       
-      // Force a page reload to completely reset state
+      // Force navigation to home page instead of reload
       setTimeout(() => {
-        window.location.reload();
-      }, 100);
+        window.location.href = '/';
+      }, 50);
     },
   });
 
