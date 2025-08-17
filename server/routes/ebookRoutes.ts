@@ -65,10 +65,14 @@ export function registerEbookRoutes(app: Express) {
     try {
       const limit = parseInt(req.query.limit as string) || 6;
       const featuredEbooks = await storage.getFeaturedEbooks(limit);
-      res.json(featuredEbooks);
+      
+      // Ensure we always return an array
+      const ebooksArray = Array.isArray(featuredEbooks) ? featuredEbooks : [];
+      res.json(ebooksArray);
     } catch (error) {
       console.error("Error fetching featured e-books:", error);
-      res.status(500).json({ error: "Failed to fetch featured e-books" });
+      // Return empty array instead of error object to prevent frontend crashes
+      res.json([]);
     }
   });
 

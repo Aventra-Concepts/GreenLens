@@ -23,8 +23,18 @@ export function FeaturedEbooksSection() {
   const { data: featuredEbooks = [], isLoading } = useQuery({
     queryKey: ['/api/ebooks/featured'],
     queryFn: async () => {
-      const response = await fetch('/api/ebooks/featured?limit=6');
-      return response.json();
+      try {
+        const response = await fetch('/api/ebooks/featured?limit=6');
+        if (!response.ok) {
+          console.error('Failed to fetch featured ebooks:', response.status);
+          return [];
+        }
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
+      } catch (error) {
+        console.error('Error fetching featured ebooks:', error);
+        return [];
+      }
     },
   });
 
@@ -108,7 +118,10 @@ export function FeaturedEbooksSection() {
     );
   }
 
-  if (!featuredEbooks || featuredEbooks.length === 0) {
+  // Ensure featuredEbooks is an array before processing
+  const ebooksArray = Array.isArray(featuredEbooks) ? featuredEbooks : [];
+  
+  if (ebooksArray.length === 0) {
     return null;
   }
 
@@ -128,7 +141,7 @@ export function FeaturedEbooksSection() {
 
         {/* E-books Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {featuredEbooks.slice(0, 6).map((ebook: Ebook) => (
+          {ebooksArray.slice(0, 6).map((ebook: Ebook) => (
             <EbookCard key={ebook.id} ebook={ebook} />
           ))}
         </div>
