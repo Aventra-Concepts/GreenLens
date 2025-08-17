@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
@@ -48,7 +48,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-lg mb-4">Product</h3>
+            <h3 className="font-semibold text-lg mb-4">Features</h3>
             <ul className="space-y-2 text-gray-400">
               <li>
                 <Link href="/identify" className="hover:text-white transition-colors">
@@ -56,61 +56,54 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">Care Plans</a>
+                <Link href="/features" className="hover:text-white transition-colors">
+                  Care Plans
+                </Link>
               </li>
               <li>
                 <a href="#" className="hover:text-white transition-colors">Disease Diagnosis</a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">API Access</a>
+                <Link href="/pricing" className="hover:text-white transition-colors">
+                  Pricing Plans
+                </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold text-lg mb-4">Resources</h3>
+            <h3 className="font-semibold text-lg mb-4">E-books & Shop</h3>
             <ul className="space-y-2 text-gray-400">
               <li>
+                <Link href="/ebook-marketplace" className="hover:text-white transition-colors">
+                  E-book Marketplace
+                </Link>
+              </li>
+              <li>
+                <Link href="/shop" className="hover:text-white transition-colors">
+                  Garden Shop
+                </Link>
+              </li>
+              <li>
                 <Link href="/blog" className="hover:text-white transition-colors">
-                  Blog
+                  Blog & Articles
                 </Link>
               </li>
               <li>
                 <Link href="/reviews" className="hover:text-white transition-colors">
-                  Reviews
+                  Customer Reviews
                 </Link>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Plant Database</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Help Center</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Community</a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold text-lg mb-4">Company</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li>
-                <a href="#" className="hover:text-white transition-colors">About Us</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Contact</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              </li>
+            <h3 className="font-semibold text-lg mb-4">Registration</h3>
+            <ul className="space-y-3 text-gray-400">
               <li>
                 <Link 
                   href="/student-registration" 
-                  className="text-blue-400 hover:text-blue-300 font-bold transition-colors border-b border-blue-400 hover:border-blue-300"
+                  className="text-blue-400 hover:text-blue-300 font-bold transition-colors border-b border-blue-400 hover:border-blue-300 block"
                   data-testid="footer-student-registration"
                 >
                   🎓 Students Register
@@ -119,11 +112,37 @@ export default function Footer() {
               <li>
                 <Link 
                   href="/author-registration" 
-                  className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors border-b border-yellow-400 hover:border-yellow-300"
+                  className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors border-b border-yellow-400 hover:border-yellow-300 block"
                   data-testid="footer-author-registration"
                 >
                   ✍️ Author Registration
                 </Link>
+              </li>
+              <li>
+                <Link href="/expert-onboarding" className="hover:text-white transition-colors">
+                  Expert Registration
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-lg mb-4">Support & Legal</h3>
+            <ul className="space-y-2 text-gray-400">
+              <li>
+                <a href="#" className="hover:text-white transition-colors">About Us</a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white transition-colors">Contact Support</a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white transition-colors">Help Center</a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
               </li>
             </ul>
           </div>
