@@ -200,6 +200,17 @@ class RazorpayPayment implements PaymentProvider {
     console.log('Payment captured:', payment.id);
   }
 
+  async createProductCheckout(params: Parameters<import('./index').PaymentProvider['createProductCheckout']>[0]): Promise<{ url: string; id: string }> {
+    // For now, Razorpay product checkout is not implemented
+    // In a production environment, you would implement this similar to Stripe
+    throw new Error('Razorpay product checkout not implemented yet');
+  }
+
+  async getSessionDetails(sessionId: string): Promise<any> {
+    // For now, session details retrieval is not implemented for Razorpay
+    throw new Error('Razorpay session details not implemented yet');
+  }
+
   supportsCurrency(currency: string): boolean {
     // Razorpay primarily supports INR
     return currency.toUpperCase() === 'INR';

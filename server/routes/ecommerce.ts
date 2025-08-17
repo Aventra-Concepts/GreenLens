@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { ecommerceStorage } from "../ecommerce";
+import { storage } from "../storage";
 import { insertProductSchema, insertCartItemSchema, insertOrderSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -222,6 +223,193 @@ export function registerEcommerceRoutes(app: Express) {
     } catch (error) {
       console.error("Error adding tracking number:", error);
       res.status(500).json({ error: "Failed to add tracking number" });
+    }
+  });
+
+  // E-commerce Payment Routes
+  app.post("/api/ecommerce/checkout", async (req, res) => {
+    try {
+      const { cartItems, shippingAddress, billingAddress, currency = 'USD' } = req.body;
+      const userId = req.user?.id;
+      const guestEmail = req.body.guestEmail;
+
+      if (!cartItems || cartItems.length === 0) {
+        return res.status(400).json({ error: "Cart is empty" });
+      }
+
+      // Calculate totals
+      let subtotal = 0;
+      const processedItems = [];
+
+      for (const item of cartItems) {
+        const product = await ecommerceStorage.getProduct(item.productId);
+        if (!product) {
+          return res.status(404).json({ error: `Product ${item.productId} not found` });
+        }
+
+        const itemTotal = Number(product.price) * item.quantity;
+        subtotal += itemTotal;
+
+        processedItems.push({
+          productId: product.id,
+          productName: product.name,
+          productImage: Array.isArray(product.images) ? product.images[0] : null,
+          sku: product.sku,
+          price: product.price,
+          quantity: item.quantity,
+          totalPrice: itemTotal,
+        });
+      }
+
+      // Check for student discount
+      let discountAmount = 0;
+      if (userId) {
+        const user = await storage.getUser(userId);
+        const studentUser = await storage.getStudentUser(userId);
+        if (studentUser && studentUser.isVerified) {
+          discountAmount = subtotal * 0.1; // 10% student discount
+        }
+      }
+
+      // Calculate shipping (simplified)
+      const shippingAmount = subtotal > 50 ? 0 : 5.99; // Free shipping over $50
+      const taxAmount = (subtotal - discountAmount) * 0.08; // 8% tax
+      const totalAmount = subtotal + shippingAmount + taxAmount - discountAmount;
+
+      // Create payment session
+      const { paymentService } = await import('../services/payments');
+      
+      const paymentSession = await paymentService.createProductCheckout({
+        userId: userId || null,
+        guestEmail,
+        items: processedItems,
+        subtotal,
+        taxAmount,
+        shippingAmount,
+        discountAmount,
+        totalAmount,
+        currency,
+        shippingAddress,
+        billingAddress,
+      });
+
+      res.json({
+        checkoutUrl: paymentSession.url,
+        sessionId: paymentSession.id,
+        currency,
+        subtotal,
+        taxAmount,
+        shippingAmount,
+        discountAmount,
+        totalAmount,
+        studentDiscountApplied: discountAmount > 0,
+      });
+
+    } catch (error) {
+      console.error("Error creating e-commerce checkout:", error);
+      res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  });
+
+  // Calculate cart totals with discounts
+  app.post("/api/cart/calculate", async (req, res) => {
+    try {
+      const { cartItems, shippingCountry = 'US' } = req.body;
+      const userId = req.user?.id;
+
+      if (!cartItems || cartItems.length === 0) {
+        return res.json({
+          subtotal: 0,
+          taxAmount: 0,
+          shippingAmount: 0,
+          discountAmount: 0,
+          totalAmount: 0,
+          studentDiscountApplied: false,
+        });
+      }
+
+      let subtotal = 0;
+      for (const item of cartItems) {
+        const product = await ecommerceStorage.getProduct(item.productId);
+        if (product) {
+          subtotal += Number(product.price) * item.quantity;
+        }
+      }
+
+      // Check for student discount
+      let discountAmount = 0;
+      let studentDiscountApplied = false;
+      if (userId) {
+        const studentUser = await storage.getStudentUser(userId);
+        if (studentUser && studentUser.isVerified) {
+          discountAmount = subtotal * 0.1; // 10% student discount
+          studentDiscountApplied = true;
+        }
+      }
+
+      // Calculate shipping and tax
+      const shippingAmount = subtotal > 50 ? 0 : 5.99;
+      const taxAmount = (subtotal - discountAmount) * 0.08;
+      const totalAmount = subtotal + shippingAmount + taxAmount - discountAmount;
+
+      res.json({
+        subtotal,
+        taxAmount,
+        shippingAmount,
+        discountAmount,
+        totalAmount,
+        studentDiscountApplied,
+      });
+
+    } catch (error) {
+      console.error("Error calculating cart totals:", error);
+      res.status(500).json({ error: "Failed to calculate cart totals" });
+    }
+  });
+
+  // Process successful payment and create order
+  app.post("/api/ecommerce/complete-order", async (req, res) => {
+    try {
+      const { sessionId, paymentIntentId } = req.body;
+
+      // Retrieve payment session details
+      const { paymentService } = await import('../services/payments');
+      const sessionDetails = await paymentService.getSessionDetails(sessionId);
+
+      if (!sessionDetails || sessionDetails.payment_status !== 'paid') {
+        return res.status(400).json({ error: "Payment not completed" });
+      }
+
+      // Create order with payment details
+      const orderData = {
+        userId: sessionDetails.metadata.userId || null,
+        guestEmail: sessionDetails.metadata.guestEmail,
+        subtotal: sessionDetails.metadata.subtotal,
+        taxAmount: sessionDetails.metadata.taxAmount,
+        shippingAmount: sessionDetails.metadata.shippingAmount,
+        discountAmount: sessionDetails.metadata.discountAmount,
+        totalAmount: sessionDetails.metadata.totalAmount,
+        currency: sessionDetails.currency,
+        paymentStatus: 'paid',
+        paymentProvider: 'stripe',
+        paymentIntentId,
+        shippingAddress: JSON.parse(sessionDetails.metadata.shippingAddress || '{}'),
+        billingAddress: JSON.parse(sessionDetails.metadata.billingAddress || '{}'),
+      };
+
+      const orderItems = JSON.parse(sessionDetails.metadata.items || '[]');
+      const order = await ecommerceStorage.createOrder(orderData, orderItems);
+
+      // Clear cart if user is logged in
+      if (orderData.userId) {
+        await ecommerceStorage.clearCart(sessionId, orderData.userId);
+      }
+
+      res.json({ success: true, order });
+
+    } catch (error) {
+      console.error("Error completing order:", error);
+      res.status(500).json({ error: "Failed to complete order" });
     }
   });
 }

@@ -205,6 +205,17 @@ class CashfreePayment implements PaymentProvider {
     console.log('Payment successful:', payment.payment_id);
   }
 
+  async createProductCheckout(params: Parameters<import('./index').PaymentProvider['createProductCheckout']>[0]): Promise<{ url: string; id: string }> {
+    // For now, Cashfree product checkout is not implemented
+    // In a production environment, you would implement this similar to Stripe
+    throw new Error('Cashfree product checkout not implemented yet');
+  }
+
+  async getSessionDetails(sessionId: string): Promise<any> {
+    // For now, session details retrieval is not implemented for Cashfree
+    throw new Error('Cashfree session details not implemented yet');
+  }
+
   supportsCurrency(currency: string): boolean {
     // Cashfree primarily supports INR
     return currency.toUpperCase() === 'INR';

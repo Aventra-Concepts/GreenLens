@@ -34,6 +34,8 @@ import EbookDetail from "@/pages/ebook-detail";
 import AuthorRegistration from "@/pages/author-registration";
 import StudentVerification from "@/pages/student-verification-new";
 import StudentDashboard from "@/pages/student-dashboard";
+import CartPage from "./pages/cart-page";
+import OrderSuccessPage from "./pages/order-success-page";
 
 // E-book Category Pages
 import GardeningBasicsPage from "@/pages/categories/gardening-basics";
@@ -75,6 +77,8 @@ function Router() {
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/reviews" component={Reviews} />
       <Route path="/shop" component={ShopPage} />
+      <Route path="/cart" component={CartPage} />
+      <Route path="/order-success" component={OrderSuccessPage} />
       <Route path="/checkout" component={CheckoutPage} />
       <Route path="/expert-onboarding" component={ExpertOnboarding} />
       <Route path="/talk-to-expert" component={TalkToExpert} />

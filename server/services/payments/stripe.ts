@@ -12,7 +12,7 @@ class StripePayment implements PaymentProvider {
     }
 
     this.stripe = new Stripe(secretKey, {
-      apiVersion: '2023-10-16',
+      apiVersion: '2025-07-30.basil',
     });
   }
 
@@ -120,7 +120,7 @@ class StripePayment implements PaymentProvider {
       
       return {
         status: subscription.status,
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
       };
 
     } catch (error) {
@@ -132,6 +132,8 @@ class StripePayment implements PaymentProvider {
   private async handleCheckoutCompleted(session: any) {
     const userId = session.metadata?.userId;
     const planId = session.metadata?.planId;
+    const currency = session.metadata?.currency || 'USD';
+    const amount = session.metadata?.amount || '0';
 
     if (!userId) {
       console.error('No userId in checkout session metadata');
@@ -142,25 +144,25 @@ class StripePayment implements PaymentProvider {
 
     await storage.createSubscription({
       userId,
-      provider: 'stripe',
-      providerSubscriptionId: subscription.id,
-      providerCustomerId: subscription.customer as string,
+      planType: planId || 'pro',
       status: subscription.status,
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      planId,
-      planName: planId === 'pro' ? 'Pro Plan' : 'Premium Plan',
+      currency,
+      amount,
+      stripeSubscriptionId: subscription.id,
+      preferredProvider: 'stripe',
+      startDate: new Date((subscription as any).current_period_start * 1000),
+      endDate: new Date((subscription as any).current_period_end * 1000),
     });
   }
 
   private async handleSubscriptionUpdated(subscription: any) {
     const existingSubscription = await storage.getUserSubscription(subscription.metadata?.userId);
     
-    if (existingSubscription && existingSubscription.providerSubscriptionId === subscription.id) {
+    if (existingSubscription && existingSubscription.stripeSubscriptionId === subscription.id) {
       await storage.updateSubscription(existingSubscription.id, {
         status: subscription.status,
-        currentPeriodStart: new Date(subscription.current_period_start * 1000),
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        startDate: new Date(subscription.current_period_start * 1000),
+        endDate: new Date(subscription.current_period_end * 1000),
       });
     }
   }
@@ -168,10 +170,131 @@ class StripePayment implements PaymentProvider {
   private async handleSubscriptionDeleted(subscription: any) {
     const existingSubscription = await storage.getUserSubscription(subscription.metadata?.userId);
     
-    if (existingSubscription && existingSubscription.providerSubscriptionId === subscription.id) {
+    if (existingSubscription && existingSubscription.stripeSubscriptionId === subscription.id) {
       await storage.updateSubscription(existingSubscription.id, {
-        status: 'canceled',
+        status: 'cancelled',
       });
+    }
+  }
+
+  async createProductCheckout(params: {
+    userId: string | null;
+    guestEmail?: string;
+    items: Array<{
+      productId: string;
+      productName: string;
+      productImage?: string;
+      price: string;
+      quantity: number;
+      totalPrice: number;
+    }>;
+    subtotal: number;
+    taxAmount: number;
+    shippingAmount: number;
+    discountAmount: number;
+    totalAmount: number;
+    currency: string;
+    shippingAddress: any;
+    billingAddress: any;
+  }): Promise<{ url: string; id: string }> {
+    try {
+      const lineItems = params.items.map(item => ({
+        price_data: {
+          currency: params.currency.toLowerCase(),
+          product_data: {
+            name: item.productName,
+            images: item.productImage ? [item.productImage] : [],
+          },
+          unit_amount: Math.round(Number(item.price) * 100),
+        },
+        quantity: item.quantity,
+      }));
+
+      // Add shipping as a line item if applicable
+      if (params.shippingAmount > 0) {
+        lineItems.push({
+          price_data: {
+            currency: params.currency.toLowerCase(),
+            product_data: {
+              name: 'Shipping',
+            },
+            unit_amount: Math.round(params.shippingAmount * 100),
+          },
+          quantity: 1,
+        });
+      }
+
+      // Add tax as a line item if applicable
+      if (params.taxAmount > 0) {
+        lineItems.push({
+          price_data: {
+            currency: params.currency.toLowerCase(),
+            product_data: {
+              name: 'Tax',
+            },
+            unit_amount: Math.round(params.taxAmount * 100),
+          },
+          quantity: 1,
+        });
+      }
+
+      const session = await this.stripe.checkout.sessions.create({
+        mode: 'payment',
+        payment_method_types: ['card'],
+        customer_email: params.guestEmail,
+        line_items: lineItems,
+        success_url: `${process.env.FRONTEND_URL || 'https://greenlens.replit.dev'}/order-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.FRONTEND_URL || 'https://greenlens.replit.dev'}/cart?canceled=true`,
+        metadata: {
+          userId: params.userId || '',
+          guestEmail: params.guestEmail || '',
+          subtotal: params.subtotal.toString(),
+          taxAmount: params.taxAmount.toString(),
+          shippingAmount: params.shippingAmount.toString(),
+          discountAmount: params.discountAmount.toString(),
+          totalAmount: params.totalAmount.toString(),
+          items: JSON.stringify(params.items),
+          shippingAddress: JSON.stringify(params.shippingAddress),
+          billingAddress: JSON.stringify(params.billingAddress),
+        },
+        // Apply discount if applicable
+        ...(params.discountAmount > 0 && {
+          discounts: [{
+            coupon: await this.createStudentDiscountCoupon(params.discountAmount, params.currency)
+          }]
+        }),
+      });
+
+      return { url: session.url || '', id: session.id };
+
+    } catch (error) {
+      console.error('Stripe product checkout creation error:', error);
+      throw new Error('Failed to create product checkout session');
+    }
+  }
+
+  async getSessionDetails(sessionId: string): Promise<any> {
+    try {
+      const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+      return session;
+    } catch (error) {
+      console.error('Stripe session retrieval error:', error);
+      throw new Error('Failed to retrieve session details');
+    }
+  }
+
+  private async createStudentDiscountCoupon(discountAmount: number, currency: string): Promise<string> {
+    try {
+      const coupon = await this.stripe.coupons.create({
+        amount_off: Math.round(discountAmount * 100),
+        currency: currency.toLowerCase(),
+        duration: 'once',
+        name: 'Student Discount (10%)',
+      });
+      return coupon.id;
+    } catch (error) {
+      console.error('Error creating student discount coupon:', error);
+      throw error;
     }
   }
 
