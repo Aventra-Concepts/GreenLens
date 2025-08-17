@@ -24,7 +24,24 @@ export default function Navigation() {
               <span className="text-lg font-bold text-gray-900">GreenLens</span>
             </Link>
             
-            {/* Navigation links removed from header */}
+            {/* Desktop Navigation Links */}
+            <div className="hidden md:flex items-center space-x-6">
+              <Link href="/features" className="text-gray-700 hover:text-green-600 font-medium transition-colors">
+                Features
+              </Link>
+              <Link href="/pricing" className="text-gray-700 hover:text-green-600 font-medium transition-colors">
+                Pricing
+              </Link>
+              <Link href="/blog" className="text-gray-700 hover:text-green-600 font-medium transition-colors">
+                Blog
+              </Link>
+              <Link href="/shop" className="text-gray-700 hover:text-green-600 font-medium transition-colors">
+                Shop
+              </Link>
+              <div className="flex items-center">
+                <ShoppingCart />
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center space-x-4">
