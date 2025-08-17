@@ -24,6 +24,7 @@ import consultationRoutes from "./routes/consultationRoutes";
 import blogRoutes from "./routes/blogRoutes";
 import { registerAuthorRoutes } from "./routes/authorRoutes";
 import studentRoutes from "./routes/studentRoutes";
+import studentAdminRoutes from "./routes/studentAdminRoutes";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -67,6 +68,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register student verification routes
   app.use('/', studentRoutes);
+  
+  // Register student admin routes
+  app.use('/api/admin', studentAdminRoutes);
   
   // Initialize blog categories and auto-blog service on startup
   (async () => {

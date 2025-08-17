@@ -772,6 +772,17 @@ export const studentUsers = pgTable("student_users", {
   convertedUserId: varchar("converted_user_id").references(() => users.id),
   conversionDate: timestamp("conversion_date"),
   
+  // Admin Extension Management
+  adminExtensionCount: integer("admin_extension_count").default(0), // Number of extensions granted
+  lastExtensionDate: timestamp("last_extension_date"),
+  extensionExpiryDate: timestamp("extension_expiry_date"), // Custom expiry date if extended
+  conversionScheduledFor: timestamp("conversion_scheduled_for"), // Auto-calculated conversion date
+  
+  // Automatic discount and conversion tracking
+  discountApplied: boolean("discount_applied").default(true), // 10% student discount
+  graduationCompleted: boolean("graduation_completed").default(false),
+  graduationCompletionDate: timestamp("graduation_completion_date"),
+  
   emailVerified: boolean("email_verified").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

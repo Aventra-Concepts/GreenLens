@@ -206,6 +206,9 @@ export interface IStorage {
   updateStudentUser(id: string, updates: Partial<StudentUser>): Promise<StudentUser>;
   getPendingStudentVerifications(): Promise<StudentUser[]>;
   getStudentsNearGraduation(): Promise<StudentUser[]>;
+  getStudentsEligibleForConversion(): Promise<StudentUser[]>;
+  extendStudentStatus(studentId: string, adminId: string): Promise<StudentUser>;
+  markStudentGraduated(studentId: string): Promise<StudentUser>;
 
   // E-book operations
   createEbook(ebook: InsertEbook): Promise<Ebook>;
@@ -1122,6 +1125,61 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(studentUsers.expectedGraduation);
+  }
+
+  async getStudentsEligibleForConversion(): Promise<StudentUser[]> {
+    const currentDate = new Date();
+    return await db
+      .select()
+      .from(studentUsers)
+      .where(
+        and(
+          eq(studentUsers.isActive, true),
+          eq(studentUsers.isConverted, false),
+          eq(studentUsers.verificationStatus, 'approved'),
+          or(
+            lt(studentUsers.conversionScheduledFor, currentDate),
+            eq(studentUsers.graduationCompleted, true)
+          )
+        )
+      );
+  }
+
+  async extendStudentStatus(studentId: string, adminId: string): Promise<StudentUser> {
+    const currentExtensionCount = await db
+      .select({ adminExtensionCount: studentUsers.adminExtensionCount })
+      .from(studentUsers)
+      .where(eq(studentUsers.id, studentId));
+    
+    const newExtensionCount = (currentExtensionCount[0]?.adminExtensionCount || 0) + 1;
+    const newExtensionDate = new Date();
+    newExtensionDate.setFullYear(newExtensionDate.getFullYear() + 1);
+    
+    const [result] = await db
+      .update(studentUsers)
+      .set({
+        adminExtensionCount: newExtensionCount,
+        lastExtensionDate: new Date(),
+        extensionExpiryDate: newExtensionDate,
+        conversionScheduledFor: newExtensionDate,
+        updatedAt: new Date(),
+      })
+      .where(eq(studentUsers.id, studentId))
+      .returning();
+    return result;
+  }
+
+  async markStudentGraduated(studentId: string): Promise<StudentUser> {
+    const [result] = await db
+      .update(studentUsers)
+      .set({
+        graduationCompleted: true,
+        graduationCompletionDate: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(studentUsers.id, studentId))
+      .returning();
+    return result;
   }
 
   // E-book operations
