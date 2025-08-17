@@ -26,8 +26,8 @@ export default function Footer() {
                 data-testid="facebook-link"
                 title="Follow us on Facebook"
               >
-                <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
-                  <Facebook className="w-4 h-4 text-white" />
+                <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
+                  <Facebook className="w-3.5 h-3.5 text-white" />
                 </div>
               </a>
               <a 
@@ -38,8 +38,8 @@ export default function Footer() {
                 data-testid="whatsapp-link"
                 title="Chat with us on WhatsApp"
               >
-                <div className="w-9 h-9 bg-green-500 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
-                  <MessageCircle className="w-4 h-4 text-white" />
+                <div className="w-7 h-7 bg-green-500 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
+                  <MessageCircle className="w-3.5 h-3.5 text-white" />
                 </div>
               </a>
               <a 
@@ -50,8 +50,8 @@ export default function Footer() {
                 data-testid="instagram-link"
                 title="Follow us on Instagram"
               >
-                <div className="w-9 h-9 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
-                  <Instagram className="w-4 h-4 text-white" />
+                <div className="w-7 h-7 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
+                  <Instagram className="w-3.5 h-3.5 text-white" />
                 </div>
               </a>
               <a 
@@ -62,8 +62,8 @@ export default function Footer() {
                 data-testid="twitter-link"
                 title="Follow us on Twitter"
               >
-                <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg border border-gray-300">
-                  <FaXTwitter className="w-4 h-4 text-black" />
+                <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg border border-gray-300">
+                  <FaXTwitter className="w-3.5 h-3.5 text-black" />
                 </div>
               </a>
             </div>
