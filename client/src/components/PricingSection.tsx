@@ -46,12 +46,72 @@ export default function PricingSection() {
     formatPrice 
   } = usePricing('USD', user?.location || undefined);
 
-  const { data: plans = [], isLoading, error } = useQuery({
-    queryKey: ['/api/pricing-plans'],
-    queryFn: () => apiRequest('GET', '/api/pricing-plans?activeOnly=true').then(res => res.json()),
-    staleTime: 0,
-    retry: 1,
-  });
+  // Static plan definitions (since we only have pro/premium)
+  const staticPlans: PricingPlan[] = [
+    {
+      id: 'free',
+      planId: 'free',
+      name: 'Free',
+      price: '0',
+      currency: selectedCurrency,
+      billingInterval: 'forever',
+      description: 'Get started with basic plant identification',
+      features: [
+        { text: '3 plant identifications', isIncluded: true },
+        { text: 'Basic care recommendations', isIncluded: true },
+        { text: 'Community access', isIncluded: true },
+        { text: 'Health assessment', isIncluded: false },
+        { text: 'PDF reports', isIncluded: false },
+        { text: 'Priority support', isIncluded: false }
+      ],
+      isPopular: false,
+      isActive: true,
+      displayOrder: 1
+    },
+    {
+      id: 'pro',
+      planId: 'pro',
+      name: 'Pro',
+      price: '9',
+      currency: selectedCurrency,
+      billingInterval: 'month',
+      description: 'Perfect for gardening enthusiasts',
+      features: [
+        { text: 'Unlimited plant identifications', isIncluded: true },
+        { text: 'Advanced care plans', isIncluded: true },
+        { text: 'Health assessment', isIncluded: true },
+        { text: 'PDF reports', isIncluded: true },
+        { text: 'Priority support', isIncluded: true },
+        { text: 'Advanced features', isIncluded: false }
+      ],
+      isPopular: true,
+      isActive: true,
+      displayOrder: 2
+    },
+    {
+      id: 'premium',
+      planId: 'premium',
+      name: 'Premium',
+      price: '19',
+      currency: selectedCurrency,
+      billingInterval: 'month',
+      description: 'For professional gardeners and landscapers',
+      features: [
+        { text: 'Everything in Pro', isIncluded: true },
+        { text: 'Expert consultations', isIncluded: true },
+        { text: 'Advanced plant database', isIncluded: true },
+        { text: 'Commercial license', isIncluded: true },
+        { text: 'Custom integrations', isIncluded: true },
+        { text: 'White-label options', isIncluded: true }
+      ],
+      isPopular: false,
+      isActive: true,
+      displayOrder: 3
+    }
+  ];
+
+  const plans = staticPlans;
+  const isLoading = pricingLoading;
 
   const checkoutMutation = useMutation({
     mutationFn: async ({ planId }: { planId: string }) => {
@@ -137,20 +197,7 @@ export default function PricingSection() {
     );
   }
 
-  if (error) {
-    return (
-      <section id="pricing" className="pt-0 pb-0.5 bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-0">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
-              Choose Your Plan
-            </h2>
-            <p className="text-red-500">Failed to load pricing plans: {error.message}</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+
 
   if (!plans || plans.length === 0) {
     return (
