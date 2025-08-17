@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { queryClient } from "@/lib/queryClient";
 import { Layout } from "@/components/Layout";
 import MyGardenSection from "@/components/MyGardenSection";
 import Footer from "@/components/Footer";
@@ -165,11 +166,18 @@ export default function Account() {
                 <Button 
                   variant="outline" 
                   className="w-full"
-                  onClick={() => {
-                    fetch('/api/logout', { method: 'POST' })
-                      .then(() => {
-                        setLocation('/auth');
-                      });
+                  onClick={async () => {
+                    try {
+                      await fetch('/api/logout', { method: 'POST' });
+                      // Clear cached user data
+                      queryClient.setQueryData(["/api/auth/user"], null);
+                      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+                      // Force redirect to home page
+                      window.location.href = '/';
+                    } catch (error) {
+                      console.error('Logout failed:', error);
+                      window.location.href = '/';
+                    }
                   }}
                 >
                   Sign Out

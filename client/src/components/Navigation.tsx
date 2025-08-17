@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { queryClient } from "@/lib/queryClient";
 import { Leaf, Menu, X } from "lucide-react";
 import { ShoppingCart } from "@/components/ecommerce/ShoppingCart";
 
@@ -62,11 +63,18 @@ export default function Navigation() {
                     )}
                     <Button 
                       variant="outline"
-                      onClick={() => {
-                        fetch('/api/logout', { method: 'POST' })
-                          .then(() => {
-                            setLocation('/auth');
-                          });
+                      onClick={async () => {
+                        try {
+                          await fetch('/api/logout', { method: 'POST' });
+                          // Clear cached user data
+                          queryClient.setQueryData(["/api/auth/user"], null);
+                          queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+                          // Force redirect to home page
+                          window.location.href = '/';
+                        } catch (error) {
+                          console.error('Logout failed:', error);
+                          window.location.href = '/';
+                        }
                       }}
                       data-testid="sign-out-button"
                     >

@@ -62,13 +62,15 @@ export default function NavigationEnhanced() {
   const handleLogout = async () => {
     try {
       await fetch("/api/logout", { method: "POST" });
-      // Clear any cached user data
-      queryClient.setQueryData(["/api/user"], null);
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      // Force redirect to auth page using window.location to ensure full refresh
-      window.location.href = "/auth";
+      // Clear any cached user data with correct cache key
+      queryClient.setQueryData(["/api/auth/user"], null);
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      // Force redirect to home page using window.location to ensure full refresh
+      window.location.href = "/";
     } catch (error) {
       console.error("Logout failed:", error);
+      // Still redirect to clear the UI state even if logout request failed
+      window.location.href = "/";
     }
   };
 
