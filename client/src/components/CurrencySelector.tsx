@@ -150,8 +150,9 @@ export function CurrencySelector({ value, onChange, userLocation }: CurrencySele
                 {showSeparator && (
                   <div className="border-t border-gray-200 dark:border-gray-600 my-1" />
                 )}
-                <SelectItem value={currency} data-testid={`option-currency-${currency.toLowerCase()}`}>
-                  {currencyNames[currency] || currency}
+                <SelectItem value={currency} data-testid={`option-currency-${currency.toLowerCase()}`} className="text-sm">
+                  <span className="text-xs opacity-80 mr-1">{currencyNames[currency]?.split(' ')[0] || currency}</span>
+                  <span className="text-sm">{currencyNames[currency]?.substring(currencyNames[currency].indexOf(' ') + 1) || currency}</span>
                 </SelectItem>
               </div>
             );
