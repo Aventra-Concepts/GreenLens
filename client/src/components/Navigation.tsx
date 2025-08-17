@@ -168,7 +168,8 @@ export default function Navigation() {
               </Link>
               
               {/* Shopping Cart - Mobile Menu */}
-              <div className="pt-2">
+              <div className="pt-2 flex items-center">
+                <span className="text-gray-700 font-medium mr-3">Cart:</span>
                 <ShoppingCart />
               </div>
               
