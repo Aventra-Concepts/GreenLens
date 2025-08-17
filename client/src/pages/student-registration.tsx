@@ -21,7 +21,8 @@ const studentRegistrationSchema = z.object({
   confirmPassword: z.string(),
   universityName: z.string().min(1, "University name is required"),
   studentId: z.string().min(1, "Student ID is required"),
-  graduationYear: z.string().min(1, "Expected graduation year is required"),
+  yearOfJoining: z.string().min(1, "Year of joining is required"),
+  graduationYear: z.string().min(1, "Expected graduation completion year is required"),
   fieldOfStudy: z.string().min(1, "Field of study is required"),
   country: z.string().min(1, "Country is required"),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -127,6 +128,7 @@ export default function StudentRegistration() {
 
   const currentYear = new Date().getFullYear();
   const graduationYears = Array.from({ length: 8 }, (_, i) => currentYear + i);
+  const joiningYears = Array.from({ length: 10 }, (_, i) => currentYear - i).sort((a, b) => b - a);
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-2xl">
@@ -309,10 +311,37 @@ export default function StudentRegistration() {
 
                   <FormField
                     control={form.control}
+                    name="yearOfJoining"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Year of Joining *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger data-testid="select-year-joining">
+                              <SelectValue placeholder="Select year" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {joiningYears.map((year) => (
+                              <SelectItem key={year} value={year.toString()}>
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
                     name="graduationYear"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Expected Graduation Year *</FormLabel>
+                        <FormLabel>Expected Graduation Completion Year *</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-graduation-year">
