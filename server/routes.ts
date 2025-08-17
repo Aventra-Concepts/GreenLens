@@ -1165,7 +1165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         confidence: analysisResult.species.confidence.toString(),
         healthStatus: analysisResult.healthAssessment.isHealthy ? 'healthy' : 'unhealthy',
         diseaseDetected: (analysisResult.healthAssessment.diseases?.length || 0) > 0,
-        careInstructions: analysisResult.careInstructions,
+        careInstructions: JSON.stringify(analysisResult.careInstructions),
         analysisData: analysisResult,
         healthAssessment: analysisResult.healthAssessment,
         diseaseInfo: analysisResult.healthAssessment.diseases || [],
