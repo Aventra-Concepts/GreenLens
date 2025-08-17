@@ -47,11 +47,9 @@ export default function NavigationEnhanced() {
 
   const authorItems = [
     { name: "Upload E-book", href: "/author-upload", icon: Upload },
-    { name: "Author Registration", href: "/author-registration", icon: User },
   ];
 
   const studentItems = [
-    { name: "Student Registration", href: "/student-registration", icon: GraduationCap },
     { name: "Student Verification", href: "/student-verification", icon: Settings },
   ];
 
