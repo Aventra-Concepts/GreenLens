@@ -6,6 +6,13 @@ GreenLens is a production-grade web application that leverages AI technology to 
 
 ## Recent Updates (August 2025)
 
+### Navigation Enhancement & E-commerce Integration (August 17, 2025)
+- **Desktop Navigation Enhancement**: Added Shop link and Cart icon to desktop top navigation bar
+- **Optimal User Experience**: Shop and Cart accessible on both desktop (top nav) and mobile (hamburger menu)
+- **Navigation Layout**: Desktop shows Logo | Shop | Cart | Talk to Our Expert | Authentication buttons
+- **Mobile Menu Maintained**: Complete mobile menu functionality with all navigation options preserved
+- **E-commerce Accessibility**: Shopping functionality now prominently available across all device types
+
 ### Complete Expert Consultation System (August 17, 2025)
 - **Full Consultation Workflow**: Implemented complete "Talk to Our Expert" system with booking, payment, and expert assignment
 - **Database Integration**: Added consultation_requests table with comprehensive fields for customer data, problem description, and scheduling
