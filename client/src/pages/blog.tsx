@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import Navigation from "@/components/Navigation";
+import { Layout } from "@/components/Layout";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,8 +13,7 @@ export default function Blog() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
+    <Layout>
       
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -80,6 +79,6 @@ export default function Blog() {
       </section>
 
       <Footer />
-    </div>
+    </Layout>
   );
 }

@@ -1,6 +1,6 @@
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import Navigation from "@/components/Navigation";
+import { Layout } from "@/components/Layout";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,8 +19,7 @@ export default function BlogPost() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
+      <Layout>
         <section className="py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="space-y-8">
@@ -36,14 +35,13 @@ export default function BlogPost() {
           </div>
         </section>
         <Footer />
-      </div>
+      </Layout>
     );
   }
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
+      <Layout>
         <section className="py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <Card>
@@ -61,13 +59,12 @@ export default function BlogPost() {
           </div>
         </section>
         <Footer />
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
+    <Layout>
       
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -119,6 +116,6 @@ export default function BlogPost() {
       </section>
 
       <Footer />
-    </div>
+    </Layout>
   );
 }

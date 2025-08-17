@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import Navigation from "@/components/Navigation";
+import { Layout } from "@/components/Layout";
 import MyGardenSection from "@/components/MyGardenSection";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,8 +51,7 @@ export default function Account() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
+    <Layout>
       
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -156,6 +155,6 @@ export default function Account() {
 
       <MyGardenSection />
       <Footer />
-    </div>
+    </Layout>
   );
 }

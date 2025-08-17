@@ -1,8 +1,10 @@
+import { Layout } from "@/components/Layout";
 import { FeatureShowcase } from '@/components/FeatureShowcase';
 
 export default function FeaturesPage() {
   return (
-    <div className="container mx-auto px-4 py-8" data-testid="features-page">
+    <Layout>
+      <div className="container mx-auto px-4 py-8" data-testid="features-page">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -15,6 +17,7 @@ export default function FeaturesPage() {
         
         <FeatureShowcase />
       </div>
-    </div>
+      </div>
+    </Layout>
   );
 }
