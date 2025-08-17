@@ -21,7 +21,7 @@ import BlogPage from "@/pages/blog-page";
 import BlogPost from "@/pages/blog-post";
 import Reviews from "@/pages/Reviews";
 import AuthPage from "@/pages/auth-page";
-import ShopPage from "@/pages/shop";
+import ShopPage from "@/pages/shop-page";
 import CheckoutPage from "@/pages/checkout";
 import ExpertOnboarding from "@/pages/expert-onboarding";
 import TalkToExpert from "@/pages/talk-to-expert";
@@ -33,6 +33,7 @@ import StudentRegistration from "@/pages/student-registration";
 import EbookDetail from "@/pages/ebook-detail";
 import AuthorRegistration from "@/pages/author-registration";
 import StudentVerification from "@/pages/student-verification-new";
+import StudentDashboard from "@/pages/student-dashboard";
 
 // E-book Category Pages
 import GardeningBasicsPage from "@/pages/categories/gardening-basics";
@@ -113,6 +114,7 @@ function Router() {
       <Route path="/student-registration" component={StudentRegistration} />
       <Route path="/author-registration" component={AuthorRegistration} />
       <Route path="/student-verification" component={StudentVerification} />
+      <Route path="/student-dashboard" component={StudentDashboard} />
       <Route path="/experts-register" component={ExpertsRegister} />
       <Route component={NotFound} />
     </Switch>

@@ -25,6 +25,7 @@ import blogRoutes from "./routes/blogRoutes";
 import { registerAuthorRoutes } from "./routes/authorRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import studentAdminRoutes from "./routes/studentAdminRoutes";
+import { GeographicRestrictionService } from "./services/geographicRestrictionService";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -71,6 +72,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register student admin routes
   app.use('/api/admin', studentAdminRoutes);
+  
+  // Geographic restrictions routes
+  app.get('/api/geographic/check-product/:productId', async (req, res) => {
+    try {
+      const { productId } = req.params;
+      const userLocation = await GeographicRestrictionService.detectUserLocation(req);
+      
+      const availability = await GeographicRestrictionService.checkProductAvailability(
+        productId, 
+        userLocation
+      );
+      
+      res.json({
+        success: true,
+        availability,
+        userLocation: { countryCode: userLocation.countryCode }
+      });
+    } catch (error) {
+      console.error('Error checking product availability:', error);
+      res.status(500).json({ success: false, message: 'Failed to check availability' });
+    }
+  });
+
+  app.get('/api/geographic/check-ebook/:ebookId', async (req, res) => {
+    try {
+      const { ebookId } = req.params;
+      const userLocation = await GeographicRestrictionService.detectUserLocation(req);
+      
+      const availability = await GeographicRestrictionService.checkEbookAvailability(
+        ebookId, 
+        userLocation
+      );
+      
+      res.json({
+        success: true,
+        availability,
+        userLocation: { countryCode: userLocation.countryCode }
+      });
+    } catch (error) {
+      console.error('Error checking e-book availability:', error);
+      res.status(500).json({ success: false, message: 'Failed to check availability' });
+    }
+  });
+
+  app.get('/api/geographic/available-products', async (req, res) => {
+    try {
+      const userLocation = await GeographicRestrictionService.detectUserLocation(req);
+      const { category } = req.query;
+      
+      const availableProducts = await GeographicRestrictionService.filterAvailableProducts(
+        userLocation, 
+        category as string
+      );
+      
+      res.json({
+        success: true,
+        products: availableProducts,
+        userLocation: { countryCode: userLocation.countryCode },
+        count: availableProducts.length
+      });
+    } catch (error) {
+      console.error('Error filtering available products:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch available products' });
+    }
+  });
+
+  app.get('/api/geographic/available-ebooks', async (req, res) => {
+    try {
+      const userLocation = await GeographicRestrictionService.detectUserLocation(req);
+      const { category } = req.query;
+      
+      const availableEbooks = await GeographicRestrictionService.filterAvailableEbooks(
+        userLocation, 
+        category as string
+      );
+      
+      res.json({
+        success: true,
+        ebooks: availableEbooks,
+        userLocation: { countryCode: userLocation.countryCode },
+        count: availableEbooks.length
+      });
+    } catch (error) {
+      console.error('Error filtering available e-books:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch available e-books' });
+    }
+  });
+
+  app.get('/api/geographic/stats', requireAdmin, async (req, res) => {
+    try {
+      const stats = await GeographicRestrictionService.getGeographicStats();
+      res.json({ success: true, stats });
+    } catch (error) {
+      console.error('Error getting geographic stats:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch stats' });
+    }
+  });
+
+  app.post('/api/geographic/init-restrictions', requireAdmin, async (req, res) => {
+    try {
+      await GeographicRestrictionService.initializeDefaultRestrictions();
+      res.json({ success: true, message: 'Default restrictions initialized' });
+    } catch (error) {
+      console.error('Error initializing restrictions:', error);
+      res.status(500).json({ success: false, message: 'Failed to initialize restrictions' });
+    }
+  });
   
   // Initialize blog categories and auto-blog service on startup
   (async () => {

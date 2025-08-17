@@ -50,6 +50,90 @@ export interface GeographicRestriction {
 }
 
 export class EbookService {
+  // Platform initialization
+  static async initializePlatformSettings(): Promise<void> {
+    // Initialize any required platform settings
+    console.log('E-book platform settings initialized');
+  }
+
+  // Price calculation with student discounts
+  static async calculatePricing(basePrice: number, isStudent: boolean): Promise<{
+    originalPrice: number;
+    studentDiscount: number;
+    platformFee: number;
+    authorEarnings: number;
+    finalPrice: number;
+  }> {
+    const originalPrice = basePrice;
+    const studentDiscountRate = isStudent ? 0.10 : 0; // 10% student discount
+    const studentDiscount = originalPrice * studentDiscountRate;
+    const finalPrice = originalPrice - studentDiscount;
+    const platformFeeRate = 0.30; // 30% platform fee
+    const platformFee = finalPrice * platformFeeRate;
+    const authorEarnings = finalPrice - platformFee;
+
+    return {
+      originalPrice,
+      studentDiscount,
+      platformFee,
+      authorEarnings,
+      finalPrice
+    };
+  }
+
+  // Student verification
+  static async isVerifiedStudent(email: string): Promise<boolean> {
+    try {
+      const { db } = await import("../db");
+      const { studentUsers } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+
+      const [student] = await db
+        .select()
+        .from(studentUsers)
+        .where(and(
+          eq(studentUsers.email, email),
+          eq(studentUsers.verificationStatus, 'verified'),
+          eq(studentUsers.isActive, true)
+        ));
+
+      return !!student;
+    } catch (error) {
+      console.error('Error checking student status:', error);
+      return false;
+    }
+  }
+
+  // Download password generation
+  static generateDownloadPassword(email: string, ebookId: string): string {
+    const crypto = require('crypto');
+    const combinedString = `${email}-${ebookId}-${Date.now()}`;
+    return crypto.createHash('sha256').update(combinedString).digest('hex').substring(0, 16);
+  }
+
+  // Download access verification
+  static async verifyDownloadAccess(ebookId: string, email: string, password: string): Promise<boolean> {
+    try {
+      const { db } = await import("../db");
+      const { ebookPurchases } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+
+      const [purchase] = await db
+        .select()
+        .from(ebookPurchases)
+        .where(and(
+          eq(ebookPurchases.ebookId, ebookId),
+          eq(ebookPurchases.buyerEmail, email),
+          eq(ebookPurchases.paymentStatus, 'completed')
+        ));
+
+      return !!purchase;
+    } catch (error) {
+      console.error('Error verifying download access:', error);
+      return false;
+    }
+  }
+
   // E-book Management
   async getEbooks(filters: EbookFilterOptions = {}): Promise<{
     ebooks: EbookWithStats[];

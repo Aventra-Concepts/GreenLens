@@ -1,187 +1,53 @@
 # GreenLens - AI Plant Identification & Care Platform
 
 ## Overview
-
-GreenLens is a production-grade web application that leverages AI technology to identify plants through photo uploads and provide comprehensive care recommendations. The platform combines multiple AI services and plant databases to deliver accurate species identification, personalized care plans, disease diagnosis, and generates detailed PDF reports for users to track their plant collection.
-
-## Recent Updates (August 2025)
-
-### Automated Student Conversion & Security System (August 17, 2025)
-- **SECURE CHECKPOINT**: Application secured with comprehensive security middleware protecting against common vulnerabilities
-- **Automatic Student-to-User Conversion**: Implemented 3-year lifecycle management with automatic conversion to regular user accounts
-- **Admin Extension Capabilities**: Admins can extend student status by 1 year before automatic conversion
-- **Graduation-Based Conversion**: Students automatically converted upon graduation completion regardless of timeline
-- **10% Student Discount System**: Automatic 10% discount applied to all student purchases (e-books, consultations)
-- **Daily Automated Processing**: Scheduled service runs at 9:00 AM daily to process eligible conversions
-- **Comprehensive Security**: Rate limiting, input validation, security headers, and centralized error handling
-- **Admin Management Interface**: Complete admin dashboard for student lifecycle management and extensions
-
-### Navigation Enhancement & E-commerce Integration (August 17, 2025)
-- **Desktop Navigation Enhancement**: Added Shop link and Cart icon to desktop top navigation bar
-- **Optimal User Experience**: Shop and Cart accessible on both desktop (top nav) and mobile (hamburger menu)
-- **Navigation Layout**: Desktop shows Logo | Shop | Cart | Talk to Our Expert | Authentication buttons
-- **Mobile Menu Maintained**: Complete mobile menu functionality with all navigation options preserved
-- **E-commerce Accessibility**: Shopping functionality now prominently available across all device types
-
-### Automated Blog Generation System (August 17, 2025)
-- **SECURE CHECKPOINT**: Application safely backed up before implementing auto-blogging system
-- **Auto-Content Creation**: Daily automated blog generation with 1500-word articles across 12 plant/agriculture categories
-- **AI Image Integration**: Copyright-free AI-generated images for each auto-created blog post
-- **Admin Editorial Control**: Full edit/delete capabilities for all auto-generated content maintained
-- **Background Processing**: Non-destructive implementation preserving all existing functionality
-- **Quality Assurance**: Content validation, duplicate prevention, and category-appropriate posting
-- **Scheduled Publishing**: Configurable daily posting with optimal timing distribution
-- **System Status**: FULLY OPERATIONAL - Auto-blog service initialized and scheduled for daily 9:00 AM generation
-
-### Complete Expert Consultation System (August 17, 2025)
-- **Full Consultation Workflow**: Implemented complete "Talk to Our Expert" system with booking, payment, and expert assignment
-- **Database Integration**: Added consultation_requests table with comprehensive fields for customer data, problem description, and scheduling
-- **Payment Processing**: Integrated Stripe payment system for consultation fees with secure payment intent creation
-- **Email Automation**: Complete email workflow including booking confirmation, payment confirmation, and expert assignment notifications  
-- **Expert Assignment System**: Admin dashboard for managing consultation requests and assigning certified plant experts
-- **Multi-Step User Journey**: From consultation booking → payment → expert assignment → scheduled phone consultation
-- **Navigation Integration**: Added "Talk to Our Expert" button in top navigation alongside authentication controls
-- **Admin Management**: Full admin interface for reviewing consultation requests and updating status
-- **Status Tracking**: Complete consultation lifecycle tracking from pending to completed with email updates
-
-### Multi-Currency Payment System (August 17, 2025)
-- **Global Currency Support**: Implemented comprehensive multi-currency payment acceptance for international users
-- **Dynamic Pricing API**: Created `/api/pricing` endpoint with real-time currency conversion and regional pricing
-- **Smart Provider Selection**: Automatic payment provider selection based on currency and user location
-- **Enhanced Payment Flow**: Updated checkout process to support currency selection and provider optimization
-- **Database Schema Updates**: Added currency and provider fields to subscriptions table for multi-currency transactions
-- **UI Currency Selector**: Interactive currency selector with location-based auto-detection
-- **Regional Exchange Rates**: Integrated currency conversion with regional pricing variations
-- **Provider Currency Support**: Stripe (12+ currencies), Razorpay (INR), Cashfree (INR) with automatic fallbacks
-
-### E-commerce Platform Integration (August 16, 2025)
-- **Complete E-commerce System**: Integrated full-featured gardening tools shop with product catalog, shopping cart, and order management
-- **Database Schema**: Added products, cart_items, orders, order_items, categories, and shipping_rates tables
-- **Navigation Integration**: Added shopping cart button with item badge and shop link to main navigation
-- **Sample Product Catalog**: Populated shop with 6 essential gardening tools and supplies
-- **PayPal Payment Ready**: Payment infrastructure prepared for PayPal integration (API keys needed)
-- **Guest Cart Support**: Anonymous users can add items to cart using session-based storage
-
-### Mobile Camera Functionality (August 16, 2025)
-- **Direct Camera Capture**: Mobile users can now take photos directly within the app using device camera
-- **Three-Slot Upload Interface**: Restored dedicated 3-slot image upload layout for optimal user experience
-- **Camera Controls**: Front/back camera switching and intuitive capture interface per slot
-- **File Restrictions**: Strict JPEG/PNG only format with 100KB maximum file size per image
-- **Auto-Cleanup System**: Automatic image deletion from memory after successful identification to prevent system crashes
-- **Enhanced Validation**: Client and server-side file type and size validation for system stability
-
-### Custom Authentication System Implementation (August 16, 2025)
-- **Complete Auth Overhaul**: Replaced Replit Auth with custom email/password authentication system
-- **Registration Template**: Implemented comprehensive registration form with name, location, email, password fields
-- **Admin Controls**: Added admin-only user management dashboard with user status controls
-- **Database Schema Updates**: Enhanced users table with admin flags, location, and authentication fields
-- **Session Management**: Secure session-based authentication with PostgreSQL storage
-- **Password Security**: Implemented bcrypt-based password hashing and validation
-- **Auth Routes Integration**: Updated all protected routes to use custom authentication middleware
-
-### UI/UX Redesign (August 16, 2025)
-- **Complete Banner Overhaul**: Restored banner image with overlay text "Identify Any Plant with GreenLens-Powered Precision"
-- **Green Color Theme**: Applied light and dark green color scheme to buttons and image upload areas
-- **Three-Slot Upload Interface**: Maintained dedicated 3-slot image upload layout for optimal user experience
-- **Authentication Gate**: Plant analysis now requires user login with clear notice under analyze button
-- **Complete Section Restoration**: Added back PoweredBySection, GardeningToolsSection, MyGardenSection, and InArticleAd
-- **Enhanced Visual Hierarchy**: Consistent green branding across all interactive elements
-
-### Free Tier System
-- **3 Free Identifications**: New users get 3 free plant identifications
-- **7-Day Validity**: Free tier expires after 7 days from first use
-- **Usage Tracking**: Database tracks free tier usage with timestamps
-- **Automatic Upgrade Prompts**: Smart messaging when limits are reached
-
-### Multilingual Plant Names
-- **12 Language Support**: English, Spanish, French, German, Italian, Portuguese, Chinese, Japanese, Korean, Arabic, Hindi, Russian
-- **Localized Plant Names**: Users see plant names in their preferred language
-- **Scientific Name Display**: Always shows scientific names alongside common names
-- **Regional Variations**: Support for regional name variations
-
-### Enhanced Features
-- **Plant Health Monitoring**: Dedicated health check endpoint for existing plants
-- **Language Preferences**: User-configurable language settings
-- **Care Tips API**: Detailed care information extraction
-- **Feature Showcase Page**: Comprehensive overview of all platform capabilities
-- **Free Tier Status Dashboard**: Real-time tracking of remaining uses and validity
+GreenLens is a production-grade web application that leverages AI technology for plant identification through photo uploads and provides comprehensive care recommendations. The platform integrates multiple AI services and plant databases to deliver accurate species identification, personalized care plans, disease diagnosis, and generates detailed PDF reports for users to track their plant collection. Key capabilities include an e-commerce platform for e-books and gardening tools, an expert consultation system, automated blog generation, and a robust user management system with multi-currency payment support.
 
 ## User Preferences
-
 Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
 ### Frontend Architecture
-- **React 18 with TypeScript**: Modern component-based architecture using functional components and hooks
-- **Wouter**: Lightweight client-side routing solution replacing traditional React Router
-- **TanStack Query**: Server state management with caching, background updates, and error handling
-- **shadcn/ui + Tailwind CSS**: Consistent design system with utility-first styling
-- **React Hook Form**: Form handling with validation and performance optimization
-- **Vite**: Fast development server and build tool with hot module replacement
+The frontend is built with **React 18 and TypeScript**, utilizing a modern component-based architecture with functional components and hooks. **Wouter** handles client-side routing, and **TanStack Query** manages server state, caching, and background updates. The design system uses **shadcn/ui + Tailwind CSS** for consistent styling. Form handling is managed by **React Hook Form**, and **Vite** provides a fast development server and build tool. The UI/UX features a light and dark green color theme, a restored banner, and a dedicated 3-slot image upload interface. Plant analysis requires user login.
 
 ### Backend Architecture
-- **Express.js with TypeScript**: RESTful API server with type safety
-- **Custom Authentication**: Email/password based auth with bcrypt hashing and session management
-- **Drizzle ORM**: Type-safe database queries with PostgreSQL
-- **Service-oriented architecture**: Modular services for external API integrations
-- **Multer**: File upload handling for plant images (up to 3 images, 10MB limit)
-- **Admin Management**: Role-based access control with admin-only endpoints
+The backend is an **Express.js with TypeScript** RESTful API server. It features a custom email/password authentication system with bcrypt hashing and session management, replacing Replit Auth. **Drizzle ORM** is used for type-safe PostgreSQL queries. A service-oriented architecture facilitates modularity, especially for external API integrations. **Multer** handles file uploads. Admin management includes role-based access control and a dashboard for user and student lifecycle management, including automated conversion processes and discount systems. An automated blog generation system with AI image integration is also implemented.
 
 ### Database Design
-- **PostgreSQL with Neon**: Cloud-hosted database with connection pooling
-- **Core entities**: Users, Subscriptions, PlantResults, BlogPosts, CatalogCache, Sessions
-- **Authentication Schema**: Users table with email, password hash, admin flags, and location
-- **Free Tier Tracking**: User table includes freeTierUsed, freeTierStartedAt, preferredLanguage fields
-- **Enhanced Plant Data**: PlantResults includes isFreeIdentification flag and localized species information
-- **Admin Controls**: User management with isAdmin, isActive, emailVerified flags
-- **Caching strategy**: TTL-based catalog cache to reduce external API calls
-- **Data relationships**: User → Subscription (1:1), User → PlantResults (1:many)
+**PostgreSQL with Neon** serves as the cloud-hosted database. Core entities include Users, Subscriptions, PlantResults, BlogPosts, CatalogCache, and Sessions. The Users table includes authentication fields, admin flags, location, and fields for tracking free tier usage. PlantResults stores localized species information. A TTL-based caching strategy is implemented for the plant catalog. New tables support e-commerce (products, cart_items, orders), consultations (consultation_requests), and multi-currency transactions.
 
 ### AI Integration Pipeline
-- **Image Quality Assessment**: Google Gemini AI validates image suitability before processing
-- **Plant Identification**: Plant.id API v3 for species identification and health assessment
-- **Care Plan Generation**: Gemini AI synthesizes personalized care recommendations
-- **Disease Detection**: Plant.id health assessment with Gemini-powered treatment advice
+The AI pipeline involves **Google Gemini AI** for image quality assessment, care plan synthesis, and disease treatment advice. **Plant.id API v3** is the primary service for species identification and health assessment. Structured output schemas ensure consistent JSON responses from AI services.
 
 ### Payment Processing
-- **Multi-provider support**: Stripe, Razorpay, Cashfree with adapter pattern
-- **Lazy loading**: Payment providers loaded only when needed to prevent startup errors
-- **Subscription management**: Recurring billing with webhook handling for status updates
-- **Plan tiers**: Free (3 identifications/7 days), Pro ($9/month), Premium ($19/month) with different feature sets
+The system supports multi-provider payments with **Stripe, Razorpay, and Cashfree** using an adapter pattern, loaded lazily. It handles subscription management, recurring billing, and webhooks. Dynamic pricing with real-time currency conversion is supported via a dedicated `/api/pricing` endpoint.
 
 ### Content Management
-- **Markdown-based blog system**: Simple CMS for plant care articles and tips
-- **PDF generation**: Puppeteer-based report creation with custom templates
-- **File storage**: Google Cloud Storage for uploaded images and generated PDFs
-- **Multilingual Content**: PlantNamesService provides localized plant names
-- **Feature Documentation**: Comprehensive feature showcase with interactive components
+Content management includes a Markdown-based blog system, **Puppeteer** for PDF report generation (e.g., detailed plant care reports), and **Google Cloud Storage** for uploaded images and PDFs. A `PlantNamesService` provides multilingual plant names in 12 languages.
 
 ## External Dependencies
 
 ### AI and Machine Learning Services
-- **Plant.id API v3**: Primary plant identification and health assessment service
-- **Google Gemini AI**: Care plan synthesis, image quality assessment, and disease advice generation
-- **Structured output schemas**: Ensures consistent JSON responses from AI services
+- **Plant.id API v3**: Plant identification and health assessment.
+- **Google Gemini AI**: Image quality assessment, care plan synthesis, and disease advice generation.
 
 ### Plant Information APIs
-- **Perenual API**: Primary plant catalog for species information and care guidelines
-- **Trefle API**: Fallback plant database for comprehensive species coverage
-- **Caching layer**: Reduces API calls and improves response times
+- **Perenual API**: Primary plant catalog.
+- **Trefle API**: Fallback plant database.
 
 ### Payment Providers
-- **Stripe**: Primary payment processor for US/EU markets with subscription management
-- **Razorpay**: Indian market payment processing with local payment methods
-- **Cashfree**: Additional Indian payment gateway for redundancy
+- **Stripe**: Primary payment processor.
+- **Razorpay**: Indian market payment processing.
+- **Cashfree**: Additional Indian payment gateway.
 
 ### Infrastructure Services
-- **Neon PostgreSQL**: Serverless PostgreSQL database with connection pooling
-- **Google Cloud Storage**: Scalable file storage for images and PDF reports
-- **Replit Authentication**: OpenID Connect integration for user management
-- **Puppeteer**: Headless browser for PDF report generation
+- **Neon PostgreSQL**: Serverless database.
+- **Google Cloud Storage**: Scalable file storage.
+- **Puppeteer**: Headless browser for PDF generation.
 
 ### Development and Deployment
-- **TypeScript**: Type safety across frontend and backend
-- **ESBuild**: Fast production bundling for server-side code
-- **Vite**: Development server with HMR and optimized production builds
-- **Drizzle Kit**: Database migration and schema management tools
+- **TypeScript**: Language for type safety.
+- **ESBuild**: Fast production bundling.
+- **Vite**: Development server and optimized builds.
+- **Drizzle Kit**: Database migration and schema management.

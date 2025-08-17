@@ -237,6 +237,11 @@ export const products = pgTable("products", {
   isFeatured: boolean("is_featured").default(false),
   metaTitle: varchar("meta_title"),
   metaDescription: text("meta_description"),
+  // Geographic Restrictions for Product Availability
+  allowedCountries: jsonb("allowed_countries").default("[]"), // Array of allowed country codes
+  restrictedCountries: jsonb("restricted_countries").default("[]"), // Array of restricted country codes  
+  globalAccess: boolean("global_access").default(false), // If true, available worldwide
+  regionRestrictions: jsonb("region_restrictions").default("{}"), // Custom region-based rules
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -988,6 +993,13 @@ export const ebooks = pgTable("ebooks", {
   
   isActive: boolean("is_active").default(true),
   isFeatured: boolean("is_featured").default(false),
+  
+  // Geographic Restrictions for E-book Availability 
+  allowedCountries: jsonb("allowed_countries").default("[]"), // Array of allowed country codes
+  restrictedCountries: jsonb("restricted_countries").default("[]"), // Array of restricted country codes  
+  globalAccess: boolean("global_access").default(true), // E-books default to global access
+  regionRestrictions: jsonb("region_restrictions").default("{}"), // Custom region-based rules
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

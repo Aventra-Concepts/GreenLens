@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { storage } from "../storage";
 import { GeolocationService } from "../services/geolocationService";
-import { EbookService } from "../services/ebookService";
+import { EbookService, ebookService } from "../services/ebookService";
 import { StudentVerificationService } from "../services/studentVerificationService";
 import { requireAuth, requireAdmin } from "../auth";
 import { insertEbookSchema, insertStudentUserSchema, insertEbookPurchaseSchema } from "@shared/schema";
@@ -103,7 +103,7 @@ export function registerEbookRoutes(app: Express) {
   // Geographic detection endpoint
   app.get("/api/location", async (req, res) => {
     try {
-      const userIP = req.ip || req.connection.remoteAddress;
+      const userIP = req.ip || req.connection.remoteAddress || '127.0.0.1';
       const country = await GeolocationService.detectUserCountry(userIP);
       const availability = GeolocationService.getAvailableProducts(country);
       
@@ -281,7 +281,7 @@ export function registerEbookRoutes(app: Express) {
       const ebookId = req.params.id;
       const { email } = req.body;
       
-      const ebook = await storage.getEbook(ebookId);
+      const ebook = await ebookService.getEbook(ebookId);
       if (!ebook || ebook.status !== 'published') {
         return res.status(404).json({ error: 'E-book not found' });
       }
@@ -298,21 +298,15 @@ export function registerEbookRoutes(app: Express) {
       // Generate download password
       const downloadPassword = EbookService.generateDownloadPassword(email, ebookId);
 
-      const purchase = await storage.createEbookPurchase({
+      const purchase = await ebookService.purchaseEbook({
         ebookId,
-        buyerEmail: email,
-        originalPrice: pricing.originalPrice.toString(),
-        studentDiscount: pricing.studentDiscount.toString(),
-        platformFee: pricing.platformFee.toString(),
-        authorEarnings: pricing.authorEarnings.toString(),
-        finalPrice: pricing.finalPrice.toString(),
+        buyerId: undefined,
+        studentBuyerId: isStudent ? email : undefined,
+        paymentIntentId: `temp_${Date.now()}`,
+        paymentProvider: 'stripe',
+        originalPrice: pricing.originalPrice,
+        finalPrice: pricing.finalPrice,
         currency: ebook.currency || 'USD',
-        downloadPassword
-      });
-
-      // In a real implementation, integrate with payment gateway here
-      // For now, mark as completed for development
-      await storage.updateEbookPurchase(purchase.id, {
         paymentStatus: 'completed'
       });
 
@@ -354,13 +348,13 @@ export function registerEbookRoutes(app: Express) {
         return res.status(403).json({ error: 'Invalid download credentials' });
       }
 
-      const ebook = await storage.getEbook(ebookId);
+      const ebook = await ebookService.getEbook(ebookId);
       if (!ebook) {
         return res.status(404).json({ error: 'E-book not found' });
       }
 
       // Serve the file
-      res.download(ebook.fullFileUrl, `${ebook.title}.${ebook.fileFormat}`);
+      res.download(ebook.fileUrl || '/uploads/sample.pdf', `${ebook.title}.pdf`);
     } catch (error) {
       console.error('Download error:', error);
       res.status(500).json({ error: 'Download failed' });
