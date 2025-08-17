@@ -71,123 +71,101 @@ export default function NavigationEnhanced() {
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-100 dark:border-gray-800 bg-white/98 backdrop-blur-md supports-[backdrop-filter]:bg-white/95 dark:bg-gray-950/98 dark:supports-[backdrop-filter]:bg-gray-950/95 shadow-sm">
-      <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-14">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 dark:border-gray-700/50 bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/90 dark:bg-gray-900/95 dark:supports-[backdrop-filter]:bg-gray-900/90">
+      <div className="container mx-auto px-8">
+        <div className="flex items-center justify-between h-12">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2.5 group">
-            <div className="w-7 h-7 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
-              <Leaf className="w-4 h-4 text-white" />
+          <Link href="/" className="flex items-center space-x-2 group">
+            <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-green-600 rounded-md flex items-center justify-center transition-all group-hover:scale-110 group-hover:rotate-3">
+              <Leaf className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
+            <span className="text-base font-medium text-gray-800 dark:text-gray-100 tracking-tight">
               GreenLens
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-0.5">
+          <nav className="hidden lg:flex items-center">
             {navigationItems.map((item) => (
               <Link key={item.name} href={item.href}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`text-xs font-medium px-3 py-2 h-8 transition-all duration-200 ${
+                <button
+                  className={`relative px-2.5 py-1.5 mx-1 text-xs font-medium rounded-md transition-all duration-300 group ${
                     isActive(item.href)
-                      ? "bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-950 dark:text-green-300 dark:hover:bg-green-900 shadow-sm"
-                      : "text-gray-600 dark:text-gray-300 hover:text-green-600 hover:bg-green-50/50 dark:hover:text-green-400 dark:hover:bg-green-950/30"
+                      ? "text-emerald-700 dark:text-emerald-300"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                   }`}
                   data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
-                  <item.icon className="w-3.5 h-3.5 mr-1.5" />
-                  {item.name}
-                </Button>
+                  <span className="flex items-center">
+                    <item.icon className="w-3 h-3 mr-1" />
+                    {item.name}
+                  </span>
+                  {isActive(item.href) && (
+                    <div className="absolute bottom-0 left-1/2 w-4 h-0.5 bg-emerald-500 rounded-full transform -translate-x-1/2 translate-y-1" />
+                  )}
+                  <div className="absolute inset-0 rounded-md bg-gray-100/0 dark:bg-gray-700/0 group-hover:bg-gray-100/60 dark:group-hover:bg-gray-700/40 transition-colors duration-200" />
+                </button>
               </Link>
             ))}
           </nav>
 
           {/* Desktop Right Section */}
-          <div className="hidden lg:flex items-center space-x-2">
+          <div className="hidden lg:flex items-center space-x-1">
             {/* Shopping Cart */}
             <Link href="/shop">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="relative h-8 px-2 text-gray-600 dark:text-gray-300 hover:text-green-600 hover:bg-green-50/50 dark:hover:text-green-400 dark:hover:bg-green-950/30 transition-all duration-200"
+              <button
+                className="relative p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200 group"
                 data-testid="nav-cart"
               >
-                <ShoppingCart className="w-4 h-4" />
+                <ShoppingCart className="w-4 h-4 group-hover:scale-105 transition-transform" />
                 {cartItemCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs p-0 min-w-0"
-                  >
+                  <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 flex items-center justify-center text-xs font-medium bg-red-500 text-white rounded-full">
                     {cartItemCount}
-                  </Badge>
+                  </span>
                 )}
-              </Button>
+              </button>
             </Link>
 
             {/* Authentication */}
             {isAuthenticated ? (
-              <div className="flex items-center space-x-1.5">
-                <span className="text-xs text-gray-500 dark:text-gray-400 max-w-32 truncate">
+              <div className="flex items-center space-x-1">
+                <span className="text-xs text-gray-400 dark:text-gray-500 max-w-20 truncate mr-1">
                   {user?.firstName || user?.email}
                 </span>
                 {user?.isAdmin && (
                   <Link href="/admin/dashboard">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="h-8 px-2.5 text-xs border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-600" 
-                      data-testid="nav-admin"
-                    >
-                      <Settings className="w-3 h-3 mr-1" />
+                    <button className="px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/60 dark:hover:bg-emerald-900/20 rounded-md transition-all duration-200" data-testid="nav-admin">
+                      <Settings className="w-3 h-3 mr-1 inline" />
                       Admin
-                    </Button>
+                    </button>
                   </Link>
                 )}
                 <Link href="/account">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-8 px-2.5 text-xs border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-600" 
-                    data-testid="nav-account"
-                  >
-                    <User className="w-3 h-3 mr-1" />
+                  <button className="px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/60 dark:hover:bg-emerald-900/20 rounded-md transition-all duration-200" data-testid="nav-account">
+                    <User className="w-3 h-3 mr-1 inline" />
                     Account
-                  </Button>
+                  </button>
                 </Link>
-                <Button
-                  variant="outline"
-                  size="sm"
+                <button
                   onClick={handleLogout}
-                  className="h-8 px-2.5 text-xs border-gray-200 dark:border-gray-700 hover:border-red-300 hover:text-red-600 dark:hover:border-red-600 dark:hover:text-red-400"
+                  className="px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/20 rounded-md transition-all duration-200"
                   data-testid="nav-logout"
                 >
-                  <LogOut className="w-3 h-3 mr-1" />
+                  <LogOut className="w-3 h-3 mr-1 inline" />
                   Logout
-                </Button>
+                </button>
               </div>
             ) : (
-              <div className="flex items-center space-x-1.5">
+              <div className="flex items-center space-x-1">
                 <Link href="/auth">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-8 px-3 text-xs border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-600" 
-                    data-testid="nav-login"
-                  >
+                  <button className="px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/60 dark:hover:bg-emerald-900/20 rounded-md transition-all duration-200" data-testid="nav-login">
                     Login
-                  </Button>
+                  </button>
                 </Link>
                 <Link href="/auth">
-                  <Button
-                    size="sm"
-                    className="h-8 px-3 text-xs bg-green-600 hover:bg-green-700 text-white shadow-sm"
-                    data-testid="nav-signup"
-                  >
+                  <button className="px-3 py-1 text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-md shadow-sm transition-all duration-200 hover:shadow-md" data-testid="nav-signup">
                     Sign Up
-                  </Button>
+                  </button>
                 </Link>
               </div>
             )}
@@ -197,14 +175,12 @@ export default function NavigationEnhanced() {
           <div className="lg:hidden">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-8 px-2 text-gray-600 dark:text-gray-300 hover:bg-green-50/50 dark:hover:bg-green-950/30" 
+                <button
+                  className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
                   data-testid="nav-mobile-menu"
                 >
                   <Menu className="w-4 h-4" />
-                </Button>
+                </button>
               </SheetTrigger>
               <SheetContent side="right" className="w-80">
                 <div className="flex flex-col space-y-4 mt-8">
