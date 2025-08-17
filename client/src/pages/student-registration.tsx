@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, AlertCircle, CheckCircle, GraduationCap, Home, ArrowLeft } from "lucide-react";
+import { Upload, AlertCircle, CheckCircle, GraduationCap, Home } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const studentRegistrationSchema = z.object({
@@ -131,41 +131,13 @@ export default function StudentRegistration() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-2xl">
       {/* Navigation Bar */}
-      <div className="flex items-center justify-between mb-6">
-        <nav className="flex items-center space-x-2 text-sm text-gray-600">
-          <Link 
-            href="/" 
-            className="hover:text-green-600 transition-colors"
-            data-testid="link-home"
-          >
-            <span>Home</span>
-          </Link>
-          <span>/</span>
-          <Link 
-            href="/ebook-marketplace" 
-            className="hover:text-green-600 transition-colors"
-            data-testid="link-marketplace"
-          >
-            <span>E-Book Marketplace</span>
-          </Link>
-          <span>/</span>
-          <span className="text-gray-900 font-medium">Student Registration</span>
-        </nav>
-
-        <div className="flex items-center gap-2">
-          <Link href="/">
-            <Button variant="outline" size="sm" className="flex items-center gap-2" data-testid="button-back-home">
-              <Home className="h-4 w-4" />
-              Back to Home
-            </Button>
-          </Link>
-          <Link href="/ebook-marketplace">
-            <Button variant="ghost" size="sm" data-testid="button-back-marketplace">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Marketplace
-            </Button>
-          </Link>
-        </div>
+      <div className="flex items-center justify-start mb-6">
+        <Link href="/">
+          <Button variant="outline" size="sm" className="flex items-center gap-2" data-testid="button-back-home">
+            <Home className="h-4 w-4" />
+            Back to Home
+          </Button>
+        </Link>
       </div>
 
       <div className="mb-8 text-center">
