@@ -137,11 +137,11 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
                   Care Plan
                 </TabsTrigger>
                 <TabsTrigger 
-                  value="diseases" 
+                  value="health" 
                   className="border-b-2 data-[state=active]:border-green-500 data-[state=active]:text-green-600 rounded-none bg-transparent px-6 py-4"
-                  data-testid="diseases-tab"
+                  data-testid="health-tab"
                 >
-                  Health & Diseases
+                  Health Assessment
                 </TabsTrigger>
                 <TabsTrigger 
                   value="seasonal" 
@@ -149,13 +149,6 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
                   data-testid="seasonal-tab"
                 >
                   Seasonal Care
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="gallery" 
-                  className="border-b-2 data-[state=active]:border-green-500 data-[state=active]:text-green-600 rounded-none bg-transparent px-6 py-4"
-                  data-testid="gallery-tab"
-                >
-                  Gallery
                 </TabsTrigger>
                 <TabsTrigger 
                   value="raw" 
@@ -320,69 +313,6 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
                     </CardContent>
                   </Card>
 
-                  {/* Watering Signs */}
-                  {careInstructions.watering?.signs && (
-                    <Card className="bg-blue-50 border-blue-100">
-                      <CardContent className="p-6">
-                        <h3 className="font-semibold text-gray-900 mb-4">Watering Signs to Watch</h3>
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div>
-                            <h4 className="font-medium text-red-600 mb-2">Overwatering Signs</h4>
-                            <ul className="text-sm text-gray-600 space-y-1">
-                              {careInstructions.watering.signs.overwatering?.map((sign, index) => (
-                                <li key={index} className="flex items-start">
-                                  <span className="text-red-500 mr-2">•</span>
-                                  {sign}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-yellow-600 mb-2">Underwatering Signs</h4>
-                            <ul className="text-sm text-gray-600 space-y-1">
-                              {careInstructions.watering.signs.underwatering?.map((sign, index) => (
-                                <li key={index} className="flex items-start">
-                                  <span className="text-yellow-500 mr-2">•</span>
-                                  {sign}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Growth Characteristics */}
-                  {growthCharacteristics.matureSize && (
-                    <Card className="bg-green-50 border-green-100">
-                      <CardContent className="p-6">
-                        <h3 className="font-semibold text-gray-900 mb-4">Growth Information</h3>
-                        <div className="grid md:grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <p className="font-medium text-gray-700">Mature Size</p>
-                            <p className="text-gray-600">Height: {growthCharacteristics.matureSize.height}</p>
-                            <p className="text-gray-600">Width: {growthCharacteristics.matureSize.width}</p>
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-700">Growth Rate</p>
-                            <p className="text-gray-600">{growthCharacteristics.growthRate}</p>
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-700">Lifespan</p>
-                            <p className="text-gray-600">{growthCharacteristics.lifespan}</p>
-                          </div>
-                          {growthCharacteristics.bloomingPeriod && (
-                            <div>
-                              <p className="font-medium text-gray-700">Blooming</p>
-                              <p className="text-gray-600">{growthCharacteristics.bloomingPeriod}</p>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
                   {/* Species Information */}
                   <Card className="bg-gray-50">
                     <CardContent className="p-6">
@@ -518,7 +448,7 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
               </div>
             </TabsContent>
 
-            <TabsContent value="diseases" className="p-6">
+            <TabsContent value="health" className="p-6">
               <div className="space-y-6">
                 {/* Overall Health Status */}
                 <Card className={`border-l-4 ${healthAssessment.isHealthy ? 'border-l-green-500 bg-green-50' : 'border-l-yellow-500 bg-yellow-50'}`}>
@@ -658,46 +588,6 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
                   </div>
                 )}
 
-                {/* Common Problems */}
-                {commonProblems.length > 0 && (
-                  <div className="space-y-4">
-                    <h4 className="text-lg font-semibold text-gray-900">Common Problems & Solutions</h4>
-                    {commonProblems.map((problem: any, index: number) => (
-                      <Card key={index} className="bg-gray-50">
-                        <CardContent className="p-6">
-                          <h5 className="font-semibold text-gray-900 mb-3">{problem.problem}</h5>
-                          
-                          <div className="grid md:grid-cols-2 gap-4">
-                            <div>
-                              <h6 className="font-medium text-gray-700 mb-2">Common Causes</h6>
-                              <ul className="text-sm text-gray-600 space-y-1">
-                                {problem.causes.map((cause: string, causeIndex: number) => (
-                                  <li key={causeIndex} className="flex items-start">
-                                    <span className="text-red-500 mr-2">•</span>
-                                    {cause}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                            
-                            <div>
-                              <h6 className="font-medium text-gray-700 mb-2">Solutions</h6>
-                              <ul className="text-sm text-gray-600 space-y-1">
-                                {problem.solutions.map((solution: string, solutionIndex: number) => (
-                                  <li key={solutionIndex} className="flex items-start">
-                                    <span className="text-green-500 mr-2">•</span>
-                                    {solution}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-
                 {/* No Issues Found */}
                 {healthAssessment.isHealthy && 
                  (!healthAssessment.diseases || healthAssessment.diseases.length === 0) &&
@@ -804,40 +694,11 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
                 )}
               </div>
             </TabsContent>
-                              <span className="font-medium">Recovery Timeline:</span> {disease.recovery_timeline}
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </>
-                ) : (
-                  <Card>
-                    <CardContent className="p-6 text-center">
-                      <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Plant Looks Healthy!</h3>
-                      <p className="text-gray-600">No diseases or issues detected in your plant photos.</p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="gallery" className="p-6">
-              <div className="grid md:grid-cols-3 gap-4">
-                {result.images?.map((image: any, index: number) => (
-                  <Card key={index} className="overflow-hidden">
-                    <div className="aspect-square bg-gray-100 flex items-center justify-center">
-                      <span className="text-gray-400">Image {index + 1}</span>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
 
             <TabsContent value="raw" className="p-6">
               <Card>
                 <CardContent className="p-6">
+                  <h3 className="font-semibold text-gray-900 mb-4">Raw Analysis Data</h3>
                   <pre className="text-sm text-gray-700 whitespace-pre-wrap bg-gray-50 p-4 rounded-lg overflow-x-auto">
                     {JSON.stringify(result, null, 2)}
                   </pre>
