@@ -194,18 +194,29 @@ export class PlantAnalysisService {
         commonProblems,
       };
     } catch (error) {
-      console.error("Plant analysis error:", error);
+      // Log detailed error for admin debugging
+      console.error("Plant analysis error (ADMIN LOG):", {
+        error: error instanceof Error ? error.message : error,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        service: 'PlantAnalysisService'
+      });
       
-      // Handle rate limit errors specifically
+      // Return user-friendly error messages without exposing internal details
       if (error instanceof Error && error.message.includes('quota exceeded')) {
-        throw new Error('Our AI service has reached its daily limit. Please try again tomorrow or upgrade to a paid plan for unlimited analysis.');
+        throw new Error('Daily analysis limit reached. Please try again tomorrow or upgrade for unlimited access.');
       }
       
       if (error instanceof Error && error.message.includes('429')) {
-        throw new Error('Too many requests to our AI service. Please wait a moment and try again.');
+        throw new Error('Service temporarily busy. Please wait a moment and try again.');
       }
       
-      throw new Error(`Analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      if (error instanceof Error && error.message.includes('Google')) {
+        throw new Error('Plant analysis service is temporarily unavailable. Please try again later.');
+      }
+      
+      // Generic user-friendly error message
+      throw new Error('Unable to analyze plant at this time. Please try again or contact support if the issue persists.');
     }
   }
 

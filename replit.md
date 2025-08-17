@@ -5,6 +5,8 @@ GreenLens is a production-grade web application that leverages AI technology for
 
 **Status**: ALL CRITICAL ISSUES PERMANENTLY RESOLVED - Registration system 100% operational, database schema fully synchronized, frontend runtime errors eliminated, logout functionality completely fixed, and Google Gemini API rate limiting implemented. Platform ready for production deployment with intelligent quota management.
 
+**SECURITY IMPROVEMENT**: Error messages now sanitized - detailed Google Gemini errors only visible to admins, users see friendly messages.
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
@@ -29,6 +31,8 @@ The backend is an **Express.js with TypeScript** RESTful API server. It features
 The AI pipeline involves **Google Gemini AI** for image quality assessment, care plan synthesis, and disease treatment advice. **Plant.id API v3** is the primary service for species identification and health assessment. Structured output schemas ensure consistent JSON responses from AI services.
 
 **Rate Limiting**: Intelligent quota management with 45 requests/day limit (under free tier 50), 2-second intervals between requests, daily counter reset, and graceful error handling for quota exceeded scenarios.
+
+**Error Handling**: Comprehensive error sanitization system where detailed API errors are logged for admin debugging but users receive friendly, actionable error messages. Error codes include SERVICE_QUOTA_EXCEEDED, AI_SERVICE_ERROR for proper categorization.
 
 ### Payment Processing
 The system supports multi-provider payments with **Stripe, Razorpay, and Cashfree** using an adapter pattern, loaded lazily. It handles subscription management, recurring billing, and webhooks. Dynamic pricing with real-time currency conversion is supported via a dedicated `/api/pricing` endpoint.

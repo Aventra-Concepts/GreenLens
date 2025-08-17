@@ -78,14 +78,25 @@ Ensure the response is properly formatted JSON that can be parsed.`;
       
       return JSON.parse(jsonMatch[0]);
     } catch (error) {
-      console.error('Error generating structured content:', error);
+      // Log detailed error for admin debugging only
+      console.error('Gemini API error (ADMIN LOG):', {
+        error: error instanceof Error ? error.message : error,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        method: 'generateStructuredContent'
+      });
       
-      // Handle rate limit errors specifically
+      // Throw sanitized error messages for users
       if (error instanceof Error && error.message.includes('429')) {
-        throw new Error('Google Gemini API quota exceeded. Please upgrade to a paid plan or try again tomorrow.');
+        throw new Error('SERVICE_QUOTA_EXCEEDED');
       }
       
-      throw error;
+      if (error instanceof Error && error.message.includes('quota')) {
+        throw new Error('SERVICE_QUOTA_EXCEEDED');
+      }
+      
+      // Generic service error
+      throw new Error('AI_SERVICE_ERROR');
     }
   }
 
@@ -141,14 +152,25 @@ Ensure the response is properly formatted JSON that can be parsed.`;
       
       return text;
     } catch (error) {
-      console.error('Error analyzing images with Gemini:', error);
+      // Log detailed error for admin debugging only
+      console.error('Gemini API error (ADMIN LOG):', {
+        error: error instanceof Error ? error.message : error,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        method: 'analyzeWithImages'
+      });
       
-      // Handle rate limit errors specifically
+      // Throw sanitized error messages for users
       if (error instanceof Error && error.message.includes('429')) {
-        throw new Error('Google Gemini API quota exceeded. Please upgrade to a paid plan or try again tomorrow.');
+        throw new Error('SERVICE_QUOTA_EXCEEDED');
       }
       
-      throw error;
+      if (error instanceof Error && error.message.includes('quota')) {
+        throw new Error('SERVICE_QUOTA_EXCEEDED');
+      }
+      
+      // Generic service error
+      throw new Error('AI_SERVICE_ERROR');
     }
   }
 
@@ -195,14 +217,25 @@ Ensure the response is properly formatted JSON that can be parsed.`;
       
       return text;
     } catch (error) {
-      console.error('Error analyzing text with Gemini:', error);
+      // Log detailed error for admin debugging only
+      console.error('Gemini API error (ADMIN LOG):', {
+        error: error instanceof Error ? error.message : error,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        method: 'analyzeText'
+      });
       
-      // Handle rate limit errors specifically
+      // Throw sanitized error messages for users
       if (error instanceof Error && error.message.includes('429')) {
-        throw new Error('Google Gemini API quota exceeded. Please upgrade to a paid plan or try again tomorrow.');
+        throw new Error('SERVICE_QUOTA_EXCEEDED');
       }
       
-      throw error;
+      if (error instanceof Error && error.message.includes('quota')) {
+        throw new Error('SERVICE_QUOTA_EXCEEDED');
+      }
+      
+      // Generic service error
+      throw new Error('AI_SERVICE_ERROR');
     }
   }
 

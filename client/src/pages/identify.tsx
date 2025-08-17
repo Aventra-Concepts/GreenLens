@@ -56,15 +56,24 @@ export default function Identify() {
     },
     onError: (error: Error) => {
       let title = "Identification Failed";
-      let description = error.message;
+      let description = "Unable to analyze your plant right now. Please try again later.";
       
-      // Handle specific API quota errors with more helpful messages
-      if (error.message.includes('quota exceeded') || error.message.includes('daily limit')) {
+      // Handle sanitized error codes from backend
+      if (error.message.includes('SERVICE_QUOTA_EXCEEDED')) {
         title = "Daily Limit Reached";
-        description = "Our AI service has reached its daily limit. Please try again tomorrow or contact support for unlimited access.";
-      } else if (error.message.includes('Too many requests')) {
-        title = "Please Wait";
-        description = "Too many requests. Please wait a moment and try again.";
+        description = "Our AI service has reached its daily limit. Please try again tomorrow or upgrade for unlimited access.";
+      } else if (error.message.includes('AI_SERVICE_ERROR')) {
+        title = "Service Temporarily Unavailable";
+        description = "Plant analysis service is temporarily unavailable. Please try again in a few minutes.";
+      } else if (error.message.includes('daily limit') || error.message.includes('quota')) {
+        title = "Daily Limit Reached";
+        description = "Daily analysis limit reached. Please try again tomorrow or upgrade for unlimited access.";
+      } else if (error.message.includes('temporarily busy') || error.message.includes('wait a moment')) {
+        title = "Service Busy";
+        description = "Service is temporarily busy. Please wait a moment and try again.";
+      } else if (error.message.includes('temporarily unavailable')) {
+        title = "Service Unavailable";
+        description = "Plant analysis service is temporarily unavailable. Please try again later.";
       }
       
       toast({
