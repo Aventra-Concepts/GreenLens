@@ -75,6 +75,8 @@ import {
   type InsertAuthorProfile,
   type StudentProfile,
   type InsertStudentProfile,
+  type InsertBlogView,
+  type InsertCatalogCache,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, gt, lt, gte, lte, asc, desc, like, sql } from "drizzle-orm";
@@ -744,7 +746,8 @@ export class DatabaseStorage implements IStorage {
         user: {
           firstName: users.firstName,
           lastName: users.lastName,
-        }
+        },
+        moderatorNotes: reviews.moderatorNotes
       })
       .from(reviews)
       .leftJoin(users, eq(reviews.userId, users.id))
@@ -864,7 +867,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(pricingPlans)
       .where(eq(pricingPlans.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   // Pricing settings operations
@@ -936,7 +939,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(pricingSettings)
       .where(eq(pricingSettings.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   async getAllPricingSettings(): Promise<PricingSettings[]> {
@@ -1397,31 +1400,7 @@ export class DatabaseStorage implements IStorage {
     return ebook;
   }
 
-  // Additional e-book storage methods
-  async getEbook(id: string): Promise<Ebook | undefined> {
-    const [ebook] = await db
-      .select()
-      .from(ebooks)
-      .where(eq(ebooks.id, id));
-    return ebook;
-  }
-
-  async createEbook(ebook: InsertEbook): Promise<Ebook> {
-    const [created] = await db
-      .insert(ebooks)
-      .values(ebook)
-      .returning();
-    return created;
-  }
-
-  async updateEbook(id: string, updates: Partial<InsertEbook>): Promise<Ebook> {
-    const [updated] = await db
-      .update(ebooks)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(ebooks.id, id))
-      .returning();
-    return updated;
-  }
+  // Duplicate methods removed - using the original implementations above
 
   async getEbookPurchases(ebookId: string): Promise<EbookPurchase[]> {
     return await db
@@ -1439,22 +1418,9 @@ export class DatabaseStorage implements IStorage {
     return purchase;
   }
 
-  async createEbookPurchase(purchase: InsertEbookPurchase): Promise<EbookPurchase> {
-    const [created] = await db
-      .insert(ebookPurchases)
-      .values(purchase)
-      .returning();
-    return created;
-  }
 
-  async updateEbookPurchase(id: string, updates: Partial<InsertEbookPurchase>): Promise<EbookPurchase> {
-    const [updated] = await db
-      .update(ebookPurchases)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(ebookPurchases.id, id))
-      .returning();
-    return updated;
-  }
+
+
 
   async getEbookReviews(ebookId: string): Promise<EbookReview[]> {
     return await db
@@ -1472,13 +1438,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(platformSettings.category, platformSettings.settingKey);
   }
 
-  async getPlatformSetting(key: string): Promise<PlatformSetting | undefined> {
-    const [setting] = await db
-      .select()
-      .from(platformSettings)
-      .where(eq(platformSettings.settingKey, key));
-    return setting;
-  }
+
 
   async createPlatformSetting(setting: InsertPlatformSetting): Promise<PlatformSetting> {
     const [created] = await db

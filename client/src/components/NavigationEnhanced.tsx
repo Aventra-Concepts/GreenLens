@@ -33,7 +33,7 @@ export default function NavigationEnhanced() {
     enabled: isAuthenticated,
   });
 
-  const cartItemCount = cartItems.reduce((total: number, item: any) => total + item.quantity, 0);
+  const cartItemCount = Array.isArray(cartItems) ? cartItems.reduce((total: number, item: any) => total + item.quantity, 0) : 0;
 
   const navigationItems = [
     { name: "Home", href: "/", icon: Home },
@@ -129,9 +129,9 @@ export default function NavigationEnhanced() {
             {isAuthenticated ? (
               <div className="flex items-center space-x-1">
                 <span className="text-xs text-gray-400 dark:text-gray-500 max-w-20 truncate mr-1">
-                  {user?.firstName || user?.email}
+                  {(user as any)?.firstName || (user as any)?.email}
                 </span>
-                {user?.isAdmin && (
+                {(user as any)?.isAdmin && (
                   <Link href="/admin/dashboard">
                     <button className="px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/60 dark:hover:bg-emerald-900/20 rounded-md transition-all duration-200" data-testid="nav-admin">
                       <Settings className="w-3 h-3 mr-1 inline" />
@@ -278,7 +278,7 @@ export default function NavigationEnhanced() {
                     {isAuthenticated ? (
                       <div className="space-y-2">
                         <div className="px-3 py-2 text-sm text-gray-600 dark:text-gray-300">
-                          Welcome, {user?.firstName || user?.email}
+                          Welcome, {(user as any)?.firstName || (user as any)?.email}
                         </div>
                         <Link href="/account">
                           <Button
@@ -291,7 +291,7 @@ export default function NavigationEnhanced() {
                             My Account
                           </Button>
                         </Link>
-                        {user?.isAdmin && (
+                        {(user as any)?.isAdmin && (
                           <Link href="/admin/dashboard">
                             <Button
                               variant="ghost"

@@ -557,6 +557,8 @@ export const insertBlogViewSchema = createInsertSchema(blogViews).omit({
 });
 export type InsertBlogView = z.infer<typeof insertBlogViewSchema>;
 
+export type InsertCatalogCache = z.infer<typeof insertCatalogCacheSchema>;
+
 // Plant catalog cache for external API data
 export const catalogCache = pgTable("catalog_cache", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
