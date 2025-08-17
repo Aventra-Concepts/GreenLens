@@ -58,10 +58,12 @@ function Router() {
 
   return (
     <Switch>
+      {/* Auth page is always available */}
+      <Route path="/auth" component={AuthPage} />
+      
       {isLoading || !user ? (
         <>
           <Route path="/" component={Landing} />
-          <Route path="/auth" component={AuthPage} />
         </>
       ) : (
         <>
