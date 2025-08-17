@@ -3,6 +3,8 @@ export interface PaymentProvider {
     userId: string;
     userEmail: string;
     planId: string;
+    currency?: string;
+    amount?: number;
   }): Promise<string>;
   
   handleWebhook(body: any, headers: any): Promise<void>;
@@ -11,6 +13,8 @@ export interface PaymentProvider {
     status: string;
     currentPeriodEnd: Date;
   }>;
+  
+  supportsCurrency(currency: string): boolean;
 }
 
 class PaymentService {
@@ -56,6 +60,8 @@ class PaymentService {
     userId: string;
     userEmail: string;
     planId: string;
+    currency?: string;
+    amount?: number;
   }): Promise<string> {
     const provider = await this.getProvider(providerName);
     return provider.createCheckout(params);
@@ -78,6 +84,27 @@ class PaymentService {
     if (process.env.CASHFREE_CLIENT_SECRET) return 'cashfree';
     
     throw new Error('No payment providers configured');
+  }
+
+  async getProviderForCurrency(currency: string): Promise<string> {
+    const availableProviders = ['stripe', 'razorpay', 'cashfree'];
+    
+    for (const providerName of availableProviders) {
+      try {
+        const provider = await this.getProvider(providerName);
+        if (provider.supportsCurrency(currency)) {
+          return providerName;
+        }
+      } catch (error) {
+        // Provider not configured, continue to next
+        continue;
+      }
+    }
+    
+    // Fallback to stripe if available
+    if (process.env.STRIPE_SECRET_KEY) return 'stripe';
+    
+    throw new Error(`No payment provider available for currency ${currency}`);
   }
 }
 

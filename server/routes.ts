@@ -12,6 +12,7 @@ import { carePlannerService } from "./services/carePlanner";
 import { pdfService } from "./services/pdf";
 import { paymentService } from "./services/payments";
 import { plantNamesService } from "./services/plantNames";
+import { pricingService } from "./services/pricing";
 import { PlantAnalysisService } from "./services/plantAnalysisService";
 import { PDFReportService } from "./services/pdfReportService";
 import { insertPlantResultSchema, insertBlogPostSchema, insertReviewSchema } from "@shared/schema";
@@ -241,10 +242,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Payment endpoints
+  // Multi-currency pricing API
+  app.get("/api/pricing", async (req, res) => {
+    try {
+      const { currency = 'USD', location } = req.query;
+      
+      // Auto-detect currency based on location if provided
+      const detectedCurrency = location 
+        ? pricingService.detectCurrencyByLocation(location as string)
+        : currency as string;
+      
+      const pricing = pricingService.getAllPlanPricing(detectedCurrency);
+      const supportedCurrencies = pricingService.getSupportedCurrencies();
+      
+      res.json({
+        currency: detectedCurrency,
+        plans: pricing,
+        supportedCurrencies,
+      });
+    } catch (error) {
+      console.error("Error fetching pricing:", error);
+      res.status(500).json({ message: "Failed to fetch pricing" });
+    }
+  });
+
+  // Payment endpoints with multi-currency support
   app.post("/api/checkout", requireAuth, async (req: any, res) => {
     try {
-      const { provider, planId } = req.body;
+      const { planId, currency = 'USD', provider } = req.body;
       const userId = req.user.id;
       const user = await storage.getUser(userId);
 
@@ -252,13 +277,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      const checkoutUrl = await paymentService.createCheckout(provider, {
+      // Get pricing for the requested currency
+      const pricing = pricingService.getPlanPricing(planId, currency);
+      if (!pricing) {
+        return res.status(400).json({ message: "Invalid plan or unsupported currency" });
+      }
+
+      // Auto-select provider if not specified
+      const selectedProvider = provider || pricingService.getOptimalProvider(currency, user.location);
+      
+      // Verify provider supports the currency
+      if (!pricing.supportedProviders.includes(selectedProvider)) {
+        return res.status(400).json({ 
+          message: `Payment provider ${selectedProvider} does not support ${currency}`,
+          supportedProviders: pricing.supportedProviders
+        });
+      }
+
+      const checkoutUrl = await paymentService.createCheckout(selectedProvider, {
         userId,
         userEmail: user.email || '',
         planId,
+        currency,
+        amount: pricing.amount,
       });
 
-      res.json({ checkoutUrl });
+      res.json({ 
+        checkoutUrl, 
+        currency, 
+        amount: pricing.amount,
+        provider: selectedProvider,
+        formattedPrice: pricingService.formatPrice(pricing.amount, currency)
+      });
 
     } catch (error) {
       console.error("Error creating checkout:", error);

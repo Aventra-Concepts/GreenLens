@@ -5,8 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { CheckCircle, Loader2, Star, Zap } from "lucide-react";
+import { CheckCircle, Loader2, Star, Zap, Globe } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { CurrencySelector } from "@/components/CurrencySelector";
+import { usePricing } from "@/hooks/usePricing";
 
 interface PricingFeature {
   name: string;
@@ -32,6 +34,15 @@ export default function PricingSection() {
   const { toast } = useToast();
   const { user } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const { 
+    pricing, 
+    selectedCurrency, 
+    setSelectedCurrency, 
+    isLoading: pricingLoading, 
+    getPlanPrice,
+    getOptimalProvider,
+    formatPrice 
+  } = usePricing('USD', user?.location || undefined);
 
   const { data: plans = [], isLoading, error } = useQuery({
     queryKey: ['/api/pricing-plans'],
@@ -47,11 +58,22 @@ export default function PricingSection() {
         return;
       }
 
-      const provider = 'stripe';
+      const planPricing = getPlanPrice(planId);
+      const provider = getOptimalProvider(planId);
+      
+      if (!planPricing) {
+        throw new Error('Plan pricing not available for selected currency');
+      }
+
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider, planId }),
+        body: JSON.stringify({ 
+          planId, 
+          currency: selectedCurrency,
+          amount: planPricing.amount,
+          provider 
+        }),
         credentials: 'include',
       });
 
@@ -157,6 +179,18 @@ export default function PricingSection() {
           <p className="text-lg text-gray-600 dark:text-gray-300">
             Select the perfect plan for your plant identification needs
           </p>
+          
+          {/* Currency Selector */}
+          <div className="flex justify-center items-center gap-2 mt-6">
+            <Globe className="w-4 h-4 text-gray-500" />
+            <div className="w-48">
+              <CurrencySelector
+                value={selectedCurrency}
+                onChange={setSelectedCurrency}
+                userLocation={user?.location || undefined}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 max-w-4xl mx-auto justify-center items-start">
@@ -189,12 +223,27 @@ export default function PricingSection() {
                 
                 <div className="space-y-1">
                   <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {plan.currency === 'USD' && '$'}
-                    {plan.price}
+                    {(() => {
+                      if (plan.planId === 'free') return 'Free';
+                      const planPricing = getPlanPrice(plan.planId);
+                      if (pricingLoading) return '...';
+                      return planPricing ? formatPrice(planPricing.amount, selectedCurrency) : plan.price;
+                    })()}
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {plan.billingInterval === 'monthly' ? '/month' : '/year'}
                   </p>
+                  {(() => {
+                    const planPricing = getPlanPrice(plan.planId);
+                    if (planPricing && selectedCurrency !== 'USD') {
+                      return (
+                        <p className="text-xs text-gray-400">
+                          Provider: {planPricing.supportedProviders[0] || 'Auto-detect'}
+                        </p>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
               </CardHeader>
 

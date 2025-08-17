@@ -6,6 +6,16 @@ GreenLens is a production-grade web application that leverages AI technology to 
 
 ## Recent Updates (August 2025)
 
+### Multi-Currency Payment System (August 17, 2025)
+- **Global Currency Support**: Implemented comprehensive multi-currency payment acceptance for international users
+- **Dynamic Pricing API**: Created `/api/pricing` endpoint with real-time currency conversion and regional pricing
+- **Smart Provider Selection**: Automatic payment provider selection based on currency and user location
+- **Enhanced Payment Flow**: Updated checkout process to support currency selection and provider optimization
+- **Database Schema Updates**: Added currency and provider fields to subscriptions table for multi-currency transactions
+- **UI Currency Selector**: Interactive currency selector with location-based auto-detection
+- **Regional Exchange Rates**: Integrated currency conversion with regional pricing variations
+- **Provider Currency Support**: Stripe (12+ currencies), Razorpay (INR), Cashfree (INR) with automatic fallbacks
+
 ### E-commerce Platform Integration (August 16, 2025)
 - **Complete E-commerce System**: Integrated full-featured gardening tools shop with product catalog, shopping cart, and order management
 - **Database Schema**: Added products, cart_items, orders, order_items, categories, and shipping_rates tables

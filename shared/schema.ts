@@ -226,15 +226,19 @@ export type InsertShippingRate = z.infer<typeof insertShippingRateSchema>;
 
 export type LoginUser = z.infer<typeof loginUserSchema>;
 
-// Subscription management
+// Subscription management with multi-currency support
 export const subscriptions = pgTable("subscriptions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   planType: varchar("plan_type").notNull(), // 'pro', 'premium'
   status: varchar("status").notNull(), // 'active', 'cancelled', 'expired'
+  currency: varchar("currency", { length: 3 }).notNull().default('USD'), // ISO currency code
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // Amount in local currency
   stripeSubscriptionId: varchar("stripe_subscription_id"),
   razorpaySubscriptionId: varchar("razorpay_subscription_id"),
   cashfreeSubscriptionId: varchar("cashfree_subscription_id"),
+  paypalSubscriptionId: varchar("paypal_subscription_id"),
+  preferredProvider: varchar("preferred_provider"), // stripe, razorpay, cashfree, paypal
   startDate: timestamp("start_date").defaultNow(),
   endDate: timestamp("end_date"),
   createdAt: timestamp("created_at").defaultNow(),

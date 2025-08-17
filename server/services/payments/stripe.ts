@@ -20,24 +20,20 @@ class StripePayment implements PaymentProvider {
     userId: string;
     userEmail: string;
     planId: string;
+    currency?: string;
+    amount?: number;
   }): Promise<string> {
     try {
-      // Define pricing plans
-      const plans = {
-        pro: {
-          priceId: process.env.STRIPE_PRO_PRICE_ID || 'price_pro',
-          amount: 900, // $9.00
-        },
-        premium: {
-          priceId: process.env.STRIPE_PREMIUM_PRICE_ID || 'price_premium',
-          amount: 1900, // $19.00
-        },
-      };
-
-      const plan = plans[params.planId as keyof typeof plans];
-      if (!plan) {
-        throw new Error('Invalid plan ID');
+      const currency = params.currency || 'USD';
+      const { pricingService } = await import('../pricing');
+      
+      // Get pricing for the specified currency
+      const pricing = pricingService.getPlanPricing(params.planId, currency);
+      if (!pricing) {
+        throw new Error('Invalid plan ID or unsupported currency');
       }
+      
+      const amount = params.amount || pricing.amount;
 
       const session = await this.stripe.checkout.sessions.create({
         mode: 'subscription',
@@ -45,7 +41,17 @@ class StripePayment implements PaymentProvider {
         customer_email: params.userEmail,
         line_items: [
           {
-            price: plan.priceId,
+            price_data: {
+              currency: (currency || 'USD').toLowerCase(),
+              product_data: {
+                name: `GreenLens ${params.planId.charAt(0).toUpperCase() + params.planId.slice(1)} Plan`,
+                description: `Monthly subscription to GreenLens ${params.planId} features`,
+              },
+              unit_amount: Math.round(amount * 100), // Convert to cents
+              recurring: {
+                interval: 'month',
+              },
+            },
             quantity: 1,
           },
         ],
@@ -54,11 +60,15 @@ class StripePayment implements PaymentProvider {
         metadata: {
           userId: params.userId,
           planId: params.planId,
+          currency: currency,
+          amount: amount.toString(),
         },
         subscription_data: {
           metadata: {
             userId: params.userId,
             planId: params.planId,
+            currency: currency,
+            amount: amount.toString(),
           },
         },
       });
@@ -163,6 +173,14 @@ class StripePayment implements PaymentProvider {
         status: 'canceled',
       });
     }
+  }
+
+  supportsCurrency(currency: string): boolean {
+    // Stripe supports a wide range of currencies
+    const supportedCurrencies = [
+      'USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'SGD', 'BRL', 'MXN', 'NZD', 'ZAR', 'INR'
+    ];
+    return supportedCurrencies.includes(currency.toUpperCase());
   }
 }
 

@@ -24,6 +24,8 @@ class CashfreePayment implements PaymentProvider {
     userId: string;
     userEmail: string;
     planId: string;
+    currency?: string;
+    amount?: number;
   }): Promise<string> {
     try {
       // Define pricing plans
@@ -201,6 +203,11 @@ class CashfreePayment implements PaymentProvider {
   private async handlePaymentSuccess(payment: any) {
     // Handle successful payment
     console.log('Payment successful:', payment.payment_id);
+  }
+
+  supportsCurrency(currency: string): boolean {
+    // Cashfree primarily supports INR
+    return currency.toUpperCase() === 'INR';
   }
 }
 

@@ -24,6 +24,8 @@ class RazorpayPayment implements PaymentProvider {
     userId: string;
     userEmail: string;
     planId: string;
+    currency?: string;
+    amount?: number;
   }): Promise<string> {
     try {
       // Define pricing plans (amounts in paise)
@@ -196,6 +198,11 @@ class RazorpayPayment implements PaymentProvider {
   private async handlePaymentCaptured(payment: any) {
     // Handle successful payment - could update subscription status if needed
     console.log('Payment captured:', payment.id);
+  }
+
+  supportsCurrency(currency: string): boolean {
+    // Razorpay primarily supports INR
+    return currency.toUpperCase() === 'INR';
   }
 }
 
