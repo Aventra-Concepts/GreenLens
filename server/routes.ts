@@ -26,6 +26,7 @@ import { registerAuthorRoutes } from "./routes/authorRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import studentAdminRoutes from "./routes/studentAdminRoutes";
 import { GeographicRestrictionService } from "./services/geographicRestrictionService";
+import { socialMediaService } from "./services/socialMediaService";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -776,6 +777,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid review data" });
       }
       res.status(500).json({ message: "Failed to create review" });
+    }
+  });
+
+  // Social Media Management API Routes
+  app.get("/api/admin/social-settings", requireAdmin, async (req, res) => {
+    try {
+      const settings = await socialMediaService.getSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching social media settings:", error);
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.put("/api/admin/social-settings", requireAdmin, async (req, res) => {
+    try {
+      const settings = await socialMediaService.updateSettings(req.body);
+      res.json(settings);
+    } catch (error) {
+      console.error("Error updating social media settings:", error);
+      res.status(500).json({ message: "Failed to update settings" });
+    }
+  });
+
+  app.get("/api/admin/social-posts", requireAdmin, async (req, res) => {
+    try {
+      const posts = await socialMediaService.getPosts();
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching social media posts:", error);
+      res.status(500).json({ message: "Failed to fetch posts" });
+    }
+  });
+
+  app.post("/api/admin/social-posts", requireAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const post = await socialMediaService.createPost(req.body, userId);
+      res.json(post);
+    } catch (error) {
+      console.error("Error creating social media post:", error);
+      res.status(500).json({ message: "Failed to create post" });
+    }
+  });
+
+  app.post("/api/admin/social-posts/:id/publish", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const result = await socialMediaService.publishPost(id);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error publishing social media post:", error);
+      res.status(500).json({ message: "Failed to publish post: " + error.message });
+    }
+  });
+
+  app.get("/api/admin/social-analytics", requireAdmin, async (req, res) => {
+    try {
+      const analytics = await socialMediaService.getAnalytics();
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching social media analytics:", error);
+      res.status(500).json({ message: "Failed to fetch analytics" });
     }
   });
 

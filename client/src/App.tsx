@@ -15,6 +15,7 @@ import Admin from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminBlogManager from "@/pages/admin-blog-manager";
+import AdminSocialMedia from "@/pages/admin-social-media";
 import ExpertsRegister from "@/pages/experts-register";
 import Features from "@/pages/features";
 import BlogPage from "@/pages/blog-page";
@@ -96,6 +97,7 @@ function Router() {
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/blog" component={AdminBlogManager} />
+      <Route path="/admin/social-media" component={AdminSocialMedia} />
       <Route path="/ebook-marketplace" component={EbookMarketplace} />
       <Route path="/ebooks/:id">
         {(params) => <EbookDetail id={params.id} />}

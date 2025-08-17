@@ -73,6 +73,77 @@ export const insertUserSchema = createInsertSchema(users).omit({
   freeTierStartedAt: true,
 });
 
+// Social Media Settings Table
+export const socialMediaSettings = pgTable("social_media_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  facebookPageId: varchar("facebook_page_id"),
+  facebookAccessToken: text("facebook_access_token"),
+  twitterApiKey: text("twitter_api_key"),
+  twitterApiSecret: text("twitter_api_secret"),
+  twitterAccessToken: text("twitter_access_token"),
+  twitterAccessTokenSecret: text("twitter_access_token_secret"),
+  instagramUserId: varchar("instagram_user_id"),
+  instagramAccessToken: text("instagram_access_token"),
+  whatsappBusinessNumber: varchar("whatsapp_business_number"),
+  whatsappAccessToken: text("whatsapp_access_token"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Social Media Posts Table
+export const socialMediaPosts = pgTable("social_media_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  platform: varchar("platform", { enum: ["facebook", "twitter", "instagram", "whatsapp"] }).notNull(),
+  content: text("content").notNull(),
+  imageUrl: text("image_url"),
+  hashtags: text("hashtags"),
+  scheduledFor: timestamp("scheduled_for"),
+  publishedAt: timestamp("published_at"),
+  status: varchar("status", { enum: ["draft", "scheduled", "published", "failed"] }).default("draft"),
+  externalPostId: varchar("external_post_id"), // ID from the social platform
+  engagementStats: jsonb("engagement_stats"), // likes, shares, comments, etc.
+  errorMessage: text("error_message"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Social Media Analytics Table
+export const socialMediaAnalytics = pgTable("social_media_analytics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  platform: varchar("platform", { enum: ["facebook", "twitter", "instagram", "whatsapp"] }).notNull(),
+  metric: varchar("metric").notNull(), // followers, likes, shares, comments, reach, etc.
+  value: integer("value").notNull(),
+  date: date("date").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type SocialMediaSettings = typeof socialMediaSettings.$inferSelect;
+export type InsertSocialMediaSettings = typeof socialMediaSettings.$inferInsert;
+
+export type SocialMediaPost = typeof socialMediaPosts.$inferSelect;
+export type InsertSocialMediaPost = typeof socialMediaPosts.$inferInsert;
+
+export type SocialMediaAnalytics = typeof socialMediaAnalytics.$inferSelect;
+export type InsertSocialMediaAnalytics = typeof socialMediaAnalytics.$inferInsert;
+
+export const insertSocialMediaSettingsSchema = createInsertSchema(socialMediaSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSocialMediaPostSchema = createInsertSchema(socialMediaPosts).omit({
+  id: true,
+  publishedAt: true,
+  externalPostId: true,
+  engagementStats: true,
+  errorMessage: true,
+  createdBy: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
 // Login schema

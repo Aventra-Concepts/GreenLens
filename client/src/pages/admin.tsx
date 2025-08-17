@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Settings, Image, Type, Save, DollarSign, Package, Shovel } from "lucide-react";
+import { Settings, Image, Type, Save, DollarSign, Package, Shovel, Share2 } from "lucide-react";
 import PricingManagement from "@/components/PricingManagement";
 import PricingPlanManager from "@/components/admin/PricingPlanManager";
 import GardeningToolsManager from "@/components/admin/GardeningToolsManager";
@@ -138,10 +138,41 @@ export default function Admin() {
             <p className="text-gray-600 dark:text-gray-400">
               Manage banner content, pricing, and system settings
             </p>
+            
+            {/* Quick Navigation */}
+            <div className="flex flex-wrap gap-3 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setLocation("/admin/dashboard")}
+                className="flex items-center gap-2"
+                data-testid="nav-admin-dashboard"
+              >
+                <Settings className="w-4 h-4" />
+                User Management
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setLocation("/admin/blog")}
+                className="flex items-center gap-2"
+                data-testid="nav-admin-blog"
+              >
+                <Type className="w-4 h-4" />
+                Blog Manager
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setLocation("/admin/social-media")}
+                className="flex items-center gap-2"
+                data-testid="nav-admin-social"
+              >
+                <Share2 className="w-4 h-4" />
+                Social Media
+              </Button>
+            </div>
           </div>
 
           <Tabs defaultValue="banner" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="banner" className="flex items-center gap-2">
                 <Image className="w-4 h-4" />
                 Banner Settings
@@ -157,6 +188,10 @@ export default function Admin() {
               <TabsTrigger value="pricing" className="flex items-center gap-2">
                 <DollarSign className="w-4 h-4" />
                 Pricing Settings
+              </TabsTrigger>
+              <TabsTrigger value="social" className="flex items-center gap-2">
+                <Share2 className="w-4 h-4" />
+                Social Media
               </TabsTrigger>
             </TabsList>
 
@@ -294,6 +329,47 @@ export default function Admin() {
 
             <TabsContent value="pricing">
               <PricingManagement />
+            </TabsContent>
+
+            <TabsContent value="social">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Share2 className="w-5 h-5" />
+                    Social Media Management
+                  </CardTitle>
+                  <CardDescription>
+                    Manage social media accounts, posts, and analytics from the dedicated social media dashboard.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700">
+                      <h3 className="font-medium text-green-900 dark:text-green-100 mb-2">
+                        Advanced Social Media Features
+                      </h3>
+                      <ul className="text-sm text-green-700 dark:text-green-300 space-y-1">
+                        <li>• Manage Facebook, WhatsApp, Instagram, and Twitter accounts</li>
+                        <li>• Create and schedule posts across all platforms</li>
+                        <li>• View analytics and engagement metrics</li>
+                        <li>• Configure automatic cross-posting settings</li>
+                        <li>• Monitor social media activity and responses</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="flex justify-center">
+                      <Button
+                        onClick={() => setLocation("/admin/social-media")}
+                        className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+                        data-testid="navigate-social-media-button"
+                      >
+                        <Share2 className="w-4 h-4" />
+                        Open Social Media Dashboard
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>
