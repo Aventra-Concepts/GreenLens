@@ -5,9 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Search, Calendar, User, Tag, ArrowRight } from "lucide-react";
+import { Search, Calendar, User, Tag, ArrowRight, Home } from "lucide-react";
 import { Link } from "wouter";
 import type { BlogCategory, BlogPost } from "@shared/schema";
+import Navigation from "@/components/Navigation";
 
 export default function BlogPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -61,7 +62,19 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-900 dark:to-gray-800">
+      {/* Navigation */}
+      <Navigation />
+      
       <div className="container mx-auto px-4 py-8">
+        {/* Back to Home Button */}
+        <div className="mb-6">
+          <Link href="/">
+            <Button variant="outline" className="flex items-center gap-2 bg-white hover:bg-green-50 border-green-200 text-green-700 hover:text-green-800 dark:bg-gray-800 dark:hover:bg-green-900 dark:border-green-700 dark:text-green-300" data-testid="button-back-home">
+              <Home className="h-4 w-4" />
+              Back to Home
+            </Button>
+          </Link>
+        </div>
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
@@ -156,7 +169,7 @@ export default function BlogPage() {
                   <h4 className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-3 flex items-center">
                     <span className="mr-2">🛡️</span>Health & Safety
                   </h4>
-                  <TabsList className="grid grid-cols-3 gap-1 h-auto p-1 bg-white/50 dark:bg-gray-800/50">
+                  <TabsList className="grid grid-cols-1 md:grid-cols-3 gap-1 h-auto p-1 bg-white/50 dark:bg-gray-800/50">
                     {categories
                       .filter(cat => ['fertilizers', 'disinfectants', 'first-aid-toxicity'].includes(cat.slug))
                       .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -164,11 +177,13 @@ export default function BlogPage() {
                         <TabsTrigger
                           key={category.id}
                           value={category.slug}
-                          className="text-xs flex items-center gap-1 p-2 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800 dark:data-[state=active]:bg-blue-800 dark:data-[state=active]:text-blue-100"
+                          className="text-xs flex flex-col items-center gap-1 p-2 min-h-[60px] data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800 dark:data-[state=active]:bg-blue-800 dark:data-[state=active]:text-blue-100"
                           data-testid={`tab-category-${category.slug}`}
                         >
-                          <span>{category.icon}</span>
-                          <span className="hidden sm:inline text-xs">{category.slug === 'first-aid-toxicity' ? 'Safety' : category.name}</span>
+                          <span className="text-lg">{category.icon}</span>
+                          <span className="text-xs text-center leading-tight">
+                            {category.slug === 'first-aid-toxicity' ? 'First Aid' : category.name}
+                          </span>
                         </TabsTrigger>
                       ))}
                   </TabsList>
@@ -370,40 +385,44 @@ export default function BlogPage() {
                 <h3 className="text-2xl font-bold text-blue-700 dark:text-blue-300">Plant Health & Safety</h3>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {categories
                 .filter(cat => ['fertilizers', 'disinfectants', 'first-aid-toxicity'].includes(cat.slug))
                 .sort((a, b) => a.sortOrder - b.sortOrder)
                 .map((category) => (
                   <Card 
                     key={category.id} 
-                    className="group hover:shadow-xl transition-all duration-300 cursor-pointer bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-2 border-blue-100 hover:border-blue-300 dark:border-blue-800 dark:hover:border-blue-600"
+                    className="group hover:shadow-xl transition-all duration-300 cursor-pointer bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-2 border-blue-100 hover:border-blue-300 dark:border-blue-800 dark:hover:border-blue-600 min-h-[280px] flex flex-col"
                   >
-                    <CardContent className="p-6 text-center">
-                      <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-200">
-                        {category.icon}
+                    <CardContent className="p-6 text-center flex-1 flex flex-col justify-between">
+                      <div className="space-y-4">
+                        <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-200">
+                          {category.icon}
+                        </div>
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300 line-height-tight">
+                          {category.name}
+                        </h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                          {category.description}
+                        </p>
                       </div>
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-700 dark:group-hover:text-blue-300">
-                        {category.name}
-                      </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4 line-clamp-3">
-                        {category.description}
-                      </p>
-                      <div className="flex items-center justify-between mb-4">
-                        <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
-                          {filteredPosts.filter(post => post.categoryId === category.id).length} articles
-                        </Badge>
+                      <div className="space-y-4 mt-auto pt-4">
+                        <div className="flex items-center justify-center">
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                            {filteredPosts.filter(post => post.categoryId === category.id).length} articles
+                          </Badge>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-300 text-blue-700 hover:text-blue-800 dark:bg-gray-800 dark:hover:bg-blue-900 dark:border-blue-700 dark:text-blue-300"
+                          onClick={() => setSelectedCategory(category.slug)}
+                          data-testid={`button-category-${category.slug}`}
+                        >
+                          Explore Guides
+                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                        </Button>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-300 text-blue-700 hover:text-blue-800 dark:bg-gray-800 dark:hover:bg-blue-900 dark:border-blue-700 dark:text-blue-300"
-                        onClick={() => setSelectedCategory(category.slug)}
-                        data-testid={`button-category-${category.slug}`}
-                      >
-                        Explore Guides
-                        <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                      </Button>
                     </CardContent>
                   </Card>
                 ))}
