@@ -74,7 +74,7 @@ export function registerEbookRoutes(app: Express) {
         message: 'Student registration successful. Verification pending.',
         studentId: student.id
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Student registration error:', error);
       res.status(400).json({ error: error.message });
     }
@@ -104,8 +104,8 @@ export function registerEbookRoutes(app: Express) {
         });
       }
 
-      req.session.studentId = student.id;
-      req.session.userType = 'student';
+      (req.session as any).studentId = student.id;
+      (req.session as any).userType = 'student';
       
       res.json({
         student: {
@@ -181,10 +181,13 @@ export function registerEbookRoutes(app: Express) {
         });
       }
 
+      if (!req.user) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
       const ebook = await storage.createEbook({
         ...validatedData,
         authorId: req.user.id,
-        authorName: `${req.user.firstName} ${req.user.lastName}`,
         coverImageUrl: files.coverImage[0].path,
         previewFileUrl: files.previewFile?.[0]?.path || null,
         fullFileUrl: files.fullFile[0].path,
@@ -196,7 +199,7 @@ export function registerEbookRoutes(app: Express) {
         message: 'E-book uploaded successfully. Pending admin approval.',
         ebookId: ebook.id
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('E-book upload error:', error);
       res.status(400).json({ error: error.message });
     }
@@ -228,12 +231,12 @@ export function registerEbookRoutes(app: Express) {
       const purchase = await storage.createEbookPurchase({
         ebookId,
         buyerEmail: email,
-        originalPrice: pricing.originalPrice,
-        studentDiscount: pricing.studentDiscount,
-        platformFee: pricing.platformFee,
-        authorEarnings: pricing.authorEarnings,
-        finalPrice: pricing.finalPrice,
-        currency: ebook.currency,
+        originalPrice: pricing.originalPrice.toString(),
+        studentDiscount: pricing.studentDiscount.toString(),
+        platformFee: pricing.platformFee.toString(),
+        authorEarnings: pricing.authorEarnings.toString(),
+        finalPrice: pricing.finalPrice.toString(),
+        currency: ebook.currency || 'USD',
         downloadPassword
       });
 
@@ -297,7 +300,7 @@ export function registerEbookRoutes(app: Express) {
   // Admin: Get pending student verifications
   app.get("/api/admin/students/pending", requireAdmin, async (req, res) => {
     try {
-      if (!req.user.isAdmin) {
+      if (!req.user?.isAdmin) {
         return res.status(403).json({ error: 'Admin access required' });
       }
 
@@ -312,7 +315,7 @@ export function registerEbookRoutes(app: Express) {
   // Admin: Approve/reject student verification
   app.put("/api/admin/students/:id/verify", requireAdmin, async (req, res) => {
     try {
-      if (!req.user.isAdmin) {
+      if (!req.user?.isAdmin) {
         return res.status(403).json({ error: 'Admin access required' });
       }
 
@@ -322,7 +325,7 @@ export function registerEbookRoutes(app: Express) {
       const student = await storage.updateStudentUser(studentId, {
         verificationStatus: status,
         adminNotes,
-        verifiedBy: req.user.id,
+        verifiedBy: req.user?.id,
         verifiedAt: new Date()
       });
 
@@ -350,7 +353,7 @@ export function registerEbookRoutes(app: Express) {
   // Admin: Get platform settings
   app.get("/api/admin/settings", requireAdmin, async (req, res) => {
     try {
-      if (!req.user.isAdmin) {
+      if (!req.user?.isAdmin) {
         return res.status(403).json({ error: 'Admin access required' });
       }
 
@@ -365,7 +368,7 @@ export function registerEbookRoutes(app: Express) {
   // Admin: Update platform setting
   app.put("/api/admin/settings/:key", requireAdmin, async (req, res) => {
     try {
-      if (!req.user.isAdmin) {
+      if (!req.user?.isAdmin) {
         return res.status(403).json({ error: 'Admin access required' });
       }
 
