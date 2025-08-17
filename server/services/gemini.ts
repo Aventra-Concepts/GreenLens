@@ -1,8 +1,8 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const ai = new GoogleGenAI({ 
-  apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY || "" 
-});
+const genAI = new GoogleGenerativeAI(
+  process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY || ""
+);
 
 export class GeminiService {
   async generateStructuredContent(prompt: string, schema: Record<string, string>): Promise<any> {
@@ -66,7 +66,7 @@ Ensure the response is properly formatted JSON that can be parsed.`;
   }
 
   private getModel() {
-    return ai.getGenerativeModel({ model: "gemini-2.5-flash" });
+    return genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
   }
 
   constructor() {
@@ -87,9 +87,9 @@ Ensure the response is properly formatted JSON that can be parsed.`;
         "Assess the quality of these plant images for identification purposes. Are they clear, well-lit, and showing sufficient plant details? Respond with JSON indicating if they're suitable and any suggestions for improvement.",
       ];
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        config: {
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash",
+        generationConfig: {
           responseMimeType: "application/json",
           responseSchema: {
             type: "object",
@@ -108,10 +108,10 @@ Ensure the response is properly formatted JSON that can be parsed.`;
             required: ["suitable", "quality_score"],
           },
         },
-        contents,
-      });
+        });
+      const response = await model.generateContent(contents);
 
-      const result = JSON.parse(response.text || "{}");
+      const result = JSON.parse(response.response.text() || "{}");
       return {
         suitable: result.suitable || false,
         qualityScore: result.quality_score || 0,
@@ -143,9 +143,9 @@ ${JSON.stringify(catalog, null, 2)}
 
 Generate a detailed care plan with specific, actionable advice for this plant.`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-pro",
-        config: {
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-pro",
+        generationConfig: {
           responseMimeType: "application/json",
           responseSchema: {
             type: "object",
@@ -229,11 +229,11 @@ Generate a detailed care plan with specific, actionable advice for this plant.`;
             },
             required: ["watering", "light", "humidity", "temperature"],
           },
-        },
-        contents: prompt,
+        }
       });
+      const response = await model.generateContent(prompt);
 
-      return JSON.parse(response.text || "{}");
+      return JSON.parse(response.response.text() || "{}");
 
     } catch (error) {
       console.error("Gemini care plan synthesis error:", error);
@@ -250,9 +250,9 @@ ${JSON.stringify(diseaseFindings, null, 2)}
 
 Provide comprehensive advice for treating and preventing these plant diseases.`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-pro",
-        config: {
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-pro",
+        generationConfig: {
           responseMimeType: "application/json",
           responseSchema: {
             type: "object",
@@ -291,11 +291,11 @@ Provide comprehensive advice for treating and preventing these plant diseases.`;
             },
             required: ["diseases", "overall_health_status"],
           },
-        },
-        contents: prompt,
+        }
       });
+      const response = await model.generateContent(prompt);
 
-      return JSON.parse(response.text || "{}");
+      return JSON.parse(response.response.text() || "{}");
 
     } catch (error) {
       console.error("Gemini disease advice error:", error);
