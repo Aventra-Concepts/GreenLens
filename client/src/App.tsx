@@ -13,6 +13,7 @@ import Pricing from "@/pages/pricing";
 import Account from "@/pages/account";
 import Admin from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
+import AdminDashboard from "@/pages/admin-dashboard";
 import Features from "@/pages/features";
 import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
@@ -21,6 +22,9 @@ import AuthPage from "@/pages/auth-page";
 import ShopPage from "@/pages/shop";
 import CheckoutPage from "@/pages/checkout";
 import ExpertOnboarding from "@/pages/expert-onboarding";
+import TalkToExpert from "@/pages/talk-to-expert";
+import ConsultationPayment from "@/pages/consultation-payment";
+import ConsultationSuccess from "@/pages/consultation-success";
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -50,7 +54,19 @@ function Router() {
       <Route path="/shop" component={ShopPage} />
       <Route path="/checkout" component={CheckoutPage} />
       <Route path="/expert-onboarding" component={ExpertOnboarding} />
+      <Route path="/talk-to-expert" component={TalkToExpert} />
+      <Route path="/payment/consultation/:id">
+        {(params) => <ConsultationPayment consultationId={params.id} />}
+      </Route>
+      <Route path="/consultation-success">
+        {({ search }) => {
+          const params = new URLSearchParams(search);
+          const id = params.get('id');
+          return id ? <ConsultationSuccess consultationId={id} /> : <NotFound />;
+        }}
+      </Route>
       <Route path="/admin-login" component={AdminLogin} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

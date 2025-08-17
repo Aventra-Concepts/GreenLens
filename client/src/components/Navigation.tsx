@@ -41,13 +41,38 @@ export default function Navigation() {
             {!isLoading && (
               <>
                 {user ? (
-                  <Button 
-                    variant="outline"
-                    onClick={() => window.location.href = '/api/logout'}
-                    data-testid="sign-out-button"
-                  >
-                    Sign Out
-                  </Button>
+                  <>
+                    <Button 
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      onClick={() => window.location.href = '/talk-to-expert'}
+                      data-testid="talk-to-expert-button"
+                    >
+                      Talk to Our Expert
+                    </Button>
+                    <Button 
+                      variant="ghost"
+                      onClick={() => window.location.href = '/account'}
+                      data-testid="account-button"
+                    >
+                      Account
+                    </Button>
+                    {user.isAdmin && (
+                      <Button 
+                        variant="ghost"
+                        onClick={() => window.location.href = '/admin/dashboard'}
+                        data-testid="admin-dashboard-button"
+                      >
+                        Admin
+                      </Button>
+                    )}
+                    <Button 
+                      variant="outline"
+                      onClick={() => window.location.href = '/api/logout'}
+                      data-testid="sign-out-button"
+                    >
+                      Sign Out
+                    </Button>
+                  </>
                 ) : (
                   <>
                     <Button 

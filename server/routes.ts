@@ -19,6 +19,7 @@ import { insertPlantResultSchema, insertBlogPostSchema, insertReviewSchema } fro
 import { trackUserLogin, trackPlantIdentification, trackSubscriptionPurchase, trackPdfDownload } from "./middleware/activityTracker";
 import { registerEcommerceRoutes } from "./routes/ecommerce";
 import expertRoutes from "./routes/expertRoutes";
+import consultationRoutes from "./routes/consultationRoutes";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -47,6 +48,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register expert onboarding routes
   app.use('/api', expertRoutes);
+  
+  // Register consultation routes
+  app.use('/api', consultationRoutes);
 
   // Admin user management routes
   app.get('/api/admin/users', requireAdmin, async (req: any, res) => {
@@ -321,6 +325,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Payment webhooks
+  // Create payment intent for consultation
+  app.post("/api/create-consultation-payment-intent", requireAuth, async (req: any, res) => {
+    try {
+      const { consultationId, amount, currency = 'USD' } = req.body;
+      
+      // Verify consultation exists and belongs to user
+      const consultation = await storage.getConsultationRequest(consultationId);
+      if (!consultation) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Consultation not found" 
+        });
+      }
+
+      if (consultation.userId !== req.user.id && !req.user.isAdmin) {
+        return res.status(403).json({ 
+          success: false, 
+          message: "Access denied" 
+        });
+      }
+
+      // Create payment intent using Stripe
+      const paymentIntent = await paymentService.createPaymentIntent(
+        Math.round(amount * 100), // Convert to cents
+        currency,
+        {
+          consultation_id: consultationId,
+          user_id: req.user.id,
+          service_type: 'consultation'
+        }
+      );
+
+      // Update consultation with payment intent ID
+      await storage.updateConsultationRequest(consultationId, {
+        paymentIntentId: paymentIntent.id,
+        status: 'payment_pending'
+      });
+
+      res.json({ 
+        success: true,
+        clientSecret: paymentIntent.client_secret 
+      });
+    } catch (error: any) {
+      console.error('Error creating consultation payment intent:', error);
+      res.status(500).json({ 
+        success: false,
+        message: "Error creating payment intent: " + error.message 
+      });
+    }
+  });
+
   app.post("/api/webhooks/stripe", async (req, res) => {
     try {
       await paymentService.handleWebhook('stripe', req.body, req.headers);

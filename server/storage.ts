@@ -45,6 +45,9 @@ import {
   expertApplications,
   type ExpertApplication,
   type InsertExpertApplication,
+  consultationRequests,
+  type ConsultationRequest,
+  type InsertConsultationRequest,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, sql, desc } from "drizzle-orm";
@@ -152,6 +155,12 @@ export interface IStorage {
   getExpertApplication(id: string): Promise<ExpertApplication | undefined>;
   getExpertApplications(status?: string, limit?: number, offset?: number): Promise<ExpertApplication[]>;
   updateExpertApplicationStatus(id: string, status: string, reviewNotes?: string): Promise<ExpertApplication>;
+
+  // Consultation request operations
+  createConsultationRequest(request: InsertConsultationRequest): Promise<ConsultationRequest>;
+  getConsultationRequest(id: string): Promise<ConsultationRequest | undefined>;
+  getConsultationRequests(userId?: string, status?: string, limit?: number, offset?: number): Promise<ConsultationRequest[]>;
+  updateConsultationRequest(id: string, updates: Partial<ConsultationRequest>): Promise<ConsultationRequest>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -864,6 +873,58 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date(),
       })
       .where(eq(expertApplications.id, id))
+      .returning();
+    return updated;
+  }
+
+  // Consultation request operations
+  async createConsultationRequest(request: InsertConsultationRequest): Promise<ConsultationRequest> {
+    const [created] = await db
+      .insert(consultationRequests)
+      .values(request)
+      .returning();
+    return created;
+  }
+
+  async getConsultationRequest(id: string): Promise<ConsultationRequest | undefined> {
+    const [request] = await db
+      .select()
+      .from(consultationRequests)
+      .where(eq(consultationRequests.id, id));
+    return request;
+  }
+
+  async getConsultationRequests(userId?: string, status?: string, limit = 10, offset = 0): Promise<ConsultationRequest[]> {
+    let query = db.select().from(consultationRequests);
+    
+    const conditions = [];
+    if (userId) {
+      conditions.push(eq(consultationRequests.userId, userId));
+    }
+    if (status) {
+      conditions.push(eq(consultationRequests.status, status));
+    }
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+    
+    const requests = await query
+      .limit(limit)
+      .offset(offset)
+      .orderBy(desc(consultationRequests.createdAt));
+    
+    return requests;
+  }
+
+  async updateConsultationRequest(id: string, updates: Partial<ConsultationRequest>): Promise<ConsultationRequest> {
+    const [updated] = await db
+      .update(consultationRequests)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(consultationRequests.id, id))
       .returning();
     return updated;
   }

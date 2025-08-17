@@ -650,3 +650,51 @@ export const insertExpertConsultationSchema = createInsertSchema(expertConsultat
   updatedAt: true,
 });
 export type InsertExpertConsultation = z.infer<typeof insertExpertConsultationSchema>;
+
+// Consultation requests for "Talk to Our Expert" feature
+export const consultationRequests = pgTable("consultation_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id), // Optional if guest users allowed
+  
+  // User Information
+  name: varchar("name").notNull(),
+  email: varchar("email").notNull(),
+  address: text("address").notNull(),
+  
+  // Problem Description
+  problemDescription: text("problem_description").notNull(), // Max 60 words validation in frontend
+  
+  // Scheduling
+  preferredDate: timestamp("preferred_date").notNull(),
+  preferredTimeSlot: varchar("preferred_time_slot").notNull(), // e.g., "09:00-10:00"
+  
+  // Status and Assignment
+  status: varchar("status").default('pending'), // 'pending', 'payment_pending', 'paid', 'assigned', 'scheduled', 'completed', 'cancelled'
+  assignedExpertId: varchar("assigned_expert_id").references(() => experts.id),
+  
+  // Payment Information
+  amount: decimal("amount", { precision: 10, scale: 2 }).default(29.99), // Default consultation fee
+  currency: varchar("currency", { length: 3 }).default('USD'),
+  paymentStatus: varchar("payment_status").default('pending'), // 'pending', 'paid', 'failed', 'refunded'
+  paymentIntentId: varchar("payment_intent_id"), // Stripe payment intent ID
+  
+  // Communication Details
+  phoneNumber: varchar("phone_number"),
+  consultationNotes: text("consultation_notes"), // Expert's notes
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type ConsultationRequest = typeof consultationRequests.$inferSelect;
+export const insertConsultationRequestSchema = createInsertSchema(consultationRequests).omit({
+  id: true,
+  status: true,
+  assignedExpertId: true,
+  paymentStatus: true,
+  paymentIntentId: true,
+  consultationNotes: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertConsultationRequest = z.infer<typeof insertConsultationRequestSchema>;

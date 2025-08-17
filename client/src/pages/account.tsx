@@ -3,12 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
 import MyGardenSection from "@/components/MyGardenSection";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { MessageSquare, Calendar, Clock, CheckCircle, DollarSign, User } from "lucide-react";
+import { format } from "date-fns";
 
 export default function Account() {
   const { toast } = useToast();
@@ -18,6 +21,24 @@ export default function Account() {
     queryKey: ['/api/subscription'],
     retry: false,
   });
+
+  // Fetch user's consultation requests
+  const { data: consultations, isLoading: consultationsLoading } = useQuery({
+    queryKey: ['/api/consultation-requests'],
+    retry: false,
+  });
+
+  const getConsultationStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'payment_pending': return 'bg-blue-100 text-blue-800';
+      case 'paid': return 'bg-green-100 text-green-800';
+      case 'expert_assigned': return 'bg-purple-100 text-purple-800';
+      case 'completed': return 'bg-gray-100 text-gray-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -150,6 +171,119 @@ export default function Account() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Consultation History Section */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-blue-600" />
+                Consultation History
+              </CardTitle>
+              <CardDescription>
+                View your expert consultation requests and their status
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {consultationsLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full mx-auto" />
+                  <p className="text-sm text-gray-600 mt-2">Loading consultations...</p>
+                </div>
+              ) : !consultations || consultations.length === 0 ? (
+                <div className="text-center py-8 space-y-4">
+                  <MessageSquare className="h-12 w-12 text-gray-400 mx-auto" />
+                  <div>
+                    <p className="text-gray-600 mb-2">No consultations yet</p>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Book your first expert consultation to get personalized plant care advice
+                    </p>
+                    <Button 
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={() => window.location.href = '/talk-to-expert'}
+                    >
+                      Book Expert Consultation
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {consultations.map((consultation: any) => (
+                    <Card key={consultation.id} className="border-l-4 border-l-blue-500">
+                      <CardContent className="p-4">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <User className="h-4 w-4 text-gray-500" />
+                              <span className="font-medium">{consultation.name}</span>
+                              <Badge className={getConsultationStatusColor(consultation.status)}>
+                                {consultation.status.replace('_', ' ')}
+                              </Badge>
+                            </div>
+                            
+                            <div className="text-sm text-gray-600 space-y-1">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-3 w-3" />
+                                <span>
+                                  {format(new Date(consultation.preferredDate), 'MMM d, yyyy')} at {consultation.preferredTimeSlot}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <DollarSign className="h-3 w-3" />
+                                <span>${consultation.amount} {consultation.currency}</span>
+                              </div>
+                            </div>
+                            
+                            <p className="text-sm text-gray-700 leading-relaxed">
+                              <span className="font-medium">Problem:</span> {consultation.problemDescription}
+                            </p>
+                          </div>
+                          
+                          <div className="flex flex-col gap-2 md:text-right">
+                            <div className="text-xs text-gray-500">
+                              Requested: {format(new Date(consultation.createdAt), 'MMM d, yyyy')}
+                            </div>
+                            
+                            {consultation.status === 'pending' && (
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => window.location.href = `/payment/consultation/${consultation.id}`}
+                              >
+                                Complete Payment
+                              </Button>
+                            )}
+                            
+                            {consultation.status === 'expert_assigned' && (
+                              <div className="flex items-center gap-1 text-sm text-green-600">
+                                <CheckCircle className="h-3 w-3" />
+                                <span>Expert Assigned</span>
+                              </div>
+                            )}
+                            
+                            {consultation.status === 'completed' && (
+                              <div className="flex items-center gap-1 text-sm text-gray-600">
+                                <CheckCircle className="h-3 w-3" />
+                                <span>Completed</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  
+                  <div className="text-center pt-4">
+                    <Button 
+                      variant="outline"
+                      onClick={() => window.location.href = '/talk-to-expert'}
+                    >
+                      Book Another Consultation
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </section>
 
