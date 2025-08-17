@@ -17,46 +17,54 @@ export default function Footer() {
             <p className="text-gray-400">
               AI-powered plant identification and care guidance for plant enthusiasts worldwide.
             </p>
-            <div className="flex space-x-4 mt-2">
+            <div className="flex space-x-3 mt-2">
               <a 
                 href="https://facebook.com/greenlens" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-blue-500 transition-colors"
+                className="group"
                 data-testid="facebook-link"
                 title="Follow us on Facebook"
               >
-                <Facebook className="w-5 h-5" />
+                <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
+                  <Facebook className="w-4 h-4 text-white" />
+                </div>
               </a>
               <a 
                 href="https://wa.me/1234567890" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-green-500 transition-colors"
+                className="group"
                 data-testid="whatsapp-link"
                 title="Chat with us on WhatsApp"
               >
-                <MessageCircle className="w-5 h-5" />
+                <div className="w-9 h-9 bg-green-500 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
+                  <MessageCircle className="w-4 h-4 text-white" />
+                </div>
               </a>
               <a 
                 href="https://instagram.com/greenlens" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-pink-500 transition-colors"
+                className="group"
                 data-testid="instagram-link"
                 title="Follow us on Instagram"
               >
-                <Instagram className="w-5 h-5" />
+                <div className="w-9 h-9 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
+                  <Instagram className="w-4 h-4 text-white" />
+                </div>
               </a>
               <a 
                 href="https://twitter.com/greenlens" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-blue-400 transition-colors"
+                className="group"
                 data-testid="twitter-link"
                 title="Follow us on Twitter"
               >
-                <FaXTwitter className="w-5 h-5" />
+                <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg border border-gray-300">
+                  <FaXTwitter className="w-4 h-4 text-black" />
+                </div>
               </a>
             </div>
           </div>
