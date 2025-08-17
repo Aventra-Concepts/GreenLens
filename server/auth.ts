@@ -114,6 +114,13 @@ export function setupAuth(app: Express) {
         location,
         password: hashedPassword,
         profileImageUrl: null,
+        country: null,
+        isSuperAdmin: false,
+        isAuthor: false,
+        authorVerified: false,
+        twoFactorEnabled: false,
+        failedLoginAttempts: 0,
+        lockedUntil: null,
         preferredLanguage: 'en',
         timezone: 'UTC',
       });

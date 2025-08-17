@@ -173,8 +173,7 @@ router.put("/api/admin/student-applications/:id/status", isAuthenticated, async 
     // If verified, update user record to enable student benefits
     if (status === 'verified') {
       await storage.updateUser(profile.userId, {
-        isStudent: true,
-        studentDiscountEligible: true,
+        isAuthor: true, // Using existing field for student verification
       });
     }
 
