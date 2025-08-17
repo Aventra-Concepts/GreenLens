@@ -19,7 +19,7 @@ const upload = multer({
     if (file.mimetype.match(/^(image\/(jpeg|jpg|png)|application\/pdf)$/)) {
       cb(null, true);
     } else {
-      cb(new Error('Only JPEG, PNG images and PDF files are allowed'), false);
+      cb(new Error('Only JPEG, PNG images and PDF files are allowed'));
     }
   }
 });

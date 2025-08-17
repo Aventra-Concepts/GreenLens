@@ -3,7 +3,7 @@ import { storage } from "../storage";
 import { GeolocationService } from "../services/geolocationService";
 import { EbookService } from "../services/ebookService";
 import { StudentVerificationService } from "../services/studentVerificationService";
-import { isAuthenticated } from "../auth";
+import { requireAuth, requireAdmin } from "../auth";
 import { insertEbookSchema, insertStudentUserSchema, insertEbookPurchaseSchema } from "@shared/schema";
 import multer from "multer";
 import path from "path";
@@ -166,7 +166,7 @@ export function registerEbookRoutes(app: Express) {
   });
 
   // Author e-book upload endpoint
-  app.post("/api/ebooks", isAuthenticated, upload.fields([
+  app.post("/api/ebooks", requireAuth, upload.fields([
     { name: 'coverImage', maxCount: 1 },
     { name: 'previewFile', maxCount: 1 },
     { name: 'fullFile', maxCount: 1 }
@@ -295,7 +295,7 @@ export function registerEbookRoutes(app: Express) {
   });
 
   // Admin: Get pending student verifications
-  app.get("/api/admin/students/pending", isAuthenticated, async (req, res) => {
+  app.get("/api/admin/students/pending", requireAdmin, async (req, res) => {
     try {
       if (!req.user.isAdmin) {
         return res.status(403).json({ error: 'Admin access required' });
@@ -310,7 +310,7 @@ export function registerEbookRoutes(app: Express) {
   });
 
   // Admin: Approve/reject student verification
-  app.put("/api/admin/students/:id/verify", isAuthenticated, async (req, res) => {
+  app.put("/api/admin/students/:id/verify", requireAdmin, async (req, res) => {
     try {
       if (!req.user.isAdmin) {
         return res.status(403).json({ error: 'Admin access required' });
@@ -348,7 +348,7 @@ export function registerEbookRoutes(app: Express) {
   });
 
   // Admin: Get platform settings
-  app.get("/api/admin/settings", isAuthenticated, async (req, res) => {
+  app.get("/api/admin/settings", requireAdmin, async (req, res) => {
     try {
       if (!req.user.isAdmin) {
         return res.status(403).json({ error: 'Admin access required' });
@@ -363,7 +363,7 @@ export function registerEbookRoutes(app: Express) {
   });
 
   // Admin: Update platform setting
-  app.put("/api/admin/settings/:key", isAuthenticated, async (req, res) => {
+  app.put("/api/admin/settings/:key", requireAdmin, async (req, res) => {
     try {
       if (!req.user.isAdmin) {
         return res.status(403).json({ error: 'Admin access required' });

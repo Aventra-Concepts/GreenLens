@@ -313,6 +313,7 @@ export const blogPosts = pgTable("blog_posts", {
   published: boolean("published").default(false),
   featuredImage: varchar("featured_image"),
   tags: text("tags").array(),
+  viewCount: integer("view_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -336,6 +337,11 @@ export const blogViews = pgTable("blog_views", {
 });
 
 export type BlogView = typeof blogViews.$inferSelect;
+export const insertBlogViewSchema = createInsertSchema(blogViews).omit({
+  id: true,
+  viewedAt: true,
+});
+export type InsertBlogView = z.infer<typeof insertBlogViewSchema>;
 
 // Plant catalog cache for external API data
 export const catalogCache = pgTable("catalog_cache", {
@@ -348,6 +354,11 @@ export const catalogCache = pgTable("catalog_cache", {
 });
 
 export type CatalogCache = typeof catalogCache.$inferSelect;
+export const insertCatalogCacheSchema = createInsertSchema(catalogCache).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertCatalogCache = z.infer<typeof insertCatalogCacheSchema>;
 
 // User activity tracking for comprehensive behavior analysis
 export const userActivity = pgTable("user_activity", {

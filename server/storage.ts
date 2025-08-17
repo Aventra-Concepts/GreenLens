@@ -453,7 +453,7 @@ export class DatabaseStorage implements IStorage {
   async updatePlantResult(id: string, updates: Partial<InsertPlantResult>): Promise<PlantResult> {
     const [result] = await db
       .update(plantResults)
-      .set({ ...updates, updatedAt: new Date() })
+      .set(updates)
       .where(eq(plantResults.id, id))
       .returning();
     return result;
@@ -609,7 +609,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(catalogCache)
       .where(and(
-        eq(catalogCache.key, key),
+        eq(catalogCache.cacheKey, key),
         gt(catalogCache.expiresAt, new Date())
       ));
     return item;
@@ -620,7 +620,7 @@ export class DatabaseStorage implements IStorage {
       .insert(catalogCache)
       .values(item)
       .onConflictDoUpdate({
-        target: catalogCache.key,
+        target: catalogCache.cacheKey,
         set: item,
       })
       .returning();
@@ -633,14 +633,7 @@ export class DatabaseStorage implements IStorage {
       .where(gt(catalogCache.expiresAt, new Date()));
   }
 
-  async updateUser(id: string, updates: Partial<UpsertUser>): Promise<User> {
-    const [user] = await db
-      .update(users)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(users.id, id))
-      .returning();
-    return user;
-  }
+
 
   async checkFreeTierEligibility(userId: string): Promise<{ eligible: boolean; remainingUses: number; daysLeft: number }> {
     const user = await this.getUser(userId);

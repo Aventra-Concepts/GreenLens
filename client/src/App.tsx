@@ -27,6 +27,9 @@ import ExpertOnboarding from "@/pages/expert-onboarding";
 import TalkToExpert from "@/pages/talk-to-expert";
 import ConsultationPayment from "@/pages/consultation-payment";
 import ConsultationSuccess from "@/pages/consultation-success";
+import EbookMarketplace from "@/pages/ebook-marketplace";
+import AuthorRegistration from "@/pages/author-registration";
+import StudentVerification from "@/pages/student-verification";
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -71,6 +74,9 @@ function Router() {
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/blog" component={AdminBlogManager} />
       <Route path="/experts-register" component={ExpertsRegister} />
+      <Route path="/ebooks" component={EbookMarketplace} />
+      <Route path="/author-registration" component={AuthorRegistration} />
+      <Route path="/student-verification" component={StudentVerification} />
       <Route component={NotFound} />
     </Switch>
   );
