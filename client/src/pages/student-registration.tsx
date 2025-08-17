@@ -101,11 +101,11 @@ export default function StudentRegistration() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
+    // Validate file size (max 50KB)
+    if (file.size > 50 * 1024) {
       toast({
         title: "File Too Large",
-        description: "Document must be less than 10MB",
+        description: "Document must be less than 50KB",
         variant: "destructive",
       });
       return;
