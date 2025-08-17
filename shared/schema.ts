@@ -976,6 +976,62 @@ export const insertEbookCategorySchema = createInsertSchema(ebookCategories).omi
 });
 export type InsertEbookCategory = z.infer<typeof insertEbookCategorySchema>;
 
+// Student Verification Schema for Educational Discounts
+export const studentProfiles = pgTable("student_profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Student Information
+  studentId: varchar("student_id").notNull(),
+  universityName: varchar("university_name").notNull(),
+  degreeProgram: varchar("degree_program").notNull(),
+  yearOfStudy: integer("year_of_study").notNull(),
+  expectedGraduationDate: date("expected_graduation_date").notNull(),
+  
+  // Contact Information
+  universityEmail: varchar("university_email").notNull(),
+  phoneNumber: varchar("phone_number"),
+  emergencyContactName: varchar("emergency_contact_name"),
+  emergencyContactPhone: varchar("emergency_contact_phone"),
+  
+  // Address
+  currentAddress: jsonb("current_address"),
+  permanentAddress: jsonb("permanent_address"),
+  
+  // Documents
+  studentIdDocumentUrl: varchar("student_id_document_url"),
+  enrollmentCertificateUrl: varchar("enrollment_certificate_url"),
+  transcriptUrl: varchar("transcript_url"),
+  
+  // Verification Status
+  verificationStatus: varchar("verification_status").default('pending'), // pending, under_review, verified, rejected, expired
+  submittedAt: timestamp("submitted_at").defaultNow(),
+  verifiedAt: timestamp("verified_at"),
+  expiresAt: timestamp("expires_at"),
+  
+  // Admin Review
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  adminNotes: text("admin_notes"),
+  
+  // Student Benefits
+  discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default('15.00'),
+  accessLevel: varchar("access_level").default('student'), // student, premium_student
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type StudentProfile = typeof studentProfiles.$inferSelect;
+export const insertStudentProfileSchema = createInsertSchema(studentProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  submittedAt: true,
+  verifiedAt: true,
+  reviewedBy: true,
+});
+export type InsertStudentProfile = z.infer<typeof insertStudentProfileSchema>;
+
 // Author Profiles Schema for E-book Marketplace
 export const authorProfiles = pgTable("author_profiles", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

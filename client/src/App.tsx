@@ -29,7 +29,7 @@ import ConsultationPayment from "@/pages/consultation-payment";
 import ConsultationSuccess from "@/pages/consultation-success";
 import EbookMarketplace from "@/pages/ebook-marketplace";
 import AuthorRegistration from "@/pages/author-registration";
-import StudentVerification from "@/pages/student-verification";
+import StudentVerification from "@/pages/student-verification-new";
 
 function Router() {
   const { user, isLoading } = useAuth();

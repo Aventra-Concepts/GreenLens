@@ -24,6 +24,7 @@ import {
   platformSettings,
   ebookReviews,
   authorProfiles,
+  studentProfiles,
   type User,
   type UpsertUser,
   type Subscription,
@@ -72,6 +73,8 @@ import {
   type InsertEbookReview,
   type AuthorProfile,
   type InsertAuthorProfile,
+  type StudentProfile,
+  type InsertStudentProfile,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, sql, desc } from "drizzle-orm";
@@ -1322,6 +1325,118 @@ export class DatabaseStorage implements IStorage {
       .where(eq(authorProfiles.id, id))
       .returning();
     return result;
+  }
+
+  // Student Profile Operations for Educational Verification
+  async createStudentProfile(profile: InsertStudentProfile): Promise<StudentProfile> {
+    const [result] = await db
+      .insert(studentProfiles)
+      .values(profile)
+      .returning();
+    return result;
+  }
+
+  async getStudentProfile(id: string): Promise<StudentProfile | undefined> {
+    const [profile] = await db
+      .select()
+      .from(studentProfiles)
+      .where(eq(studentProfiles.id, id))
+      .limit(1);
+    return profile;
+  }
+
+  async getStudentProfileByUserId(userId: string): Promise<StudentProfile | undefined> {
+    const [profile] = await db
+      .select()
+      .from(studentProfiles)
+      .where(eq(studentProfiles.userId, userId))
+      .limit(1);
+    return profile;
+  }
+
+  async updateStudentProfile(id: string, updates: Partial<StudentProfile>): Promise<StudentProfile> {
+    const [result] = await db
+      .update(studentProfiles)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(studentProfiles.id, id))
+      .returning();
+    return result;
+  }
+
+  async getStudentProfiles(status?: string, limit: number = 50, offset: number = 0): Promise<StudentProfile[]> {
+    let query = db.select().from(studentProfiles);
+    
+    if (status) {
+      query = query.where(eq(studentProfiles.verificationStatus, status));
+    }
+    
+    return await query
+      .orderBy(desc(studentProfiles.submittedAt))
+      .limit(limit)
+      .offset(offset);
+  }
+
+  async updateStudentVerificationStatus(
+    id: string, 
+    status: string, 
+    adminNotes?: string, 
+    reviewedBy?: string
+  ): Promise<StudentProfile> {
+    const updateData: any = {
+      verificationStatus: status,
+      updatedAt: new Date(),
+    };
+
+    if (adminNotes) {
+      updateData.adminNotes = adminNotes;
+    }
+
+    if (reviewedBy) {
+      updateData.reviewedBy = reviewedBy;
+    }
+
+    if (status === 'verified') {
+      updateData.verifiedAt = new Date();
+      // Set expiration to 1 year from now for verified students
+      updateData.expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+    }
+
+    const [result] = await db
+      .update(studentProfiles)
+      .set(updateData)
+      .where(eq(studentProfiles.id, id))
+      .returning();
+    return result;
+  }
+
+  async getExpiredStudentProfiles(): Promise<StudentProfile[]> {
+    return await db
+      .select()
+      .from(studentProfiles)
+      .where(
+        and(
+          eq(studentProfiles.verificationStatus, 'verified'),
+          lt(studentProfiles.expiresAt, new Date())
+        )
+      );
+  }
+
+  async convertExpiredStudentsToRegular(): Promise<number> {
+    // This method converts expired student accounts to regular user accounts
+    const expiredStudents = await this.getExpiredStudentProfiles();
+    
+    for (const student of expiredStudents) {
+      // Update student profile status
+      await this.updateStudentVerificationStatus(student.id, 'expired');
+      
+      // Remove student-specific privileges from user account
+      await this.updateUser(student.userId, {
+        isStudent: false,
+        studentDiscountEligible: false,
+      });
+    }
+    
+    return expiredStudents.length;
   }
 }
 

@@ -174,6 +174,22 @@ export function setupAuth(app: Express) {
   });
 }
 
+// Authentication middleware
+export function isAuthenticated(req: any, res: any, next: any) {
+  if (req.isAuthenticated() && req.user) {
+    return next();
+  }
+  return res.status(401).json({ message: "Authentication required" });
+}
+
+// Admin authentication middleware
+export function requireAdmin(req: any, res: any, next: any) {
+  if (req.isAuthenticated() && req.user && req.user.isAdmin) {
+    return next();
+  }
+  return res.status(403).json({ message: "Admin access required" });
+}
+
 // Middleware to protect routes
 export function requireAuth(req: any, res: any, next: any) {
   if (!req.isAuthenticated()) {
