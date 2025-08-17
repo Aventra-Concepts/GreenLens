@@ -77,7 +77,7 @@ import {
   type InsertStudentProfile,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gt, sql, desc } from "drizzle-orm";
+import { eq, and, or, gt, lt, gte, lte, asc, desc, like, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -1242,6 +1242,250 @@ export class DatabaseStorage implements IStorage {
       .from(ebookCategories)
       .where(eq(ebookCategories.isActive, true))
       .orderBy(ebookCategories.sortOrder, ebookCategories.name);
+  }
+
+  // E-book marketplace methods
+
+  async getEbooks(filters: {
+    search: string;
+    category: string;
+    sortBy: string;
+    priceFilter: string;
+    limit: number;
+    offset: number;
+  }): Promise<Ebook[]> {
+    let query = db
+      .select()
+      .from(ebooks)
+      .where(eq(ebooks.status, 'published'));
+
+    // Apply search filter
+    if (filters.search) {
+      query = query.where(
+        or(
+          like(ebooks.title, `%${filters.search}%`),
+          like(ebooks.description, `%${filters.search}%`),
+          like(ebooks.authorName, `%${filters.search}%`)
+        )
+      );
+    }
+
+    // Apply category filter
+    if (filters.category !== 'all') {
+      query = query.where(eq(ebooks.category, filters.category));
+    }
+
+    // Apply price filter
+    if (filters.priceFilter !== 'all') {
+      switch (filters.priceFilter) {
+        case 'free':
+          query = query.where(eq(ebooks.basePrice, '0'));
+          break;
+        case 'under_10':
+          query = query.where(lt(ebooks.basePrice, '10'));
+          break;
+        case '10_25':
+          query = query.where(and(gte(ebooks.basePrice, '10'), lte(ebooks.basePrice, '25')));
+          break;
+        case '25_50':
+          query = query.where(and(gte(ebooks.basePrice, '25'), lte(ebooks.basePrice, '50')));
+          break;
+        case 'over_50':
+          query = query.where(gt(ebooks.basePrice, '50'));
+          break;
+      }
+    }
+
+    // Apply sorting
+    switch (filters.sortBy) {
+      case 'newest':
+        query = query.orderBy(desc(ebooks.publishedAt));
+        break;
+      case 'rating':
+        query = query.orderBy(desc(ebooks.averageRating));
+        break;
+      case 'price_low':
+        query = query.orderBy(asc(ebooks.basePrice));
+        break;
+      case 'price_high':
+        query = query.orderBy(desc(ebooks.basePrice));
+        break;
+      case 'popularity':
+      default:
+        query = query.orderBy(desc(ebooks.downloadCount), desc(ebooks.averageRating));
+        break;
+    }
+
+    // Apply pagination
+    query = query.limit(filters.limit).offset(filters.offset);
+
+    return await query;
+  }
+
+  async getFeaturedEbooks(limit: number = 6): Promise<Ebook[]> {
+    return await db
+      .select()
+      .from(ebooks)
+      .where(and(eq(ebooks.isFeatured, true), eq(ebooks.status, 'published')))
+      .orderBy(desc(ebooks.averageRating), desc(ebooks.downloadCount))
+      .limit(limit);
+  }
+
+  async getEbookById(id: string): Promise<Ebook | undefined> {
+    const [ebook] = await db
+      .select()
+      .from(ebooks)
+      .where(and(eq(ebooks.id, id), eq(ebooks.status, 'published')));
+    return ebook;
+  }
+
+  // Additional e-book storage methods
+  async getEbook(id: string): Promise<Ebook | undefined> {
+    const [ebook] = await db
+      .select()
+      .from(ebooks)
+      .where(eq(ebooks.id, id));
+    return ebook;
+  }
+
+  async createEbook(ebook: InsertEbook): Promise<Ebook> {
+    const [created] = await db
+      .insert(ebooks)
+      .values(ebook)
+      .returning();
+    return created;
+  }
+
+  async updateEbook(id: string, updates: Partial<InsertEbook>): Promise<Ebook> {
+    const [updated] = await db
+      .update(ebooks)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(ebooks.id, id))
+      .returning();
+    return updated;
+  }
+
+  async getEbookPurchases(ebookId: string): Promise<EbookPurchase[]> {
+    return await db
+      .select()
+      .from(ebookPurchases)
+      .where(eq(ebookPurchases.ebookId, ebookId))
+      .orderBy(desc(ebookPurchases.createdAt));
+  }
+
+  async getEbookPurchaseByEmailAndEbook(email: string, ebookId: string): Promise<EbookPurchase | undefined> {
+    const [purchase] = await db
+      .select()
+      .from(ebookPurchases)
+      .where(and(eq(ebookPurchases.buyerEmail, email), eq(ebookPurchases.ebookId, ebookId)));
+    return purchase;
+  }
+
+  async createEbookPurchase(purchase: InsertEbookPurchase): Promise<EbookPurchase> {
+    const [created] = await db
+      .insert(ebookPurchases)
+      .values(purchase)
+      .returning();
+    return created;
+  }
+
+  async updateEbookPurchase(id: string, updates: Partial<InsertEbookPurchase>): Promise<EbookPurchase> {
+    const [updated] = await db
+      .update(ebookPurchases)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(ebookPurchases.id, id))
+      .returning();
+    return updated;
+  }
+
+  async getEbookReviews(ebookId: string): Promise<EbookReview[]> {
+    return await db
+      .select()
+      .from(ebookReviews)
+      .where(eq(ebookReviews.ebookId, ebookId))
+      .orderBy(desc(ebookReviews.createdAt));
+  }
+
+  // Platform settings methods
+  async getPlatformSettings(): Promise<PlatformSetting[]> {
+    return await db
+      .select()
+      .from(platformSettings)
+      .orderBy(platformSettings.category, platformSettings.key);
+  }
+
+  async getPlatformSetting(key: string): Promise<PlatformSetting | undefined> {
+    const [setting] = await db
+      .select()
+      .from(platformSettings)
+      .where(eq(platformSettings.key, key));
+    return setting;
+  }
+
+  async createPlatformSetting(setting: InsertPlatformSetting): Promise<PlatformSetting> {
+    const [created] = await db
+      .insert(platformSettings)
+      .values(setting)
+      .returning();
+    return created;
+  }
+
+  async updatePlatformSetting(id: string, updates: Partial<InsertPlatformSetting>): Promise<PlatformSetting> {
+    const [updated] = await db
+      .update(platformSettings)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(platformSettings.id, id))
+      .returning();
+    return updated;
+  }
+
+  // Student user methods
+  async getStudentUser(id: string): Promise<StudentUser | undefined> {
+    const [student] = await db
+      .select()
+      .from(studentUsers)
+      .where(eq(studentUsers.id, id));
+    return student;
+  }
+
+  async getStudentUserByEmail(email: string): Promise<StudentUser | undefined> {
+    const [student] = await db
+      .select()
+      .from(studentUsers)
+      .where(eq(studentUsers.email, email));
+    return student;
+  }
+
+  async createStudentUser(student: InsertStudentUser): Promise<StudentUser> {
+    const [created] = await db
+      .insert(studentUsers)
+      .values(student)
+      .returning();
+    return created;
+  }
+
+  async updateStudentUser(id: string, updates: Partial<InsertStudentUser>): Promise<StudentUser> {
+    const [updated] = await db
+      .update(studentUsers)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(studentUsers.id, id))
+      .returning();
+    return updated;
+  }
+
+  async getStudentUsersByGraduationYear(year: string): Promise<StudentUser[]> {
+    return await db
+      .select()
+      .from(studentUsers)
+      .where(eq(studentUsers.graduationYear, year));
+  }
+
+  async getPendingStudentVerifications(): Promise<StudentUser[]> {
+    return await db
+      .select()
+      .from(studentUsers)
+      .where(eq(studentUsers.verificationStatus, 'pending'))
+      .orderBy(desc(studentUsers.createdAt));
   }
 
   // Author Profile operations

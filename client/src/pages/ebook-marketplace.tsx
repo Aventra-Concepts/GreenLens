@@ -42,6 +42,19 @@ export default function EbookMarketplace() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("popularity");
   const [priceFilter, setPriceFilter] = useState("all");
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Initialize filters from URL parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category');
+    const featured = urlParams.get('featured');
+    const sort = urlParams.get('sortBy');
+    
+    if (category) setSelectedCategory(category);
+    if (featured === 'true') setSortBy('featured');
+    if (sort) setSortBy(sort);
+  }, []);
 
   const { data: ebooks = [], isLoading: ebooksLoading } = useQuery({
     queryKey: ['/api/ebooks', searchTerm, selectedCategory, sortBy, priceFilter],

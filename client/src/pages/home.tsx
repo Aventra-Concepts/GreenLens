@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { PoweredBySection } from "@/components/PoweredBySection";
 import GardeningToolsSection from "@/components/GardeningToolsSection";
+import { FeaturedEbooksSection } from "@/components/FeaturedEbooksSection";
 
 export default function Home() {
   const { toast } = useToast();
@@ -48,6 +49,9 @@ export default function Home() {
         
         {/* Gardening tools and soil preparation section */}
         <GardeningToolsSection />
+        
+        {/* Featured E-books Section */}
+        <FeaturedEbooksSection />
         
         <MyGardenSection />
       </div>

@@ -30,6 +30,76 @@ export function registerEbookRoutes(app: Express) {
   // Initialize platform settings on startup
   EbookService.initializePlatformSettings().catch(console.error);
 
+  // Marketplace API endpoints
+
+  // Get all e-books with filtering and search
+  app.get("/api/ebooks", async (req, res) => {
+    try {
+      const {
+        search = "",
+        category = "all",
+        sortBy = "popularity",
+        priceFilter = "all",
+        limit = "50",
+        offset = "0"
+      } = req.query;
+
+      const ebooks = await storage.getEbooks({
+        search: search as string,
+        category: category as string,
+        sortBy: sortBy as string,
+        priceFilter: priceFilter as string,
+        limit: parseInt(limit as string),
+        offset: parseInt(offset as string),
+      });
+
+      res.json(ebooks);
+    } catch (error) {
+      console.error("Error fetching e-books:", error);
+      res.status(500).json({ error: "Failed to fetch e-books" });
+    }
+  });
+
+  // Get featured e-books
+  app.get("/api/ebooks/featured", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 6;
+      const featuredEbooks = await storage.getFeaturedEbooks(limit);
+      res.json(featuredEbooks);
+    } catch (error) {
+      console.error("Error fetching featured e-books:", error);
+      res.status(500).json({ error: "Failed to fetch featured e-books" });
+    }
+  });
+
+  // Get e-book categories
+  app.get("/api/ebook-categories", async (req, res) => {
+    try {
+      const categories = await storage.getEbookCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching e-book categories:", error);
+      res.status(500).json({ error: "Failed to fetch e-book categories" });
+    }
+  });
+
+  // Get single e-book by ID
+  app.get("/api/ebooks/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const ebook = await storage.getEbookById(id);
+      
+      if (!ebook) {
+        return res.status(404).json({ error: "E-book not found" });
+      }
+
+      res.json(ebook);
+    } catch (error) {
+      console.error("Error fetching e-book:", error);
+      res.status(500).json({ error: "Failed to fetch e-book" });
+    }
+  });
+
   // Geographic detection endpoint
   app.get("/api/location", async (req, res) => {
     try {

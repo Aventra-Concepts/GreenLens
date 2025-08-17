@@ -1,184 +1,242 @@
-import { db } from "../db";
-import { ebooks, ebookPurchases, ebookCategories, platformSettings, studentUsers } from "@shared/schema";
-import { eq, desc, and, or } from "drizzle-orm";
+import { storage } from "../storage";
 import crypto from "crypto";
 
 export class EbookService {
-  // Get platform settings
-  static async getPlatformSetting(key: string): Promise<string | null> {
-    const [setting] = await db
-      .select()
-      .from(platformSettings)
-      .where(eq(platformSettings.settingKey, key))
-      .limit(1);
-    
-    return setting?.settingValue || null;
+  // Initialize platform settings with default values
+  static async initializePlatformSettings() {
+    try {
+      // Check if settings already exist
+      const existingSettings = await storage.getPlatformSettings();
+      
+      if (existingSettings.length === 0) {
+        // Create default platform settings
+        const defaultSettings = [
+          {
+            key: 'student_discount_percentage',
+            value: '20',
+            description: 'Student discount percentage',
+            category: 'pricing'
+          },
+          {
+            key: 'platform_fee_percentage',
+            value: '15',
+            description: 'Platform fee percentage',
+            category: 'pricing'
+          },
+          {
+            key: 'author_earnings_percentage', 
+            value: '85',
+            description: 'Author earnings percentage',
+            category: 'pricing'
+          },
+          {
+            key: 'min_ebook_price',
+            value: '0.99',
+            description: 'Minimum e-book price',
+            category: 'pricing'
+          },
+          {
+            key: 'max_ebook_size_mb',
+            value: '50',
+            description: 'Maximum e-book file size in MB',
+            category: 'uploads'
+          }
+        ];
+
+        for (const setting of defaultSettings) {
+          await storage.createPlatformSetting(setting);
+        }
+        
+        console.log('Platform settings initialized successfully');
+      }
+    } catch (error) {
+      console.error('Error initializing platform settings:', error);
+    }
   }
 
-  // Calculate pricing with platform fees and student discounts
-  static async calculatePricing(basePrice: number, isStudent: boolean = false) {
-    const platformFeeType = await this.getPlatformSetting('platform_fee_type') || 'percentage';
-    const platformFeeValue = parseFloat(await this.getPlatformSetting('platform_fee_value') || '10');
-    const studentDiscountPercent = parseFloat(await this.getPlatformSetting('student_discount_percent') || '15');
-
-    let platformFee = 0;
-    if (platformFeeType === 'percentage') {
-      platformFee = (basePrice * platformFeeValue) / 100;
-    } else {
-      platformFee = platformFeeValue;
+  // Check if user is a verified student
+  static async isVerifiedStudent(email: string): Promise<boolean> {
+    try {
+      const student = await storage.getStudentUserByEmail(email);
+      return student?.verificationStatus === 'approved';
+    } catch (error) {
+      console.error('Error checking student status:', error);
+      return false;
     }
-
-    let studentDiscount = 0;
-    if (isStudent) {
-      studentDiscount = (basePrice * studentDiscountPercent) / 100;
-    }
-
-    const finalPrice = basePrice - studentDiscount;
-    const authorEarnings = finalPrice - platformFee;
-
-    return {
-      originalPrice: basePrice,
-      studentDiscount,
-      platformFee,
-      authorEarnings: Math.max(0, authorEarnings), // Ensure non-negative
-      finalPrice
-    };
   }
 
-  // Generate secure download password based on email
+  // Calculate pricing based on base price and student status
+  static async calculatePricing(basePrice: number, isStudent: boolean) {
+    try {
+      // Get platform settings
+      const studentDiscountSetting = await storage.getPlatformSetting('student_discount_percentage');
+      const platformFeeSetting = await storage.getPlatformSetting('platform_fee_percentage');
+      
+      const studentDiscountPercentage = parseFloat(studentDiscountSetting?.value || '20');
+      const platformFeePercentage = parseFloat(platformFeeSetting?.value || '15');
+
+      let originalPrice = basePrice;
+      let studentDiscount = 0;
+      let finalPrice = originalPrice;
+
+      // Apply student discount if applicable
+      if (isStudent) {
+        studentDiscount = (originalPrice * studentDiscountPercentage) / 100;
+        finalPrice = originalPrice - studentDiscount;
+      }
+
+      // Calculate platform fee (from final price)
+      const platformFee = (finalPrice * platformFeePercentage) / 100;
+      
+      // Calculate author earnings (final price minus platform fee)
+      const authorEarnings = finalPrice - platformFee;
+
+      return {
+        originalPrice: parseFloat(originalPrice.toFixed(2)),
+        studentDiscount: parseFloat(studentDiscount.toFixed(2)),
+        platformFee: parseFloat(platformFee.toFixed(2)),
+        authorEarnings: parseFloat(authorEarnings.toFixed(2)),
+        finalPrice: parseFloat(finalPrice.toFixed(2))
+      };
+    } catch (error) {
+      console.error('Error calculating pricing:', error);
+      throw new Error('Failed to calculate pricing');
+    }
+  }
+
+  // Generate secure download password
   static generateDownloadPassword(email: string, ebookId: string): string {
-    const salt = process.env.SESSION_SECRET || 'default-salt';
-    return crypto.createHash('sha256')
-      .update(`${email}:${ebookId}:${salt}`)
-      .digest('hex')
-      .substring(0, 16);
+    const secret = process.env.DOWNLOAD_SECRET || 'default-secret-key';
+    const data = `${email}:${ebookId}:${Date.now()}`;
+    return crypto.createHmac('sha256', secret).update(data).digest('hex').substring(0, 16);
   }
 
   // Verify download access
   static async verifyDownloadAccess(ebookId: string, email: string, password: string): Promise<boolean> {
-    const expectedPassword = this.generateDownloadPassword(email, ebookId);
-    
-    if (password !== expectedPassword) {
+    try {
+      // Check if there's a valid purchase for this email and ebook
+      const purchase = await storage.getEbookPurchaseByEmailAndEbook(email, ebookId);
+      
+      if (!purchase || purchase.paymentStatus !== 'completed') {
+        return false;
+      }
+
+      // Verify the download password
+      return purchase.downloadPassword === password;
+    } catch (error) {
+      console.error('Error verifying download access:', error);
       return false;
     }
-
-    // Check if purchase exists and is valid
-    const [purchase] = await db
-      .select()
-      .from(ebookPurchases)
-      .where(
-        and(
-          eq(ebookPurchases.ebookId, ebookId),
-          eq(ebookPurchases.buyerEmail, email),
-          eq(ebookPurchases.paymentStatus, 'completed')
-        )
-      )
-      .limit(1);
-
-    return !!purchase;
   }
 
-  // Get e-books with author verification
-  static async getPublishedEbooks(limit: number = 50, offset: number = 0) {
-    return await db
-      .select({
-        id: ebooks.id,
-        title: ebooks.title,
-        description: ebooks.description,
-        authorName: ebooks.authorName,
-        category: ebooks.category,
-        subcategory: ebooks.subcategory,
-        language: ebooks.language,
-        pageCount: ebooks.pageCount,
-        basePrice: ebooks.basePrice,
-        currency: ebooks.currency,
-        coverImageUrl: ebooks.coverImageUrl,
-        previewFileUrl: ebooks.previewFileUrl,
-        fileFormat: ebooks.fileFormat,
-        contentRating: ebooks.contentRating,
-        downloadCount: ebooks.downloadCount,
-        rating: ebooks.rating,
-        reviewCount: ebooks.reviewCount,
-        isFeatured: ebooks.isFeatured,
-        createdAt: ebooks.createdAt,
-        tags: ebooks.tags
-      })
-      .from(ebooks)
-      .where(
-        and(
-          eq(ebooks.status, 'published'),
-          eq(ebooks.isActive, true)
-        )
-      )
-      .orderBy(desc(ebooks.isFeatured), desc(ebooks.createdAt))
-      .limit(limit)
-      .offset(offset);
+  // Get platform setting value
+  static async getPlatformSetting(key: string): Promise<string | null> {
+    try {
+      const setting = await storage.getPlatformSetting(key);
+      return setting?.value || null;
+    } catch (error) {
+      console.error(`Error getting platform setting ${key}:`, error);
+      return null;
+    }
   }
 
-  // Check if user is verified student
-  static async isVerifiedStudent(email: string): Promise<boolean> {
-    const [student] = await db
-      .select()
-      .from(studentUsers)
-      .where(
-        and(
-          eq(studentUsers.email, email),
-          eq(studentUsers.verificationStatus, 'approved'),
-          eq(studentUsers.isActive, true),
-          eq(studentUsers.isConverted, false)
-        )
-      )
-      .limit(1);
-
-    return !!student;
-  }
-
-  // Initialize default platform settings
-  static async initializePlatformSettings() {
-    const defaultSettings = [
-      {
-        settingKey: 'platform_fee_type',
-        settingValue: 'percentage',
-        settingType: 'string',
-        description: 'Platform fee calculation method (percentage or fixed)',
-        category: 'ebook'
-      },
-      {
-        settingKey: 'platform_fee_value',
-        settingValue: '10',
-        settingType: 'number',
-        description: 'Platform fee value (10% or fixed amount)',
-        category: 'ebook'
-      },
-      {
-        settingKey: 'student_discount_percent',
-        settingValue: '15',
-        settingType: 'number',
-        description: 'Student discount percentage',
-        category: 'student'
-      },
-      {
-        settingKey: 'max_file_size_mb',
-        settingValue: '50',
-        settingType: 'number',
-        description: 'Maximum e-book file size in MB',
-        category: 'ebook'
-      },
-      {
-        settingKey: 'allowed_file_formats',
-        settingValue: 'pdf,epub,mobi',
-        settingType: 'string',
-        description: 'Allowed e-book file formats',
-        category: 'ebook'
+  // Update platform setting
+  static async updatePlatformSetting(key: string, value: string): Promise<boolean> {
+    try {
+      const existingSetting = await storage.getPlatformSetting(key);
+      
+      if (existingSetting) {
+        await storage.updatePlatformSetting(existingSetting.id, { value });
+      } else {
+        await storage.createPlatformSetting({
+          key,
+          value,
+          description: `Auto-created setting for ${key}`,
+          category: 'general'
+        });
       }
-    ];
+      
+      return true;
+    } catch (error) {
+      console.error(`Error updating platform setting ${key}:`, error);
+      return false;
+    }
+  }
 
-    for (const setting of defaultSettings) {
-      try {
-        await db.insert(platformSettings).values(setting).onConflictDoNothing();
-      } catch (error) {
-        console.log(`Setting ${setting.settingKey} already exists`);
+  // Validate e-book file
+  static validateEbookFile(file: Express.Multer.File): { valid: boolean; error?: string } {
+    const allowedTypes = ['application/pdf', 'application/epub+zip', 'application/x-mobipocket-ebook'];
+    const maxSizeBytes = 50 * 1024 * 1024; // 50MB
+
+    if (!allowedTypes.includes(file.mimetype)) {
+      return {
+        valid: false,
+        error: 'Invalid file type. Only PDF, EPUB, and MOBI files are allowed.'
+      };
+    }
+
+    if (file.size > maxSizeBytes) {
+      return {
+        valid: false,
+        error: 'File too large. Maximum size is 50MB.'
+      };
+    }
+
+    return { valid: true };
+  }
+
+  // Validate cover image
+  static validateCoverImage(file: Express.Multer.File): { valid: boolean; error?: string } {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const maxSizeBytes = 5 * 1024 * 1024; // 5MB
+
+    if (!allowedTypes.includes(file.mimetype)) {
+      return {
+        valid: false,
+        error: 'Invalid image type. Only JPG, PNG, and WebP files are allowed.'
+      };
+    }
+
+    if (file.size > maxSizeBytes) {
+      return {
+        valid: false,
+        error: 'Image too large. Maximum size is 5MB.'
+      };
+    }
+
+    return { valid: true };
+  }
+
+  // Generate e-book statistics
+  static async getEbookStatistics(ebookId: string) {
+    try {
+      const ebook = await storage.getEbookById(ebookId);
+      if (!ebook) {
+        throw new Error('E-book not found');
       }
+
+      const purchases = await storage.getEbookPurchases(ebookId);
+      const reviews = await storage.getEbookReviews(ebookId);
+
+      const totalSales = purchases.filter(p => p.paymentStatus === 'completed').length;
+      const totalRevenue = purchases
+        .filter(p => p.paymentStatus === 'completed')
+        .reduce((sum, p) => sum + parseFloat(p.finalPrice), 0);
+
+      const averageRating = reviews.length > 0 
+        ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length 
+        : 0;
+
+      return {
+        totalSales,
+        totalRevenue: parseFloat(totalRevenue.toFixed(2)),
+        averageRating: parseFloat(averageRating.toFixed(1)),
+        totalReviews: reviews.length,
+        downloadCount: ebook.downloadCount || 0
+      };
+    } catch (error) {
+      console.error('Error generating e-book statistics:', error);
+      throw new Error('Failed to generate statistics');
     }
   }
 }

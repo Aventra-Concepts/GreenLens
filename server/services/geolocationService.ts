@@ -1,39 +1,143 @@
-// Geolocation service to detect user location and determine product availability
 export class GeolocationService {
-  static async detectUserCountry(ip?: string): Promise<string> {
+  // Detect user country from IP address
+  static async detectUserCountry(ip: string): Promise<string> {
     try {
-      // Use a simple IP geolocation service
-      if (!ip || ip === '127.0.0.1' || ip === '::1') {
-        // For local development, return a default country
-        return 'US';
+      // For development, return default country
+      if (process.env.NODE_ENV === 'development' || !ip || ip === '127.0.0.1' || ip === '::1') {
+        return 'US'; // Default to US for development
       }
 
-      // Use ipapi.co for IP geolocation (free tier available)
-      const response = await fetch(`https://ipapi.co/${ip}/country/`);
-      if (response.ok) {
-        const country = await response.text();
-        return country.trim();
-      }
+      // In production, you could integrate with a real geolocation service
+      // For now, return US as default
+      return 'US';
     } catch (error) {
-      console.error('Geolocation detection failed:', error);
+      console.error('Error detecting user country:', error);
+      return 'US'; // Fallback to US
     }
-    
-    // Fallback to US if detection fails
-    return 'US';
   }
 
-  static isIndianUser(country: string): boolean {
+  // Get available products based on country
+  static getAvailableProducts(country: string) {
+    const isIndia = country === 'IN';
+    
+    return {
+      country,
+      canAccessEbooks: true, // E-books are available globally
+      canAccessGardeningTools: isIndia, // Gardening tools only in India
+      restrictedMessage: isIndia 
+        ? null 
+        : 'Gardening tools are currently only available for customers in India. E-books are available worldwide.',
+      availableCategories: {
+        ebooks: [
+          'Gardening Guides',
+          'Plant Care',
+          'Organic Farming',
+          'Indoor Plants',
+          'Landscaping',
+          'Hydroponics',
+          'Permaculture',
+          'Pest Control',
+          'Soil Management',
+          'Seasonal Gardening',
+          'Herb Gardens',
+          'Vegetable Growing'
+        ],
+        gardeningTools: isIndia ? [
+          'Hand Tools',
+          'Watering Equipment',
+          'Plant Pots',
+          'Fertilizers',
+          'Seeds',
+          'Soil & Compost'
+        ] : []
+      }
+    };
+  }
+
+  // Check if gardening tools are available in user's country
+  static isGardeningToolsAvailable(country: string): boolean {
     return country === 'IN';
   }
 
-  static getAvailableProducts(country: string) {
-    const isIndia = this.isIndianUser(country);
-    
-    return {
-      gardeningTools: isIndia,
-      ebooks: true, // Available globally
-      country,
-      region: isIndia ? 'India' : 'International'
+  // Check if e-books are available in user's country
+  static isEbooksAvailable(country: string): boolean {
+    return true; // E-books are available globally
+  }
+
+  // Get localized currency based on country
+  static getLocalCurrency(country: string): string {
+    const currencyMap: { [key: string]: string } = {
+      'US': 'USD',
+      'IN': 'INR',
+      'GB': 'GBP',
+      'CA': 'CAD',
+      'AU': 'AUD',
+      'DE': 'EUR',
+      'FR': 'EUR',
+      'IT': 'EUR',
+      'ES': 'EUR',
+      'JP': 'JPY',
+      'KR': 'KRW',
+      'CN': 'CNY',
+      'BR': 'BRL',
+      'MX': 'MXN'
     };
+
+    return currencyMap[country] || 'USD';
+  }
+
+  // Get country-specific payment methods
+  static getPaymentMethods(country: string): string[] {
+    const paymentMethodsMap: { [key: string]: string[] } = {
+      'US': ['stripe', 'paypal'],
+      'IN': ['razorpay', 'cashfree', 'stripe'],
+      'GB': ['stripe', 'paypal'],
+      'CA': ['stripe', 'paypal'],
+      'AU': ['stripe', 'paypal'],
+      'DE': ['stripe', 'paypal'],
+      'FR': ['stripe', 'paypal'],
+      'IT': ['stripe', 'paypal'],
+      'ES': ['stripe', 'paypal'],
+      'JP': ['stripe'],
+      'KR': ['stripe'],
+      'CN': ['stripe'],
+      'BR': ['stripe'],
+      'MX': ['stripe']
+    };
+
+    return paymentMethodsMap[country] || ['stripe'];
+  }
+
+  // Get shipping information for physical products
+  static getShippingInfo(country: string) {
+    return {
+      available: country === 'IN', // Only shipping to India for gardening tools
+      estimatedDays: country === 'IN' ? '3-7' : null,
+      cost: country === 'IN' ? 'Free for orders over ₹500' : null,
+      restrictions: country === 'IN' 
+        ? null 
+        : 'Physical products are currently only shipped within India'
+    };
+  }
+
+  // Validate if order can be processed for the user's location
+  static canProcessOrder(country: string, hasPhysicalProducts: boolean, hasDigitalProducts: boolean): {
+    canProcess: boolean;
+    reason?: string;
+  } {
+    // Digital products (e-books) can be processed globally
+    if (hasDigitalProducts && !hasPhysicalProducts) {
+      return { canProcess: true };
+    }
+
+    // Physical products can only be processed for India
+    if (hasPhysicalProducts && country !== 'IN') {
+      return {
+        canProcess: false,
+        reason: 'Physical products can only be shipped to addresses in India'
+      };
+    }
+
+    return { canProcess: true };
   }
 }

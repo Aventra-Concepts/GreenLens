@@ -28,6 +28,8 @@ import TalkToExpert from "@/pages/talk-to-expert";
 import ConsultationPayment from "@/pages/consultation-payment";
 import ConsultationSuccess from "@/pages/consultation-success";
 import EbookMarketplace from "@/pages/ebook-marketplace";
+import AuthorUpload from "@/pages/author-upload";
+import StudentRegistration from "@/pages/student-registration";
 import EbookDetail from "@/pages/ebook-detail";
 import AuthorRegistration from "@/pages/author-registration";
 import StudentVerification from "@/pages/student-verification-new";
@@ -78,6 +80,8 @@ function Router() {
       <Route path="/ebooks/:id">
         {(params) => <EbookDetail id={params.id} />}
       </Route>
+      <Route path="/author-upload" component={AuthorUpload} />
+      <Route path="/student-registration" component={StudentRegistration} />
       <Route path="/author-registration" component={AuthorRegistration} />
       <Route path="/student-verification" component={StudentVerification} />
       <Route path="/experts-register" component={ExpertsRegister} />
