@@ -15,6 +15,14 @@ import {
   pricingPlans,
   payments,
   gardeningContent,
+  expertApplications,
+  consultationRequests,
+  studentUsers,
+  ebooks,
+  ebookPurchases,
+  ebookCategories,
+  platformSettings,
+  ebookReviews,
   type User,
   type UpsertUser,
   type Subscription,
@@ -45,12 +53,22 @@ import {
   type InsertPayment,
   type GardeningContent,
   type InsertGardeningContent,
-  expertApplications,
   type ExpertApplication,
   type InsertExpertApplication,
-  consultationRequests,
   type ConsultationRequest,
   type InsertConsultationRequest,
+  type StudentUser,
+  type InsertStudentUser,
+  type Ebook,
+  type InsertEbook,
+  type EbookPurchase,
+  type InsertEbookPurchase,
+  type EbookCategory,
+  type InsertEbookCategory,
+  type PlatformSetting,
+  type InsertPlatformSetting,
+  type EbookReview,
+  type InsertEbookReview,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, sql, desc } from "drizzle-orm";
@@ -174,6 +192,36 @@ export interface IStorage {
   getConsultationRequest(id: string): Promise<ConsultationRequest | undefined>;
   getConsultationRequests(userId?: string, status?: string, limit?: number, offset?: number): Promise<ConsultationRequest[]>;
   updateConsultationRequest(id: string, updates: Partial<ConsultationRequest>): Promise<ConsultationRequest>;
+
+  // Student User operations
+  createStudentUser(student: InsertStudentUser): Promise<StudentUser>;
+  getStudentUser(id: string): Promise<StudentUser | undefined>;
+  getStudentUserByEmail(email: string): Promise<StudentUser | undefined>;
+  updateStudentUser(id: string, updates: Partial<StudentUser>): Promise<StudentUser>;
+  getPendingStudentVerifications(): Promise<StudentUser[]>;
+  getStudentsNearGraduation(): Promise<StudentUser[]>;
+
+  // E-book operations
+  createEbook(ebook: InsertEbook): Promise<Ebook>;
+  getEbook(id: string): Promise<Ebook | undefined>;
+  getEbooksByAuthor(authorId: string): Promise<Ebook[]>;
+  getPublishedEbooks(limit?: number, offset?: number): Promise<Ebook[]>;
+  updateEbook(id: string, updates: Partial<Ebook>): Promise<Ebook>;
+  
+  // E-book Purchase operations
+  createEbookPurchase(purchase: InsertEbookPurchase): Promise<EbookPurchase>;
+  getEbookPurchase(id: string): Promise<EbookPurchase | undefined>;
+  getEbookPurchasesByUser(email: string): Promise<EbookPurchase[]>;
+  updateEbookPurchase(id: string, updates: Partial<EbookPurchase>): Promise<EbookPurchase>;
+
+  // Platform Settings operations
+  getPlatformSetting(key: string): Promise<PlatformSetting | undefined>;
+  updatePlatformSetting(key: string, value: string): Promise<PlatformSetting>;
+  getAllPlatformSettings(): Promise<PlatformSetting[]>;
+
+  // E-book Category operations
+  createEbookCategory(category: InsertEbookCategory): Promise<EbookCategory>;
+  getEbookCategories(): Promise<EbookCategory[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1017,6 +1065,176 @@ export class DatabaseStorage implements IStorage {
       .where(eq(consultationRequests.id, id))
       .returning();
     return updated;
+  }
+
+  // Student User operations
+  async createStudentUser(student: InsertStudentUser): Promise<StudentUser> {
+    const [result] = await db
+      .insert(studentUsers)
+      .values(student)
+      .returning();
+    return result;
+  }
+
+  async getStudentUser(id: string): Promise<StudentUser | undefined> {
+    const [student] = await db.select().from(studentUsers).where(eq(studentUsers.id, id));
+    return student;
+  }
+
+  async getStudentUserByEmail(email: string): Promise<StudentUser | undefined> {
+    const [student] = await db.select().from(studentUsers).where(eq(studentUsers.email, email));
+    return student;
+  }
+
+  async updateStudentUser(id: string, updates: Partial<StudentUser>): Promise<StudentUser> {
+    const [result] = await db
+      .update(studentUsers)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(studentUsers.id, id))
+      .returning();
+    return result;
+  }
+
+  async getPendingStudentVerifications(): Promise<StudentUser[]> {
+    return await db
+      .select()
+      .from(studentUsers)
+      .where(eq(studentUsers.verificationStatus, 'pending'))
+      .orderBy(studentUsers.createdAt);
+  }
+
+  async getStudentsNearGraduation(): Promise<StudentUser[]> {
+    return await db
+      .select()
+      .from(studentUsers)
+      .where(
+        and(
+          eq(studentUsers.verificationStatus, 'approved'),
+          eq(studentUsers.isActive, true),
+          eq(studentUsers.isConverted, false)
+        )
+      )
+      .orderBy(studentUsers.expectedGraduation);
+  }
+
+  // E-book operations
+  async createEbook(ebook: InsertEbook): Promise<Ebook> {
+    const [result] = await db
+      .insert(ebooks)
+      .values(ebook)
+      .returning();
+    return result;
+  }
+
+  async getEbook(id: string): Promise<Ebook | undefined> {
+    const [ebook] = await db.select().from(ebooks).where(eq(ebooks.id, id));
+    return ebook;
+  }
+
+  async getEbooksByAuthor(authorId: string): Promise<Ebook[]> {
+    return await db
+      .select()
+      .from(ebooks)
+      .where(eq(ebooks.authorId, authorId))
+      .orderBy(desc(ebooks.createdAt));
+  }
+
+  async getPublishedEbooks(limit: number = 50, offset: number = 0): Promise<Ebook[]> {
+    return await db
+      .select()
+      .from(ebooks)
+      .where(
+        and(
+          eq(ebooks.status, 'published'),
+          eq(ebooks.isActive, true)
+        )
+      )
+      .orderBy(desc(ebooks.isFeatured), desc(ebooks.createdAt))
+      .limit(limit)
+      .offset(offset);
+  }
+
+  async updateEbook(id: string, updates: Partial<Ebook>): Promise<Ebook> {
+    const [result] = await db
+      .update(ebooks)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(ebooks.id, id))
+      .returning();
+    return result;
+  }
+
+  // E-book Purchase operations
+  async createEbookPurchase(purchase: InsertEbookPurchase): Promise<EbookPurchase> {
+    const [result] = await db
+      .insert(ebookPurchases)
+      .values(purchase)
+      .returning();
+    return result;
+  }
+
+  async getEbookPurchase(id: string): Promise<EbookPurchase | undefined> {
+    const [purchase] = await db.select().from(ebookPurchases).where(eq(ebookPurchases.id, id));
+    return purchase;
+  }
+
+  async getEbookPurchasesByUser(email: string): Promise<EbookPurchase[]> {
+    return await db
+      .select()
+      .from(ebookPurchases)
+      .where(eq(ebookPurchases.buyerEmail, email))
+      .orderBy(desc(ebookPurchases.createdAt));
+  }
+
+  async updateEbookPurchase(id: string, updates: Partial<EbookPurchase>): Promise<EbookPurchase> {
+    const [result] = await db
+      .update(ebookPurchases)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(ebookPurchases.id, id))
+      .returning();
+    return result;
+  }
+
+  // Platform Settings operations
+  async getPlatformSetting(key: string): Promise<PlatformSetting | undefined> {
+    const [setting] = await db
+      .select()
+      .from(platformSettings)
+      .where(eq(platformSettings.settingKey, key))
+      .limit(1);
+    return setting;
+  }
+
+  async updatePlatformSetting(key: string, value: string): Promise<PlatformSetting> {
+    const [result] = await db
+      .update(platformSettings)
+      .set({ settingValue: value, updatedAt: new Date() })
+      .where(eq(platformSettings.settingKey, key))
+      .returning();
+    return result;
+  }
+
+  async getAllPlatformSettings(): Promise<PlatformSetting[]> {
+    return await db
+      .select()
+      .from(platformSettings)
+      .orderBy(platformSettings.category, platformSettings.settingKey);
+  }
+
+  // E-book Category operations
+  async createEbookCategory(category: InsertEbookCategory): Promise<EbookCategory> {
+    const [result] = await db
+      .insert(ebookCategories)
+      .values(category)
+      .returning();
+    return result;
+  }
+
+  async getEbookCategories(): Promise<EbookCategory[]> {
+    return await db
+      .select()
+      .from(ebookCategories)
+      .where(eq(ebookCategories.isActive, true))
+      .orderBy(ebookCategories.sortOrder, ebookCategories.name);
   }
 }
 

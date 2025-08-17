@@ -36,8 +36,11 @@ export const users = pgTable("users", {
   location: varchar("location"),
   password: varchar("password").notNull(), // Hashed password
   profileImageUrl: varchar("profile_image_url"),
+  country: varchar("country"),
   isAdmin: boolean("is_admin").default(false),
   isActive: boolean("is_active").default(true),
+  isAuthor: boolean("is_author").default(false),
+  authorVerified: boolean("author_verified").default(false),
   emailVerified: boolean("email_verified").default(false),
   lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -720,3 +723,244 @@ export const insertConsultationRequestSchema = createInsertSchema(consultationRe
   updatedAt: true,
 });
 export type InsertConsultationRequest = z.infer<typeof insertConsultationRequestSchema>;
+
+// Student Users Schema - Separate registration for students with academic verification
+export const studentUsers = pgTable("student_users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email").unique().notNull(),
+  firstName: varchar("first_name").notNull(),
+  lastName: varchar("last_name").notNull(),
+  country: varchar("country").notNull(),
+  password: varchar("password").notNull(),
+  
+  // Academic Information
+  universityName: varchar("university_name").notNull(),
+  instituteName: varchar("institute_name"),
+  academicBranch: varchar("academic_branch").notNull(),
+  yearOfJoining: integer("year_of_joining").notNull(),
+  currentAcademicYear: varchar("current_academic_year").notNull(),
+  academicStatus: varchar("academic_status").notNull(), // undergraduate, graduate, phd, etc.
+  subjectsStudying: text("subjects_studying").array(),
+  expectedGraduation: varchar("expected_graduation"),
+  studentId: varchar("student_id"),
+  
+  // Verification Documents
+  studentDocumentUrl: varchar("student_document_url").notNull(),
+  documentType: varchar("document_type").notNull(), // id_card, enrollment_certificate, etc.
+  
+  // Verification Status
+  verificationStatus: varchar("verification_status").default('pending'), // pending, approved, rejected
+  adminNotes: text("admin_notes"),
+  verifiedBy: varchar("verified_by").references(() => users.id),
+  verifiedAt: timestamp("verified_at"),
+  
+  // Lifecycle Management
+  isActive: boolean("is_active").default(true),
+  isConverted: boolean("is_converted").default(false), // Converted to regular user after graduation
+  convertedUserId: varchar("converted_user_id").references(() => users.id),
+  conversionDate: timestamp("conversion_date"),
+  
+  emailVerified: boolean("email_verified").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type StudentUser = typeof studentUsers.$inferSelect;
+export const insertStudentUserSchema = createInsertSchema(studentUsers).omit({
+  id: true,
+  verificationStatus: true,
+  adminNotes: true,
+  verifiedBy: true,
+  verifiedAt: true,
+  isActive: true,
+  isConverted: true,
+  convertedUserId: true,
+  conversionDate: true,
+  emailVerified: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertStudentUser = z.infer<typeof insertStudentUserSchema>;
+
+// E-books Schema
+export const ebooks = pgTable("ebooks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  authorId: varchar("author_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  authorName: varchar("author_name").notNull(), // Store at time of upload
+  
+  // Book Details
+  isbn: varchar("isbn").unique(),
+  category: varchar("category").notNull(),
+  subcategory: varchar("subcategory"),
+  language: varchar("language").default('en'),
+  pageCount: integer("page_count"),
+  publicationDate: timestamp("publication_date"),
+  tags: text("tags").array(),
+  
+  // Pricing
+  basePrice: decimal("base_price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default('USD'),
+  
+  // Files
+  coverImageUrl: varchar("cover_image_url").notNull(),
+  previewFileUrl: varchar("preview_file_url"), // Preview pages
+  fullFileUrl: varchar("full_file_url").notNull(), // Complete e-book file
+  fileSize: integer("file_size"), // In bytes
+  fileFormat: varchar("file_format").notNull(), // pdf, epub, etc.
+  
+  // Publishing Compliance
+  copyrightStatus: varchar("copyright_status").notNull(), // original, licensed, public_domain
+  publishingRights: boolean("publishing_rights").default(false),
+  contentRating: varchar("content_rating"), // all_ages, teen, adult
+  
+  // Status & Verification
+  status: varchar("status").default('pending'), // pending, approved, rejected, published, suspended
+  adminNotes: text("admin_notes"),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  approvedAt: timestamp("approved_at"),
+  
+  // Analytics
+  downloadCount: integer("download_count").default(0),
+  rating: decimal("rating", { precision: 3, scale: 2 }),
+  reviewCount: integer("review_count").default(0),
+  
+  isActive: boolean("is_active").default(true),
+  isFeatured: boolean("is_featured").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type Ebook = typeof ebooks.$inferSelect;
+export const insertEbookSchema = createInsertSchema(ebooks).omit({
+  id: true,
+  authorName: true,
+  downloadCount: true,
+  rating: true,
+  reviewCount: true,
+  status: true,
+  adminNotes: true,
+  approvedBy: true,
+  approvedAt: true,
+  isActive: true,
+  isFeatured: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertEbook = z.infer<typeof insertEbookSchema>;
+
+// E-book Purchases Schema
+export const ebookPurchases = pgTable("ebook_purchases", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  ebookId: varchar("ebook_id").notNull().references(() => ebooks.id, { onDelete: "cascade" }),
+  buyerId: varchar("buyer_id").references(() => users.id, { onDelete: "cascade" }),
+  studentBuyerId: varchar("student_buyer_id").references(() => studentUsers.id, { onDelete: "cascade" }),
+  buyerEmail: varchar("buyer_email").notNull(),
+  
+  // Pricing at time of purchase
+  originalPrice: decimal("original_price", { precision: 10, scale: 2 }).notNull(),
+  studentDiscount: decimal("student_discount", { precision: 10, scale: 2 }).default('0'),
+  platformFee: decimal("platform_fee", { precision: 10, scale: 2 }).notNull(),
+  authorEarnings: decimal("author_earnings", { precision: 10, scale: 2 }).notNull(),
+  finalPrice: decimal("final_price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).notNull(),
+  
+  // Payment Details
+  paymentStatus: varchar("payment_status").default('pending'), // pending, completed, failed, refunded
+  paymentProvider: varchar("payment_provider"), // stripe, paypal, etc.
+  paymentIntentId: varchar("payment_intent_id"),
+  transactionId: varchar("transaction_id"),
+  
+  // Access Management
+  downloadPassword: varchar("download_password").notNull(), // Email-based password
+  downloadCount: integer("download_count").default(0),
+  lastDownloadAt: timestamp("last_download_at"),
+  accessExpiresAt: timestamp("access_expires_at"), // Optional expiry
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type EbookPurchase = typeof ebookPurchases.$inferSelect;
+export const insertEbookPurchaseSchema = createInsertSchema(ebookPurchases).omit({
+  id: true,
+  downloadPassword: true,
+  downloadCount: true,
+  lastDownloadAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertEbookPurchase = z.infer<typeof insertEbookPurchaseSchema>;
+
+// Platform Settings Schema for Admin Control
+export const platformSettings = pgTable("platform_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  settingKey: varchar("setting_key").unique().notNull(),
+  settingValue: text("setting_value").notNull(),
+  settingType: varchar("setting_type").notNull(), // string, number, boolean, json
+  description: text("description"),
+  category: varchar("category").notNull(), // ebook, payment, student, general
+  isEditable: boolean("is_editable").default(true),
+  updatedBy: varchar("updated_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type PlatformSetting = typeof platformSettings.$inferSelect;
+export const insertPlatformSettingSchema = createInsertSchema(platformSettings).omit({
+  id: true,
+  updatedBy: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertPlatformSetting = z.infer<typeof insertPlatformSettingSchema>;
+
+// E-book Reviews Schema
+export const ebookReviews = pgTable("ebook_reviews", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  ebookId: varchar("ebook_id").notNull().references(() => ebooks.id, { onDelete: "cascade" }),
+  reviewerId: varchar("reviewer_id").references(() => users.id, { onDelete: "cascade" }),
+  studentReviewerId: varchar("student_reviewer_id").references(() => studentUsers.id, { onDelete: "cascade" }),
+  rating: integer("rating").notNull(), // 1-5 stars
+  reviewTitle: varchar("review_title"),
+  reviewContent: text("review_content"),
+  isVerifiedPurchase: boolean("is_verified_purchase").default(false),
+  isApproved: boolean("is_approved").default(true),
+  helpfulVotes: integer("helpful_votes").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type EbookReview = typeof ebookReviews.$inferSelect;
+export const insertEbookReviewSchema = createInsertSchema(ebookReviews).omit({
+  id: true,
+  isVerifiedPurchase: true,
+  isApproved: true,
+  helpfulVotes: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertEbookReview = z.infer<typeof insertEbookReviewSchema>;
+
+// E-book Categories Schema
+export const ebookCategories = pgTable("ebook_categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull().unique(),
+  slug: varchar("slug").notNull().unique(),
+  description: text("description"),
+  parentId: varchar("parent_id").references(() => ebookCategories.id),
+  icon: varchar("icon"),
+  isActive: boolean("is_active").default(true),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type EbookCategory = typeof ebookCategories.$inferSelect;
+export const insertEbookCategorySchema = createInsertSchema(ebookCategories).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertEbookCategory = z.infer<typeof insertEbookCategorySchema>;
