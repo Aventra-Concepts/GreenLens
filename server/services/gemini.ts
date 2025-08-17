@@ -35,8 +35,6 @@ Ensure the response is properly formatted JSON that can be parsed.`;
 
   async analyzeWithImages(prompt: string, imageBase64Array: string[], options?: { type?: "json_object" }): Promise<string> {
     try {
-      const model = this.getModel();
-      
       // Convert base64 images to the format Gemini expects
       const imageContents = imageBase64Array.map(base64 => ({
         inlineData: {
@@ -47,18 +45,39 @@ Ensure the response is properly formatted JSON that can be parsed.`;
 
       const contents = [
         ...imageContents,
-        prompt
+        { text: prompt }
       ];
 
-      let config: any = {};
+      let modelConfig: any = { model: "gemini-1.5-flash" };
       if (options?.type === "json_object") {
-        config.responseMimeType = "application/json";
+        modelConfig.generationConfig = {
+          responseMimeType: "application/json"
+        };
       }
 
+      const model = genAI.getGenerativeModel(modelConfig);
       const result = await model.generateContent(contents);
 
       const response = result.response;
-      return response.text();
+      const text = response.text();
+      
+      // If expecting JSON, try to parse and validate it
+      if (options?.type === "json_object") {
+        try {
+          JSON.parse(text); // Validate JSON
+          return text;
+        } catch (parseError) {
+          // Try to extract JSON from the response if it's wrapped in text
+          const jsonMatch = text.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            JSON.parse(jsonMatch[0]); // Validate extracted JSON
+            return jsonMatch[0];
+          }
+          throw new Error(`Invalid JSON response: ${text}`);
+        }
+      }
+      
+      return text;
     } catch (error) {
       console.error('Error analyzing images with Gemini:', error);
       throw error;
@@ -67,6 +86,44 @@ Ensure the response is properly formatted JSON that can be parsed.`;
 
   private getModel() {
     return genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  }
+
+  async analyzeText(prompt: string, options?: { type?: "json_object" }): Promise<string> {
+    try {
+      let modelConfig: any = { model: "gemini-1.5-flash" };
+      if (options?.type === "json_object") {
+        modelConfig.generationConfig = {
+          responseMimeType: "application/json"
+        };
+      }
+
+      const model = genAI.getGenerativeModel(modelConfig);
+      const result = await model.generateContent(prompt);
+
+      const response = result.response;
+      const text = response.text();
+      
+      // If expecting JSON, try to parse and validate it
+      if (options?.type === "json_object") {
+        try {
+          JSON.parse(text); // Validate JSON
+          return text;
+        } catch (parseError) {
+          // Try to extract JSON from the response if it's wrapped in text
+          const jsonMatch = text.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            JSON.parse(jsonMatch[0]); // Validate extracted JSON
+            return jsonMatch[0];
+          }
+          throw new Error(`Invalid JSON response: ${text}`);
+        }
+      }
+      
+      return text;
+    } catch (error) {
+      console.error('Error analyzing text with Gemini:', error);
+      throw error;
+    }
   }
 
   constructor() {
@@ -92,17 +149,17 @@ Ensure the response is properly formatted JSON that can be parsed.`;
         generationConfig: {
           responseMimeType: "application/json",
           responseSchema: {
-            type: "object",
+            type: "object" as const,
             properties: {
-              suitable: { type: "boolean" },
-              quality_score: { type: "number" },
+              suitable: { type: "boolean" as const },
+              quality_score: { type: "number" as const },
               issues: { 
-                type: "array",
-                items: { type: "string" }
+                type: "array" as const,
+                items: { type: "string" as const }
               },
               suggestions: {
-                type: "array", 
-                items: { type: "string" }
+                type: "array" as const, 
+                items: { type: "string" as const }
               },
             },
             required: ["suitable", "quality_score"],
@@ -148,82 +205,82 @@ Generate a detailed care plan with specific, actionable advice for this plant.`;
         generationConfig: {
           responseMimeType: "application/json",
           responseSchema: {
-            type: "object",
+            type: "object" as const,
             properties: {
               watering: {
-                type: "object",
+                type: "object" as const,
                 properties: {
-                  frequency: { type: "string" },
-                  description: { type: "string" },
-                  schedule: { type: "string" },
+                  frequency: { type: "string" as const },
+                  description: { type: "string" as const },
+                  schedule: { type: "string" as const },
                 },
               },
               light: {
-                type: "object",
+                type: "object" as const,
                 properties: {
-                  level: { type: "string" },
-                  description: { type: "string" },
-                  placement: { type: "string" },
+                  level: { type: "string" as const },
+                  description: { type: "string" as const },
+                  placement: { type: "string" as const },
                 },
               },
               humidity: {
-                type: "object",
+                type: "object" as const,
                 properties: {
-                  range: { type: "string" },
-                  description: { type: "string" },
-                  tips: { type: "array", items: { type: "string" } },
+                  range: { type: "string" as const },
+                  description: { type: "string" as const },
+                  tips: { type: "array" as const, items: { type: "string" as const } },
                 },
               },
               temperature: {
-                type: "object",
+                type: "object" as const,
                 properties: {
-                  range: { type: "string" },
-                  description: { type: "string" },
-                  seasonal_notes: { type: "string" },
+                  range: { type: "string" as const },
+                  description: { type: "string" as const },
+                  seasonal_notes: { type: "string" as const },
                 },
               },
               soil: {
-                type: "object",
+                type: "object" as const,
                 properties: {
-                  type: { type: "string" },
-                  details: { type: "string" },
-                  repotting: { type: "string" },
+                  type: { type: "string" as const },
+                  details: { type: "string" as const },
+                  repotting: { type: "string" as const },
                 },
               },
               fertilizer: {
-                type: "object",
+                type: "object" as const,
                 properties: {
-                  type: { type: "string" },
-                  frequency: { type: "string" },
-                  details: { type: "string" },
+                  type: { type: "string" as const },
+                  frequency: { type: "string" as const },
+                  details: { type: "string" as const },
                 },
               },
               pruning: {
-                type: "object",
+                type: "object" as const,
                 properties: {
-                  frequency: { type: "string" },
-                  details: { type: "string" },
-                  tools: { type: "array", items: { type: "string" } },
+                  frequency: { type: "string" as const },
+                  details: { type: "string" as const },
+                  tools: { type: "array" as const, items: { type: "string" as const } },
                 },
               },
               common_issues: {
-                type: "array",
+                type: "array" as const,
                 items: {
-                  type: "object",
+                  type: "object" as const,
                   properties: {
-                    issue: { type: "string" },
-                    symptoms: { type: "string" },
-                    solution: { type: "string" },
+                    issue: { type: "string" as const },
+                    symptoms: { type: "string" as const },
+                    solution: { type: "string" as const },
                   },
                 },
               },
               seasonal_care: {
-                type: "object",
+                type: "object" as const,
                 properties: {
-                  spring: { type: "string" },
-                  summer: { type: "string" },
-                  fall: { type: "string" },
-                  winter: { type: "string" },
+                  spring: { type: "string" as const },
+                  summer: { type: "string" as const },
+                  fall: { type: "string" as const },
+                  winter: { type: "string" as const },
                 },
               },
             },
@@ -255,38 +312,38 @@ Provide comprehensive advice for treating and preventing these plant diseases.`;
         generationConfig: {
           responseMimeType: "application/json",
           responseSchema: {
-            type: "object",
+            type: "object" as const,
             properties: {
               diseases: {
-                type: "array",
+                type: "array" as const,
                 items: {
-                  type: "object",
+                  type: "object" as const,
                   properties: {
-                    name: { type: "string" },
-                    severity: { type: "string" },
-                    description: { type: "string" },
-                    symptoms: { type: "array", items: { type: "string" } },
+                    name: { type: "string" as const },
+                    severity: { type: "string" as const },
+                    description: { type: "string" as const },
+                    symptoms: { type: "array" as const, items: { type: "string" as const } },
                     treatment: {
-                      type: "object",
+                      type: "object" as const,
                       properties: {
-                        immediate_actions: { type: "array", items: { type: "string" } },
-                        ongoing_care: { type: "array", items: { type: "string" } },
-                        products: { type: "array", items: { type: "string" } },
+                        immediate_actions: { type: "array" as const, items: { type: "string" as const } },
+                        ongoing_care: { type: "array" as const, items: { type: "string" as const } },
+                        products: { type: "array" as const, items: { type: "string" as const } },
                       },
                     },
                     prevention: {
-                      type: "array",
-                      items: { type: "string" },
+                      type: "array" as const,
+                      items: { type: "string" as const },
                     },
-                    recovery_timeline: { type: "string" },
+                    recovery_timeline: { type: "string" as const },
                   },
                 },
               },
-              overall_health_status: { type: "string" },
-              urgent_actions_needed: { type: "boolean" },
+              overall_health_status: { type: "string" as const },
+              urgent_actions_needed: { type: "boolean" as const },
               general_recommendations: {
-                type: "array",
-                items: { type: "string" },
+                type: "array" as const,
+                items: { type: "string" as const },
               },
             },
             required: ["diseases", "overall_health_status"],

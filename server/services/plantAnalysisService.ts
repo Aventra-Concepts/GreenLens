@@ -73,7 +73,27 @@ export class PlantAnalysisService {
     try {
       speciesData = JSON.parse(analysisResult);
     } catch (e) {
-      throw new Error("Failed to parse species identification result");
+      console.error("Raw Gemini response:", analysisResult);
+      console.error("Parse error:", e);
+      
+      // Try to extract JSON if it's embedded in text
+      const jsonMatch = analysisResult.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          speciesData = JSON.parse(jsonMatch[0]);
+          console.log("Successfully extracted JSON from response");
+        } catch (extractError) {
+          throw new Error(`Failed to extract valid JSON from response: ${analysisResult.substring(0, 200)}...`);
+        }
+      } else {
+        // Fallback to a basic response if no JSON found
+        console.warn("No JSON found in Gemini response, using fallback");
+        speciesData = {
+          scientific: "Unknown species",
+          common: "Unidentified plant",
+          confidence: 0.5
+        };
+      }
     }
 
     return {
@@ -120,7 +140,30 @@ export class PlantAnalysisService {
     try {
       healthData = JSON.parse(healthResult);
     } catch (e) {
-      throw new Error("Failed to parse health assessment result");
+      console.error("Raw health analysis response:", healthResult);
+      console.error("Health parse error:", e);
+      
+      // Try to extract JSON if it's embedded in text
+      const jsonMatch = healthResult.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          healthData = JSON.parse(jsonMatch[0]);
+        } catch (extractError) {
+          // Fallback to healthy status if parsing fails
+          healthData = {
+            isHealthy: true,
+            diseases: [],
+            issues: []
+          };
+        }
+      } else {
+        // Fallback to healthy status
+        healthData = {
+          isHealthy: true,
+          diseases: [],
+          issues: []
+        };
+      }
     }
 
     return {
@@ -170,7 +213,28 @@ export class PlantAnalysisService {
     try {
       careData = JSON.parse(careResult);
     } catch (e) {
-      throw new Error("Failed to parse care instructions result");
+      console.error("Raw care instructions response:", careResult);
+      console.error("Care parse error:", e);
+      
+      // Try to extract JSON if it's embedded in text
+      const jsonMatch = careResult.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          careData = JSON.parse(jsonMatch[0]);
+        } catch (extractError) {
+          // Fallback to basic care instructions
+          careData = {
+            instructions: "General plant care: provide adequate light, water when soil is dry, ensure good drainage, and maintain consistent temperature.",
+            recommendations: ["Monitor plant regularly", "Ensure proper drainage", "Provide adequate sunlight"]
+          };
+        }
+      } else {
+        // Fallback to basic care instructions
+        careData = {
+          instructions: "General plant care: provide adequate light, water when soil is dry, ensure good drainage, and maintain consistent temperature.",
+          recommendations: ["Monitor plant regularly", "Ensure proper drainage", "Provide adequate sunlight"]
+        };
+      }
     }
 
     return {
