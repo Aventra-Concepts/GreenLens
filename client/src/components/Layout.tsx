@@ -20,8 +20,8 @@ export function Layout({
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
       <Navigation />
       
-      {/* Top Menu Bar */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-2">
+      {/* Top Menu Bar - Sticky */}
+      <div className="sticky top-16 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-2 backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center justify-center space-x-6 text-sm">
             <a href="/" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors" data-testid="link-home">
