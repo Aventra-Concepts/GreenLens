@@ -119,9 +119,9 @@ export default function PricingSection() {
 
   if (isLoading) {
     return (
-      <section id="pricing" className="pt-1 pb-2 bg-gray-50 dark:bg-gray-900">
+      <section id="pricing" className="pt-0 pb-0.5 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-0.5 mb-1">
+          <div className="text-center space-y-0 mb-0">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
               Choose Your Plan
             </h2>
@@ -139,9 +139,9 @@ export default function PricingSection() {
 
   if (error) {
     return (
-      <section id="pricing" className="pt-1 pb-2 bg-gray-50 dark:bg-gray-900">
+      <section id="pricing" className="pt-0 pb-0.5 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-0.5">
+          <div className="text-center space-y-0">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
               Choose Your Plan
             </h2>
@@ -154,9 +154,9 @@ export default function PricingSection() {
 
   if (!plans || plans.length === 0) {
     return (
-      <section id="pricing" className="pt-1 pb-2 bg-gray-50 dark:bg-gray-900">
+      <section id="pricing" className="pt-0 pb-0.5 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-0.5">
+          <div className="text-center space-y-0">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
               Choose Your Plan
             </h2>
@@ -171,9 +171,9 @@ export default function PricingSection() {
   const sortedPlans = plans.sort((a: PricingPlan, b: PricingPlan) => a.displayOrder - b.displayOrder);
 
   return (
-    <section id="pricing" className="pt-1 pb-2 bg-gray-50 dark:bg-gray-900">
+    <section id="pricing" className="pt-0 pb-0.5 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-0.5 mb-1">
+        <div className="text-center space-y-0 mb-0">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
             Choose Your Plan
           </h2>
@@ -182,7 +182,7 @@ export default function PricingSection() {
           </p>
           
           {/* Currency Selector */}
-          <div className="flex justify-center items-center gap-2 mt-0.5">
+          <div className="flex justify-center items-center gap-2 mt-0">
             <Globe className="w-4 h-4 text-gray-500" />
             <div className="w-48">
               <CurrencySelector
