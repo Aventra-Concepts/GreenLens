@@ -40,7 +40,14 @@ export function usePricing(initialCurrency = 'USD', userLocation?: string) {
   }, [data?.currency, selectedCurrency, userLocation]);
 
   const getPlanPrice = (planId: string) => {
-    return data?.plans[planId];
+    const result = data?.plans[planId];
+    console.log(`🔍 getPlanPrice(${planId}) for currency ${selectedCurrency}:`, {
+      hasData: !!data,
+      plansAvailable: data?.plans ? Object.keys(data.plans) : [],
+      result,
+      fullPricingData: data
+    });
+    return result;
   };
 
   const getOptimalProvider = (planId: string) => {

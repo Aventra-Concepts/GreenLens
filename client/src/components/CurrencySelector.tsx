@@ -18,29 +18,19 @@ export function CurrencySelector({ value, onChange, userLocation }: CurrencySele
   const [availableCurrencies, setAvailableCurrencies] = useState<string[]>([]);
 
   const { data: pricingData } = useQuery<PricingResponse>({
-    queryKey: ['/api/pricing', userLocation],
+    queryKey: ['/api/pricing', 'USD'], // Use USD to get supported currencies list only
     queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append('currency', value || 'USD');
-      if (userLocation) params.append('location', userLocation);
-      const response = await fetch(`/api/pricing?${params}`);
+      const response = await fetch('/api/pricing?currency=USD');
       return response.json();
     },
   });
 
   useEffect(() => {
     if (pricingData?.supportedCurrencies) {
-      // Check if the data is an array of objects or strings
-      const currencyCodes = pricingData.supportedCurrencies.map(currency => 
-        typeof currency === 'string' ? currency : currency.code
-      );
-      setAvailableCurrencies(currencyCodes);
-      // Auto-detect currency if available
-      if (pricingData.currency && pricingData.currency !== value) {
-        onChange(pricingData.currency);
-      }
+      // Supported currencies should be an array of strings
+      setAvailableCurrencies(pricingData.supportedCurrencies);
     }
-  }, [pricingData, value, onChange]);
+  }, [pricingData]);
 
   // Priority currencies (top section) - as requested by user
   const priorityCurrencies = ['USD', 'EUR', 'GBP', 'AUD', 'SGD', 'AED', 'CAD', 'INR'];
