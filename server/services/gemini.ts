@@ -33,6 +33,42 @@ Ensure the response is properly formatted JSON that can be parsed.`;
     }
   }
 
+  async analyzeWithImages(prompt: string, imageBase64Array: string[], options?: { type?: "json_object" }): Promise<string> {
+    try {
+      const model = this.getModel();
+      
+      // Convert base64 images to the format Gemini expects
+      const imageContents = imageBase64Array.map(base64 => ({
+        inlineData: {
+          data: base64,
+          mimeType: "image/jpeg", // Assuming JPEG, adjust if needed
+        },
+      }));
+
+      const contents = [
+        ...imageContents,
+        prompt
+      ];
+
+      let config: any = {};
+      if (options?.type === "json_object") {
+        config.responseMimeType = "application/json";
+      }
+
+      const result = await model.generateContent(contents);
+
+      const response = result.response;
+      return response.text();
+    } catch (error) {
+      console.error('Error analyzing images with Gemini:', error);
+      throw error;
+    }
+  }
+
+  private getModel() {
+    return ai.getGenerativeModel({ model: "gemini-2.5-flash" });
+  }
+
   constructor() {
     if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_GENAI_API_KEY) {
       throw new Error('GEMINI_API_KEY or GOOGLE_GENAI_API_KEY environment variable is required');
