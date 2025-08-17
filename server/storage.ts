@@ -274,22 +274,32 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.email, email));
+      return user;
+    } catch (error) {
+      console.error('Database error in getUserByEmail:', error);
+      throw error;
+    }
   }
 
   async createUser(userData: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'isAdmin' | 'isActive' | 'emailVerified' | 'lastLoginAt' | 'freeTierUsed' | 'freeTierStartedAt'>): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values({
-        ...userData,
-        isAdmin: false,
-        isActive: true,
-        emailVerified: false,
-        freeTierUsed: 0,
-      })
-      .returning();
-    return user;
+    try {
+      const [user] = await db
+        .insert(users)
+        .values({
+          ...userData,
+          isAdmin: false,
+          isActive: true,
+          emailVerified: false,
+          freeTierUsed: 0,
+        })
+        .returning();
+      return user;
+    } catch (error) {
+      console.error('Database error in createUser:', error);
+      throw error;
+    }
   }
 
   async updateUserLoginActivity(userId: string): Promise<void> {

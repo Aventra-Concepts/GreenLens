@@ -114,25 +114,58 @@ export function registerEbookRoutes(app: Express) {
     }
   });
 
-  // Student registration endpoint
+  // Student registration endpoint with improved error handling
   app.post("/api/register/student", upload.single('studentDocument'), async (req, res) => {
     try {
-      const validatedData = insertStudentUserSchema.parse(req.body);
+      // Validate required fields
+      const { email, firstName, lastName, password, university, fieldOfStudy, yearOfJoining } = req.body;
+      
+      if (!email || !firstName || !lastName || !password || !university || !fieldOfStudy || !yearOfJoining) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+      }
+
+      // Validate password strength
+      if (password.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters' });
+      }
       
       if (!req.file) {
         return res.status(400).json({ error: 'Student document is required' });
       }
 
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+
       // Hash password before storing
       const bcrypt = require('bcrypt');
-      const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+      const hashedPassword = await bcrypt.hash(password.trim(), 10);
 
-      const student = await storage.createStudentUser({
-        ...validatedData,
+      const studentData = {
+        email: email.toLowerCase().trim(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
         password: hashedPassword,
+        location: req.body.location?.trim() || null,
+        country: req.body.country?.trim() || null,
+        university: university.trim(),
+        fieldOfStudy: fieldOfStudy.trim(),
+        yearOfJoining: parseInt(yearOfJoining),
+        expectedGraduation: req.body.expectedGraduation ? parseInt(req.body.expectedGraduation) : null,
+        studentId: req.body.studentId?.trim() || null,
         studentDocumentUrl: req.file.path,
         documentType: req.file.mimetype.includes('pdf') ? 'pdf' : 'image'
-      });
+      };
+
+      const student = await storage.createStudentUser(studentData);
 
       // Send verification email
       await StudentVerificationService.sendVerificationEmail(
@@ -146,7 +179,20 @@ export function registerEbookRoutes(app: Express) {
       });
     } catch (error: any) {
       console.error('Student registration error:', error);
-      res.status(400).json({ error: error.message });
+      
+      // Handle specific database errors
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage?.includes('column') && errorMessage?.includes('does not exist')) {
+        return res.status(500).json({ 
+          error: "System maintenance required. Please try again in a few minutes." 
+        });
+      }
+      
+      if (errorMessage?.includes('duplicate key') || errorMessage?.includes('unique constraint')) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+      
+      res.status(500).json({ error: "Registration failed. Please try again." });
     }
   });
 

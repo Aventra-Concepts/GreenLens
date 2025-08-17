@@ -94,10 +94,26 @@ export function setupAuth(app: Express) {
     }
   });
 
-  // Registration endpoint
+  // Registration endpoint with comprehensive error handling
   app.post("/api/register", async (req, res, next) => {
     try {
-      const { email, firstName, lastName, location, password } = req.body;
+      const { email, firstName, lastName, location, password, country } = req.body;
+      
+      // Validate required fields
+      if (!email || !firstName || !lastName || !password) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+
+      // Validate password strength
+      if (password.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      }
       
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
@@ -105,16 +121,18 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "Email already registered" });
       }
 
-      // Hash password and create user
+      // Hash password and create user with safe defaults
       const hashedPassword = await hashPassword(password);
-      const user = await storage.createUser({
-        email,
-        firstName,
-        lastName,
-        location,
+      
+      // Create user data with all required fields and safe defaults
+      const userData = {
+        email: email.toLowerCase().trim(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        location: location?.trim() || null,
         password: hashedPassword,
         profileImageUrl: null,
-        country: null,
+        country: country?.trim() || null,
         isSuperAdmin: false,
         isAuthor: false,
         authorVerified: false,
@@ -123,11 +141,19 @@ export function setupAuth(app: Express) {
         lockedUntil: null,
         preferredLanguage: 'en',
         timezone: 'UTC',
-      });
+      };
+
+      const user = await storage.createUser(userData);
 
       // Auto-login the user
       req.login(user, (err) => {
-        if (err) return next(err);
+        if (err) {
+          console.error('Auto-login error:', err);
+          return res.status(201).json({ 
+            message: "Registration successful, please login manually",
+            userId: user.id
+          });
+        }
         
         // Return user without password
         const { password: _, ...userWithoutPassword } = user;
@@ -135,7 +161,20 @@ export function setupAuth(app: Express) {
       });
     } catch (error) {
       console.error('Registration error:', error);
-      res.status(500).json({ message: "Registration failed" });
+      
+      // Handle specific database errors
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage?.includes('column') && errorMessage?.includes('does not exist')) {
+        return res.status(500).json({ 
+          message: "System maintenance required. Please try again in a few minutes." 
+        });
+      }
+      
+      if (errorMessage?.includes('duplicate key') || errorMessage?.includes('unique constraint')) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+      
+      res.status(500).json({ message: "Registration failed. Please try again." });
     }
   });
 

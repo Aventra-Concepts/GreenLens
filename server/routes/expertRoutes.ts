@@ -24,24 +24,70 @@ const upload = multer({
   }
 });
 
-// Expert application submission endpoint
+// Expert application submission endpoint with enhanced security
 router.post('/expert-applications', upload.any(), async (req, res) => {
   try {
-    // Parse the application data from form
-    const applicationData = JSON.parse(req.body.applicationData);
-    
-    // Validate the application data
+    // Validate required form data
+    if (!req.body.applicationData) {
+      return res.status(400).json({
+        success: false,
+        message: 'Application data is required',
+      });
+    }
+
+    // Parse and validate the application data
+    let applicationData;
+    try {
+      applicationData = JSON.parse(req.body.applicationData);
+    } catch (parseError) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid application data format',
+      });
+    }
+
+    // Validate required fields
+    const { firstName, lastName, email, phoneNumber, expertise, yearsOfExperience } = applicationData;
+    if (!firstName || !lastName || !email || !phoneNumber || !expertise || !yearsOfExperience) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields',
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email format',
+      });
+    }
+
+    // Check if application already exists
+    const existingApplication = await storage.getExpertApplicationByEmail(email);
+    if (existingApplication) {
+      return res.status(400).json({
+        success: false,
+        message: 'Application already exists for this email',
+      });
+    }
+
+    // Validate the application data with schema
     const validatedData = insertExpertApplicationSchema.parse({
       ...applicationData,
+      firstName: firstName.trim(),
+      lastName: lastName.trim(), 
+      email: email.toLowerCase().trim(),
+      phoneNumber: phoneNumber.trim(),
+      expertise: expertise.trim(),
       termsAcceptedAt: applicationData.termsAccepted ? new Date() : null,
     });
 
-    // TODO: Handle file uploads to object storage
-    // For now, we'll store placeholder paths
+    // Handle file uploads safely
     let profilePhotoPath = null;
     const qualificationDocuments: string[] = [];
 
-    // Process uploaded files (this would normally upload to object storage)
     const files = req.files as Express.Multer.File[];
     if (files) {
       files.forEach((file, index) => {
@@ -62,13 +108,23 @@ router.post('/expert-applications', upload.any(), async (req, res) => {
     });
 
     // Send confirmation email to applicant
-    await EmailService.sendExpertApplicationConfirmation(
-      application.email,
-      application.firstName
-    );
+    try {
+      await EmailService.sendExpertApplicationConfirmation(
+        application.email,
+        application.firstName
+      );
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+      // Continue since application was successful
+    }
 
     // Send notification email to admin team
-    await EmailService.sendExpertApplicationNotificationToAdmin(application);
+    try {
+      await EmailService.sendExpertApplicationNotificationToAdmin(application);
+    } catch (emailError) {
+      console.error('Failed to send admin notification:', emailError);
+      // Continue since application was successful
+    }
 
     res.status(201).json({
       success: true,
@@ -94,9 +150,25 @@ router.post('/expert-applications', upload.any(), async (req, res) => {
       });
     }
 
+    // Handle specific database errors
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage?.includes('column') && errorMessage?.includes('does not exist')) {
+      return res.status(500).json({
+        success: false,
+        message: "System maintenance required. Please try again in a few minutes.",
+      });
+    }
+
+    if (errorMessage?.includes('duplicate key') || errorMessage?.includes('unique constraint')) {
+      return res.status(400).json({
+        success: false,
+        message: "Application already exists for this email",
+      });
+    }
+
     res.status(500).json({
       success: false,
-      message: 'Internal server error while processing application',
+      message: 'Application submission failed. Please try again.',
     });
   }
 });
