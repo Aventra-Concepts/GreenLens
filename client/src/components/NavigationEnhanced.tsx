@@ -143,11 +143,12 @@ export default function NavigationEnhanced() {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/20 rounded-md transition-all duration-200"
+                  disabled={logoutMutation.isPending}
+                  className="px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/20 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   data-testid="nav-logout"
                 >
                   <LogOut className="w-3 h-3 mr-1 inline" />
-                  Logout
+                  {logoutMutation.isPending ? "Signing out..." : "Logout"}
                 </button>
               </div>
             ) : (
@@ -303,6 +304,7 @@ export default function NavigationEnhanced() {
                         <Button
                           variant="ghost"
                           className="w-full justify-start text-left text-red-600 dark:text-red-400"
+                          disabled={logoutMutation.isPending}
                           onClick={() => {
                             handleLogout();
                             closeMobileMenu();
@@ -310,7 +312,7 @@ export default function NavigationEnhanced() {
                           data-testid="mobile-nav-logout"
                         >
                           <LogOut className="w-4 h-4 mr-3" />
-                          Logout
+                          {logoutMutation.isPending ? "Signing out..." : "Logout"}
                         </Button>
                       </div>
                     ) : (
