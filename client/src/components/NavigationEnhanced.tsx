@@ -28,8 +28,7 @@ export default function NavigationEnhanced() {
   const { user, isAuthenticated, logoutMutation } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Debug logging
-  console.log("Navigation state:", { user, isAuthenticated, isPending: logoutMutation.isPending });
+
 
   // Get cart item count
   const { data: cartItems = [] } = useQuery({

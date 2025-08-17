@@ -408,12 +408,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? pricingService.detectCurrencyByLocation(location as string)
         : currency as string;
       
-      const pricing = pricingService.getAllPlanPricing(detectedCurrency);
+      const pricingArray = pricingService.getAllPlanPricing(detectedCurrency);
       const supportedCurrencies = pricingService.getSupportedCurrencies();
+      
+      // Convert plans array to object format expected by frontend
+      const plansObject = pricingArray.reduce((acc, plan) => {
+        acc[plan.planId] = {
+          planId: plan.planId,
+          amount: plan.amount,
+          formattedPrice: new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: detectedCurrency,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+          }).format(plan.amount),
+          supportedProviders: plan.supportedProviders
+        };
+        return acc;
+      }, {} as Record<string, any>);
       
       res.json({
         currency: detectedCurrency,
-        plans: pricing,
+        plans: plansObject,
         supportedCurrencies,
       });
     } catch (error) {
