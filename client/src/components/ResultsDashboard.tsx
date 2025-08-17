@@ -64,10 +64,28 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
     },
   });
 
-  const species = result.species || {};
-  const carePlan = result.carePlan || {};
-  const diseases = result.diseases || {};
-  const confidence = Math.round((parseFloat(result.confidence) || 0) * 100);
+  // Handle both old and new data structures
+  const species = {
+    commonName: result.species?.common || result.commonName || 'Unknown Plant',
+    scientificName: result.species?.scientific || result.species || 'Unknown species',
+    family: result.species?.family || 'Unknown family',
+    genus: result.species?.genus || 'Unknown genus',
+    alternativeNames: result.species?.alternativeNames || [],
+    nativeRegion: result.species?.nativeRegion || 'Unknown region',
+    plantType: result.species?.plantType || 'Unknown type'
+  };
+
+  const healthAssessment = result.healthAssessment || {};
+  const careInstructions = result.careInstructions || {};
+  const propagation = result.propagation || {};
+  const growthCharacteristics = result.growthCharacteristics || {};
+  const seasonalCalendar = result.seasonalCalendar || [];
+  const recommendations = result.recommendations || [];
+  const toxicity = result.toxicity;
+  const companionPlants = result.companionPlants || [];
+  const commonProblems = result.commonProblems || [];
+
+  const confidence = Math.round((result.species?.confidence || parseFloat(result.confidence) || 0) * 100);
 
   return (
     <section className="py-16 bg-gray-50">
@@ -126,6 +144,13 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
                   Health & Diseases
                 </TabsTrigger>
                 <TabsTrigger 
+                  value="seasonal" 
+                  className="border-b-2 data-[state=active]:border-green-500 data-[state=active]:text-green-600 rounded-none bg-transparent px-6 py-4"
+                  data-testid="seasonal-tab"
+                >
+                  Seasonal Care
+                </TabsTrigger>
+                <TabsTrigger 
                   value="gallery" 
                   className="border-b-2 data-[state=active]:border-green-500 data-[state=active]:text-green-600 rounded-none bg-transparent px-6 py-4"
                   data-testid="gallery-tab"
@@ -156,10 +181,10 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
                           <h3 className="font-semibold text-gray-900">Watering</h3>
                         </div>
                         <p className="text-sm text-gray-600 mb-3">
-                          {carePlan.watering?.description || 'Water when top 2 inches of soil feel dry, typically every 7-10 days'}
+                          {careInstructions.watering?.method || 'Water when top 2 inches of soil feel dry, typically every 7-10 days'}
                         </p>
                         <div className="text-xs text-green-600 font-medium">
-                          {carePlan.watering?.frequency || 'Every 7-10 days'}
+                          {careInstructions.watering?.frequency || 'Every 7-10 days'}
                         </div>
                       </CardContent>
                     </Card>
@@ -173,10 +198,10 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
                           <h3 className="font-semibold text-gray-900">Light</h3>
                         </div>
                         <p className="text-sm text-gray-600 mb-3">
-                          {carePlan.light?.description || 'Bright, indirect light. Avoid direct sunlight which can scorch leaves'}
+                          {careInstructions.lighting?.positioning || 'Bright, indirect light. Avoid direct sunlight which can scorch leaves'}
                         </p>
                         <div className="text-xs text-yellow-600 font-medium">
-                          {carePlan.light?.level || 'Bright Indirect'}
+                          {careInstructions.lighting?.requirement || 'Bright Indirect'}
                         </div>
                       </CardContent>
                     </Card>
@@ -190,10 +215,10 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
                           <h3 className="font-semibold text-gray-900">Humidity</h3>
                         </div>
                         <p className="text-sm text-gray-600 mb-3">
-                          {carePlan.humidity?.description || 'Prefers 40-60% humidity. Use humidifier or pebble tray if needed'}
+                          {careInstructions.humidity?.methods?.join(', ') || 'Prefers 40-60% humidity. Use humidifier or pebble tray if needed'}
                         </p>
                         <div className="text-xs text-blue-600 font-medium">
-                          {carePlan.humidity?.range || '40-60%'}
+                          {careInstructions.humidity?.level || '40-60%'}
                         </div>
                       </CardContent>
                     </Card>
@@ -207,10 +232,10 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
                           <h3 className="font-semibold text-gray-900">Temperature</h3>
                         </div>
                         <p className="text-sm text-gray-600 mb-3">
-                          {carePlan.temperature?.description || 'Thrives in warm temperatures between 65-75°F (18-24°C)'}
+                          {careInstructions.temperature?.seasonalVariations || 'Thrives in warm temperatures between 65-75°F (18-24°C)'}
                         </p>
                         <div className="text-xs text-orange-600 font-medium">
-                          {carePlan.temperature?.range || '65-75°F'}
+                          {careInstructions.temperature?.optimal || '65-75°F'}
                         </div>
                       </CardContent>
                     </Card>
@@ -219,41 +244,168 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
                   {/* Detailed Care Instructions */}
                   <Card className="bg-gray-50">
                     <CardContent className="p-6">
-                      <h3 className="font-semibold text-gray-900 mb-4">Detailed Care Instructions</h3>
-                      <div className="space-y-4">
-                        <div className="flex space-x-4">
-                          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <CheckCircle className="w-3 h-3 text-white" />
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-gray-900">Soil & Repotting</h4>
-                            <p className="text-sm text-gray-600">
-                              {carePlan.soil?.details || 'Use well-draining potting mix. Repot every 2-3 years or when rootbound.'}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex space-x-4">
-                          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <CheckCircle className="w-3 h-3 text-white" />
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-gray-900">Fertilizing</h4>
-                            <p className="text-sm text-gray-600">
-                              {carePlan.fertilizer?.details || 'Feed monthly during growing season (spring/summer) with diluted liquid fertilizer.'}
-                            </p>
+                      <h3 className="font-semibold text-gray-900 mb-4">Detailed Care Guide</h3>
+                      <div className="grid md:grid-cols-2 gap-6">
+                        
+                        {/* Soil Care */}
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-gray-800 flex items-center">
+                            <div className="w-4 h-4 bg-amber-500 rounded-full mr-2"></div>
+                            Soil Requirements
+                          </h4>
+                          <div className="text-sm text-gray-600 space-y-1">
+                            <p><strong>Type:</strong> {careInstructions.soil?.type || 'Well-draining potting mix'}</p>
+                            <p><strong>pH Level:</strong> {careInstructions.soil?.pH || '6.0-7.0'}</p>
+                            <p><strong>Drainage:</strong> {careInstructions.soil?.drainage || 'Must have drainage holes'}</p>
+                            {careInstructions.soil?.amendments && (
+                              <p><strong>Amendments:</strong> {careInstructions.soil.amendments.join(', ')}</p>
+                            )}
                           </div>
                         </div>
-                        <div className="flex space-x-4">
-                          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <CheckCircle className="w-3 h-3 text-white" />
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-gray-900">Pruning & Maintenance</h4>
-                            <p className="text-sm text-gray-600">
-                              {carePlan.pruning?.details || 'Remove dead or damaged leaves. Dust leaves weekly for optimal photosynthesis.'}
-                            </p>
+
+                        {/* Fertilizing */}
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-gray-800 flex items-center">
+                            <div className="w-4 h-4 bg-purple-500 rounded-full mr-2"></div>
+                            Fertilizing
+                          </h4>
+                          <div className="text-sm text-gray-600 space-y-1">
+                            <p><strong>Type:</strong> {careInstructions.fertilizing?.type || 'Balanced liquid fertilizer'}</p>
+                            <p><strong>Frequency:</strong> {careInstructions.fertilizing?.frequency || 'Monthly during growing season'}</p>
+                            <p><strong>NPK Ratio:</strong> {careInstructions.fertilizing?.npkRatio || '20-20-20'}</p>
+                            <p><strong>Schedule:</strong> {careInstructions.fertilizing?.seasonalSchedule || 'Spring through fall'}</p>
                           </div>
                         </div>
+
+                        {/* Pruning */}
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-gray-800 flex items-center">
+                            <div className="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
+                            Pruning & Maintenance
+                          </h4>
+                          <div className="text-sm text-gray-600 space-y-1">
+                            <p><strong>Timing:</strong> {careInstructions.pruning?.timing || 'Spring before new growth'}</p>
+                            <p><strong>Method:</strong> {careInstructions.pruning?.method || 'Clean cuts with sterilized tools'}</p>
+                            <p><strong>Frequency:</strong> {careInstructions.pruning?.frequency || 'As needed'}</p>
+                            {careInstructions.pruning?.purpose && (
+                              <p><strong>Purpose:</strong> {careInstructions.pruning.purpose.join(', ')}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Repotting */}
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-gray-800 flex items-center">
+                            <div className="w-4 h-4 bg-teal-500 rounded-full mr-2"></div>
+                            Repotting
+                          </h4>
+                          <div className="text-sm text-gray-600 space-y-1">
+                            <p><strong>Frequency:</strong> {careInstructions.repotting?.frequency || 'Every 2-3 years'}</p>
+                            <p><strong>Best Time:</strong> {careInstructions.repotting?.timing || 'Early spring'}</p>
+                            <p><strong>Container Size:</strong> {careInstructions.repotting?.containerSize || '1-2 inches larger'}</p>
+                            {careInstructions.repotting?.signs && (
+                              <div>
+                                <strong>Signs to Repot:</strong>
+                                <ul className="list-disc list-inside mt-1">
+                                  {careInstructions.repotting.signs.map((sign, index) => (
+                                    <li key={index}>{sign}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Watering Signs */}
+                  {careInstructions.watering?.signs && (
+                    <Card className="bg-blue-50 border-blue-100">
+                      <CardContent className="p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4">Watering Signs to Watch</h3>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <h4 className="font-medium text-red-600 mb-2">Overwatering Signs</h4>
+                            <ul className="text-sm text-gray-600 space-y-1">
+                              {careInstructions.watering.signs.overwatering?.map((sign, index) => (
+                                <li key={index} className="flex items-start">
+                                  <span className="text-red-500 mr-2">•</span>
+                                  {sign}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-yellow-600 mb-2">Underwatering Signs</h4>
+                            <ul className="text-sm text-gray-600 space-y-1">
+                              {careInstructions.watering.signs.underwatering?.map((sign, index) => (
+                                <li key={index} className="flex items-start">
+                                  <span className="text-yellow-500 mr-2">•</span>
+                                  {sign}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Growth Characteristics */}
+                  {growthCharacteristics.matureSize && (
+                    <Card className="bg-green-50 border-green-100">
+                      <CardContent className="p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4">Growth Information</h3>
+                        <div className="grid md:grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <p className="font-medium text-gray-700">Mature Size</p>
+                            <p className="text-gray-600">Height: {growthCharacteristics.matureSize.height}</p>
+                            <p className="text-gray-600">Width: {growthCharacteristics.matureSize.width}</p>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-700">Growth Rate</p>
+                            <p className="text-gray-600">{growthCharacteristics.growthRate}</p>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-700">Lifespan</p>
+                            <p className="text-gray-600">{growthCharacteristics.lifespan}</p>
+                          </div>
+                          {growthCharacteristics.bloomingPeriod && (
+                            <div>
+                              <p className="font-medium text-gray-700">Blooming</p>
+                              <p className="text-gray-600">{growthCharacteristics.bloomingPeriod}</p>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Species Information */}
+                  <Card className="bg-gray-50">
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold text-gray-900 mb-4">Plant Information</h3>
+                      <div className="grid md:grid-cols-2 gap-4 text-sm">
+                        <div className="space-y-2">
+                          <p><strong>Family:</strong> {species.family}</p>
+                          <p><strong>Genus:</strong> {species.genus}</p>
+                          <p><strong>Plant Type:</strong> {species.plantType}</p>
+                          <p><strong>Native Region:</strong> {species.nativeRegion}</p>
+                        </div>
+                        {species.alternativeNames.length > 0 && (
+                          <div>
+                            <p className="font-medium text-gray-700 mb-2">Alternative Names</p>
+                            <div className="flex flex-wrap gap-1">
+                              {species.alternativeNames.map((name, index) => (
+                                <Badge key={index} variant="secondary" className="text-xs">
+                                  {name}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -266,125 +418,392 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
                       <h3 className="font-semibold text-gray-900 mb-4">Quick Reference</h3>
                       <div className="space-y-3">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Difficulty</span>
-                          <span className="font-medium text-green-600">
-                            {carePlan.plant_info?.difficulty || 'Moderate'}
+                          <span className="text-gray-600">Watering</span>
+                          <span className="font-medium text-blue-600">
+                            {careInstructions.watering?.frequency || 'Weekly'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Light Level</span>
+                          <span className="font-medium">
+                            {careInstructions.lighting?.requirement || 'Bright Indirect'}
                           </span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Growth Rate</span>
                           <span className="font-medium">
-                            {carePlan.plant_info?.growthRate || 'Medium'}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Pet Safe</span>
-                          <span className={`font-medium ${carePlan.plant_info?.petSafe ? 'text-green-600' : 'text-red-600'}`}>
-                            {carePlan.plant_info?.petSafe ? 'Yes' : 'No'}
+                            {growthCharacteristics.growthRate || 'Medium'}
                           </span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Mature Size</span>
                           <span className="font-medium">
-                            {carePlan.plant_info?.matureSize || '6-10 ft'}
+                            {growthCharacteristics.matureSize?.height || 'Varies'}
                           </span>
                         </div>
+                        {toxicity && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Toxicity</span>
+                            <span className={`font-medium ${toxicity.level === 'Non-toxic' ? 'text-green-600' : 'text-red-600'}`}>
+                              {toxicity.level}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-                    <CardContent className="p-6">
-                      <h3 className="font-semibold text-gray-900 mb-3">Care Reminders</h3>
-                      <div className="space-y-3">
-                        {carePlan.care_reminders?.map((reminder: any, index: number) => (
-                          <div key={index} className="flex items-center space-x-3 text-sm">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span className="text-gray-700">{reminder.message}</span>
+                  {/* Propagation Guide */}
+                  {propagation.methods && propagation.methods.length > 0 && (
+                    <Card className="bg-purple-50 border-purple-100">
+                      <CardContent className="p-6">
+                        <h3 className="font-semibold text-gray-900 mb-3">Propagation Methods</h3>
+                        <div className="space-y-3">
+                          {propagation.methods.map((method, index) => (
+                            <div key={index} className="border-l-4 border-purple-500 pl-3">
+                              <div className="flex justify-between items-start mb-1">
+                                <h4 className="font-medium text-gray-800">{method.type}</h4>
+                                <Badge variant={method.difficulty === 'Easy' ? 'default' : method.difficulty === 'Medium' ? 'secondary' : 'destructive'}>
+                                  {method.difficulty}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-gray-600 mb-1">{method.instructions}</p>
+                              <p className="text-xs text-purple-600">Best time: {method.timing}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Companion Plants */}
+                  {companionPlants.length > 0 && (
+                    <Card className="bg-green-50 border-green-100">
+                      <CardContent className="p-6">
+                        <h3 className="font-semibold text-gray-900 mb-3">Companion Plants</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {companionPlants.map((plant, index) => (
+                            <Badge key={index} variant="outline" className="border-green-300 text-green-700">
+                              {plant}
+                            </Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Toxicity Warning */}
+                  {toxicity && toxicity.level !== 'Non-toxic' && (
+                    <Card className="bg-red-50 border-red-200">
+                      <CardContent className="p-6">
+                        <div className="flex items-center mb-3">
+                          <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
+                          <h3 className="font-semibold text-red-800">Toxicity Warning</h3>
+                        </div>
+                        <p className="text-sm text-red-700 mb-2">
+                          <strong>Level:</strong> {toxicity.level}
+                        </p>
+                        <p className="text-sm text-red-700 mb-2">
+                          <strong>Affects:</strong> {toxicity.affectedParties.join(', ')}
+                        </p>
+                        {toxicity.symptoms.length > 0 && (
+                          <div className="text-sm text-red-700">
+                            <strong>Symptoms:</strong> {toxicity.symptoms.join(', ')}
                           </div>
-                        )) || (
-                          <>
-                            <div className="flex items-center space-x-3 text-sm">
-                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              <span className="text-gray-700">Next watering in 5 days</span>
-                            </div>
-                            <div className="flex items-center space-x-3 text-sm">
-                              <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                              <span className="text-gray-700">Fertilize in 2 weeks</span>
-                            </div>
-                            <div className="flex items-center space-x-3 text-sm">
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                              <span className="text-gray-700">Check humidity levels</span>
-                            </div>
-                          </>
                         )}
-                      </div>
-                      <Button className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white text-sm py-2 rounded-lg transition-colors">
-                        Set Reminders
-                      </Button>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
               </div>
             </TabsContent>
 
             <TabsContent value="diseases" className="p-6">
               <div className="space-y-6">
-                {diseases.diseases && diseases.diseases.length > 0 ? (
-                  <>
-                    <div className="mb-6">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Health Assessment</h3>
-                      <p className="text-gray-600">
-                        Overall Status: <span className="font-medium">{diseases.overall_health_status}</span>
-                      </p>
-                      {diseases.urgent_actions_needed && (
-                        <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                          <div className="flex items-center">
-                            <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
-                            <span className="text-red-800 font-medium">Urgent action needed</span>
-                          </div>
-                        </div>
-                      )}
+                {/* Overall Health Status */}
+                <Card className={`border-l-4 ${healthAssessment.isHealthy ? 'border-l-green-500 bg-green-50' : 'border-l-yellow-500 bg-yellow-50'}`}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-semibold text-gray-900">Overall Plant Health</h3>
+                      <Badge variant={healthAssessment.isHealthy ? 'default' : 'secondary'} className={healthAssessment.isHealthy ? 'bg-green-500' : 'bg-yellow-500'}>
+                        {healthAssessment.isHealthy ? 'Healthy' : 'Needs Attention'}
+                      </Badge>
                     </div>
-                    
-                    {diseases.diseases.map((disease: any, index: number) => (
-                      <Card key={index} className="border-l-4 border-l-red-500">
+                    <p className="text-gray-600">
+                      {healthAssessment.overallHealth || 'Health assessment completed.'}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Diseases */}
+                {healthAssessment.diseases && healthAssessment.diseases.length > 0 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Disease Detection</h4>
+                    {healthAssessment.diseases.map((disease: any, index: number) => (
+                      <Card key={index} className="border-l-4 border-l-red-500 bg-red-50">
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between mb-4">
-                            <h4 className="text-lg font-semibold text-gray-900">{disease.name}</h4>
-                            <Badge variant="destructive">{disease.severity}</Badge>
+                            <h5 className="text-lg font-semibold text-gray-900">{disease.name}</h5>
+                            <Badge variant="destructive">{disease.severity || 'Moderate'}</Badge>
                           </div>
                           <p className="text-gray-600 mb-4">{disease.description}</p>
                           
-                          {disease.symptoms && (
+                          {disease.treatment && (
+                            <div className="bg-white p-4 rounded-lg border">
+                              <h6 className="font-medium text-gray-900 mb-2">Treatment</h6>
+                              <p className="text-sm text-gray-600">{disease.treatment}</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Pest Issues */}
+                {healthAssessment.pests && healthAssessment.pests.length > 0 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Pest Issues</h4>
+                    {healthAssessment.pests.map((pest: any, index: number) => (
+                      <Card key={index} className="border-l-4 border-l-orange-500 bg-orange-50">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <h5 className="text-lg font-semibold text-gray-900">{pest.name}</h5>
+                            <Badge variant="secondary" className="bg-orange-500 text-white">{pest.severity || 'Moderate'}</Badge>
+                          </div>
+                          <p className="text-gray-600 mb-4">{pest.description}</p>
+                          
+                          {pest.treatment && (
+                            <div className="bg-white p-4 rounded-lg border">
+                              <h6 className="font-medium text-gray-900 mb-2">Treatment</h6>
+                              <p className="text-sm text-gray-600">{pest.treatment}</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Nutritional Deficiencies */}
+                {healthAssessment.nutritionalDeficiencies && healthAssessment.nutritionalDeficiencies.length > 0 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Nutritional Deficiencies</h4>
+                    {healthAssessment.nutritionalDeficiencies.map((deficiency: any, index: number) => (
+                      <Card key={index} className="border-l-4 border-l-purple-500 bg-purple-50">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <h5 className="text-lg font-semibold text-gray-900">{deficiency.nutrient} Deficiency</h5>
+                            <Badge variant="secondary" className="bg-purple-500 text-white">{deficiency.severity || 'Moderate'}</Badge>
+                          </div>
+                          <p className="text-gray-600 mb-4">{deficiency.symptoms}</p>
+                          
+                          {deficiency.treatment && (
+                            <div className="bg-white p-4 rounded-lg border">
+                              <h6 className="font-medium text-gray-900 mb-2">Treatment</h6>
+                              <p className="text-sm text-gray-600">{deficiency.treatment}</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Environmental Stress */}
+                {healthAssessment.environmentalStress && healthAssessment.environmentalStress.length > 0 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Environmental Stress</h4>
+                    {healthAssessment.environmentalStress.map((stress: any, index: number) => (
+                      <Card key={index} className="border-l-4 border-l-blue-500 bg-blue-50">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <h5 className="text-lg font-semibold text-gray-900">{stress.type}</h5>
+                            <Badge variant="secondary" className="bg-blue-500 text-white">{stress.severity || 'Moderate'}</Badge>
+                          </div>
+                          <p className="text-gray-600 mb-4">{stress.description}</p>
+                          
+                          {stress.solution && (
+                            <div className="bg-white p-4 rounded-lg border">
+                              <h6 className="font-medium text-gray-900 mb-2">Solution</h6>
+                              <p className="text-sm text-gray-600">{stress.solution}</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Recommendations */}
+                {recommendations.length > 0 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Recommendations</h4>
+                    <div className="grid gap-4">
+                      {recommendations.map((rec: any, index: number) => (
+                        <Card key={index} className={`border-l-4 ${rec.priority === 'High' ? 'border-l-red-500' : rec.priority === 'Medium' ? 'border-l-yellow-500' : 'border-l-green-500'}`}>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between mb-2">
+                              <h6 className="font-medium text-gray-900">{rec.category}</h6>
+                              <Badge variant={rec.priority === 'High' ? 'destructive' : rec.priority === 'Medium' ? 'secondary' : 'default'}>
+                                {rec.priority} Priority
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{rec.action}</p>
+                            <p className="text-xs text-gray-500">{rec.reason}</p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Common Problems */}
+                {commonProblems.length > 0 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Common Problems & Solutions</h4>
+                    {commonProblems.map((problem: any, index: number) => (
+                      <Card key={index} className="bg-gray-50">
+                        <CardContent className="p-6">
+                          <h5 className="font-semibold text-gray-900 mb-3">{problem.problem}</h5>
+                          
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                              <h6 className="font-medium text-gray-700 mb-2">Common Causes</h6>
+                              <ul className="text-sm text-gray-600 space-y-1">
+                                {problem.causes.map((cause: string, causeIndex: number) => (
+                                  <li key={causeIndex} className="flex items-start">
+                                    <span className="text-red-500 mr-2">•</span>
+                                    {cause}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            
+                            <div>
+                              <h6 className="font-medium text-gray-700 mb-2">Solutions</h6>
+                              <ul className="text-sm text-gray-600 space-y-1">
+                                {problem.solutions.map((solution: string, solutionIndex: number) => (
+                                  <li key={solutionIndex} className="flex items-start">
+                                    <span className="text-green-500 mr-2">•</span>
+                                    {solution}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* No Issues Found */}
+                {healthAssessment.isHealthy && 
+                 (!healthAssessment.diseases || healthAssessment.diseases.length === 0) &&
+                 (!healthAssessment.pests || healthAssessment.pests.length === 0) &&
+                 (!healthAssessment.nutritionalDeficiencies || healthAssessment.nutritionalDeficiencies.length === 0) &&
+                 (!healthAssessment.environmentalStress || healthAssessment.environmentalStress.length === 0) && (
+                  <Card className="bg-green-50 border-green-200">
+                    <CardContent className="p-6 text-center">
+                      <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                      <h4 className="text-lg font-semibold text-green-800 mb-2">Plant Looks Healthy!</h4>
+                      <p className="text-green-600">
+                        No significant health issues detected. Continue with regular care routine.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="seasonal" className="p-6">
+              <div className="space-y-6">
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Seasonal Care Calendar</h3>
+                  <p className="text-gray-600">Follow this seasonal guide to keep your plant healthy year-round.</p>
+                </div>
+
+                {seasonalCalendar.length > 0 ? (
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {seasonalCalendar.map((season, index) => (
+                      <Card key={index} className={`border-l-4 ${
+                        season.season === 'Spring' ? 'border-l-green-500 bg-green-50' :
+                        season.season === 'Summer' ? 'border-l-yellow-500 bg-yellow-50' :
+                        season.season === 'Fall' ? 'border-l-orange-500 bg-orange-50' :
+                        'border-l-blue-500 bg-blue-50'
+                      }`}>
+                        <CardContent className="p-6">
+                          <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            {season.season === 'Spring' && '🌱'}
+                            {season.season === 'Summer' && '☀️'}
+                            {season.season === 'Fall' && '🍂'}
+                            {season.season === 'Winter' && '❄️'}
+                            <span className="ml-2">{season.season}</span>
+                          </h4>
+                          
+                          {season.tasks && season.tasks.length > 0 && (
                             <div className="mb-4">
-                              <h5 className="font-medium text-gray-900 mb-2">Symptoms:</h5>
-                              <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                                {disease.symptoms.map((symptom: string, idx: number) => (
-                                  <li key={idx}>{symptom}</li>
+                              <h5 className="font-medium text-gray-800 mb-2">Care Tasks</h5>
+                              <ul className="text-sm text-gray-600 space-y-1">
+                                {season.tasks.map((task, taskIndex) => (
+                                  <li key={taskIndex} className="flex items-start">
+                                    <span className="text-green-500 mr-2">✓</span>
+                                    {task}
+                                  </li>
                                 ))}
                               </ul>
                             </div>
                           )}
                           
-                          {disease.treatment && (
-                            <div className="mb-4">
-                              <h5 className="font-medium text-gray-900 mb-2">Treatment:</h5>
-                              {disease.treatment.immediate_actions && (
-                                <div className="mb-2">
-                                  <h6 className="text-sm font-medium text-gray-900">Immediate Actions:</h6>
-                                  <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                                    {disease.treatment.immediate_actions.map((action: string, idx: number) => (
-                                      <li key={idx}>{action}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
+                          {season.expectations && season.expectations.length > 0 && (
+                            <div>
+                              <h5 className="font-medium text-gray-800 mb-2">What to Expect</h5>
+                              <ul className="text-sm text-gray-600 space-y-1">
+                                {season.expectations.map((expectation, expIndex) => (
+                                  <li key={expIndex} className="flex items-start">
+                                    <span className="text-blue-500 mr-2">•</span>
+                                    {expectation}
+                                  </li>
+                                ))}
+                              </ul>
                             </div>
                           )}
-                          
-                          {disease.recovery_timeline && (
-                            <div className="text-sm text-gray-600">
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="bg-gray-50">
+                    <CardContent className="p-6 text-center">
+                      <div className="text-gray-400 mb-4">📅</div>
+                      <h4 className="text-lg font-semibold text-gray-700 mb-2">Seasonal Care Calendar</h4>
+                      <p className="text-gray-600 mb-4">
+                        A seasonal care schedule will help you provide the best care for your plant throughout the year.
+                      </p>
+                      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                        <div className="p-3 bg-white rounded-lg border">
+                          <h5 className="font-medium text-green-600 mb-1">🌱 Spring</h5>
+                          <p className="text-gray-600">Resume growth care, increase watering, begin fertilizing</p>
+                        </div>
+                        <div className="p-3 bg-white rounded-lg border">
+                          <h5 className="font-medium text-yellow-600 mb-1">☀️ Summer</h5>
+                          <p className="text-gray-600">Peak growing season, regular feeding, monitor water needs</p>
+                        </div>
+                        <div className="p-3 bg-white rounded-lg border">
+                          <h5 className="font-medium text-orange-600 mb-1">🍂 Fall</h5>
+                          <p className="text-gray-600">Prepare for dormancy, reduce fertilizing, adjust watering</p>
+                        </div>
+                        <div className="p-3 bg-white rounded-lg border">
+                          <h5 className="font-medium text-blue-600 mb-1">❄️ Winter</h5>
+                          <p className="text-gray-600">Dormant period, minimal watering, stop fertilizing</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </TabsContent>
                               <span className="font-medium">Recovery Timeline:</span> {disease.recovery_timeline}
                             </div>
                           )}
