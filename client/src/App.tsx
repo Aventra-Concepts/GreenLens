@@ -34,6 +34,20 @@ import EbookDetail from "@/pages/ebook-detail";
 import AuthorRegistration from "@/pages/author-registration";
 import StudentVerification from "@/pages/student-verification-new";
 
+// E-book Category Pages
+import GardeningBasicsPage from "@/pages/categories/gardening-basics";
+import PlantCarePage from "@/pages/categories/plant-care";
+import OrganicFarmingPage from "@/pages/categories/organic-farming";
+import IndoorPlantsPage from "@/pages/categories/indoor-plants";
+import HerbsAndVegetablesPage from "@/pages/categories/herbs-and-vegetables";
+import FlowerGardeningPage from "@/pages/categories/flower-gardening";
+import LandscapingPage from "@/pages/categories/landscaping";
+import PestManagementPage from "@/pages/categories/pest-management";
+import SeasonalGardeningPage from "@/pages/categories/seasonal-gardening";
+import GardenToolsPage from "@/pages/categories/garden-tools";
+import BotanyAndSciencePage from "@/pages/categories/botany-and-science";
+import PermaculturePage from "@/pages/categories/permaculture";
+
 function Router() {
   const { user, isLoading } = useAuth();
 
@@ -80,6 +94,21 @@ function Router() {
       <Route path="/ebooks/:id">
         {(params) => <EbookDetail id={params.id} />}
       </Route>
+      
+      {/* E-book Category Routes */}
+      <Route path="/categories/gardening-basics" component={GardeningBasicsPage} />
+      <Route path="/categories/plant-care" component={PlantCarePage} />
+      <Route path="/categories/organic-farming" component={OrganicFarmingPage} />
+      <Route path="/categories/indoor-plants" component={IndoorPlantsPage} />
+      <Route path="/categories/herbs-and-vegetables" component={HerbsAndVegetablesPage} />
+      <Route path="/categories/flower-gardening" component={FlowerGardeningPage} />
+      <Route path="/categories/landscaping" component={LandscapingPage} />
+      <Route path="/categories/pest-management" component={PestManagementPage} />
+      <Route path="/categories/seasonal-gardening" component={SeasonalGardeningPage} />
+      <Route path="/categories/garden-tools" component={GardenToolsPage} />
+      <Route path="/categories/botany-and-science" component={BotanyAndSciencePage} />
+      <Route path="/categories/permaculture" component={PermaculturePage} />
+      
       <Route path="/author-upload" component={AuthorUpload} />
       <Route path="/student-registration" component={StudentRegistration} />
       <Route path="/author-registration" component={AuthorRegistration} />
