@@ -5,71 +5,73 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { 
   UserPlus, 
-  Users, 
+  Edit, 
+  Trash2, 
   Building, 
-  TrendingUp, 
-  Activity,
-  Edit,
-  Trash2,
-  Shield,
-  Mail,
+  User, 
+  Calendar, 
+  DollarSign,
   Phone,
-  Calendar,
-  DollarSign
+  Mail,
+  Shield,
+  Users,
+  Search,
+  Filter,
+  Download
 } from "lucide-react";
 
 interface Employee {
   id: string;
   userId: string;
   employeeId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
   department: string;
   position: string;
+  salary: number;
   hireDate: string;
+  terminationDate?: string;
   isActive: boolean;
-  salary?: number;
   phoneNumber?: string;
-  managerId?: string;
-  managerName?: string;
+  skills: string[];
+  certifications: string[];
+  user: {
+    email: string;
+    firstName: string;
+    lastName: string;
+  };
 }
 
-interface OnboardingForm {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  department: string;
-  position: string;
-  salary: string;
-  phoneNumber: string;
-  managerId: string;
+interface Role {
+  id: string;
+  name: string;
+  description: string;
   permissions: string[];
 }
 
 export default function EmployeeManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-  const [onboardingForm, setOnboardingForm] = useState<OnboardingForm>({
+  const [searchTerm, setSearchTerm] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({
+    email: "",
     firstName: "",
     lastName: "",
-    email: "",
-    password: "",
     department: "",
     position: "",
     salary: "",
+    hireDate: "",
     phoneNumber: "",
-    managerId: "",
-    permissions: []
+    skills: "",
+    certifications: ""
   });
 
   // Fetch employees
@@ -77,58 +79,50 @@ export default function EmployeeManagement() {
     queryKey: ["/api/admin/employees"],
   });
 
-  // Fetch department stats
-  const { data: departmentStats } = useQuery({
-    queryKey: ["/api/admin/employees/department-stats"],
+  // Fetch roles
+  const { data: roles = [] } = useQuery<Role[]>({
+    queryKey: ["/api/admin/roles"],
   });
 
-  // Fetch employee hierarchy
-  const { data: hierarchy } = useQuery({
-    queryKey: ["/api/admin/employees/hierarchy"],
-  });
-
-  // Onboard employee mutation
-  const onboardMutation = useMutation({
-    mutationFn: async (data: OnboardingForm) => {
-      const response = await apiRequest('POST', '/api/admin/employees/onboard', {
-        ...data,
-        salary: parseFloat(data.salary) || undefined
-      });
+  // Add employee mutation
+  const addEmployeeMutation = useMutation({
+    mutationFn: async (employeeData: any) => {
+      const response = await apiRequest('POST', '/api/admin/employees', employeeData);
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/employees"] });
-      setShowOnboarding(false);
-      setOnboardingForm({
+      setIsAddDialogOpen(false);
+      setNewEmployee({
+        email: "",
         firstName: "",
         lastName: "",
-        email: "",
-        password: "",
         department: "",
         position: "",
         salary: "",
+        hireDate: "",
         phoneNumber: "",
-        managerId: "",
-        permissions: []
+        skills: "",
+        certifications: ""
       });
       toast({
-        title: "Employee Onboarded",
-        description: "New employee has been successfully onboarded",
+        title: "Employee Added",
+        description: "New employee has been successfully added",
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Onboarding Failed",
-        description: error.message,
+        title: "Error",
+        description: error.message || "Failed to add employee",
         variant: "destructive",
       });
-    },
+    }
   });
 
   // Update employee mutation
-  const updateMutation = useMutation({
+  const updateEmployeeMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
-      const response = await apiRequest('PUT', `/api/admin/employees/${id}`, updates);
+      const response = await apiRequest('PATCH', `/api/admin/employees/${id}`, updates);
       return response.json();
     },
     onSuccess: () => {
@@ -138,436 +132,362 @@ export default function EmployeeManagement() {
         description: "Employee information has been updated",
       });
     },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update employee",
+        variant: "destructive",
+      });
+    }
   });
 
-  // Terminate employee mutation
-  const terminateMutation = useMutation({
-    mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
-      const response = await apiRequest('POST', `/api/admin/employees/${id}/terminate`, {
-        terminationDate: new Date().toISOString(),
-        reason
+  // Deactivate employee mutation
+  const deactivateEmployeeMutation = useMutation({
+    mutationFn: async (employeeId: string) => {
+      const response = await apiRequest('PATCH', `/api/admin/employees/${employeeId}`, {
+        isActive: false,
+        terminationDate: new Date().toISOString()
       });
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/employees"] });
       toast({
-        title: "Employee Terminated",
-        description: "Employee has been terminated",
+        title: "Employee Deactivated",
+        description: "Employee has been deactivated",
       });
     },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to deactivate employee",
+        variant: "destructive",
+      });
+    }
   });
 
-  const handleOnboardingSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onboardMutation.mutate(onboardingForm);
+  const handleAddEmployee = () => {
+    const employeeData = {
+      ...newEmployee,
+      salary: parseFloat(newEmployee.salary),
+      skills: newEmployee.skills.split(',').map(s => s.trim()).filter(s => s),
+      certifications: newEmployee.certifications.split(',').map(c => c.trim()).filter(c => c)
+    };
+    addEmployeeMutation.mutate(employeeData);
   };
 
-  const handleInputChange = (field: keyof OnboardingForm, value: string | string[]) => {
-    setOnboardingForm(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  const filteredEmployees = employees.filter(employee => {
+    const matchesSearch = 
+      employee.user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.position.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesDepartment = departmentFilter === "all" || employee.department === departmentFilter;
+    
+    return matchesSearch && matchesDepartment;
+  });
 
-  const departments = ["Engineering", "Marketing", "Sales", "Support", "HR", "Finance", "Operations"];
-  const positions = ["Manager", "Senior Developer", "Developer", "Analyst", "Specialist", "Coordinator"];
-  const permissions = ["admin", "moderator", "analytics", "user_management", "content_management"];
+  const departments = Array.from(new Set(employees.map(emp => emp.department)));
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Employee Management</h2>
-          <p className="text-gray-600">Manage employees, roles, and organizational structure</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Employee Management</h2>
+          <p className="text-gray-600 dark:text-gray-400">Manage your team and organizational structure</p>
         </div>
-        <Button
-          onClick={() => setShowOnboarding(true)}
-          className="flex items-center gap-2"
-          data-testid="add-employee-button"
-        >
-          <UserPlus className="w-4 h-4" />
-          Onboard Employee
-        </Button>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="flex items-center gap-2" data-testid="add-employee-button">
+              <UserPlus className="w-4 h-4" />
+              Add Employee
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Add New Employee</DialogTitle>
+              <DialogDescription>
+                Create a new employee record and set up their account
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    value={newEmployee.firstName}
+                    onChange={(e) => setNewEmployee(prev => ({ ...prev, firstName: e.target.value }))}
+                    data-testid="employee-first-name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    value={newEmployee.lastName}
+                    onChange={(e) => setNewEmployee(prev => ({ ...prev, lastName: e.target.value }))}
+                    data-testid="employee-last-name"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={newEmployee.email}
+                  onChange={(e) => setNewEmployee(prev => ({ ...prev, email: e.target.value }))}
+                  data-testid="employee-email"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="department">Department</Label>
+                  <Input
+                    id="department"
+                    value={newEmployee.department}
+                    onChange={(e) => setNewEmployee(prev => ({ ...prev, department: e.target.value }))}
+                    data-testid="employee-department"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="position">Position</Label>
+                  <Input
+                    id="position"
+                    value={newEmployee.position}
+                    onChange={(e) => setNewEmployee(prev => ({ ...prev, position: e.target.value }))}
+                    data-testid="employee-position"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="salary">Salary</Label>
+                  <Input
+                    id="salary"
+                    type="number"
+                    value={newEmployee.salary}
+                    onChange={(e) => setNewEmployee(prev => ({ ...prev, salary: e.target.value }))}
+                    data-testid="employee-salary"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="hireDate">Hire Date</Label>
+                  <Input
+                    id="hireDate"
+                    type="date"
+                    value={newEmployee.hireDate}
+                    onChange={(e) => setNewEmployee(prev => ({ ...prev, hireDate: e.target.value }))}
+                    data-testid="employee-hire-date"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <Input
+                  id="phoneNumber"
+                  value={newEmployee.phoneNumber}
+                  onChange={(e) => setNewEmployee(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                  data-testid="employee-phone"
+                />
+              </div>
+              <div>
+                <Label htmlFor="skills">Skills (comma-separated)</Label>
+                <Input
+                  id="skills"
+                  value={newEmployee.skills}
+                  onChange={(e) => setNewEmployee(prev => ({ ...prev, skills: e.target.value }))}
+                  placeholder="React, Node.js, Python"
+                  data-testid="employee-skills"
+                />
+              </div>
+              <div>
+                <Label htmlFor="certifications">Certifications (comma-separated)</Label>
+                <Input
+                  id="certifications"
+                  value={newEmployee.certifications}
+                  onChange={(e) => setNewEmployee(prev => ({ ...prev, certifications: e.target.value }))}
+                  placeholder="AWS Certified, Scrum Master"
+                  data-testid="employee-certifications"
+                />
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button 
+                  onClick={handleAddEmployee}
+                  disabled={addEmployeeMutation.isPending}
+                  className="flex-1"
+                  data-testid="save-employee-button"
+                >
+                  {addEmployeeMutation.isPending ? "Adding..." : "Add Employee"}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsAddDialogOpen(false)}
+                  data-testid="cancel-employee-button"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      <Tabs defaultValue="employees" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="employees" className="flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            Employees
-          </TabsTrigger>
-          <TabsTrigger value="departments" className="flex items-center gap-2">
-            <Building className="w-4 h-4" />
-            Departments
-          </TabsTrigger>
-          <TabsTrigger value="hierarchy" className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4" />
-            Hierarchy
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2">
-            <Activity className="w-4 h-4" />
-            Analytics
-          </TabsTrigger>
-        </TabsList>
+      {/* Filters and Search */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Search className="w-5 h-5" />
+            Search & Filter
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <Input
+                placeholder="Search employees..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full"
+                data-testid="employee-search"
+              />
+            </div>
+            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+              <SelectTrigger className="w-48" data-testid="department-filter">
+                <SelectValue placeholder="Filter by department" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Departments</SelectItem>
+                {departments.map(dept => (
+                  <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button variant="outline" className="flex items-center gap-2" data-testid="export-employees">
+              <Download className="w-4 h-4" />
+              Export
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Employee List */}
-        <TabsContent value="employees">
+      {/* Employee List */}
+      <div className="grid gap-6">
+        {employeesLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full" />
+          </div>
+        ) : filteredEmployees.length === 0 ? (
           <Card>
-            <CardHeader>
-              <CardTitle>All Employees</CardTitle>
-              <CardDescription>
-                Manage employee accounts and access permissions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {employeesLoading ? (
-                <div className="space-y-4">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="flex items-center justify-between p-4 border rounded-lg animate-pulse">
-                      <div className="space-y-2">
-                        <div className="h-4 bg-gray-200 rounded w-48" />
-                        <div className="h-3 bg-gray-200 rounded w-32" />
+            <CardContent className="py-8 text-center">
+              <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No employees found</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {searchTerm || departmentFilter !== "all" 
+                  ? "Try adjusting your search or filters" 
+                  : "Add your first employee to get started"}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4">
+            {filteredEmployees.map((employee) => (
+              <Card key={employee.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                        <User className="w-6 h-6 text-green-600" />
                       </div>
-                      <div className="h-8 bg-gray-200 rounded w-20" />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {employees.map((employee) => (
-                    <div
-                      key={employee.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
-                      data-testid={`employee-${employee.id}`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold">
-                              {employee.firstName} {employee.lastName}
-                            </h3>
-                            <Badge variant={employee.isActive ? "default" : "secondary"}>
-                              {employee.isActive ? "Active" : "Inactive"}
-                            </Badge>
-                          </div>
-                          <div className="text-sm text-gray-600 space-y-1">
-                            <div className="flex items-center gap-4">
-                              <span className="flex items-center gap-1">
-                                <Mail className="w-3 h-3" />
-                                {employee.email}
-                              </span>
-                              {employee.phoneNumber && (
-                                <span className="flex items-center gap-1">
-                                  <Phone className="w-3 h-3" />
-                                  {employee.phoneNumber}
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <span>{employee.position} • {employee.department}</span>
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                Joined {new Date(employee.hireDate).toLocaleDateString()}
-                              </span>
-                              {employee.salary && (
-                                <span className="flex items-center gap-1">
-                                  <DollarSign className="w-3 h-3" />
-                                  {employee.salary.toLocaleString()}
-                                </span>
-                              )}
-                            </div>
-                            {employee.managerName && (
-                              <div className="text-xs text-gray-500">
-                                Reports to: {employee.managerName}
-                              </div>
-                            )}
-                          </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          {employee.user.firstName} {employee.user.lastName}
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400">{employee.position}</p>
+                        <div className="flex items-center gap-4 mt-2 text-sm">
+                          <span className="flex items-center gap-1">
+                            <Building className="w-4 h-4" />
+                            {employee.department}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Mail className="w-4 h-4" />
+                            {employee.user.email}
+                          </span>
+                          {employee.phoneNumber && (
+                            <span className="flex items-center gap-1">
+                              <Phone className="w-4 h-4" />
+                              {employee.phoneNumber}
+                            </span>
+                          )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={employee.isActive ? "default" : "secondary"}>
+                        {employee.isActive ? "Active" : "Inactive"}
+                      </Badge>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedEmployee(employee)}
+                        data-testid={`edit-employee-${employee.id}`}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      {employee.isActive && (
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setSelectedEmployee(employee)}
-                          data-testid={`edit-employee-${employee.id}`}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => terminateMutation.mutate({ 
-                            id: employee.id, 
-                            reason: "Administrative termination" 
-                          })}
-                          className="text-red-600 hover:text-red-700"
-                          data-testid={`terminate-employee-${employee.id}`}
+                          onClick={() => deactivateEmployeeMutation.mutate(employee.id)}
+                          data-testid={`deactivate-employee-${employee.id}`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Employee Details */}
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-500">Employee ID:</span>
+                        <p className="font-medium">{employee.employeeId}</p>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Department Overview */}
-        <TabsContent value="departments">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {departmentStats ? Object.entries(departmentStats).map(([dept, stats]: [string, any]) => (
-              <Card key={dept}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building className="w-5 h-5" />
-                    {dept}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Total Employees:</span>
-                      <span className="font-semibold">{stats.total}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Active:</span>
-                      <span className="font-semibold text-green-600">{stats.active}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Terminated:</span>
-                      <span className="font-semibold text-red-600">{stats.terminated}</span>
-                    </div>
-                    <div className="mt-4">
-                      <div className="text-sm text-gray-600 mb-2">Positions:</div>
-                      <div className="flex flex-wrap gap-1">
-                        {stats.positions.map((position: string) => (
-                          <Badge key={position} variant="outline" className="text-xs">
-                            {position}
-                          </Badge>
-                        ))}
+                      <div>
+                        <span className="text-gray-500">Hire Date:</span>
+                        <p className="font-medium">{new Date(employee.hireDate).toLocaleDateString()}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Salary:</span>
+                        <p className="font-medium">${employee.salary?.toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Skills:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {employee.skills?.slice(0, 3).map(skill => (
+                            <Badge key={skill} variant="outline" className="text-xs">
+                              {skill}
+                            </Badge>
+                          ))}
+                          {employee.skills?.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{employee.skills.length - 3} more
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-            )) : (
-              <div className="col-span-3 text-center py-8 text-gray-500">
-                Loading department statistics...
-              </div>
-            )}
+            ))}
           </div>
-        </TabsContent>
-
-        {/* Organizational Hierarchy */}
-        <TabsContent value="hierarchy">
-          <Card>
-            <CardHeader>
-              <CardTitle>Organizational Hierarchy</CardTitle>
-              <CardDescription>
-                View reporting structure and management levels
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                Organizational hierarchy visualization coming soon...
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Employee Analytics */}
-        <TabsContent value="analytics">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Employee Metrics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-gray-500">
-                  Employee analytics dashboard coming soon...
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Trends</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-gray-500">
-                  Performance tracking coming soon...
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      {/* Employee Onboarding Modal */}
-      {showOnboarding && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4">
-            <CardHeader>
-              <CardTitle>Employee Onboarding</CardTitle>
-              <CardDescription>
-                Add a new employee and set up their account
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleOnboardingSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      value={onboardingForm.firstName}
-                      onChange={(e) => handleInputChange("firstName", e.target.value)}
-                      required
-                      data-testid="employee-first-name"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      value={onboardingForm.lastName}
-                      onChange={(e) => handleInputChange("lastName", e.target.value)}
-                      required
-                      data-testid="employee-last-name"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={onboardingForm.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    required
-                    data-testid="employee-email"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="password">Temporary Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={onboardingForm.password}
-                    onChange={(e) => handleInputChange("password", e.target.value)}
-                    required
-                    data-testid="employee-password"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="department">Department</Label>
-                    <Select
-                      value={onboardingForm.department}
-                      onValueChange={(value) => handleInputChange("department", value)}
-                    >
-                      <SelectTrigger data-testid="employee-department">
-                        <SelectValue placeholder="Select department" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {departments.map((dept) => (
-                          <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="position">Position</Label>
-                    <Select
-                      value={onboardingForm.position}
-                      onValueChange={(value) => handleInputChange("position", value)}
-                    >
-                      <SelectTrigger data-testid="employee-position">
-                        <SelectValue placeholder="Select position" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {positions.map((pos) => (
-                          <SelectItem key={pos} value={pos}>{pos}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="salary">Salary (optional)</Label>
-                    <Input
-                      id="salary"
-                      type="number"
-                      value={onboardingForm.salary}
-                      onChange={(e) => handleInputChange("salary", e.target.value)}
-                      placeholder="50000"
-                      data-testid="employee-salary"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="phoneNumber">Phone Number (optional)</Label>
-                    <Input
-                      id="phoneNumber"
-                      value={onboardingForm.phoneNumber}
-                      onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-                      placeholder="+1 (555) 123-4567"
-                      data-testid="employee-phone"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Permissions</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {permissions.map((permission) => (
-                      <label key={permission} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={onboardingForm.permissions.includes(permission)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              handleInputChange("permissions", [...onboardingForm.permissions, permission]);
-                            } else {
-                              handleInputChange("permissions", onboardingForm.permissions.filter(p => p !== permission));
-                            }
-                          }}
-                          data-testid={`permission-${permission}`}
-                        />
-                        <Badge variant="outline">{permission}</Badge>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-4 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowOnboarding(false)}
-                    data-testid="cancel-onboarding"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={onboardMutation.isPending}
-                    data-testid="submit-onboarding"
-                  >
-                    {onboardMutation.isPending ? "Onboarding..." : "Onboard Employee"}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
