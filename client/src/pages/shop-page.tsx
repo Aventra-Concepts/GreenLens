@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { LazyImage } from "@/components/performance/LazyImage";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,6 +57,9 @@ export default function ShopPage() {
     sort: "newest"
   });
 
+  // Debounce search input for performance
+  const debouncedSearch = useDebounce(filters.search, 300);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const [userLocation, setUserLocation] = useState<{countryCode: string} | null>(null);
@@ -79,10 +84,10 @@ export default function ShopPage() {
 
   // Fetch e-books with geographic filtering and other filters
   const { data: ebooksData, isLoading: ebooksLoading } = useQuery({
-    queryKey: ["/api/geographic/available-ebooks", filters, currentPage],
+    queryKey: ["/api/geographic/available-ebooks", debouncedSearch, filters.category, filters.minPrice, filters.maxPrice, filters.language, filters.sort, currentPage],
     queryFn: async () => {
       const params = new URLSearchParams({
-        search: filters.search,
+        search: debouncedSearch,
         category: filters.category,
         minPrice: filters.minPrice.toString(),
         maxPrice: filters.maxPrice.toString(),
@@ -326,10 +331,11 @@ export default function ShopPage() {
                 {/* Cover Image */}
                 <div className="aspect-[3/4] bg-gray-200 dark:bg-gray-700 rounded-lg mb-4 flex items-center justify-center">
                   {ebook.coverImageUrl ? (
-                    <img
+                    <LazyImage
                       src={ebook.coverImageUrl}
                       alt={ebook.title}
                       className="w-full h-full object-cover rounded-lg"
+                      placeholderClassName="bg-gray-200 dark:bg-gray-700"
                     />
                   ) : (
                     <BookOpen className="w-16 h-16 text-gray-400" />

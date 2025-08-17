@@ -36,6 +36,7 @@ import StudentVerification from "@/pages/student-verification-new";
 import StudentDashboard from "@/pages/student-dashboard";
 import CartPage from "./pages/cart-page";
 import OrderSuccessPage from "./pages/order-success-page";
+import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 
 // E-book Category Pages
 import GardeningBasicsPage from "@/pages/categories/gardening-basics";
@@ -132,6 +133,7 @@ function App() {
         <AuthProvider>
           <Toaster />
           <Router />
+          <PerformanceMetrics />
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>

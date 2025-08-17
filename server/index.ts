@@ -10,6 +10,8 @@ import {
   errorHandler,
   healthCheck
 } from "./middleware/securityMiddleware";
+import { compressionMiddleware, apiRateLimit } from "./middleware/compression";
+import { staticAssetCache, apiCache, etagMiddleware } from "./middleware/cache";
 
 const app = express();
 
@@ -17,6 +19,18 @@ const app = express();
 app.use(securityHeaders);
 app.use(rateLimiter(200, 15 * 60 * 1000)); // 200 requests per 15 minutes
 app.use(validateInput);
+
+// Performance middleware
+app.use(compressionMiddleware);
+app.use(etagMiddleware);
+
+// Static asset caching
+app.use('/assets', staticAssetCache);
+app.use('/uploads', staticAssetCache);
+
+// API rate limiting and caching
+app.use('/api', apiRateLimit(100, 15 * 60 * 1000)); // 100 requests per 15 minutes for API
+app.use('/api', apiCache);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
