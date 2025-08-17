@@ -1166,7 +1166,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         healthStatus: analysisResult.healthAssessment.isHealthy ? 'healthy' : 'unhealthy',
         diseaseDetected: (analysisResult.healthAssessment.diseases?.length || 0) > 0,
         careInstructions: analysisResult.careInstructions,
-        analysisData: JSON.stringify(analysisResult),
+        analysisData: analysisResult,
+        healthAssessment: analysisResult.healthAssessment,
+        diseaseInfo: analysisResult.healthAssessment.diseases || [],
         isFreeIdentification: true,
       });
 
