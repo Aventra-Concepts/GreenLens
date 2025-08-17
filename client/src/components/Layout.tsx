@@ -40,7 +40,7 @@ export function Layout({
               Blog
             </a>
             <a href="/expert-onboarding" className="text-sm bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition-colors font-medium">
-              Become an Expert
+              Experts Register
             </a>
           </nav>
         </div>
