@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ import {
 
 export default function NavigationEnhanced() {
   const [location] = useLocation();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logoutMutation } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Get cart item count
@@ -59,19 +59,8 @@ export default function NavigationEnhanced() {
     return false;
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/logout", { method: "POST" });
-      // Clear any cached user data with correct cache key
-      queryClient.setQueryData(["/api/auth/user"], null);
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      // Force redirect to home page using window.location to ensure full refresh
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Logout failed:", error);
-      // Still redirect to clear the UI state even if logout request failed
-      window.location.href = "/";
-    }
+  const handleLogout = () => {
+    logoutMutation.mutate();
   };
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);

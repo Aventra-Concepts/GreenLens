@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { Plus, Eye, Trash2 } from "lucide-react";
 
 export default function MyGardenSection() {
@@ -67,9 +67,9 @@ export default function MyGardenSection() {
               </Card>
             ))}
           </div>
-        ) : userPlants && userPlants.length > 0 ? (
+        ) : userPlants && Array.isArray(userPlants) && userPlants.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {userPlants.map((plant: any) => (
+            {(userPlants || []).map((plant: any) => (
               <Card key={plant.id} className="overflow-hidden hover:shadow-md transition-shadow">
                 <div className="w-full h-48 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
                   <div className="text-4xl">🌱</div>

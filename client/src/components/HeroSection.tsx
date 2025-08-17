@@ -6,7 +6,7 @@ import { Upload, Camera, Sparkles, Loader2, X, CheckCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import PlantAnalysisResults from "./PlantAnalysisResults";
 import gardenImage from "@assets/image_1755326099673.png";
 

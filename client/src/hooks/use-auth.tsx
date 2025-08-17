@@ -73,13 +73,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(["/api/auth/user"], null);
       // Clear all cached queries
       queryClient.clear();
+      // Navigate to home page without forced reload
+      window.location.href = "/";
     },
     onError: (error: Error) => {
-      toast({
-        title: "Logout failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error("Logout error:", error);
+      // Still redirect on error to ensure UI state clears
+      window.location.href = "/";
     },
   });
 
