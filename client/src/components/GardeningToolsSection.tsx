@@ -73,7 +73,7 @@ export default function GardeningToolsSection() {
   }
 
   return (
-    <section className="py-16 bg-gray-50 dark:bg-gray-900" data-testid="gardening-tools-section">
+    <section className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix" data-testid="gardening-tools-section">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
@@ -96,7 +96,7 @@ export default function GardeningToolsSection() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {gardeningContent.tools.map((tool) => (
-              <Card key={tool.id} className="hover:shadow-lg transition-shadow duration-300 relative" data-testid={`tool-card-${tool.id}`}>
+              <Card key={tool.id} className="hover:shadow-lg transition-shadow duration-300 relative gardening-tools-card" data-testid={`tool-card-${tool.id}`}>
                 {tool.isRecommended && (
                   <div className="absolute -top-3 -right-3 z-10">
                     <Badge className="bg-yellow-500 text-yellow-900 flex items-center gap-1 px-3 py-1">

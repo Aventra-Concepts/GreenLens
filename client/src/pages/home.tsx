@@ -1,32 +1,15 @@
-import { useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import HeroSection from "@/components/HeroSection";
 import MyGardenSection from "@/components/MyGardenSection";
 import { InArticleAd } from "@/components/AdSense";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
-import { useToast } from "@/hooks/use-toast";
 import { PoweredBySection } from "@/components/PoweredBySection";
 import GardeningToolsSection from "@/components/GardeningToolsSection";
 import { FeaturedEbooksSection } from "@/components/FeaturedEbooksSection";
 
 export default function Home() {
-  const { toast } = useToast();
   const { user, isLoading } = useAuth();
-
-  useEffect(() => {
-    if (!isLoading && !user) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/auth";
-      }, 500);
-      return;
-    }
-  }, [user, isLoading, toast]);
 
   if (isLoading) {
     return (

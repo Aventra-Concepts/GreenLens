@@ -30,7 +30,7 @@ export function PoweredBySection({ className = "" }: PoweredBySectionProps) {
   const description = poweredBySettings?.description || "Experience the future of plant identification with our cutting-edge artificial intelligence system";
 
   return (
-    <section className={`py-16 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 ${className}`}>
+    <section className={`py-16 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 section-content-fix ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -47,8 +47,8 @@ export function PoweredBySection({ className = "" }: PoweredBySectionProps) {
             const Icon = icons[index % icons.length];
             
             return (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300 border-green-100 dark:border-green-800">
-                <CardContent className="p-6">
+              <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300 border-green-100 dark:border-green-800 powered-by-card">
+                <CardContent className="p-6 card-content-fix">
                   <div className="w-12 h-12 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Icon className="w-6 h-6 text-green-600 dark:text-green-400" />
                   </div>

@@ -39,8 +39,8 @@ export function FeaturedEbooksSection() {
   });
 
   const EbookCard = ({ ebook }: { ebook: Ebook }) => (
-    <Card className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1" data-testid={`card-featured-ebook-${ebook.id}`}>
-      <CardHeader className="p-4">
+    <Card className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ebook-card" data-testid={`card-featured-ebook-${ebook.id}`}>
+      <CardHeader className="p-4 card-content-fix">
         <div className="aspect-[3/4] relative mb-3">
           <img
             src={ebook.coverImageUrl || '/placeholder-book-cover.jpg'}
@@ -60,7 +60,7 @@ export function FeaturedEbooksSection() {
           by {ebook.authorName}
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
+      <CardContent className="p-4 pt-0 card-content-fix">
         <div className="flex items-center gap-1 mb-2">
           <div className="flex items-center">
             {[...Array(5)].map((_, i) => (
@@ -81,7 +81,7 @@ export function FeaturedEbooksSection() {
         </p>
         <Badge variant="outline" className="text-xs">{ebook.category}</Badge>
       </CardContent>
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-4 pt-0 card-content-fix">
         <div className="flex items-center justify-between w-full">
           <span className="text-lg font-bold text-green-600">${parseFloat(ebook.basePrice).toFixed(2)}</span>
           <Link href={`/ebooks/${ebook.id}`}>
@@ -126,7 +126,7 @@ export function FeaturedEbooksSection() {
   }
 
   return (
-    <section className="py-16 bg-white" data-testid="section-featured-ebooks">
+    <section className="py-16 bg-white section-content-fix" data-testid="section-featured-ebooks">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
