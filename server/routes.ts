@@ -57,18 +57,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register e-book marketplace routes
   app.use('/api/ebooks', ebookRoutes);
   
-  // Register separate ebook categories route
+  // Register separate ebook categories route - connected to database
   app.get('/api/ebook-categories', async (req, res) => {
     try {
-      // Return some default categories for now
-      const categories = [
-        { id: '1', name: 'Fiction', slug: 'fiction', description: 'Fictional literature and novels' },
-        { id: '2', name: 'Non-Fiction', slug: 'non-fiction', description: 'Non-fictional books and guides' },
-        { id: '3', name: 'Science', slug: 'science', description: 'Scientific and educational content' },
-        { id: '4', name: 'Technology', slug: 'technology', description: 'Technology and programming guides' },
-        { id: '5', name: 'Health', slug: 'health', description: 'Health and wellness guides' },
-        { id: '6', name: 'Business', slug: 'business', description: 'Business and entrepreneurship' }
-      ];
+      const categories = await storage.getEbookCategories();
       res.json(categories);
     } catch (error) {
       console.error('Get ebook categories error:', error);

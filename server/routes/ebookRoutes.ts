@@ -498,18 +498,6 @@ router.put('/:id/reject', isAuthenticated, async (req, res) => {
   }
 });
 
-// Get ebook categories
-router.get('/categories', async (req, res) => {
-  try {
-    const categories = await ebookService.getCategories();
-    res.json(categories);
-  } catch (error) {
-    console.error('Get ebook categories error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch categories',
-    });
-  }
-});
+// This route is moved to /api/ebook-categories in the main routes.ts file
 
 export default router;

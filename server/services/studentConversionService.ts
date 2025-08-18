@@ -81,9 +81,16 @@ export class StudentConversionService {
         location: student.universityName || 'Not specified',
         password: 'temp_password_' + Math.random().toString(36), // Generate temporary password
         profileImageUrl: null,
+        country: student.country,
+        isAdmin: false,
+        isSuperAdmin: false,
+        isActive: true,
         isAuthor: false,
         authorVerified: false,
-        // emailVerified: student.emailVerified, // Field not available in users table
+        emailVerified: student.emailVerified || false,
+        twoFactorEnabled: false,
+        failedLoginAttempts: 0,
+        lockedUntil: null,
         preferredLanguage: 'en',
         timezone: 'UTC',
       });
@@ -131,7 +138,7 @@ export class StudentConversionService {
       
       // Calculate new conversion date
       const newConversionDate = this.calculateConversionDate(
-        student.createdAt,
+        student.createdAt || new Date(),
         student.expectedGraduation || '',
         newExtensionCount
       );
@@ -197,10 +204,10 @@ export class StudentConversionService {
       if (!student) return false;
       
       return (
-        student.isActive &&
-        !student.isConverted &&
+        (student.isActive ?? false) &&
+        !(student.isConverted ?? false) &&
         student.verificationStatus === 'approved' &&
-        student.discountApplied === true
+        (student.discountApplied ?? false) === true
       );
     } catch (error) {
       console.error('Error checking student discount eligibility:', error);

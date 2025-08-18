@@ -934,7 +934,7 @@ export const consultationRequests = pgTable("consultation_requests", {
   assignedExpertId: varchar("assigned_expert_id").references(() => experts.id),
   
   // Payment Information
-  amount: decimal("amount", { precision: 10, scale: 2 }).default(29.99), // Default consultation fee
+  amount: decimal("amount", { precision: 10, scale: 2 }).default('29.99'), // Default consultation fee
   currency: varchar("currency", { length: 3 }).default('USD'),
   paymentStatus: varchar("payment_status").default('pending'), // 'pending', 'paid', 'failed', 'refunded'
   paymentIntentId: varchar("payment_intent_id"), // Stripe payment intent ID
@@ -969,22 +969,22 @@ export const studentUsers = pgTable("student_users", {
   password: varchar("password").notNull(),
   
   // Academic Information
-  universityName: varchar("university_name").notNull(),
-  instituteName: varchar("institute_name"),
-  academicBranch: varchar("academic_branch").notNull(),
+  universityName: varchar("university_name", { length: 255 }).notNull(),
+  instituteName: varchar("institute_name", { length: 255 }),
+  academicBranch: varchar("academic_branch", { length: 100 }).notNull(),
   yearOfJoining: integer("year_of_joining").notNull(),
-  currentAcademicYear: varchar("current_academic_year").notNull(),
-  academicStatus: varchar("academic_status").notNull(), // undergraduate, graduate, phd, etc.
+  currentAcademicYear: varchar("current_academic_year", { length: 50 }).notNull(),
+  academicStatus: varchar("academic_status", { length: 50 }).notNull(), // undergraduate, graduate, phd, etc.
   subjectsStudying: text("subjects_studying").array(),
-  expectedGraduation: varchar("expected_graduation"),
-  studentId: varchar("student_id"),
+  expectedGraduation: varchar("expected_graduation", { length: 50 }),
+  studentId: varchar("student_id", { length: 100 }),
   
   // Verification Documents
-  studentDocumentUrl: varchar("student_document_url").notNull(),
-  documentType: varchar("document_type").notNull(), // id_card, enrollment_certificate, etc.
+  studentDocumentUrl: varchar("student_document_url", { length: 500 }).notNull(),
+  documentType: varchar("document_type", { length: 50 }).notNull(), // id_card, enrollment_certificate, etc.
   
   // Verification Status
-  verificationStatus: varchar("verification_status").default('pending'), // pending, approved, rejected
+  verificationStatus: varchar("verification_status", { length: 20 }).default('pending'), // pending, approved, rejected
   adminNotes: text("admin_notes"),
   verifiedBy: varchar("verified_by").references(() => users.id),
   verifiedAt: timestamp("verified_at"),
@@ -1036,7 +1036,7 @@ export const ebooks = pgTable("ebooks", {
   description: text("description").notNull(),
   shortDescription: varchar("short_description", { length: 500 }),
   authorId: varchar("author_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  authorName: varchar("author_name").notNull(), // Store at time of upload
+  authorName: varchar("author_name", { length: 255 }).notNull(), // Store at time of upload
   
   // Book Details
   isbn: varchar("isbn").unique(),
