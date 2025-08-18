@@ -170,23 +170,23 @@ export default function TalkToExpert() {
 
         {/* Consultation Request Form */}
         <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl">Book Your Consultation</CardTitle>
-            <CardDescription>Complete the form to schedule your expert consultation session.</CardDescription>
+          <CardHeader className="pb-3 md:pb-4">
+            <CardTitle className="text-lg md:text-xl">Book Your Consultation</CardTitle>
+            <CardDescription className="text-sm">Complete the form to schedule your expert consultation session.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 md:p-6">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                {/* Personal Information */}
-                <div className="grid md:grid-cols-3 gap-3">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 md:space-y-4">
+                {/* Personal Information - Mobile: Stack, Desktop: 3 columns */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
                   <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm">Full Name *</FormLabel>
+                        <FormLabel className="text-xs md:text-sm">Full Name *</FormLabel>
                         <FormControl>
-                          <Input placeholder="Your name" {...field} data-testid="input-name" className="h-9" />
+                          <Input placeholder="Your name" {...field} data-testid="input-name" className="h-8 md:h-9 text-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -197,9 +197,9 @@ export default function TalkToExpert() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm">Email ID *</FormLabel>
+                        <FormLabel className="text-xs md:text-sm">Email ID *</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="your@email.com" {...field} data-testid="input-email" className="h-9" />
+                          <Input type="email" placeholder="your@email.com" {...field} data-testid="input-email" className="h-8 md:h-9 text-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -209,10 +209,10 @@ export default function TalkToExpert() {
                     control={form.control}
                     name="phoneNumber"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm">Phone Number *</FormLabel>
+                      <FormItem className="sm:col-span-2 lg:col-span-1">
+                        <FormLabel className="text-xs md:text-sm">Phone Number *</FormLabel>
                         <FormControl>
-                          <Input placeholder="+1234567890" {...field} data-testid="input-phone" className="h-9" />
+                          <Input placeholder="+1234567890" {...field} data-testid="input-phone" className="h-8 md:h-9 text-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -221,12 +221,13 @@ export default function TalkToExpert() {
                 </div>
 
                 {/* Address Details */}
-                <div className="border-t pt-4">
-                  <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />Address Details
+                <div className="border-t pt-3 md:pt-4">
+                  <h3 className="text-xs md:text-sm font-medium mb-2 md:mb-3 flex items-center gap-2">
+                    <MapPin className="h-3 w-3 md:h-4 md:w-4" />Address Details
                   </h3>
                   
-                  <div className="grid md:grid-cols-4 gap-3 mb-3">
+                  {/* First row - Mobile: 2 cols, Desktop: 4 cols */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3 mb-2 md:mb-3">
                     <FormField
                       control={form.control}
                       name="houseNumber"
@@ -234,7 +235,7 @@ export default function TalkToExpert() {
                         <FormItem>
                           <FormLabel className="text-xs text-gray-600">House/Flat No.</FormLabel>
                           <FormControl>
-                            <Input placeholder="123, A-45" {...field} data-testid="input-house-number" className="h-9" />
+                            <Input placeholder="123, A-45" {...field} data-testid="input-house-number" className="h-8 md:h-9 text-xs md:text-sm" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -247,7 +248,7 @@ export default function TalkToExpert() {
                         <FormItem>
                           <FormLabel className="text-xs text-gray-600">Building Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Green Apartments" {...field} data-testid="input-building-name" className="h-9" />
+                            <Input placeholder="Green Apartments" {...field} data-testid="input-building-name" className="h-8 md:h-9 text-xs md:text-sm" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -260,7 +261,7 @@ export default function TalkToExpert() {
                         <FormItem>
                           <FormLabel className="text-xs text-gray-600">Road/Street</FormLabel>
                           <FormControl>
-                            <Input placeholder="Road 15" {...field} data-testid="input-road-number" className="h-9" />
+                            <Input placeholder="Road 15" {...field} data-testid="input-road-number" className="h-8 md:h-9 text-xs md:text-sm" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -273,7 +274,7 @@ export default function TalkToExpert() {
                         <FormItem>
                           <FormLabel className="text-xs text-gray-600">Colony/Locality</FormLabel>
                           <FormControl>
-                            <Input placeholder="Model Town" {...field} data-testid="input-colony" className="h-9" />
+                            <Input placeholder="Model Town" {...field} data-testid="input-colony" className="h-8 md:h-9 text-xs md:text-sm" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -281,7 +282,8 @@ export default function TalkToExpert() {
                     />
                   </div>
 
-                  <div className="grid md:grid-cols-5 gap-3">
+                  {/* Second row - Mobile: 2 cols, Tablet: 3 cols, Desktop: 5 cols */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3">
                     <FormField
                       control={form.control}
                       name="area"
@@ -289,7 +291,7 @@ export default function TalkToExpert() {
                         <FormItem>
                           <FormLabel className="text-xs text-gray-600">Area/Sector</FormLabel>
                           <FormControl>
-                            <Input placeholder="Sector 21" {...field} data-testid="input-area" className="h-9" />
+                            <Input placeholder="Sector 21" {...field} data-testid="input-area" className="h-8 md:h-9 text-xs md:text-sm" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -302,7 +304,7 @@ export default function TalkToExpert() {
                         <FormItem>
                           <FormLabel className="text-xs text-gray-600">City *</FormLabel>
                           <FormControl>
-                            <Input placeholder="New Delhi" {...field} data-testid="input-city" className="h-9" />
+                            <Input placeholder="New Delhi" {...field} data-testid="input-city" className="h-8 md:h-9 text-xs md:text-sm" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -315,7 +317,7 @@ export default function TalkToExpert() {
                         <FormItem>
                           <FormLabel className="text-xs text-gray-600">State *</FormLabel>
                           <FormControl>
-                            <Input placeholder="Delhi" {...field} data-testid="input-state" className="h-9" />
+                            <Input placeholder="Delhi" {...field} data-testid="input-state" className="h-8 md:h-9 text-xs md:text-sm" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -328,7 +330,7 @@ export default function TalkToExpert() {
                         <FormItem>
                           <FormLabel className="text-xs text-gray-600">Country *</FormLabel>
                           <FormControl>
-                            <Input placeholder="India" {...field} data-testid="input-country" className="h-9" />
+                            <Input placeholder="India" {...field} data-testid="input-country" className="h-8 md:h-9 text-xs md:text-sm" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -338,10 +340,10 @@ export default function TalkToExpert() {
                       control={form.control}
                       name="pinZip"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 md:col-span-1">
                           <FormLabel className="text-xs text-gray-600">PIN/ZIP *</FormLabel>
                           <FormControl>
-                            <Input placeholder="110001" {...field} data-testid="input-pin-zip" className="h-9" />
+                            <Input placeholder="110001" {...field} data-testid="input-pin-zip" className="h-8 md:h-9 text-xs md:text-sm" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -351,19 +353,19 @@ export default function TalkToExpert() {
                 </div>
 
                 {/* Problem Description & Scheduling */}
-                <div className="border-t pt-4 space-y-3">
+                <div className="border-t pt-3 md:pt-4 space-y-2 md:space-y-3">
                   <FormField
                     control={form.control}
                     name="problemDescription"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm flex items-center gap-2">
-                          <MessageSquare className="h-4 w-4" />Problem Description (Max 60 words)
+                        <FormLabel className="text-xs md:text-sm flex items-center gap-2">
+                          <MessageSquare className="h-3 w-3 md:h-4 md:w-4" />Problem Description (Max 60 words)
                         </FormLabel>
                         <FormControl>
                           <Textarea
                             placeholder="Describe your plant-related problem or question..."
-                            className="min-h-[80px] text-sm"
+                            className="min-h-[60px] md:min-h-[80px] text-xs md:text-sm"
                             maxLength={300}
                             {...field}
                             data-testid="input-problem"
@@ -375,14 +377,14 @@ export default function TalkToExpert() {
                     )}
                   />
 
-                  <div className="grid md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                     <FormField
                       control={form.control}
                       name="preferredDate"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel className="text-sm flex items-center gap-2">
-                            <CalendarIcon className="h-4 w-4" />Preferred Date
+                          <FormLabel className="text-xs md:text-sm flex items-center gap-2">
+                            <CalendarIcon className="h-3 w-3 md:h-4 md:w-4" />Preferred Date
                           </FormLabel>
                           <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                             <PopoverTrigger asChild>
@@ -390,13 +392,13 @@ export default function TalkToExpert() {
                                 <Button
                                   variant="outline"
                                   className={cn(
-                                    "h-9 pl-3 text-left font-normal",
+                                    "h-8 md:h-9 pl-3 text-left font-normal text-xs md:text-sm",
                                     !field.value && "text-muted-foreground"
                                   )}
                                   data-testid="button-date-picker"
                                 >
                                   {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  <CalendarIcon className="ml-auto h-3 w-3 md:h-4 md:w-4 opacity-50" />
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
@@ -423,12 +425,12 @@ export default function TalkToExpert() {
                       name="preferredTimeSlot"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm flex items-center gap-2">
-                            <Clock className="h-4 w-4" />Time Slot
+                          <FormLabel className="text-xs md:text-sm flex items-center gap-2">
+                            <Clock className="h-3 w-3 md:h-4 md:w-4" />Time Slot
                           </FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger data-testid="select-time-slot" className="h-9">
+                              <SelectTrigger data-testid="select-time-slot" className="h-8 md:h-9 text-xs md:text-sm">
                                 <SelectValue placeholder="Select time slot" />
                               </SelectTrigger>
                             </FormControl>
@@ -446,21 +448,21 @@ export default function TalkToExpert() {
                 </div>
 
                 {/* Submit Button */}
-                <div className="pt-4 border-t">
+                <div className="pt-3 md:pt-4 border-t">
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white h-11"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white h-10 md:h-11 text-sm md:text-base"
                     disabled={createConsultationMutation.isPending}
                     data-testid="button-submit-consultation"
                   >
                     {createConsultationMutation.isPending ? (
                       <div className="flex items-center gap-2">
                         <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                        Processing...
+                        <span className="text-xs md:text-sm">Processing...</span>
                       </div>
                     ) : (
-                      "Book Consultation ($29.99) - Proceed to Payment"
+                      <span className="text-xs md:text-base">Book Consultation ($29.99) - Proceed to Payment</span>
                     )}
                   </Button>
                 </div>

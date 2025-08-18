@@ -176,6 +176,32 @@ export default function NavigationClean() {
                         </Button>
                       </Link>
                     ))}
+                    
+                    {/* Expert Consultation Links - Mobile Only */}
+                    <div className="border-t pt-2 space-y-2">
+                      <Link href="/expert-registration">
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start text-left text-blue-600 dark:text-blue-400"
+                          onClick={closeMobileMenu}
+                          data-testid="mobile-nav-expert-registration"
+                        >
+                          <GraduationCap className="w-4 h-4 mr-3" />
+                          Experts Registration
+                        </Button>
+                      </Link>
+                      <Link href="/talk-to-expert">
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start text-left text-green-600 dark:text-green-400"
+                          onClick={closeMobileMenu}
+                          data-testid="mobile-nav-talk-to-expert"
+                        >
+                          <MessageCircle className="w-4 h-4 mr-3" />
+                          Talk to Expert
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 )}
 
