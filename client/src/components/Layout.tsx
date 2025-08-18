@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
 import NavigationClean from "@/components/NavigationClean";
 import { ImageUploadBanner } from "@/components/ImageUploadBanner";
 import { SidebarAd } from "@/components/AdSense";
@@ -16,6 +17,19 @@ export function Layout({
   showSidebarAds = false, 
   className = "" 
 }: LayoutProps) {
+  // Fetch feature settings to control navigation visibility
+  const { data: featureSettings } = useQuery<{
+    gardeningShopEnabled?: boolean;
+    ebookMarketplaceEnabled?: boolean;
+  }>({
+    queryKey: ["/api/admin/feature-settings"],
+    retry: false,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  const showEbookMarketplace = featureSettings?.ebookMarketplaceEnabled ?? true; // Default to true if not loaded
+  const showGardeningShop = featureSettings?.gardeningShopEnabled ?? true; // Default to true if not loaded
+
   return (
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
       <NavigationClean />
@@ -31,31 +45,33 @@ export function Layout({
               Identify Plant
             </a>
             
-            {/* E-book Marketplace Section */}
-            <div className="relative group">
-              <a href="/ebook-marketplace" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium" data-testid="link-ebooks">
-                📚 E-books
-              </a>
-              <div className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                <div className="py-2">
-                  <a href="/ebook-marketplace" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900 hover:text-green-600" data-testid="link-browse-ebooks">
-                    Browse All E-books
-                  </a>
-                  <a href="/ebook-marketplace?category=gardening" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900 hover:text-green-600" data-testid="link-gardening-ebooks">
-                    Gardening Guides
-                  </a>
-                  <a href="/ebook-marketplace?category=agriculture" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900 hover:text-green-600" data-testid="link-agriculture-ebooks">
-                    Agriculture & Farming
-                  </a>
-                  <a href="/ebook-marketplace?featured=true" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900 hover:text-green-600" data-testid="link-featured-ebooks">
-                    Featured E-books
-                  </a>
-                  <a href="/ebook-marketplace?sortBy=rating" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900 hover:text-green-600" data-testid="link-top-rated-ebooks">
-                    Top Rated
-                  </a>
+            {/* E-book Marketplace Section - Only show if enabled */}
+            {showEbookMarketplace && (
+              <div className="relative group">
+                <a href="/ebook-marketplace" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium" data-testid="link-ebooks">
+                  📚 E-books
+                </a>
+                <div className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <div className="py-2">
+                    <a href="/ebook-marketplace" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900 hover:text-green-600" data-testid="link-browse-ebooks">
+                      Browse All E-books
+                    </a>
+                    <a href="/ebook-marketplace?category=gardening" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900 hover:text-green-600" data-testid="link-gardening-ebooks">
+                      Gardening Guides
+                    </a>
+                    <a href="/ebook-marketplace?category=agriculture" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900 hover:text-green-600" data-testid="link-agriculture-ebooks">
+                      Agriculture & Farming
+                    </a>
+                    <a href="/ebook-marketplace?featured=true" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900 hover:text-green-600" data-testid="link-featured-ebooks">
+                      Featured E-books
+                    </a>
+                    <a href="/ebook-marketplace?sortBy=rating" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900 hover:text-green-600" data-testid="link-top-rated-ebooks">
+                      Top Rated
+                    </a>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             
             <a href="/account" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors" data-testid="link-account">
               My Garden

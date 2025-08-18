@@ -1458,6 +1458,26 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
+  async setPlatformSetting(setting: InsertPlatformSetting): Promise<PlatformSetting> {
+    const [result] = await db
+      .insert(platformSettings)
+      .values(setting)
+      .onConflictDoUpdate({
+        target: platformSettings.settingKey,
+        set: {
+          settingValue: setting.settingValue,
+          settingType: setting.settingType,
+          description: setting.description,
+          category: setting.category,
+          isEditable: setting.isEditable,
+          updatedBy: setting.updatedBy,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return result;
+  }
+
   async updatePlatformSetting(id: string, updates: Partial<InsertPlatformSetting>): Promise<PlatformSetting> {
     const [updated] = await db
       .update(platformSettings)

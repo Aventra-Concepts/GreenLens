@@ -119,70 +119,56 @@ export default function EbookMarketplace() {
   };
 
   const EbookCard = ({ ebook }: { ebook: Ebook }) => (
-    <Card className="h-full hover:shadow-lg transition-shadow" data-testid={`card-ebook-${ebook.id}`}>
-      <CardHeader className="p-4">
-        <div className="aspect-[3/4] relative mb-3">
-          <img
-            src={ebook.coverImageUrl || '/placeholder-book-cover.jpg'}
-            alt={ebook.title}
-            className="w-full h-full object-cover rounded-md"
-            data-testid={`img-cover-${ebook.id}`}
-          />
-          {ebook.isFeatured && (
-            <Badge className="absolute top-2 right-2 bg-yellow-500">
-              <Award className="w-3 h-3 mr-1" />
-              Featured
-            </Badge>
-          )}
-        </div>
-        <CardTitle className="text-sm font-semibold line-clamp-2" data-testid={`text-title-${ebook.id}`}>
-          {ebook.title}
-        </CardTitle>
-        <CardDescription className="text-xs text-gray-600" data-testid={`text-author-${ebook.id}`}>
-          by {ebook.authorName}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <div className="flex items-center gap-1 mb-2">
-          <div className="flex items-center">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`w-3 h-3 ${
-                  i < Math.floor(ebook.averageRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-                }`}
-              />
-            ))}
+    <Link href={`/ebooks/${ebook.id}`}>
+      <Card className="h-64 group hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 cursor-pointer" data-testid={`card-ebook-${ebook.id}`}>
+        <div className="p-3 h-full flex flex-col">
+          <div className="aspect-[3/4] relative mb-2 flex-shrink-0">
+            <img
+              src={ebook.coverImageUrl || '/placeholder-book-cover.jpg'}
+              alt={ebook.title}
+              className="w-full h-full object-cover rounded-sm"
+              data-testid={`img-cover-${ebook.id}`}
+            />
+            {ebook.isFeatured && (
+              <Badge className="absolute top-1 right-1 bg-yellow-500 text-xs px-1 py-0.5">
+                ⭐
+              </Badge>
+            )}
           </div>
-          <span className="text-xs text-gray-600">
-            ({ebook.totalRatings} reviews)
-          </span>
+          
+          <div className="flex-1 min-h-0 flex flex-col">
+            <h3 className="text-xs font-medium line-clamp-2 mb-1 group-hover:text-green-600 transition-colors" data-testid={`text-title-${ebook.id}`}>
+              {ebook.title}
+            </h3>
+            <p className="text-xs text-gray-500 mb-1 truncate" data-testid={`text-author-${ebook.id}`}>
+              {ebook.authorName}
+            </p>
+            
+            <div className="flex items-center gap-1 mb-1">
+              <div className="flex items-center">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-2.5 h-2.5 ${
+                      i < Math.floor(ebook.averageRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-gray-500">
+                ({ebook.totalRatings})
+              </span>
+            </div>
+            
+            <div className="mt-auto">
+              <div className="text-xs font-semibold text-green-600">
+                {formatPrice(ebook.basePrice)}
+              </div>
+            </div>
+          </div>
         </div>
-        <p className="text-xs text-gray-700 line-clamp-2 mb-2" data-testid={`text-description-${ebook.id}`}>
-          {ebook.description}
-        </p>
-        <div className="flex items-center gap-2 mb-2">
-          <Badge variant="outline" className="text-xs">{ebook.category}</Badge>
-          <Badge variant="outline" className="text-xs">{ebook.fileFormat}</Badge>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-gray-500">
-          <Download className="w-3 h-3" />
-          <span>{ebook.downloadCount} downloads</span>
-          <Globe className="w-3 h-3" />
-          <span>{ebook.language}</span>
-        </div>
-      </CardContent>
-      <CardFooter className="p-4 pt-0">
-        <div className="flex items-center justify-between w-full">
-          {formatPrice(ebook.basePrice)}
-          <Link href={`/ebooks/${ebook.id}`}>
-            <Button size="sm" className="bg-green-600 hover:bg-green-700" data-testid={`button-view-${ebook.id}`}>
-              View Details
-            </Button>
-          </Link>
-        </div>
-      </CardFooter>
-    </Card>
+      </Card>
+    </Link>
   );
 
   return (
@@ -214,38 +200,38 @@ export default function EbookMarketplace() {
         </div>
       </div>
 
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-green-600 to-green-800 text-white py-16">
+      {/* Hero Section - Compact & Elegant */}
+      <div className="bg-gradient-to-r from-green-600 to-green-800 text-white py-10">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">Global E-book Marketplace</h1>
-            <p className="text-xl mb-8">Discover thousands of gardening and agriculture e-books from expert authors worldwide</p>
+            <h1 className="text-2xl md:text-4xl font-bold mb-3">📚 E-book Marketplace</h1>
+            <p className="text-lg mb-6">Expert gardening & agriculture knowledge from worldwide authors</p>
             
-            {/* Quick Stats */}
-            <div className="flex justify-center gap-8 mb-8">
+            {/* Quick Stats - Compact */}
+            <div className="flex justify-center gap-6 mb-6">
               <div className="text-center">
-                <div className="text-2xl font-bold">5,000+</div>
-                <div className="text-sm opacity-90">E-books Available</div>
+                <div className="text-lg font-bold">5,000+</div>
+                <div className="text-xs opacity-90">E-books</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">200+</div>
-                <div className="text-sm opacity-90">Expert Authors</div>
+                <div className="text-lg font-bold">200+</div>
+                <div className="text-xs opacity-90">Authors</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">50+</div>
-                <div className="text-sm opacity-90">Countries</div>
+                <div className="text-lg font-bold">50+</div>
+                <div className="text-xs opacity-90">Countries</div>
               </div>
             </div>
 
-            {/* Search Bar */}
-            <div className="max-w-2xl mx-auto">
+            {/* Search Bar - Compact */}
+            <div className="max-w-xl mx-auto">
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Search e-books by title, author, or topic..."
+                  placeholder="Search e-books..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 py-6 text-lg"
+                  className="pl-10 py-3 text-base"
                   data-testid="input-search"
                 />
               </div>
@@ -340,8 +326,8 @@ export default function EbookMarketplace() {
               <Award className="h-6 w-6 text-yellow-500" />
               Featured E-books
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredEbooks.slice(0, 4).map((ebook: Ebook) => (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+              {featuredEbooks.slice(0, 6).map((ebook: Ebook) => (
                 <EbookCard key={ebook.id} ebook={ebook} />
               ))}
             </div>
@@ -360,28 +346,28 @@ export default function EbookMarketplace() {
           </div>
 
           {ebooksLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <Card key={i} className="h-[400px] animate-pulse">
-                  <CardHeader className="p-4">
-                    <div className="aspect-[3/4] bg-gray-200 rounded-md mb-3"></div>
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                  </CardHeader>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+              {[...Array(12)].map((_, i) => (
+                <Card key={i} className="h-64 animate-pulse">
+                  <div className="p-3">
+                    <div className="aspect-[3/4] bg-gray-200 rounded-md mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded mb-1"></div>
+                    <div className="h-2 bg-gray-200 rounded w-3/4"></div>
+                  </div>
                 </Card>
               ))}
             </div>
           ) : ebooks.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
               {ebooks.map((ebook: Ebook) => (
                 <EbookCard key={ebook.id} ebook={ebook} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">No e-books found</h3>
-              <p className="text-gray-500">
+            <div className="text-center py-8">
+              <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold text-gray-600 mb-2">No e-books found</h3>
+              <p className="text-gray-500 text-sm">
                 Try adjusting your search criteria or browse different categories.
               </p>
             </div>

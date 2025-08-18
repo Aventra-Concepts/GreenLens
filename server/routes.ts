@@ -960,18 +960,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Feature control settings endpoints
   app.get("/api/admin/feature-settings", async (req, res) => {
     try {
-      const [gardeningShop, ebookMarketplace] = await Promise.all([
+      const [gardeningShop, ebookMarketplace, blog, consultation] = await Promise.all([
         storage.getPlatformSetting('gardeningShopEnabled'),
-        storage.getPlatformSetting('ebookMarketplaceEnabled')
+        storage.getPlatformSetting('ebookMarketplaceEnabled'),
+        storage.getPlatformSetting('blogEnabled'),
+        storage.getPlatformSetting('consultationEnabled')
       ]);
       
       res.json({
         gardeningShopEnabled: gardeningShop?.settingValue === 'true',
         ebookMarketplaceEnabled: ebookMarketplace?.settingValue === 'true',
+        blogEnabled: blog?.settingValue === 'true',
+        consultationEnabled: consultation?.settingValue === 'true',
       });
     } catch (error) {
       console.error("Error fetching feature settings:", error);
       res.status(500).json({ message: "Failed to fetch feature settings" });
+    }
+  });
+
+  app.post("/api/admin/feature-settings", requireAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { gardeningShopEnabled, ebookMarketplaceEnabled, blogEnabled, consultationEnabled } = req.body;
+      
+      const updates = [];
+      
+      if (gardeningShopEnabled !== undefined) {
+        updates.push(storage.setPlatformSetting({
+          settingKey: 'gardeningShopEnabled',
+          settingValue: gardeningShopEnabled.toString(),
+          settingType: 'boolean',
+          description: 'Enable/disable the gardening shop feature',
+          category: 'general',
+          updatedBy: userId,
+        }));
+      }
+      
+      if (ebookMarketplaceEnabled !== undefined) {
+        updates.push(storage.setPlatformSetting({
+          settingKey: 'ebookMarketplaceEnabled',
+          settingValue: ebookMarketplaceEnabled.toString(),
+          settingType: 'boolean',
+          description: 'Enable/disable the e-book marketplace feature',
+          category: 'ebook',
+          updatedBy: userId,
+        }));
+      }
+
+      if (blogEnabled !== undefined) {
+        updates.push(storage.setPlatformSetting({
+          settingKey: 'blogEnabled',
+          settingValue: blogEnabled.toString(),
+          settingType: 'boolean',
+          description: 'Enable/disable the blog feature',
+          category: 'general',
+          updatedBy: userId,
+        }));
+      }
+
+      if (consultationEnabled !== undefined) {
+        updates.push(storage.setPlatformSetting({
+          settingKey: 'consultationEnabled',
+          settingValue: consultationEnabled.toString(),
+          settingType: 'boolean',
+          description: 'Enable/disable the consultation feature',
+          category: 'general',
+          updatedBy: userId,
+        }));
+      }
+
+      await Promise.all(updates);
+
+      res.json({ 
+        gardeningShopEnabled: gardeningShopEnabled,
+        ebookMarketplaceEnabled: ebookMarketplaceEnabled,
+        blogEnabled: blogEnabled,
+        consultationEnabled: consultationEnabled,
+      });
+    } catch (error) {
+      console.error("Error updating feature settings:", error);
+      res.status(500).json({ message: "Failed to update feature settings" });
     }
   });
 
