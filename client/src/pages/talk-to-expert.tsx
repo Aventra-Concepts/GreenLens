@@ -130,13 +130,13 @@ export default function TalkToExpert() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
+      <div className="max-w-4xl mx-auto px-6 pt-2 pb-6 lg:pt-1 space-y-4 lg:space-y-3">
         {/* Header Section */}
-        <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <div className="text-center space-y-3 lg:space-y-2">
+          <h1 className="text-3xl lg:text-2xl font-bold text-gray-900 dark:text-white">
             Talk to Our Expert
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
+          <p className="text-lg lg:text-base text-gray-600 dark:text-gray-300">
             Get personalized advice from certified plant experts. Book a consultation session today!
           </p>
         </div>
