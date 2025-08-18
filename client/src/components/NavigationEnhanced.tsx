@@ -121,96 +121,14 @@ export default function NavigationEnhanced() {
               </button>
             </Link>
             
-            {/* Desktop Menu Button */}
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <button
-                  className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
-                  data-testid="nav-desktop-menu"
-                >
-                  <Menu className="w-5 h-5" />
-                </button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-80 overflow-y-auto">
-                <div className="flex flex-col space-y-4 mt-6">
-                  {/* Authentication Section */}
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Account
-                    </h3>
-                    {isAuthenticated ? (
-                      <div className="space-y-2">
-                        <div className="px-3 py-2 text-sm text-gray-600 dark:text-gray-300">
-                          Welcome, {(user as any)?.firstName || (user as any)?.email}
-                        </div>
-                        <Link href="/account">
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start text-left"
-                            onClick={closeMobileMenu}
-                            data-testid="desktop-nav-account"
-                          >
-                            <User className="w-4 h-4 mr-3" />
-                            My Account
-                          </Button>
-                        </Link>
-                        {(user as any)?.isAdmin && (
-                          <Link href="/admin/dashboard">
-                            <Button
-                              variant="ghost"
-                              className="w-full justify-start text-left"
-                              onClick={closeMobileMenu}
-                              data-testid="desktop-nav-admin"
-                            >
-                              <Settings className="w-4 h-4 mr-3" />
-                              Admin Dashboard
-                            </Button>
-                          </Link>
-                        )}
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start text-left text-red-600 dark:text-red-400"
-                          disabled={logoutMutation.isPending}
-                          onClick={() => {
-                            handleLogout();
-                            closeMobileMenu();
-                          }}
-                          data-testid="desktop-nav-logout"
-                        >
-                          <LogOut className="w-4 h-4 mr-3" />
-                          {logoutMutation.isPending ? "Signing out..." : "Logout"}
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <Link href="/auth">
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start text-left"
-                            onClick={closeMobileMenu}
-                            data-testid="desktop-nav-login"
-                          >
-                            <LogIn className="w-4 h-4 mr-3" />
-                            Login
-                          </Button>
-                        </Link>
-                        <Link href="/auth">
-                          <Button
-                            variant="default"
-                            className="w-full justify-start text-left bg-emerald-600 hover:bg-emerald-700"
-                            onClick={closeMobileMenu}
-                            data-testid="desktop-nav-signup"
-                          >
-                            <UserPlus className="w-4 h-4 mr-3" />
-                            Sign Up
-                          </Button>
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
+            {/* Menu Button for Account Access */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
+              data-testid="nav-menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
           </div>
 
           {/* Mobile Right Section */}
@@ -231,15 +149,17 @@ export default function NavigationEnhanced() {
             </Link>
             
             {/* Mobile Menu Button */}
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <button
-                  className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
-                  data-testid="nav-mobile-menu"
-                >
-                  <Menu className="w-4 h-4" />
-                </button>
-              </SheetTrigger>
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
+              data-testid="nav-mobile-menu"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Unified Side Menu for both Desktop and Mobile */}
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetContent side="right" className="w-[300px] sm:w-80 overflow-y-auto">
                 <div className="flex flex-col space-y-4 mt-6">
                   {/* Mobile Navigation Items */}
