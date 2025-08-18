@@ -69,14 +69,14 @@ export default function NavigationEnhanced() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 dark:border-gray-700/50 bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/90 dark:bg-gray-900/95 dark:supports-[backdrop-filter]:bg-gray-900/90">
-      <div className="container mx-auto px-1 sm:px-4 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-16">
+      <div className="container mx-auto px-2 sm:px-4 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16 w-full">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
+          <Link href="/" className="flex items-center space-x-2 group flex-shrink-0">
             <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center transition-all group-hover:scale-105">
               <Leaf className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-semibold text-gray-800 dark:text-gray-100 tracking-tight">
+            <span className="text-lg font-semibold text-gray-800 dark:text-gray-100 tracking-tight whitespace-nowrap">
               GreenLens
             </span>
           </Link>
@@ -163,7 +163,7 @@ export default function NavigationEnhanced() {
           </div>
 
           {/* Mobile Right Section */}
-          <div className="flex lg:hidden items-center space-x-1">
+          <div className="flex lg:hidden items-center space-x-2 flex-shrink-0">
             {/* Mobile Cart */}
             <Link href="/shop">
               <button
