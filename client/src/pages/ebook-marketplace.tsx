@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useQuery } from "@tanstack/react-query";
 import { Search, Filter, BookOpen, Star, Download, Globe, Users, Award, ArrowLeft, Home } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { Layout } from "@/components/Layout";
 
 interface Ebook {
   id: string;
@@ -185,8 +186,9 @@ export default function EbookMarketplace() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation Bar */}
+    <Layout>
+      <div className="min-h-screen bg-gray-50">
+        {/* Navigation Bar */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -406,6 +408,7 @@ export default function EbookMarketplace() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </Layout>
   );
 }

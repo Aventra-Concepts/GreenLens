@@ -172,10 +172,14 @@ export default function Admin() {
           </div>
 
           <Tabs defaultValue="banner" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="banner" className="flex items-center gap-2">
                 <Image className="w-4 h-4" />
                 Banner Settings
+              </TabsTrigger>
+              <TabsTrigger value="features" className="flex items-center gap-2">
+                <Settings className="w-4 h-4" />
+                Feature Control
               </TabsTrigger>
               <TabsTrigger value="gardening" className="flex items-center gap-2">
                 <Shovel className="w-4 h-4" />
@@ -319,6 +323,10 @@ export default function Admin() {
               </form>
             </TabsContent>
 
+            <TabsContent value="features">
+              <FeatureControlManager />
+            </TabsContent>
+
             <TabsContent value="gardening">
               <GardeningToolsManager />
             </TabsContent>
@@ -375,5 +383,152 @@ export default function Admin() {
         </div>
       </div>
     </Layout>
+  );
+}
+
+// Feature Control Manager Component
+function FeatureControlManager() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch current feature settings
+  const { data: featureSettings, isLoading } = useQuery<{
+    gardeningShopEnabled?: boolean;
+    ebookMarketplaceEnabled?: boolean;
+  }>({
+    queryKey: ["/api/admin/feature-settings"],
+  });
+
+  // Update feature settings mutation
+  const updateFeatureMutation = useMutation({
+    mutationFn: async (settings: { key: string; value: boolean }) => {
+      const response = await apiRequest("POST", "/api/admin/feature-settings", {
+        settingKey: settings.key,
+        settingValue: settings.value.toString(),
+        settingType: "boolean",
+        category: "features",
+        description: `Enable/disable ${settings.key} feature`,
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/feature-settings"] });
+      toast({
+        title: "Settings Updated",
+        description: "Feature settings have been updated successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update feature settings",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleFeatureToggle = (featureKey: string, enabled: boolean) => {
+    updateFeatureMutation.mutate({ key: featureKey, value: enabled });
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings className="w-5 h-5" />
+            Platform Feature Control
+          </CardTitle>
+          <CardDescription>
+            Enable or disable specific platform features for users. Changes take effect immediately.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Gardening Tools Shop Control */}
+          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+            <div className="flex-1">
+              <h3 className="font-medium text-gray-900">Gardening Tools Shop</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Allow users to browse and purchase gardening tools and equipment from the dedicated shop page.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-600">
+                {featureSettings?.gardeningShopEnabled ? "Enabled" : "Disabled"}
+              </span>
+              <Button
+                variant={featureSettings?.gardeningShopEnabled ? "destructive" : "default"}
+                size="sm"
+                onClick={() => handleFeatureToggle("gardeningShopEnabled", !featureSettings?.gardeningShopEnabled)}
+                disabled={updateFeatureMutation.isPending}
+                data-testid="toggle-gardening-shop"
+              >
+                {featureSettings?.gardeningShopEnabled ? "Disable" : "Enable"}
+              </Button>
+            </div>
+          </div>
+
+          {/* E-book Marketplace Control */}
+          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+            <div className="flex-1">
+              <h3 className="font-medium text-gray-900">E-book Marketplace</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Allow users to browse and purchase gardening and plant care e-books from the global marketplace.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-600">
+                {featureSettings?.ebookMarketplaceEnabled ? "Enabled" : "Disabled"}
+              </span>
+              <Button
+                variant={featureSettings?.ebookMarketplaceEnabled ? "destructive" : "default"}
+                size="sm"
+                onClick={() => handleFeatureToggle("ebookMarketplaceEnabled", !featureSettings?.ebookMarketplaceEnabled)}
+                disabled={updateFeatureMutation.isPending}
+                data-testid="toggle-ebook-marketplace"
+              >
+                {featureSettings?.ebookMarketplaceEnabled ? "Disable" : "Enable"}
+              </Button>
+            </div>
+          </div>
+
+          {/* Status Summary */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="font-medium text-blue-900 mb-2">Current Status</h4>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>
+                • Gardening Tools Shop: <span className="font-medium">
+                  {featureSettings?.gardeningShopEnabled ? "Active" : "Inactive"}
+                </span>
+              </li>
+              <li>
+                • E-book Marketplace: <span className="font-medium">
+                  {featureSettings?.ebookMarketplaceEnabled ? "Active" : "Inactive"}
+                </span>
+              </li>
+            </ul>
+            <p className="text-xs text-blue-600 mt-2">
+              Users will only see enabled features in the navigation and can only access enabled shop sections.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

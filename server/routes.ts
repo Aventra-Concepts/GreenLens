@@ -957,6 +957,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Feature control settings endpoints
+  app.get("/api/admin/feature-settings", async (req, res) => {
+    try {
+      const [gardeningShop, ebookMarketplace] = await Promise.all([
+        storage.getPlatformSetting('gardeningShopEnabled'),
+        storage.getPlatformSetting('ebookMarketplaceEnabled')
+      ]);
+      
+      res.json({
+        gardeningShopEnabled: gardeningShop?.settingValue === 'true',
+        ebookMarketplaceEnabled: ebookMarketplace?.settingValue === 'true',
+      });
+    } catch (error) {
+      console.error("Error fetching feature settings:", error);
+      res.status(500).json({ message: "Failed to fetch feature settings" });
+    }
+  });
+
+  app.post("/api/admin/feature-settings", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { settingKey, settingValue, settingType, category, description } = req.body;
+      
+      // Try to update existing setting first
+      const existingSetting = await storage.getPlatformSetting(settingKey);
+      
+      if (existingSetting) {
+        await storage.updatePlatformSetting(settingKey, settingValue);
+      } else {
+        await storage.createPlatformSetting({
+          settingKey,
+          settingValue,
+          settingType,
+          category,
+          description,
+          updatedBy: userId,
+        });
+      }
+
+      res.json({ 
+        success: true,
+        settingKey,
+        settingValue,
+      });
+    } catch (error) {
+      console.error("Error updating feature settings:", error);
+      res.status(500).json({ message: "Failed to update feature settings" });
+    }
+  });
+
   // Gardening content routes
   app.get('/api/admin/gardening-content', async (req, res) => {
     try {
