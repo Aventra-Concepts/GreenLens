@@ -153,30 +153,30 @@ export default function HeroSection() {
 
   return (
     <>
-      <section className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 py-8 sm:py-12 lg:py-16 xl:py-24">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <div className="space-y-8">
-              <div className="space-y-6">
-                <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight text-center">
+            <div className="space-y-6 sm:space-y-8">
+              <div className="space-y-4 sm:space-y-6">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-gray-900 dark:text-white leading-tight text-center px-2">
                   Identify Any Plant with{" "}
                   <span className="text-green-600">GreenLens-Powered</span>{" "}
                   Precision
                 </h1>
-                <div className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed text-center">
+                <div className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300 leading-relaxed text-center px-4">
                   <div>Upload up to 3 photos and get instant plant identification, personalized care plans, and expert</div>
                   <div>disease diagnosis with advanced AI analysis.</div>
                 </div>
               </div>
               
               {/* Image upload boxes */}
-              <div className="flex justify-center gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 justify-items-center max-w-2xl mx-auto">
                 {[1, 2, 3].map((slot) => {
                   const uploadedImage = getImageForSlot(slot);
                   return (
-                    <div key={slot} className="flex flex-col items-center">
+                    <div key={slot} className="flex flex-col items-center w-full max-w-xs">
                       <div 
-                        className="w-40 h-48 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors cursor-pointer relative"
+                        className="w-full h-32 sm:h-36 lg:h-40 xl:h-48 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors cursor-pointer relative"
                         onClick={() => fileInputRefs[slot - 1].current?.click()}
                       >
                         {uploadedImage ? (
@@ -202,8 +202,8 @@ export default function HeroSection() {
                           </>
                         ) : (
                           <>
-                            <Upload className="w-8 h-8 text-gray-400 dark:text-gray-500 mb-2" />
-                            <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">Image {slot}</span>
+                            <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 dark:text-gray-500 mb-2" />
+                            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Image {slot}</span>
                             <span className="text-xs text-gray-400 dark:text-gray-500">≤100KB</span>
                           </>
                         )}
@@ -218,7 +218,7 @@ export default function HeroSection() {
                       />
                       <Button 
                         size="sm"
-                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium text-sm mt-3 transition-colors"
+                        className="bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-md font-medium text-xs sm:text-sm mt-2 sm:mt-3 transition-colors w-full"
                         onClick={() => fileInputRefs[slot - 1].current?.click()}
                         data-testid={`upload-image-${slot}-button`}
                       >
@@ -231,30 +231,32 @@ export default function HeroSection() {
               </div>
 
               {/* Analyze button */}
-              <div className="flex justify-center">
+              <div className="flex justify-center px-4">
                 <Button
                   onClick={handleAnalyze}
                   disabled={analysisQueueMutation.isPending || uploadedImages.length === 0}
-                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
                   data-testid="analyze-images-button"
                 >
                   {analysisQueueMutation.isPending ? (
                     <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Analyzing Images...
+                      <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+                      <span className="hidden sm:inline">Analyzing Images...</span>
+                      <span className="sm:hidden">Analyzing...</span>
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-5 h-5 mr-2" />
-                      Analyze the Images
+                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                      <span className="hidden sm:inline">Analyze the Images</span>
+                      <span className="sm:hidden">Analyze</span>
                     </>
                   )}
                 </Button>
               </div>
               
               {!isAuthenticated && (
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-center px-4">
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                     <Link href="/auth">
                       <span className="text-green-600 hover:text-green-700 font-medium cursor-pointer">
                         Log in

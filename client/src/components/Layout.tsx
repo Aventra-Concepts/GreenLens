@@ -20,14 +20,14 @@ export function Layout({
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
       <Navigation />
       
-      {/* Top Menu Bar - Sticky */}
-      <div className="sticky top-16 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-2 backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
+      {/* Top Menu Bar - Sticky - Hidden on small screens */}
+      <div className="hidden sm:block sticky top-12 sm:top-14 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-2 backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center justify-center space-x-6 text-sm">
-            <a href="/" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors" data-testid="link-home">
+          <nav className="flex items-center justify-center space-x-4 sm:space-x-6 text-sm overflow-x-auto pb-1">
+            <a href="/" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors whitespace-nowrap" data-testid="link-home">
               Home
             </a>
-            <a href="/identify" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors" data-testid="link-identify">
+            <a href="/identify" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors whitespace-nowrap" data-testid="link-identify">
               Identify Plant
             </a>
             
@@ -77,9 +77,9 @@ export function Layout({
         </div>
       </div>
 
-      {/* Image Upload Banner - 2.5 inches height */}
+      {/* Image Upload Banner - Responsive height */}
       {showImageBanner && (
-        <div className="h-60 sm:h-64 lg:h-72">
+        <div className="h-48 sm:h-56 lg:h-64 px-2 sm:px-4 lg:px-8 py-3 sm:py-4">
           <ImageUploadBanner />
         </div>
       )}
@@ -87,7 +87,9 @@ export function Layout({
       <div className="flex">
         {/* Main Content */}
         <main className={`flex-1 ${showSidebarAds ? 'lg:pr-64' : ''}`}>
-          {children}
+          <div className="px-2 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+            {children}
+          </div>
         </main>
         
         {/* Sidebar with Ads */}

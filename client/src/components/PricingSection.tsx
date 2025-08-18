@@ -218,20 +218,20 @@ export default function PricingSection() {
   const sortedPlans = plans.sort((a: PricingPlan, b: PricingPlan) => a.displayOrder - b.displayOrder);
 
   return (
-    <section id="pricing" className="pt-0 pb-0.5 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-0 mb-0">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+    <section id="pricing" className="pt-4 pb-8 bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="text-center space-y-3 mb-6">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
             Choose Your Plan
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
+          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 px-2">
             Select the perfect plan for your plant identification needs
           </p>
           
           {/* Currency Selector */}
-          <div className="flex justify-center items-center gap-2 mt-0">
+          <div className="flex justify-center items-center gap-2 flex-wrap">
             <Globe className="w-4 h-4 text-gray-500" />
-            <div className="w-48">
+            <div className="w-full max-w-xs sm:w-48">
               <CurrencySelector
                 value={selectedCurrency}
                 onChange={setSelectedCurrency}
@@ -241,11 +241,11 @@ export default function PricingSection() {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 max-w-4xl mx-auto justify-center items-start mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto mt-6">
           {sortedPlans.map((plan: PricingPlan) => (
             <Card
               key={plan.id}
-              className={`relative transition-all duration-300 hover:shadow-lg w-full sm:w-48 flex-shrink-0 h-80 flex flex-col ${
+              className={`relative transition-all duration-300 hover:shadow-lg w-full flex flex-col h-auto min-h-[300px] sm:min-h-[320px] ${
                 plan.isPopular
                   ? 'ring-2 ring-primary border-primary shadow-xl'
                   : 'border-gray-200 dark:border-gray-700'
@@ -261,7 +261,7 @@ export default function PricingSection() {
                 </div>
               )}
 
-              <CardHeader className="text-center space-y-2 pb-3 px-3">
+              <CardHeader className="text-center space-y-2 pb-3 px-4 sm:px-3">
                 <div className="flex items-center justify-center gap-1">
                   {plan.isPopular && <Zap className="w-3 h-3 text-primary" />}
                   <CardTitle className="text-base font-bold text-gray-900 dark:text-white">

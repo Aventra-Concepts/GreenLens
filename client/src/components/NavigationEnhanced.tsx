@@ -69,10 +69,10 @@ export default function NavigationEnhanced() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 dark:border-gray-700/50 bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/90 dark:bg-gray-900/95 dark:supports-[backdrop-filter]:bg-gray-900/90">
-      <div className="container mx-auto px-8">
-        <div className="flex items-center justify-between h-12">
+      <div className="container mx-auto px-2 sm:px-4 lg:px-8">
+        <div className="flex items-center justify-between h-12 sm:h-14">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
+          <Link href="/" className="flex items-center space-x-1 sm:space-x-2 group">
             <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-green-600 rounded-md flex items-center justify-center transition-all group-hover:scale-110 group-hover:rotate-3">
               <Leaf className="w-3.5 h-3.5 text-white" />
             </div>
@@ -169,19 +169,35 @@ export default function NavigationEnhanced() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="lg:hidden">
+          {/* Mobile Right Section */}
+          <div className="flex lg:hidden items-center space-x-2">
+            {/* Mobile Cart */}
+            <Link href="/shop">
+              <button
+                className="relative p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
+                data-testid="nav-mobile-cart"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs font-medium bg-red-500 text-white rounded-full">
+                    {cartItemCount}
+                  </span>
+                )}
+              </button>
+            </Link>
+            
+            {/* Mobile Menu Button */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <button
-                  className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
+                  className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
                   data-testid="nav-mobile-menu"
                 >
-                  <Menu className="w-4 h-4" />
+                  <Menu className="w-5 h-5" />
                 </button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-80">
-                <div className="flex flex-col space-y-4 mt-8">
+              <SheetContent side="right" className="w-[300px] sm:w-80 overflow-y-auto">
+                <div className="flex flex-col space-y-4 mt-6">
                   {/* Mobile Navigation Items */}
                   <div className="space-y-2">
                     <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
