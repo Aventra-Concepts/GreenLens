@@ -909,7 +909,18 @@ export const consultationRequests = pgTable("consultation_requests", {
   // User Information
   name: varchar("name").notNull(),
   email: varchar("email").notNull(),
-  address: text("address").notNull(),
+  phoneNumber: varchar("phone_number").notNull(), // Now mandatory
+  
+  // Detailed Address Information
+  houseNumber: varchar("house_number"),
+  buildingName: varchar("building_name"),
+  roadNumber: varchar("road_number"),
+  colony: varchar("colony"),
+  area: varchar("area"),
+  city: varchar("city").notNull(),
+  state: varchar("state").notNull(),
+  country: varchar("country").notNull(),
+  pinZip: varchar("pin_zip").notNull(),
   
   // Problem Description
   problemDescription: text("problem_description").notNull(), // Max 60 words validation in frontend
@@ -929,7 +940,6 @@ export const consultationRequests = pgTable("consultation_requests", {
   paymentIntentId: varchar("payment_intent_id"), // Stripe payment intent ID
   
   // Communication Details
-  phoneNumber: varchar("phone_number"),
   consultationNotes: text("consultation_notes"), // Expert's notes
   
   createdAt: timestamp("created_at").defaultNow(),

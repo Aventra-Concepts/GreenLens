@@ -23,7 +23,19 @@ import { cn } from "@/lib/utils";
 const consultationRequestSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
-  address: z.string().min(10, "Please provide a complete address"),
+  phoneNumber: z.string()
+    .min(10, "Phone number must be at least 10 digits")
+    .regex(/^[+]?[0-9\s\-\(\)]+$/, "Please enter a valid phone number"),
+  // Detailed address fields
+  houseNumber: z.string().optional(),
+  buildingName: z.string().optional(),
+  roadNumber: z.string().optional(),
+  colony: z.string().optional(),
+  area: z.string().optional(),
+  city: z.string().min(2, "City is required"),
+  state: z.string().min(2, "State is required"),
+  country: z.string().min(2, "Country is required"),
+  pinZip: z.string().min(3, "PIN/ZIP code is required"),
   problemDescription: z.string()
     .min(10, "Please provide more details about your problem")
     .max(300, "Description must be 60 words or less (approximately 300 characters)"),
@@ -33,7 +45,6 @@ const consultationRequestSchema = z.object({
   preferredTimeSlot: z.string({
     required_error: "Please select a preferred time slot",
   }),
-  phoneNumber: z.string().optional(),
 });
 
 type ConsultationRequestForm = z.infer<typeof consultationRequestSchema>;
@@ -61,9 +72,17 @@ export default function TalkToExpert() {
     defaultValues: {
       name: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : "",
       email: user?.email || "",
-      address: "",
-      problemDescription: "",
       phoneNumber: "",
+      houseNumber: "",
+      buildingName: "",
+      roadNumber: "",
+      colony: "",
+      area: "",
+      city: "",
+      state: "",
+      country: "",
+      pinZip: "",
+      problemDescription: "",
     },
   });
 
@@ -207,36 +226,15 @@ export default function TalkToExpert() {
                   />
                 </div>
 
-                {/* Address Field */}
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4" />
-                        Address
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Enter your complete address"
-                          className="min-h-[80px]"
-                          {...field}
-                          data-testid="input-address"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Phone Number (Optional) */}
+                {/* Phone Number (Mandatory) */}
                 <FormField
                   control={form.control}
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number (Optional)</FormLabel>
+                      <FormLabel className="flex items-center gap-2">
+                        📞 Phone Number *
+                      </FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Enter your phone number"
@@ -248,6 +246,193 @@ export default function TalkToExpert() {
                     </FormItem>
                   )}
                 />
+
+                {/* Address Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <MapPin className="h-4 w-4" />
+                    <h3 className="text-lg font-semibold">Address Details</h3>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* House Number */}
+                    <FormField
+                      control={form.control}
+                      name="houseNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>House/Flat Number</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., 123, A-45"
+                              {...field}
+                              data-testid="input-house-number"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Building Name */}
+                    <FormField
+                      control={form.control}
+                      name="buildingName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Building Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., Green Apartments"
+                              {...field}
+                              data-testid="input-building-name"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* Road Number */}
+                    <FormField
+                      control={form.control}
+                      name="roadNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Road/Street Number</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., Road 15, Street 7"
+                              {...field}
+                              data-testid="input-road-number"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Colony */}
+                    <FormField
+                      control={form.control}
+                      name="colony"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Colony/Locality</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., Model Town"
+                              {...field}
+                              data-testid="input-colony"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* Area */}
+                    <FormField
+                      control={form.control}
+                      name="area"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Area/Sector</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., Sector 21"
+                              {...field}
+                              data-testid="input-area"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* City */}
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>City *</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., New Delhi"
+                              {...field}
+                              data-testid="input-city"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid md:grid-cols-3 gap-4">
+                    {/* State */}
+                    <FormField
+                      control={form.control}
+                      name="state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>State/Province *</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., Delhi"
+                              {...field}
+                              data-testid="input-state"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Country */}
+                    <FormField
+                      control={form.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Country *</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., India"
+                              {...field}
+                              data-testid="input-country"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* PIN/ZIP */}
+                    <FormField
+                      control={form.control}
+                      name="pinZip"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>PIN/ZIP Code *</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., 110001"
+                              {...field}
+                              data-testid="input-pin-zip"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
 
                 {/* Problem Description */}
                 <FormField

@@ -13,6 +13,13 @@ const consultationRequestValidationSchema = insertConsultationRequestSchema.exte
     .min(10, "Problem description must be at least 10 characters")
     .max(300, "Problem description must be maximum 300 characters (approximately 60 words)"),
   preferredDate: z.string().transform((str) => new Date(str)),
+  phoneNumber: z.string()
+    .min(10, "Phone number must be at least 10 digits")
+    .regex(/^[+]?[0-9\s\-\(\)]+$/, "Please enter a valid phone number"),
+  city: z.string().min(2, "City is required"),
+  state: z.string().min(2, "State is required"),
+  country: z.string().min(2, "Country is required"),
+  pinZip: z.string().min(3, "PIN/ZIP code is required"),
 });
 
 // Create a new consultation request
