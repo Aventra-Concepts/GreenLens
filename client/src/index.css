@@ -62,6 +62,13 @@
   --earth-600: hsl(32 51% 35%);
 }
 
+/* Desktop hamburger menu - hide navigation items */
+@media (min-width: 1024px) {
+  .desktop-hide-nav {
+    display: none !important;
+  }
+}
+
 .dark {
   --background: hsl(20 14.3% 4.1%);
   --foreground: hsl(0 0% 95%);

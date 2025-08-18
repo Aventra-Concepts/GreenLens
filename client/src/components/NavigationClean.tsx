@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
@@ -28,6 +28,18 @@ export default function NavigationClean() {
   const [location] = useLocation();
   const { user, isAuthenticated, logoutMutation } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsDesktop(window.innerWidth >= 1024); // lg breakpoint
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   // Get cart item count
   const { data: cartItems = [] } = useQuery({
@@ -151,8 +163,8 @@ export default function NavigationClean() {
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetContent side="right" className="w-[300px] sm:w-80 overflow-y-auto">
               <div className="flex flex-col space-y-4 mt-6">
-                {/* Navigation Items - ONLY VISIBLE ON MOBILE */}
-                <div className="space-y-2 lg:hidden">
+                {/* Navigation Items - ONLY VISIBLE ON MOBILE SCREENS */}
+                <div className="lg:hidden desktop-hide-nav space-y-2">
                   <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Navigation
                   </h3>
