@@ -147,12 +147,12 @@ export default function NavigationClean() {
             </button>
           </div>
 
-          {/* Side Menu with ALL Authentication Options */}
+          {/* Side Menu - Different content for mobile vs desktop */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetContent side="right" className="w-[300px] sm:w-80 overflow-y-auto">
               <div className="flex flex-col space-y-4 mt-6">
-                {/* Navigation Items */}
-                <div className="space-y-2">
+                {/* Navigation Items - ONLY VISIBLE ON MOBILE */}
+                <div className="space-y-2 lg:hidden">
                   <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Navigation
                   </h3>
@@ -176,7 +176,7 @@ export default function NavigationClean() {
                 </div>
 
                 {/* Authentication Section - ALL AUTH BUTTONS HERE */}
-                <div className="border-t pt-4 space-y-2">
+                <div className={`${isMobileMenuOpen ? 'lg:border-t-0 lg:pt-0' : ''} border-t pt-4 space-y-2 lg:border-t-0 lg:pt-0`}>
                   <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Account
                   </h3>
