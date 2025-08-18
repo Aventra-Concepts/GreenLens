@@ -207,7 +207,7 @@ export default function ShopPage() {
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories?.map((category: EbookCategory) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
@@ -280,7 +280,7 @@ export default function ShopPage() {
                       <SelectValue placeholder="All Languages" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Languages</SelectItem>
+                      <SelectItem value="all">All Languages</SelectItem>
                       <SelectItem value="en">English</SelectItem>
                       <SelectItem value="es">Spanish</SelectItem>
                       <SelectItem value="fr">French</SelectItem>

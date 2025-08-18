@@ -44,6 +44,11 @@ export default function EbookMarketplace() {
   const [priceFilter, setPriceFilter] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
 
+  // Ensure these values are never empty strings to prevent Select component errors
+  const safeCategoryValue = selectedCategory || "all";
+  const safeSortValue = sortBy || "popularity";
+  const safePriceValue = priceFilter || "all";
+
   // Initialize filters from URL parameters
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -275,24 +280,26 @@ export default function EbookMarketplace() {
         <div className="flex flex-wrap gap-4 mb-8 p-4 bg-white rounded-lg shadow">
           <div className="flex-1 min-w-[200px]">
             <label className="block text-sm font-medium mb-2">Category</label>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select value={safeCategoryValue} onValueChange={(value) => setSelectedCategory(value || "all")}>
               <SelectTrigger data-testid="select-category">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category: Category) => (
-                  <SelectItem key={category.id} value={category.slug}>
-                    {category.name}
-                  </SelectItem>
-                ))}
+                {categories
+                  .filter((category: Category) => category && category.slug && category.slug.trim() !== '')
+                  .map((category: Category) => (
+                    <SelectItem key={category.id} value={category.slug}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex-1 min-w-[150px]">
             <label className="block text-sm font-medium mb-2">Sort By</label>
-            <Select value={sortBy} onValueChange={setSortBy}>
+            <Select value={safeSortValue} onValueChange={(value) => setSortBy(value || "popularity")}>
               <SelectTrigger data-testid="select-sort">
                 <SelectValue placeholder="Sort by..." />
               </SelectTrigger>
@@ -308,7 +315,7 @@ export default function EbookMarketplace() {
 
           <div className="flex-1 min-w-[150px]">
             <label className="block text-sm font-medium mb-2">Price Range</label>
-            <Select value={priceFilter} onValueChange={setPriceFilter}>
+            <Select value={safePriceValue} onValueChange={(value) => setPriceFilter(value || "all")}>
               <SelectTrigger data-testid="select-price">
                 <SelectValue placeholder="Filter by price..." />
               </SelectTrigger>
