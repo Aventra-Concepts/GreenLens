@@ -163,6 +163,26 @@
   overflow: hidden;
 }
 
+/* Layout fixes for sidebar spacing */
+@media (min-width: 1024px) {
+  .section-content-fix {
+    /* Account for 256px sidebar spacers on each side */
+    padding-left: 16rem; /* 256px */
+    padding-right: 16rem; /* 256px */
+  }
+  
+  .section-content-fix .max-w-7xl {
+    /* Reset max-width when using sidebar layout */
+    max-width: none;
+  }
+  
+  .section-content-fix .mx-auto {
+    /* Reset margin auto when using sidebar layout */
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
 /* Smooth transitions for interactive elements */
 .transition-colors {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;

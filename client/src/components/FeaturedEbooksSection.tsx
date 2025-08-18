@@ -96,7 +96,7 @@ export function FeaturedEbooksSection() {
 
   if (isLoading) {
     return (
-      <section className="py-16 bg-white" data-testid="section-featured-ebooks-loading">
+      <section className="py-16 bg-white section-content-fix" data-testid="section-featured-ebooks-loading">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <div className="h-8 bg-gray-200 rounded w-64 mx-auto mb-4 animate-pulse"></div>
