@@ -210,6 +210,18 @@
     width: 100% !important;
     max-width: none !important;
   }
+  
+  /* Specific fix for gardening tools and other sections with px-4 */
+  .section-content-fix div[class*="px-4"] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  /* Override padding utilities in sidebar sections */
+  .section-content-fix .px-4 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
 }
 
 /* Smooth transitions for interactive elements */
