@@ -5,6 +5,12 @@ GreenLens is a production-grade web application that leverages AI technology for
 
 **Status**: ALL CRITICAL ISSUES PERMANENTLY RESOLVED - Registration system 100% operational, database schema fully synchronized, frontend runtime errors eliminated, logout functionality completely fixed, **OpenAI API migration successfully completed**, and **layout balance issues resolved**. Platform ready for production deployment with comprehensive AI functionality.
 
+**NAVIGATION FIXES COMPLETE**: Successfully resolved all navigation issues by properly integrating Layout component across all pages. Ebook marketplace now uses consistent navigation system.
+
+**UI TERMINOLOGY UPDATES**: Renamed "E-book Marketplace" to "E-Books" throughout the application per user preference for cleaner, more concise terminology.
+
+**SHOP FUNCTIONALITY REMOVED**: Completely removed all shopping cart functionality, shop links, and related routes as requested by user.
+
 **MIGRATION COMPLETE**: Successfully migrated from Google Gemini to OpenAI API across all AI services including plant identification, care planning, disease diagnosis, and blog generation.
 
 **SECURITY IMPROVEMENT**: Error messages now sanitized - detailed AI API errors only visible to admins, users see friendly messages.

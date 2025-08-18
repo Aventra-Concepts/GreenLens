@@ -484,12 +484,12 @@ function FeatureControlManager() {
             </div>
           </div>
 
-          {/* E-book Marketplace Control */}
+          {/* E-Books Control */}
           <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
             <div className="flex-1">
-              <h3 className="font-medium text-gray-900">E-book Marketplace</h3>
+              <h3 className="font-medium text-gray-900">E-Books</h3>
               <p className="text-sm text-gray-600 mt-1">
-                Allow users to browse and purchase gardening and plant care e-books from the global marketplace.
+                Allow users to browse and purchase gardening and plant care e-books.
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -518,7 +518,7 @@ function FeatureControlManager() {
                 </span>
               </li>
               <li>
-                • E-book Marketplace: <span className="font-medium">
+                • E-Books: <span className="font-medium">
                   {featureSettings?.ebookMarketplaceEnabled ? "Active" : "Inactive"}
                 </span>
               </li>

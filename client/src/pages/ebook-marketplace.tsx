@@ -174,7 +174,7 @@ export default function EbookMarketplace() {
       <section className="bg-gradient-to-br from-green-50 to-emerald-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            E-book Marketplace
+            E-Books
           </h1>
           <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
             Discover expert knowledge in gardening, agriculture, and sustainable farming. 

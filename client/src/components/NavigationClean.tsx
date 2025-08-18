@@ -7,7 +7,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { 
   Menu, 
-  ShoppingCart, 
   BookOpen, 
   Upload, 
   GraduationCap,
@@ -20,8 +19,7 @@ import {
   DollarSign,
   Star,
   MessageCircle,
-  Settings,
-  Store
+  Settings
 } from "lucide-react";
 
 export default function NavigationClean() {
@@ -44,19 +42,12 @@ export default function NavigationClean() {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Get cart item count
-  const { data: cartItems = [] } = useQuery({
-    queryKey: ["/api/cart"],
-    enabled: isAuthenticated,
-  });
 
-  const cartItemCount = Array.isArray(cartItems) ? cartItems.reduce((total: number, item: any) => total + item.quantity, 0) : 0;
 
   const navigationItems = [
     { name: "Home", href: "/", icon: Home },
     { name: "Identify Plants", href: "/identify", icon: Leaf },
-    { name: "E-book Marketplace", href: "/ebook-marketplace", icon: BookOpen },
-    { name: "Shop", href: "/shop", icon: Store },
+    { name: "E-Books", href: "/ebook-marketplace", icon: BookOpen },
     { name: "Pricing", href: "/pricing", icon: DollarSign },
     { name: "Reviews", href: "/reviews", icon: Star },
   ];
@@ -92,25 +83,10 @@ export default function NavigationClean() {
           {/* Center - Clean spacer for both desktop and mobile */}
           <div className="flex-1"></div>
 
-          {/* Right - Desktop and Mobile Cart and Menu */}
+          {/* Right - Desktop and Mobile Menu */}
           <div className="flex-shrink-0">
             {/* Desktop version */}
-            <div className="hidden lg:flex items-center space-x-3">
-              {/* Shopping Cart */}
-              <Link href="/shop">
-                <button
-                  className="relative p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
-                  data-testid="nav-cart"
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  {cartItemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs font-medium bg-red-500 text-white rounded-full">
-                      {cartItemCount}
-                    </span>
-                  )}
-                </button>
-              </Link>
-              
+            <div className="hidden lg:flex items-center space-x-3">              
               {/* Hamburger Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
@@ -122,22 +98,7 @@ export default function NavigationClean() {
             </div>
 
             {/* Mobile version - Clean and minimal */}
-            <div className="flex lg:hidden items-center space-x-3">
-              {/* Mobile Cart */}
-              <Link href="/shop">
-                <button
-                  className="relative p-2.5 rounded-xl text-gray-600 dark:text-gray-300 hover:text-emerald-600 hover:bg-emerald-50/80 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/30 transition-all duration-200 shadow-sm hover:shadow-md"
-                  data-testid="nav-mobile-cart"
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  {cartItemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs font-semibold bg-red-500 text-white rounded-full shadow-sm">
-                      {cartItemCount}
-                    </span>
-                  )}
-                </button>
-              </Link>
-              
+            <div className="flex lg:hidden items-center space-x-3">              
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}

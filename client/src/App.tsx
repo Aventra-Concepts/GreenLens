@@ -22,8 +22,6 @@ import BlogPage from "@/pages/blog-page";
 import BlogPost from "@/pages/blog-post";
 import Reviews from "@/pages/Reviews";
 import AuthPage from "@/pages/auth-page";
-import ShopPage from "@/pages/shop-page";
-import CheckoutPage from "@/pages/checkout";
 import ExpertOnboarding from "@/pages/expert-onboarding";
 import TalkToExpert from "@/pages/talk-to-expert";
 import ConsultationPayment from "@/pages/consultation-payment";
@@ -35,8 +33,6 @@ import EbookDetail from "@/pages/ebook-detail";
 import AuthorRegistration from "@/pages/author-registration";
 import StudentVerification from "@/pages/student-verification-new";
 import StudentDashboard from "@/pages/student-dashboard";
-import CartPage from "./pages/cart-page";
-import OrderSuccessPage from "./pages/order-success-page";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 
 // E-book Category Pages
@@ -76,10 +72,6 @@ function Router() {
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/reviews" component={Reviews} />
-      <Route path="/shop" component={ShopPage} />
-      <Route path="/cart" component={CartPage} />
-      <Route path="/order-success" component={OrderSuccessPage} />
-      <Route path="/checkout" component={CheckoutPage} />
       <Route path="/expert-onboarding" component={ExpertOnboarding} />
       <Route path="/talk-to-expert" component={TalkToExpert} />
       <Route path="/payment/consultation/:id">
