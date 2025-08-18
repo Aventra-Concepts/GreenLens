@@ -36,7 +36,6 @@ export default function NavigationClean() {
     const checkScreenSize = () => {
       const isDesktopSize = window.innerWidth >= 1024;
       setIsDesktop(isDesktopSize);
-      console.log('🖥️ Screen size check:', { width: window.innerWidth, isDesktop: isDesktopSize });
     };
     
     checkScreenSize();
@@ -76,7 +75,7 @@ export default function NavigationClean() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 dark:border-gray-700/50 bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/90 dark:bg-gray-900/95 dark:supports-[backdrop-filter]:bg-gray-900/90">
-      <div className="container mx-auto px-2 sm:px-4 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16 w-full">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group flex-shrink-0">
