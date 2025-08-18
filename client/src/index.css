@@ -167,24 +167,48 @@
 @media (min-width: 1024px) {
   .section-content-fix {
     /* Account for 256px sidebar spacers on each side */
-    padding-left: 16rem; /* 256px */
-    padding-right: 16rem; /* 256px */
+    padding-left: 16rem !important; /* 256px */
+    padding-right: 16rem !important; /* 256px */
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
   }
   
-  .section-content-fix .container,
+  /* Completely override container constraints for sections with sidebars */
+  .section-content-fix .container {
+    /* Remove all container constraints */
+    max-width: none !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  /* Remove all Tailwind max-width utilities within sidebar sections */
   .section-content-fix .max-w-7xl,
   .section-content-fix .max-w-6xl,
   .section-content-fix .max-w-5xl,
-  .section-content-fix .max-w-4xl {
+  .section-content-fix .max-w-4xl,
+  .section-content-fix .max-w-3xl,
+  .section-content-fix .max-w-2xl,
+  .section-content-fix .max-w-xl,
+  .section-content-fix .max-w-lg {
     /* Remove max-width constraints for sections with sidebar layout */
     max-width: none !important;
     width: 100% !important;
   }
   
+  /* Reset all margin auto classes within sidebar sections */
   .section-content-fix .mx-auto {
     /* Reset margin auto when using sidebar layout */
     margin-left: 0 !important;
     margin-right: 0 !important;
+  }
+  
+  /* Ensure inner content uses full width */
+  .section-content-fix > div {
+    width: 100% !important;
+    max-width: none !important;
   }
 }
 
