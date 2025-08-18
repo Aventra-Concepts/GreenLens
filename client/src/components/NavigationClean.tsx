@@ -179,7 +179,7 @@ export default function NavigationClean() {
                     
                     {/* Expert Consultation Links - Mobile Only */}
                     <div className="border-t pt-2 space-y-2">
-                      <Link href="/expert-registration">
+                      <Link href="/expert-onboarding">
                         <Button
                           variant="ghost"
                           className="w-full justify-start text-left text-blue-600 dark:text-blue-400"
