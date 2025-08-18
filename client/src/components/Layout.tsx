@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import Navigation from "@/components/Navigation";
+import NavigationClean from "@/components/NavigationClean";
 import { ImageUploadBanner } from "@/components/ImageUploadBanner";
 import { SidebarAd } from "@/components/AdSense";
 
@@ -18,7 +18,7 @@ export function Layout({
 }: LayoutProps) {
   return (
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
-      <Navigation />
+      <NavigationClean />
       
       {/* Top Menu Bar - Sticky - Hidden on small screens */}
       <div className="hidden sm:block sticky top-12 sm:top-14 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-2 backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
