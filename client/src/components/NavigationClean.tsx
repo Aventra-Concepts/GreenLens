@@ -153,8 +153,8 @@ export default function NavigationClean() {
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetContent side="right" className="w-[300px] sm:w-80 overflow-y-auto">
               <div className="flex flex-col space-y-4 mt-6">
-                {/* Navigation Items - ONLY VISIBLE ON MOBILE SCREENS - JAVASCRIPT CONDITIONAL */}
-                {isClient && !isDesktop && (
+                {/* Navigation Items - ALL DEVICES */}
+                {isClient && (
                   <div className="space-y-2">
                     <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Navigation
@@ -177,9 +177,9 @@ export default function NavigationClean() {
                       </Link>
                     ))}
                     
-                    {/* Expert Consultation Links - Mobile Only */}
+                    {/* Expert Consultation Links - ALL DEVICES */}
                     <div className="border-t pt-2 space-y-2">
-                      <Link href="/expert-onboarding">
+                      <Link href="/experts-register">
                         <Button
                           variant="ghost"
                           className="w-full justify-start text-left text-blue-600 dark:text-blue-400"
@@ -187,7 +187,7 @@ export default function NavigationClean() {
                           data-testid="mobile-nav-expert-registration"
                         >
                           <GraduationCap className="w-4 h-4 mr-3" />
-                          Experts Registration
+                          Experts Register
                         </Button>
                       </Link>
                       <Link href="/talk-to-expert">

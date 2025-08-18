@@ -30,18 +30,11 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  // Session configuration
-  const PostgresSessionStore = connectPg(session);
-  const sessionStore = new PostgresSessionStore({
-    conString: process.env.DATABASE_URL!,
-    createTableIfMissing: true,
-  });
-
+  // Session configuration - Using in-memory store for now due to Neon endpoint issues
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || 'your-session-secret-here',
     resave: false,
     saveUninitialized: false,
-    store: sessionStore,
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
