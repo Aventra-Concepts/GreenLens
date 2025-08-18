@@ -37,8 +37,8 @@ export default function GardeningToolsSection() {
 
   if (isLoading) {
     return (
-      <section className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix" data-testid="gardening-tools-section">
-        <div className="w-full px-4">
+      <section className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix -mx-4 sm:-mx-6 lg:-mx-8" data-testid="gardening-tools-section">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <Skeleton className="h-10 w-3/4 mx-auto mb-4" />
             <Skeleton className="h-6 w-1/2 mx-auto" />
@@ -62,8 +62,8 @@ export default function GardeningToolsSection() {
 
   if (error || !gardeningContent) {
     return (
-      <section className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix" data-testid="gardening-tools-section">
-        <div className="w-full px-4 text-center">
+      <section className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix -mx-4 sm:-mx-6 lg:-mx-8" data-testid="gardening-tools-section">
+        <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
           <div className="text-red-500 mb-4">
             Failed to load gardening tools content
           </div>
@@ -73,8 +73,8 @@ export default function GardeningToolsSection() {
   }
 
   return (
-    <section className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix" data-testid="gardening-tools-section">
-      <div className="w-full">
+    <section className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix -mx-4 sm:-mx-6 lg:-mx-8" data-testid="gardening-tools-section">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4" data-testid="section-title">
