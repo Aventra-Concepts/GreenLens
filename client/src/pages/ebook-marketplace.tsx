@@ -294,7 +294,7 @@ export default function EbookMarketplace() {
             <label className="block text-sm font-medium mb-2">Sort By</label>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger data-testid="select-sort">
-                <SelectValue />
+                <SelectValue placeholder="Sort by..." />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="popularity">Most Popular</SelectItem>
@@ -310,7 +310,7 @@ export default function EbookMarketplace() {
             <label className="block text-sm font-medium mb-2">Price Range</label>
             <Select value={priceFilter} onValueChange={setPriceFilter}>
               <SelectTrigger data-testid="select-price">
-                <SelectValue />
+                <SelectValue placeholder="Filter by price..." />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Prices</SelectItem>
