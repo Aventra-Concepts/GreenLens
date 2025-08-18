@@ -29,10 +29,14 @@ export default function NavigationClean() {
   const { user, isAuthenticated, logoutMutation } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const checkScreenSize = () => {
-      setIsDesktop(window.innerWidth >= 1024); // lg breakpoint
+      const isDesktopSize = window.innerWidth >= 1024;
+      setIsDesktop(isDesktopSize);
+      console.log('🖥️ Screen size check:', { width: window.innerWidth, isDesktop: isDesktopSize });
     };
     
     checkScreenSize();
@@ -164,7 +168,7 @@ export default function NavigationClean() {
             <SheetContent side="right" className="w-[300px] sm:w-80 overflow-y-auto">
               <div className="flex flex-col space-y-4 mt-6">
                 {/* Navigation Items - ONLY VISIBLE ON MOBILE SCREENS - JAVASCRIPT CONDITIONAL */}
-                {!isDesktop && (
+                {isClient && !isDesktop && (
                   <div className="space-y-2">
                     <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Navigation
@@ -190,7 +194,7 @@ export default function NavigationClean() {
                 )}
 
                 {/* Authentication Section - ALL AUTH BUTTONS HERE */}
-                <div className={`space-y-2 ${!isDesktop ? 'border-t pt-4' : 'pt-0'}`}>
+                <div className={`space-y-2 ${isClient && !isDesktop ? 'border-t pt-4' : 'pt-0'}`}>
                   <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Account
                   </h3>
