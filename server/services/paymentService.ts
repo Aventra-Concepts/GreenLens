@@ -4,13 +4,14 @@ import { eq } from "drizzle-orm";
 import Stripe from "stripe";
 import { nanoid } from "nanoid";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
-}
+// Initialize Stripe only if the secret key is provided
+let stripe: Stripe | null = null;
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
-});
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2023-10-16",
+  });
+}
 
 export class PaymentService {
   
@@ -24,6 +25,9 @@ export class PaymentService {
     purchaseId: string;
     amount: number;
   }> {
+    if (!stripe) {
+      throw new Error('Payment processing is not configured. Please contact support.');
+    }
     // Get e-book details
     const [ebook] = await db
       .select()
@@ -106,6 +110,10 @@ export class PaymentService {
 
   // Process successful payment
   async handlePaymentSuccess(paymentIntentId: string): Promise<void> {
+    if (!stripe) {
+      throw new Error('Payment processing is not configured. Please contact support.');
+    }
+    
     // Retrieve payment intent from Stripe
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
     
@@ -164,6 +172,9 @@ export class PaymentService {
     reason: string,
     refundAmount?: number
   ): Promise<void> {
+    if (!stripe) {
+      throw new Error('Payment processing is not configured. Please contact support.');
+    }
     const [purchase] = await db
       .select()
       .from(ebookPurchases)
@@ -211,6 +222,10 @@ export class PaymentService {
 
   // Get or create Stripe customer
   private async getOrCreateStripeCustomer(user: any): Promise<string> {
+    if (!stripe) {
+      throw new Error('Payment processing is not configured. Please contact support.');
+    }
+    
     // In a real implementation, you'd store stripeCustomerId in the user record
     // For now, create a new customer each time (not ideal for production)
     const customer = await stripe.customers.create({

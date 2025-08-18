@@ -1198,7 +1198,6 @@ export const platformSettings = pgTable("platform_settings", {
 export type PlatformSetting = typeof platformSettings.$inferSelect;
 export const insertPlatformSettingSchema = createInsertSchema(platformSettings).omit({
   id: true,
-  updatedBy: true,
   createdAt: true,
   updatedAt: true,
 });
@@ -1557,7 +1556,7 @@ export const publishingSettings = pgTable("publishing_settings", {
   // Publishing Requirements
   minimumPageCount: integer("minimum_page_count").default(10),
   maximumFileSize: integer("maximum_file_size").default(52428800), // 50MB in bytes
-  allowedFileFormats: text("allowed_file_formats").array().default(array(['pdf', 'epub', 'mobi'])),
+  allowedFileFormats: text("allowed_file_formats").array().default(['pdf', 'epub', 'mobi']),
   
   // Review Process
   autoPublishEnabled: boolean("auto_publish_enabled").default(false),

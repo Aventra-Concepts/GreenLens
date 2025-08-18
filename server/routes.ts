@@ -18,7 +18,7 @@ import { PDFReportService } from "./services/pdfReportService";
 import { insertPlantResultSchema, insertBlogPostSchema, insertReviewSchema } from "@shared/schema";
 import { trackUserLogin, trackPlantIdentification, trackSubscriptionPurchase, trackPdfDownload } from "./middleware/activityTracker";
 import { registerEcommerceRoutes } from "./routes/ecommerce";
-import { registerEbookRoutes } from "./routes/ebookRoutes";
+import ebookRoutes from "./routes/ebookRoutes";
 import expertRoutes from "./routes/expertRoutes";
 import consultationRoutes from "./routes/consultationRoutes";
 import blogRoutes from "./routes/blogRoutes";
@@ -54,7 +54,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerEcommerceRoutes(app);
   
   // Register e-book marketplace routes
-  registerEbookRoutes(app);
+  app.use('/api/ebooks', ebookRoutes);
   
   // Register author registration routes
   registerAuthorRoutes(app);
