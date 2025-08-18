@@ -80,21 +80,45 @@ export function Layout({
       {/* Image Upload Banner - Responsive height */}
       {showImageBanner && (
         <div className="h-40 sm:h-48 lg:h-56 py-2 sm:py-4">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-            <ImageUploadBanner />
+          <div className="flex">
+            {/* Left Spacer to balance the right sidebar */}
+            {showSidebarAds && (
+              <div className="hidden lg:block w-64 flex-shrink-0"></div>
+            )}
+            
+            <div className="flex-1">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+                <ImageUploadBanner />
+              </div>
+            </div>
+            
+            {/* Right spacer equivalent to sidebar width */}
+            {showSidebarAds && (
+              <div className="hidden lg:block w-64 flex-shrink-0"></div>
+            )}
           </div>
         </div>
       )}
       
       <div className="flex">
+        {/* Left Spacer to balance the right sidebar */}
+        {showSidebarAds && (
+          <div className="hidden lg:block w-64 flex-shrink-0"></div>
+        )}
+        
         {/* Main Content */}
-        <main className={`flex-1 ${showSidebarAds ? 'lg:pr-64' : ''}`}>
+        <main className="flex-1">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-6 lg:py-8">
             {children}
           </div>
         </main>
         
-        {/* Sidebar with Ads */}
+        {/* Right spacer equivalent to sidebar width */}
+        {showSidebarAds && (
+          <div className="hidden lg:block w-64 flex-shrink-0"></div>
+        )}
+        
+        {/* Right Sidebar with Ads - Fixed Position */}
         {showSidebarAds && (
           <aside className="hidden lg:block fixed right-0 top-0 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700">
             <div className="p-4 space-y-6">
