@@ -89,22 +89,26 @@ export default function NavigationClean() {
             </Link>
           </div>
 
-          {/* Center - Desktop Navigation */}
+          {/* Center - Spacer for desktop, navigation for mobile */}
           <div className="flex-1 flex justify-center">
-            <nav className="hidden lg:flex items-center space-x-1">
-              {navigationItems.map((item) => (
+            {/* Desktop: Empty spacer - all navigation moved to hamburger menu */}
+            <div className="hidden lg:block"></div>
+            
+            {/* Mobile: Show navigation links inline */}
+            <nav className="flex lg:hidden items-center space-x-1 overflow-x-auto">
+              {navigationItems.slice(0, 3).map((item) => (
                 <Link key={item.name} href={item.href}>
                   <button
-                    className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    className={`relative px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 whitespace-nowrap ${
                       isActive(item.href)
                         ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
                         : "text-gray-600 dark:text-gray-300 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20"
                     }`}
                     data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                   >
-                    <span className="flex items-center space-x-2">
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.name}</span>
+                    <span className="flex items-center space-x-1">
+                      <item.icon className="w-3 h-3" />
+                      <span className="hidden sm:inline">{item.name}</span>
                     </span>
                   </button>
                 </Link>
