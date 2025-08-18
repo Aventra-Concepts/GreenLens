@@ -153,17 +153,17 @@ export default function HeroSection() {
 
   return (
     <>
-      <section className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 py-8 sm:py-12 lg:py-16 xl:py-24">
+      <section className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 py-6 sm:py-10 lg:py-14 xl:py-20">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <div className="space-y-6 sm:space-y-8">
-              <div className="space-y-4 sm:space-y-6">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-gray-900 dark:text-white leading-tight text-center px-2">
+            <div className="space-y-5 sm:space-y-7">
+              <div className="space-y-3 sm:space-y-5">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-gray-900 dark:text-white leading-tight text-center px-2">
                   Identify Any Plant with{" "}
                   <span className="text-green-600">GreenLens-Powered</span>{" "}
                   Precision
                 </h1>
-                <div className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300 leading-relaxed text-center px-4">
+                <div className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-300 leading-relaxed text-center px-4">
                   <div>Upload up to 3 photos and get instant plant identification, personalized care plans, and expert</div>
                   <div>disease diagnosis with advanced AI analysis.</div>
                 </div>

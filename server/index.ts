@@ -10,15 +10,28 @@ import {
   errorHandler,
   healthCheck
 } from "./middleware/securityMiddleware";
+import { 
+  sanitizeInput, 
+  validateFileUpload, 
+  preventSqlInjection, 
+  xssProtection,
+  apiLimiter,
+  authLimiter
+} from "./middleware/security";
 import { compressionMiddleware, apiRateLimit } from "./middleware/compression";
 import { staticAssetCache, apiCache, etagMiddleware } from "./middleware/cache";
 
 const app = express();
 
-// Security middleware
+// Enhanced Security middleware
 app.use(securityHeaders);
+app.use(xssProtection);
 app.use(rateLimiter(1000, 15 * 60 * 1000)); // 1000 requests per 15 minutes
+app.use(apiLimiter);
 app.use(validateInput);
+app.use(sanitizeInput);
+app.use(preventSqlInjection);
+app.use(validateFileUpload);
 
 // Performance middleware
 app.use(compressionMiddleware);

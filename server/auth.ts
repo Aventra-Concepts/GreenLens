@@ -7,6 +7,7 @@ import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 import connectPg from "connect-pg-simple";
+import { authLimiter, validateEmail, validatePassword } from "./middleware/security";
 
 declare global {
   namespace Express {
@@ -88,7 +89,7 @@ export function setupAuth(app: Express) {
   });
 
   // Registration endpoint with comprehensive error handling
-  app.post("/api/register", async (req, res, next) => {
+  app.post("/api/register", authLimiter, async (req, res, next) => {
     try {
       const { email, firstName, lastName, location, password, country } = req.body;
       
@@ -97,15 +98,15 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
+      // Enhanced email validation
+      if (!validateEmail(email)) {
         return res.status(400).json({ message: "Invalid email format" });
       }
 
-      // Validate password strength
-      if (password.length < 6) {
-        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      // Enhanced password validation
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ message: passwordValidation.message });
       }
       
       // Check if user already exists
@@ -172,7 +173,7 @@ export function setupAuth(app: Express) {
   });
 
   // Login endpoint
-  app.post("/api/login", (req, res, next) => {
+  app.post("/api/login", authLimiter, (req, res, next) => {
     passport.authenticate("local", (err: any, user: SelectUser | false, info: any) => {
       if (err) {
         return res.status(500).json({ message: "Login failed" });
