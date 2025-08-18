@@ -171,15 +171,20 @@
     padding-right: 16rem; /* 256px */
   }
   
-  .section-content-fix .max-w-7xl {
-    /* Reset max-width when using sidebar layout */
-    max-width: none;
+  .section-content-fix .container,
+  .section-content-fix .max-w-7xl,
+  .section-content-fix .max-w-6xl,
+  .section-content-fix .max-w-5xl,
+  .section-content-fix .max-w-4xl {
+    /* Remove max-width constraints for sections with sidebar layout */
+    max-width: none !important;
+    width: 100% !important;
   }
   
   .section-content-fix .mx-auto {
     /* Reset margin auto when using sidebar layout */
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
 }
 
