@@ -130,38 +130,38 @@ export default function TalkToExpert() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto px-6 pt-2 pb-6 lg:pt-1 space-y-4 lg:space-y-3">
+      <div className="max-w-4xl mx-auto px-6 pt-1 pb-6 lg:pt-0 space-y-3 lg:space-y-2">
         {/* Header Section */}
-        <div className="text-center space-y-3 lg:space-y-2">
-          <h1 className="text-3xl lg:text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="text-center space-y-2 lg:space-y-1">
+          <h1 className="text-2xl lg:text-xl font-bold text-gray-900 dark:text-white">
             Talk to Our Expert
           </h1>
-          <p className="text-lg lg:text-base text-gray-600 dark:text-gray-300">
+          <p className="text-base lg:text-sm text-gray-600 dark:text-gray-300">
             Get personalized advice from certified plant experts. Book a consultation session today!
           </p>
         </div>
 
         {/* Service Overview Card */}
         <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-green-200 dark:border-green-700">
-          <CardContent className="p-6">
-            <div className="grid md:grid-cols-3 gap-4 text-center">
-              <div className="space-y-2">
-                <Clock className="h-8 w-8 text-green-600 mx-auto" />
-                <h3 className="font-semibold text-gray-900 dark:text-white">30-Minute Session</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">One-on-one consultation</p>
+          <CardContent className="p-4 lg:p-3">
+            <div className="grid md:grid-cols-3 gap-3 lg:gap-2 text-center">
+              <div className="space-y-1">
+                <Clock className="h-6 w-6 lg:h-5 lg:w-5 text-green-600 mx-auto" />
+                <h3 className="font-semibold text-sm lg:text-xs text-gray-900 dark:text-white">30-Minute Session</h3>
+                <p className="text-xs lg:text-xs text-gray-600 dark:text-gray-300">One-on-one consultation</p>
               </div>
-              <div className="space-y-2">
-                <User className="h-8 w-8 text-blue-600 mx-auto" />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Certified Experts</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Qualified plant specialists</p>
+              <div className="space-y-1">
+                <User className="h-6 w-6 lg:h-5 lg:w-5 text-blue-600 mx-auto" />
+                <h3 className="font-semibold text-sm lg:text-xs text-gray-900 dark:text-white">Certified Experts</h3>
+                <p className="text-xs lg:text-xs text-gray-600 dark:text-gray-300">Qualified plant specialists</p>
               </div>
-              <div className="space-y-2">
-                <MessageSquare className="h-8 w-8 text-purple-600 mx-auto" />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Phone Consultation</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Direct telephonic advice</p>
+              <div className="space-y-1">
+                <MessageSquare className="h-6 w-6 lg:h-5 lg:w-5 text-purple-600 mx-auto" />
+                <h3 className="font-semibold text-sm lg:text-xs text-gray-900 dark:text-white">Phone Consultation</h3>
+                <p className="text-xs lg:text-xs text-gray-600 dark:text-gray-300">Direct telephonic advice</p>
               </div>
             </div>
-            <div className="mt-4 text-center">
+            <div className="mt-2 lg:mt-1 text-center">
               <span className="text-2xl font-bold text-green-600">$29.99</span>
               <span className="text-gray-600 dark:text-gray-300 ml-2">per consultation</span>
             </div>
@@ -170,15 +170,15 @@ export default function TalkToExpert() {
 
         {/* Consultation Request Form */}
         <Card>
-          <CardHeader className="pb-3 md:pb-4">
-            <CardTitle className="text-lg md:text-xl">Book Your Consultation</CardTitle>
-            <CardDescription className="text-sm">Complete the form to schedule your expert consultation session.</CardDescription>
+          <CardHeader className="pb-2 lg:pb-1">
+            <CardTitle className="text-base lg:text-sm">Book Your Consultation</CardTitle>
+            <CardDescription className="text-xs lg:text-xs">Complete the form to schedule your expert consultation session.</CardDescription>
           </CardHeader>
-          <CardContent className="p-4 md:p-6">
+          <CardContent className="p-3 lg:p-2">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 md:space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 lg:space-y-1">
                 {/* Personal Information - Mobile: Stack, Desktop: 3 columns */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-1">
                   <FormField
                     control={form.control}
                     name="name"
@@ -377,7 +377,7 @@ export default function TalkToExpert() {
                     )}
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:gap-1">
                     <FormField
                       control={form.control}
                       name="preferredDate"
@@ -448,11 +448,11 @@ export default function TalkToExpert() {
                 </div>
 
                 {/* Submit Button */}
-                <div className="pt-3 md:pt-4 border-t">
+                <div className="pt-2 lg:pt-1 border-t">
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white h-10 md:h-11 text-sm md:text-base"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white h-8 lg:h-7 text-xs lg:text-xs"
                     disabled={createConsultationMutation.isPending}
                     data-testid="button-submit-consultation"
                   >
