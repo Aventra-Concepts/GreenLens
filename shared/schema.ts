@@ -1032,48 +1032,83 @@ export type InsertStudentUser = z.infer<typeof insertStudentUserSchema>;
 export const ebooks = pgTable("ebooks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: varchar("title").notNull(),
+  subtitle: varchar("subtitle"),
   description: text("description").notNull(),
+  shortDescription: varchar("short_description", { length: 500 }),
   authorId: varchar("author_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   authorName: varchar("author_name").notNull(), // Store at time of upload
   
   // Book Details
   isbn: varchar("isbn").unique(),
+  isbn13: varchar("isbn13").unique(),
   category: varchar("category").notNull(),
   subcategory: varchar("subcategory"),
   language: varchar("language").default('en'),
   pageCount: integer("page_count"),
+  wordCount: integer("word_count"),
   publicationDate: timestamp("publication_date"),
+  originalPublicationDate: timestamp("original_publication_date"),
+  edition: varchar("edition").default('1'),
+  publisher: varchar("publisher"),
   tags: text("tags").array(),
+  keywords: text("keywords").array(), // For search optimization
   
-  // Pricing
+  // Pricing - Enhanced for KDP-style royalties
   basePrice: decimal("base_price", { precision: 10, scale: 2 }).notNull(),
+  minimumPrice: decimal("minimum_price", { precision: 10, scale: 2 }),
+  maximumPrice: decimal("maximum_price", { precision: 10, scale: 2 }),
   currency: varchar("currency", { length: 3 }).default('USD'),
+  royaltyRate: decimal("royalty_rate", { precision: 5, scale: 4 }).default(0.7000), // 70% default
+  platformCommissionRate: decimal("platform_commission_rate", { precision: 5, scale: 4 }).default(0.3000), // 30% platform fee
   
-  // Files
+  // Files and Media
   coverImageUrl: varchar("cover_image_url").notNull(),
-  previewFileUrl: varchar("preview_file_url"), // Preview pages
+  thumbnailUrl: varchar("thumbnail_url"),
+  previewFileUrl: varchar("preview_file_url"), // Preview pages (first 10% or specific pages)
   fullFileUrl: varchar("full_file_url").notNull(), // Complete e-book file
+  manuscriptUrl: varchar("manuscript_url"), // Original manuscript for review
   fileSize: integer("file_size"), // In bytes
-  fileFormat: varchar("file_format").notNull(), // pdf, epub, etc.
+  fileFormat: varchar("file_format").notNull(), // pdf, epub, mobi, etc.
+  previewPageCount: integer("preview_page_count").default(10),
   
   // Publishing Compliance
   copyrightStatus: varchar("copyright_status").notNull(), // original, licensed, public_domain
   publishingRights: boolean("publishing_rights").default(false),
   contentRating: varchar("content_rating"), // all_ages, teen, adult
   
-  // Status & Verification
-  status: varchar("status").default('pending'), // pending, approved, rejected, published, suspended
+  // Status & Verification - Enhanced KDP-style workflow
+  status: varchar("status").default('draft'), // draft, submitted, under_review, published, rejected, suspended
+  submissionNotes: text("submission_notes"), // Author's notes to reviewers
   adminNotes: text("admin_notes"),
+  rejectionReason: text("rejection_reason"),
   approvedBy: varchar("approved_by").references(() => users.id),
   approvedAt: timestamp("approved_at"),
+  submittedAt: timestamp("submitted_at"),
+  publishedAt: timestamp("published_at"),
+  lastModifiedAt: timestamp("last_modified_at"),
   
-  // Analytics
+  // Sales and Performance Analytics
+  totalSales: integer("total_sales").default(0),
+  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).default(0),
+  authorEarnings: decimal("author_earnings", { precision: 12, scale: 2 }).default(0),
+  platformEarnings: decimal("platform_earnings", { precision: 12, scale: 2 }).default(0),
   downloadCount: integer("download_count").default(0),
+  viewCount: integer("view_count").default(0),
+  wishlistCount: integer("wishlist_count").default(0),
   ratingAverage: decimal("rating_average", { precision: 3, scale: 2 }),
   ratingCount: integer("rating_count").default(0),
   
   isActive: boolean("is_active").default(true),
   isFeatured: boolean("is_featured").default(false),
+  isExclusive: boolean("is_exclusive").default(false), // Platform exclusive
+  isBestseller: boolean("is_bestseller").default(false),
+  
+  // Author Rights and Legal
+  hasExclusiveRights: boolean("has_exclusive_rights").default(true),
+  copyrightYear: integer("copyright_year"),
+  copyrightHolder: varchar("copyright_holder"),
+  licenseType: varchar("license_type").default('standard'), // standard, creative_commons, public_domain
+  termsAcceptedAt: timestamp("terms_accepted_at"),
   
   // Geographic Restrictions for E-book Availability 
   allowedCountries: jsonb("allowed_countries").default("[]"), // Array of allowed country codes
@@ -1361,3 +1396,191 @@ export const insertAuthorProfileSchema = createInsertSchema(authorProfiles).omit
   updatedAt: true,
 });
 export type InsertAuthorProfile = z.infer<typeof insertAuthorProfileSchema>;
+
+// KDP-Style Terms and Conditions Management
+export const termsAndConditions = pgTable("terms_and_conditions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: varchar("type").notNull(), // author_agreement, platform_terms, privacy_policy, publishing_guidelines
+  version: varchar("version").notNull(),
+  title: varchar("title").notNull(),
+  content: text("content").notNull(),
+  effectiveDate: timestamp("effective_date").notNull(),
+  lastModifiedBy: varchar("last_modified_by").references(() => users.id),
+  isActive: boolean("is_active").default(true),
+  requiresAcceptance: boolean("requires_acceptance").default(true),
+  
+  // Tracking changes
+  previousVersionId: varchar("previous_version_id").references(() => termsAndConditions.id),
+  changeNotes: text("change_notes"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type TermsAndConditions = typeof termsAndConditions.$inferSelect;
+export const insertTermsAndConditionsSchema = createInsertSchema(termsAndConditions).omit({
+  id: true,
+  lastModifiedBy: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// User Terms Acceptance Tracking
+export const userTermsAcceptance = pgTable("user_terms_acceptance", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  termsId: varchar("terms_id").notNull().references(() => termsAndConditions.id),
+  acceptedAt: timestamp("accepted_at").defaultNow(),
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  isActive: boolean("is_active").default(true),
+});
+
+export type UserTermsAcceptance = typeof userTermsAcceptance.$inferSelect;
+
+// Enhanced Sales Analytics for Admin Dashboard
+export const salesAnalytics = pgTable("sales_analytics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  ebookId: varchar("ebook_id").notNull().references(() => ebooks.id, { onDelete: "cascade" }),
+  authorId: varchar("author_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Date/Period for the analytics
+  reportDate: date("report_date").notNull(),
+  reportPeriod: varchar("report_period").notNull(), // daily, weekly, monthly, yearly
+  
+  // Sales Metrics
+  totalSales: integer("total_sales").default(0),
+  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).default(0),
+  totalDiscounts: decimal("total_discounts", { precision: 12, scale: 2 }).default(0),
+  totalTaxes: decimal("total_taxes", { precision: 12, scale: 2 }).default(0),
+  totalPlatformFees: decimal("total_platform_fees", { precision: 12, scale: 2 }).default(0),
+  totalAuthorEarnings: decimal("total_author_earnings", { precision: 12, scale: 2 }).default(0),
+  
+  // Performance Metrics
+  averageDailyDownloads: decimal("avg_daily_downloads", { precision: 8, scale: 2 }).default(0),
+  peakSalesDay: date("peak_sales_day"),
+  conversionRate: decimal("conversion_rate", { precision: 5, scale: 4 }).default(0), // views to purchases
+  
+  // Geographic breakdown (top 5 countries)
+  topCountriesData: jsonb("top_countries_data").default("[]"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type SalesAnalytics = typeof salesAnalytics.$inferSelect;
+
+// Author Payment History
+export const authorPayments = pgTable("author_payments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  authorId: varchar("author_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Payment Details
+  paymentPeriodStart: date("payment_period_start").notNull(),
+  paymentPeriodEnd: date("payment_period_end").notNull(),
+  totalEarnings: decimal("total_earnings", { precision: 12, scale: 2 }).notNull(),
+  totalBooks: integer("total_books").notNull(), // Number of books sold in period
+  totalSales: integer("total_sales").notNull(), // Number of individual sales
+  
+  // Payment Processing
+  paymentMethod: varchar("payment_method").notNull(), // bank_transfer, paypal, stripe, etc.
+  paymentReference: varchar("payment_reference"),
+  paymentStatus: varchar("payment_status").default('pending'), // pending, processing, paid, failed
+  paidAt: timestamp("paid_at"),
+  
+  // Bank Details (for payment)
+  bankDetails: jsonb("bank_details"), // Encrypted bank account info
+  paymentNotes: text("payment_notes"),
+  
+  // Tax Information
+  taxWithheld: decimal("tax_withheld", { precision: 10, scale: 2 }).default(0),
+  taxDocumentPath: varchar("tax_document_path"), // Path to tax document
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type AuthorPayment = typeof authorPayments.$inferSelect;
+
+// E-book Upload Process Tracking
+export const ebookUploads = pgTable("ebook_uploads", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  authorId: varchar("author_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Upload Session
+  uploadSessionId: varchar("upload_session_id").unique().notNull(),
+  currentStep: varchar("current_step").default('basic_info'), // basic_info, files, pricing, review, submit
+  stepProgress: jsonb("step_progress").default("{}"), // Track completion of each step
+  
+  // Temporary Data Storage (before final submission)
+  temporaryData: jsonb("temporary_data").default("{}"), // Store form data between steps
+  
+  // File Upload Status
+  coverImageUploaded: boolean("cover_image_uploaded").default(false),
+  manuscriptUploaded: boolean("manuscript_uploaded").default(false),
+  previewGenerated: boolean("preview_generated").default(false),
+  
+  // Validation Status
+  contentValidated: boolean("content_validated").default(false),
+  metadataValidated: boolean("metadata_validated").default(false),
+  pricingValidated: boolean("pricing_validated").default(false),
+  
+  // Final Status
+  isCompleted: boolean("is_completed").default(false),
+  ebookId: varchar("ebook_id").references(() => ebooks.id), // Set when upload completes
+  completedAt: timestamp("completed_at"),
+  
+  // Session Management
+  lastActivityAt: timestamp("last_activity_at").defaultNow(),
+  expiresAt: timestamp("expires_at"), // Upload session expiry
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type EbookUpload = typeof ebookUploads.$inferSelect;
+
+// Platform Configuration for E-book Publishing
+export const publishingSettings = pgTable("publishing_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Royalty and Commission Rates
+  defaultRoyaltyRate: decimal("default_royalty_rate", { precision: 5, scale: 4 }).default(0.7000), // 70%
+  platformCommissionRate: decimal("platform_commission_rate", { precision: 5, scale: 4 }).default(0.3000), // 30%
+  minimumRoyaltyRate: decimal("minimum_royalty_rate", { precision: 5, scale: 4 }).default(0.3500), // 35%
+  maximumRoyaltyRate: decimal("maximum_royalty_rate", { precision: 5, scale: 4 }).default(0.7000), // 70%
+  
+  // Pricing Limits
+  minimumBookPrice: decimal("minimum_book_price", { precision: 8, scale: 2 }).default(0.99),
+  maximumBookPrice: decimal("maximum_book_price", { precision: 8, scale: 2 }).default(999.99),
+  
+  // Publishing Requirements
+  minimumPageCount: integer("minimum_page_count").default(10),
+  maximumFileSize: integer("maximum_file_size").default(52428800), // 50MB in bytes
+  allowedFileFormats: text("allowed_file_formats").array().default(array(['pdf', 'epub', 'mobi'])),
+  
+  // Review Process
+  autoPublishEnabled: boolean("auto_publish_enabled").default(false),
+  requireManualReview: boolean("require_manual_review").default(true),
+  reviewTimeframeDays: integer("review_timeframe_days").default(7),
+  
+  // Payment Processing
+  paymentSchedule: varchar("payment_schedule").default('monthly'), // weekly, monthly, quarterly
+  minimumPayoutAmount: decimal("minimum_payout_amount", { precision: 8, scale: 2 }).default(25.00),
+  
+  // Content Guidelines
+  allowAdultContent: boolean("allow_adult_content").default(false),
+  requireContentWarnings: boolean("require_content_warnings").default(true),
+  plagiarismCheckEnabled: boolean("plagiarism_check_enabled").default(true),
+  
+  // Tax Settings
+  collectTaxes: boolean("collect_taxes").default(true),
+  defaultTaxRate: decimal("default_tax_rate", { precision: 5, scale: 4 }).default(0.0000),
+  taxByLocation: boolean("tax_by_location").default(true),
+  
+  lastUpdatedBy: varchar("last_updated_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type PublishingSetting = typeof publishingSettings.$inferSelect;
