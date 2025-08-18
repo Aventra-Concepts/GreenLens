@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
+import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useQuery } from "@tanstack/react-query";
 import { Search, Filter, BookOpen, Star, Download, Globe, Users, Award, Home, Menu, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import Footer from "@/components/Footer";
 
 interface Ebook {
   id: string;
@@ -166,83 +168,7 @@ export default function EbookMarketplace() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* NAVIGATION HEADER - FIXED AND VISIBLE */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            
-            {/* Logo - Always Visible */}
-            <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">🌱</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">GreenLens</span>
-            </Link>
-            
-            {/* Desktop Navigation - Hidden on Mobile */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-gray-600 hover:text-green-600 font-medium transition-colors">
-                Home
-              </Link>
-              <Link href="/identify" className="text-gray-600 hover:text-green-600 font-medium transition-colors">
-                Identify Plants
-              </Link>
-              <Link href="/ebook-marketplace" className="text-green-600 font-bold border-b-2 border-green-600 pb-1">
-                E-book Marketplace
-              </Link>
-              <Link href="/pricing" className="text-gray-600 hover:text-green-600 font-medium transition-colors">
-                Pricing
-              </Link>
-              <Link href="/blog" className="text-gray-600 hover:text-green-600 font-medium transition-colors">
-                Blog
-              </Link>
-            </nav>
-
-            {/* Right Side - Back Button & Mobile Menu */}
-            <div className="flex items-center space-x-4">
-              {/* Back Button - Always Visible */}
-              <Link href="/">
-                <Button variant="outline" size="sm" className="flex items-center space-x-2">
-                  <Home className="h-4 w-4" />
-                  <span className="hidden sm:inline">Home</span>
-                </Button>
-              </Link>
-              
-              {/* Mobile Menu Button */}
-              <Button
-                variant="outline"
-                size="sm"
-                className="md:hidden"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Navigation Menu */}
-          {mobileMenuOpen && (
-            <div className="md:hidden border-t border-gray-200 py-3 space-y-2">
-              <Link href="/" className="block px-3 py-2 text-gray-600 hover:text-green-600 font-medium">
-                Home
-              </Link>
-              <Link href="/identify" className="block px-3 py-2 text-gray-600 hover:text-green-600 font-medium">
-                Identify Plants
-              </Link>
-              <Link href="/ebook-marketplace" className="block px-3 py-2 text-green-600 font-bold bg-green-50 rounded-md">
-                E-book Marketplace
-              </Link>
-              <Link href="/pricing" className="block px-3 py-2 text-gray-600 hover:text-green-600 font-medium">
-                Pricing
-              </Link>
-              <Link href="/blog" className="block px-3 py-2 text-gray-600 hover:text-green-600 font-medium">
-                Blog
-              </Link>
-            </div>
-          )}
-        </div>
-      </header>
+    <Layout showSidebarAds={false}>
 
       {/* HERO SECTION - COMPACT */}
       <section className="bg-gradient-to-br from-green-50 to-emerald-50 py-12">
@@ -377,6 +303,7 @@ export default function EbookMarketplace() {
           </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </Layout>
   );
 }
