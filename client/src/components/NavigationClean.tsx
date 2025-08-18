@@ -163,32 +163,34 @@ export default function NavigationClean() {
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetContent side="right" className="w-[300px] sm:w-80 overflow-y-auto">
               <div className="flex flex-col space-y-4 mt-6">
-                {/* Navigation Items - ONLY VISIBLE ON MOBILE SCREENS */}
-                <div className="lg:hidden desktop-hide-nav space-y-2">
-                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Navigation
-                  </h3>
-                  {navigationItems.map((item) => (
-                    <Link key={item.name} href={item.href}>
-                      <Button
-                        variant={isActive(item.href) ? "default" : "ghost"}
-                        className={`w-full justify-start text-left ${
-                          isActive(item.href)
-                            ? "bg-green-600 text-white"
-                            : "text-gray-700 dark:text-gray-200"
-                        }`}
-                        onClick={closeMobileMenu}
-                        data-testid={`mobile-nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
-                      >
-                        <item.icon className="w-4 h-4 mr-3" />
-                        {item.name}
-                      </Button>
-                    </Link>
-                  ))}
-                </div>
+                {/* Navigation Items - ONLY VISIBLE ON MOBILE SCREENS - JAVASCRIPT CONDITIONAL */}
+                {!isDesktop && (
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Navigation
+                    </h3>
+                    {navigationItems.map((item) => (
+                      <Link key={item.name} href={item.href}>
+                        <Button
+                          variant={isActive(item.href) ? "default" : "ghost"}
+                          className={`w-full justify-start text-left ${
+                            isActive(item.href)
+                              ? "bg-green-600 text-white"
+                              : "text-gray-700 dark:text-gray-200"
+                          }`}
+                          onClick={closeMobileMenu}
+                          data-testid={`mobile-nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                        >
+                          <item.icon className="w-4 h-4 mr-3" />
+                          {item.name}
+                        </Button>
+                      </Link>
+                    ))}
+                  </div>
+                )}
 
                 {/* Authentication Section - ALL AUTH BUTTONS HERE */}
-                <div className={`${isMobileMenuOpen ? 'lg:border-t-0 lg:pt-0' : ''} border-t pt-4 space-y-2 lg:border-t-0 lg:pt-0`}>
+                <div className={`space-y-2 ${!isDesktop ? 'border-t pt-4' : 'pt-0'}`}>
                   <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Account
                   </h3>
