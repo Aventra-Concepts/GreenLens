@@ -33,6 +33,7 @@ import EbookDetail from "@/pages/ebook-detail";
 import AuthorRegistration from "@/pages/author-registration";
 import StudentVerification from "@/pages/student-verification-new";
 import StudentDashboard from "@/pages/student-dashboard";
+import MyGarden from "@/pages/my-garden";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 
 // E-book Category Pages
@@ -72,6 +73,7 @@ function Router() {
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/reviews" component={Reviews} />
+      <Route path="/my-garden" component={MyGarden} />
       <Route path="/expert-onboarding" component={ExpertOnboarding} />
       <Route path="/talk-to-expert" component={TalkToExpert} />
       <Route path="/payment/consultation/:id">

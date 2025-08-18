@@ -44,6 +44,9 @@ export function Layout({
             <a href="/identify" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors whitespace-nowrap" data-testid="link-identify">
               Identify Plant
             </a>
+            <a href="/my-garden" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors whitespace-nowrap" data-testid="link-my-garden">
+              🌱 My Garden
+            </a>
             
             {/* E-Books Section - Only show if enabled */}
             {showEbookMarketplace && (
