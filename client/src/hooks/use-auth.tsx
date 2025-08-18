@@ -70,8 +70,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       console.log("🔄 Starting logout...");
-      await apiRequest("POST", "/api/logout");
-      console.log("✅ Logout API call completed");
+      try {
+        await apiRequest("POST", "/api/logout");
+        console.log("✅ Logout API call completed");
+      } catch (error) {
+        console.warn("⚠️ Logout API call failed, but proceeding with client cleanup:", error);
+        // Even if the API call fails, we still want to clear local state
+      }
     },
     onMutate: () => {
       console.log("🔥 Optimistically clearing user data");
@@ -79,12 +84,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(["/api/user"], null);
     },
     onSettled: () => {
-      console.log("🧹 Clearing all queries and reloading page");
+      console.log("🧹 Clearing all queries and forcing reload");
       // Always clear everything after logout attempt (success or failure)
       queryClient.clear();
       
+      // Clear any potential cached authentication tokens or local storage
+      localStorage.clear();
+      sessionStorage.clear();
+      
       // Force a complete page reload to reset all application state
-      window.location.reload();
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 100);
     },
   });
 

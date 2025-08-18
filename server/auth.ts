@@ -202,9 +202,26 @@ export function setupAuth(app: Express) {
 
   // Logout endpoint - support both GET and POST for compatibility
   const logoutHandler = (req: any, res: any, next: any) => {
+    console.log("🔥 Logout request received for user:", req.user?.email);
+    
     req.logout((err: any) => {
-      if (err) return next(err);
-      res.sendStatus(200);
+      if (err) {
+        console.error("❌ Logout error:", err);
+        return next(err);
+      }
+      
+      // Destroy the session completely
+      req.session.destroy((destroyErr: any) => {
+        if (destroyErr) {
+          console.error("❌ Session destroy error:", destroyErr);
+          return res.status(500).json({ message: "Logout failed" });
+        }
+        
+        // Clear the session cookie
+        res.clearCookie('connect.sid');
+        console.log("✅ User logged out successfully and session destroyed");
+        res.sendStatus(200);
+      });
     });
   };
   
