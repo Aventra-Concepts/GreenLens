@@ -325,8 +325,7 @@ export default function NavigationEnhanced() {
                   </div>
                 </div>
               </SheetContent>
-            </Sheet>
-          </div>
+          </Sheet>
         </div>
       </div>
     </header>
