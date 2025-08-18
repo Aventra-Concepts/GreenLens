@@ -168,49 +168,55 @@ export default function EbookMarketplace() {
 
   return (
     <>
-      {/* DIRECT NAVIGATION - GUARANTEED TO WORK */}
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo and Brand */}
-            <div className="flex items-center space-x-3">
-              <Link href="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">🌱</span>
+      {/* FIXED DESKTOP NAVIGATION - EXPLICIT AND VISIBLE */}
+      <header className="w-full bg-white border-b-2 border-gray-300 shadow-lg" style={{ position: 'sticky', top: '0', zIndex: '9999' }}>
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* LEFT: Logo and Brand - BOLD AND VISIBLE */}
+            <div className="flex items-center">
+              <Link href="/">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold text-lg">🌱</span>
+                  </div>
+                  <h1 className="text-2xl font-bold text-gray-900 tracking-tight">GreenLens</h1>
                 </div>
-                <span className="text-xl font-semibold text-gray-900">GreenLens</span>
               </Link>
             </div>
             
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link href="/" className="text-gray-600 hover:text-green-600 transition-colors">
+            {/* CENTER: Desktop Navigation Menu - ALWAYS VISIBLE */}
+            <nav className="flex items-center space-x-8 text-lg font-medium">
+              <Link href="/" className="text-gray-700 hover:text-green-600 transition-colors duration-200 px-3 py-2 rounded-md hover:bg-gray-100">
                 Home
               </Link>
-              <Link href="/identify" className="text-gray-600 hover:text-green-600 transition-colors">
+              <Link href="/identify" className="text-gray-700 hover:text-green-600 transition-colors duration-200 px-3 py-2 rounded-md hover:bg-gray-100">
                 Identify Plants
               </Link>
-              <Link href="/ebook-marketplace" className="text-green-600 font-medium">
+              <Link href="/ebook-marketplace" className="text-green-600 font-bold bg-green-50 px-3 py-2 rounded-md">
                 E-book Marketplace
               </Link>
-              <Link href="/pricing" className="text-gray-600 hover:text-green-600 transition-colors">
+              <Link href="/pricing" className="text-gray-700 hover:text-green-600 transition-colors duration-200 px-3 py-2 rounded-md hover:bg-gray-100">
                 Pricing
               </Link>
-              <Link href="/blog" className="text-gray-600 hover:text-green-600 transition-colors">
+              <Link href="/blog" className="text-gray-700 hover:text-green-600 transition-colors duration-200 px-3 py-2 rounded-md hover:bg-gray-100">
                 Blog
               </Link>
             </nav>
 
-            {/* Back Button */}
+            {/* RIGHT: Back Button - PROMINENT */}
             <Link href="/">
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
-                <Home className="h-4 w-4" />
-                <span className="hidden sm:inline">Back to Home</span>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="flex items-center gap-3 text-lg font-medium border-2 border-gray-400 hover:border-green-600 hover:bg-green-50"
+              >
+                <Home className="h-5 w-5" />
+                <span>Back to Home</span>
               </Button>
             </Link>
           </div>
         </div>
-      </div>
+      </header>
       
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section - Compact & Elegant */}
