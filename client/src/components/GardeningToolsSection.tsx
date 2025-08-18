@@ -37,44 +37,83 @@ export default function GardeningToolsSection() {
 
   if (isLoading) {
     return (
-      <section className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix -mx-4 sm:-mx-6 lg:-mx-8" data-testid="gardening-tools-section">
-        <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <Skeleton className="h-10 w-3/4 mx-auto mb-4" />
-            <Skeleton className="h-6 w-1/2 mx-auto" />
+      <div className="relative">
+        <section 
+          className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix"
+          style={{
+            position: 'relative',
+            left: '50%',
+            right: '50%',
+            marginLeft: '-50vw',
+            marginRight: '-50vw',
+            width: '100vw'
+          }}
+          data-testid="gardening-tools-section"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <Skeleton className="h-10 w-3/4 mx-auto mb-4" />
+              <Skeleton className="h-6 w-1/2 mx-auto" />
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i}>
+                  <CardContent className="p-6">
+                    <Skeleton className="h-6 w-3/4 mb-2" />
+                    <Skeleton className="h-4 w-1/2 mb-4" />
+                    <Skeleton className="h-16 w-full mb-4" />
+                    <Skeleton className="h-8 w-1/3" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {[...Array(6)].map((_, i) => (
-              <Card key={i}>
-                <CardContent className="p-6">
-                  <Skeleton className="h-6 w-3/4 mb-2" />
-                  <Skeleton className="h-4 w-1/2 mb-4" />
-                  <Skeleton className="h-16 w-full mb-4" />
-                  <Skeleton className="h-8 w-1/3" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     );
   }
 
   if (error || !gardeningContent) {
     return (
-      <section className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix -mx-4 sm:-mx-6 lg:-mx-8" data-testid="gardening-tools-section">
-        <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-red-500 mb-4">
-            Failed to load gardening tools content
+      <div className="relative">
+        <section 
+          className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix"
+          style={{
+            position: 'relative',
+            left: '50%',
+            right: '50%',
+            marginLeft: '-50vw',
+            marginRight: '-50vw',
+            width: '100vw'
+          }}
+          data-testid="gardening-tools-section"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="text-red-500 mb-4">
+              Failed to load gardening tools content
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     );
   }
 
   return (
-    <section className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix -mx-4 sm:-mx-6 lg:-mx-8" data-testid="gardening-tools-section">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
+    <div className="relative">
+      {/* Break out of container with absolute positioning */}
+      <section 
+        className="py-16 bg-gray-50 dark:bg-gray-900 section-content-fix"
+        style={{
+          position: 'relative',
+          left: '50%',
+          right: '50%',
+          marginLeft: '-50vw',
+          marginRight: '-50vw',
+          width: '100vw'
+        }}
+        data-testid="gardening-tools-section"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4" data-testid="section-title">
@@ -203,5 +242,6 @@ export default function GardeningToolsSection() {
         </div>
       </div>
     </section>
+    </div>
   );
 }
