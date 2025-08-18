@@ -206,6 +206,109 @@ router.post('/upload/:sessionId/complete', isAuthenticated, async (req, res) => 
   }
 });
 
+// Get all e-books with filtering (public marketplace endpoint)
+router.get('/', async (req, res) => {
+  try {
+    const { search, category, sortBy, priceFilter, limit, offset } = req.query;
+    
+    // Return sample e-books for now until database schema is fully set up
+    const sampleEbooks = [
+      {
+        id: '1',
+        title: 'Advanced Plant Care Guide',
+        authorId: 'author1',
+        authorName: 'Dr. Green Thumb',
+        description: 'A comprehensive guide to caring for indoor and outdoor plants with expert tips and techniques.',
+        category: 'gardening',
+        basePrice: '19.99',
+        coverImageUrl: '/placeholder-book-cover.jpg',
+        fileFormat: 'PDF',
+        copyrightStatus: 'copyrighted',
+        averageRating: 4.5,
+        totalRatings: 127,
+        downloadCount: 1250,
+        tags: ['plants', 'gardening', 'care'],
+        language: 'English',
+        publishedAt: new Date('2024-01-15'),
+        isFeatured: true,
+      },
+      {
+        id: '2',
+        title: 'Organic Gardening Secrets',
+        authorId: 'author2',
+        authorName: 'Maria Rodriguez',
+        description: 'Learn the secrets of organic gardening and grow healthy, chemical-free plants.',
+        category: 'gardening',
+        basePrice: '24.99',
+        coverImageUrl: '/placeholder-book-cover.jpg',
+        fileFormat: 'PDF',
+        copyrightStatus: 'copyrighted',
+        averageRating: 4.7,
+        totalRatings: 89,
+        downloadCount: 890,
+        tags: ['organic', 'gardening', 'sustainable'],
+        language: 'English',
+        publishedAt: new Date('2024-02-20'),
+        isFeatured: false,
+      },
+      {
+        id: '3',
+        title: 'Indoor Plant Encyclopedia',
+        authorId: 'author3',
+        authorName: 'John Smith',
+        description: 'A complete reference guide to over 200 indoor plants with care instructions.',
+        category: 'reference',
+        basePrice: '29.99',
+        coverImageUrl: '/placeholder-book-cover.jpg',
+        fileFormat: 'PDF',
+        copyrightStatus: 'copyrighted',
+        averageRating: 4.3,
+        totalRatings: 156,
+        downloadCount: 1560,
+        tags: ['indoor', 'plants', 'reference'],
+        language: 'English',
+        publishedAt: new Date('2024-03-10'),
+        isFeatured: true,
+      }
+    ];
+    
+    // Apply simple filtering
+    let filteredEbooks = sampleEbooks;
+    
+    if (search) {
+      const searchLower = search.toString().toLowerCase();
+      filteredEbooks = filteredEbooks.filter(ebook => 
+        ebook.title.toLowerCase().includes(searchLower) ||
+        ebook.description.toLowerCase().includes(searchLower) ||
+        ebook.authorName.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    if (category && category !== 'all') {
+      filteredEbooks = filteredEbooks.filter(ebook => ebook.category === category);
+    }
+    
+    // Apply sorting
+    if (sortBy === 'price-low') {
+      filteredEbooks.sort((a, b) => parseFloat(a.basePrice) - parseFloat(b.basePrice));
+    } else if (sortBy === 'price-high') {
+      filteredEbooks.sort((a, b) => parseFloat(b.basePrice) - parseFloat(a.basePrice));
+    } else if (sortBy === 'rating') {
+      filteredEbooks.sort((a, b) => b.averageRating - a.averageRating);
+    } else if (sortBy === 'popular') {
+      filteredEbooks.sort((a, b) => b.downloadCount - a.downloadCount);
+    }
+    
+    res.json(filteredEbooks);
+  } catch (error) {
+    console.error('Get ebooks error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch e-books',
+    });
+  }
+});
+
 // Get published e-books (public)
 router.get('/published', async (req, res) => {
   try {
@@ -391,6 +494,20 @@ router.put('/:id/reject', isAuthenticated, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to reject e-book',
+    });
+  }
+});
+
+// Get ebook categories
+router.get('/categories', async (req, res) => {
+  try {
+    const categories = await ebookService.getCategories();
+    res.json(categories);
+  } catch (error) {
+    console.error('Get ebook categories error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch categories',
     });
   }
 });

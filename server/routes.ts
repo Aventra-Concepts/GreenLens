@@ -25,6 +25,7 @@ import blogRoutes from "./routes/blogRoutes";
 import { registerAuthorRoutes } from "./routes/authorRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import studentAdminRoutes from "./routes/studentAdminRoutes";
+import enhancedPaymentRoutes from "./routes/enhancedPaymentRoutes";
 import { GeographicRestrictionService } from "./services/geographicRestrictionService";
 import { socialMediaService } from "./services/socialMediaService";
 
@@ -56,6 +57,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register e-book marketplace routes
   app.use('/api/ebooks', ebookRoutes);
   
+  // Register separate ebook categories route
+  app.get('/api/ebook-categories', async (req, res) => {
+    try {
+      // Return some default categories for now
+      const categories = [
+        { id: '1', name: 'Fiction', slug: 'fiction', description: 'Fictional literature and novels' },
+        { id: '2', name: 'Non-Fiction', slug: 'non-fiction', description: 'Non-fictional books and guides' },
+        { id: '3', name: 'Science', slug: 'science', description: 'Scientific and educational content' },
+        { id: '4', name: 'Technology', slug: 'technology', description: 'Technology and programming guides' },
+        { id: '5', name: 'Health', slug: 'health', description: 'Health and wellness guides' },
+        { id: '6', name: 'Business', slug: 'business', description: 'Business and entrepreneurship' }
+      ];
+      res.json(categories);
+    } catch (error) {
+      console.error('Get ebook categories error:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch categories' });
+    }
+  });
+  
   // Register author registration routes
   registerAuthorRoutes(app);
   
@@ -73,6 +93,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register student admin routes
   app.use('/api/admin', studentAdminRoutes);
+  
+  // Register enhanced payment gateway routes
+  app.use('/api/payments', enhancedPaymentRoutes);
   
   // Geographic restrictions routes
   app.get('/api/geographic/check-product/:productId', async (req, res) => {
