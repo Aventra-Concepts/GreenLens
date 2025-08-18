@@ -241,7 +241,7 @@ export default function PricingSection() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 max-w-5xl mx-auto mt-6 px-1 sm:px-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 max-w-5xl mx-auto mt-12 px-1 sm:px-2">
           {sortedPlans.map((plan: PricingPlan) => (
             <Card
               key={plan.id}
@@ -253,8 +253,8 @@ export default function PricingSection() {
               data-testid={`pricing-plan-${plan.planId}`}
             >
               {plan.isPopular && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-primary text-primary-foreground px-3 py-1 flex items-center gap-1 text-xs">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                  <Badge className="bg-primary text-primary-foreground px-3 py-1 flex items-center gap-1 text-xs shadow-lg">
                     <Star className="w-3 h-3" />
                     Most Popular
                   </Badge>
