@@ -89,32 +89,8 @@ export default function NavigationClean() {
             </Link>
           </div>
 
-          {/* Center - Spacer for desktop, navigation for mobile */}
-          <div className="flex-1 flex justify-center">
-            {/* Desktop: Empty spacer - all navigation moved to hamburger menu */}
-            <div className="hidden lg:block"></div>
-            
-            {/* Mobile: Show navigation links inline */}
-            <nav className="flex lg:hidden items-center space-x-1 overflow-x-auto">
-              {navigationItems.slice(0, 3).map((item) => (
-                <Link key={item.name} href={item.href}>
-                  <button
-                    className={`relative px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 whitespace-nowrap ${
-                      isActive(item.href)
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
-                        : "text-gray-600 dark:text-gray-300 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20"
-                    }`}
-                    data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
-                  >
-                    <span className="flex items-center space-x-1">
-                      <item.icon className="w-3 h-3" />
-                      <span className="hidden sm:inline">{item.name}</span>
-                    </span>
-                  </button>
-                </Link>
-              ))}
-            </nav>
-          </div>
+          {/* Center - Clean spacer for both desktop and mobile */}
+          <div className="flex-1"></div>
 
           {/* Right - Desktop and Mobile Cart and Menu */}
           <div className="flex-shrink-0">
@@ -145,17 +121,17 @@ export default function NavigationClean() {
               </button>
             </div>
 
-            {/* Mobile version */}
-            <div className="flex lg:hidden items-center space-x-2">
+            {/* Mobile version - Clean and minimal */}
+            <div className="flex lg:hidden items-center space-x-3">
               {/* Mobile Cart */}
               <Link href="/shop">
                 <button
-                  className="relative p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
+                  className="relative p-2.5 rounded-xl text-gray-600 dark:text-gray-300 hover:text-emerald-600 hover:bg-emerald-50/80 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/30 transition-all duration-200 shadow-sm hover:shadow-md"
                   data-testid="nav-mobile-cart"
                 >
-                  <ShoppingCart className="w-4 h-4" />
+                  <ShoppingCart className="w-5 h-5" />
                   {cartItemCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 flex items-center justify-center text-xs font-medium bg-red-500 text-white rounded-full">
+                    <span className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs font-semibold bg-red-500 text-white rounded-full shadow-sm">
                       {cartItemCount}
                     </span>
                   )}
@@ -165,10 +141,10 @@ export default function NavigationClean() {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
+                className="p-2.5 rounded-xl text-gray-600 dark:text-gray-300 hover:text-emerald-600 hover:bg-emerald-50/80 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/30 transition-all duration-200 shadow-sm hover:shadow-md"
                 data-testid="nav-mobile-menu"
               >
-                <Menu className="w-4 h-4" />
+                <Menu className="w-5 h-5" />
               </button>
             </div>
           </div>
