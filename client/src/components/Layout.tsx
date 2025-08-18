@@ -79,7 +79,7 @@ export function Layout({
 
       {/* Image Upload Banner - Responsive height */}
       {showImageBanner && (
-        <div className="h-48 sm:h-56 lg:h-64 px-2 sm:px-4 lg:px-8 py-3 sm:py-4">
+        <div className="h-40 sm:h-48 lg:h-56 px-1 sm:px-4 lg:px-8 py-2 sm:py-4">
           <ImageUploadBanner />
         </div>
       )}
@@ -87,7 +87,7 @@ export function Layout({
       <div className="flex">
         {/* Main Content */}
         <main className={`flex-1 ${showSidebarAds ? 'lg:pr-64' : ''}`}>
-          <div className="px-2 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+          <div className="px-1 sm:px-4 lg:px-8 py-3 sm:py-6 lg:py-8">
             {children}
           </div>
         </main>

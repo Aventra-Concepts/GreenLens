@@ -170,13 +170,13 @@ export default function HeroSection() {
               </div>
               
               {/* Image upload boxes */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 justify-items-center max-w-2xl mx-auto">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-6 justify-items-center max-w-[300px] sm:max-w-2xl mx-auto px-2 sm:px-4">
                 {[1, 2, 3].map((slot) => {
                   const uploadedImage = getImageForSlot(slot);
                   return (
-                    <div key={slot} className="flex flex-col items-center w-full max-w-xs">
+                    <div key={slot} className="flex flex-col items-center w-full">
                       <div 
-                        className="w-full h-32 sm:h-36 lg:h-40 xl:h-48 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors cursor-pointer relative"
+                        className="w-full h-20 sm:h-32 lg:h-40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md sm:rounded-lg flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors cursor-pointer relative"
                         onClick={() => fileInputRefs[slot - 1].current?.click()}
                       >
                         {uploadedImage ? (
@@ -202,9 +202,9 @@ export default function HeroSection() {
                           </>
                         ) : (
                           <>
-                            <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 dark:text-gray-500 mb-2" />
-                            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Image {slot}</span>
-                            <span className="text-xs text-gray-400 dark:text-gray-500">≤100KB</span>
+                            <Upload className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-gray-400 dark:text-gray-500 mb-1" />
+                            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Image {slot}</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:block">≤100KB</span>
                           </>
                         )}
                       </div>
@@ -218,12 +218,13 @@ export default function HeroSection() {
                       />
                       <Button 
                         size="sm"
-                        className="bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-md font-medium text-xs sm:text-sm mt-2 sm:mt-3 transition-colors w-full"
+                        className="bg-green-600 hover:bg-green-700 text-white px-1 sm:px-3 py-1 sm:py-2 rounded text-xs sm:text-sm mt-1 sm:mt-2 transition-colors w-full"
                         onClick={() => fileInputRefs[slot - 1].current?.click()}
                         data-testid={`upload-image-${slot}-button`}
                       >
-                        <Upload className="w-3 h-3 mr-1" />
-                        {uploadedImage ? 'Change' : 'Upload'}
+                        <Upload className="w-3 h-3 mr-0 sm:mr-1" />
+                        <span className="hidden sm:inline">{uploadedImage ? 'Change' : 'Upload'}</span>
+                        <span className="sm:hidden">{slot}</span>
                       </Button>
                     </div>
                   );
@@ -231,11 +232,11 @@ export default function HeroSection() {
               </div>
 
               {/* Analyze button */}
-              <div className="flex justify-center px-4">
+              <div className="flex justify-center px-2 sm:px-4">
                 <Button
                   onClick={handleAnalyze}
                   disabled={analysisQueueMutation.isPending || uploadedImages.length === 0}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 sm:px-8 py-2 sm:py-3 text-sm sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all w-full max-w-xs sm:w-auto"
                   data-testid="analyze-images-button"
                 >
                   {analysisQueueMutation.isPending ? (

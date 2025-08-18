@@ -146,12 +146,12 @@ export function ImageUploadBanner() {
         }}
       ></div>
       
-      <div className="h-full flex flex-col justify-center items-center px-3 sm:px-6 py-6 sm:py-8 relative z-10">
-        <h2 className="text-base sm:text-lg lg:text-xl xl:text-2xl font-bold text-black text-center mb-3 sm:mb-4 leading-tight">
+      <div className="h-full flex flex-col justify-center items-center px-2 sm:px-6 py-4 sm:py-8 relative z-10">
+        <h2 className="text-sm sm:text-lg lg:text-xl xl:text-2xl font-bold text-black text-center mb-2 sm:mb-4 leading-tight">
           <div>Know Accurately About Your Plants</div>
           <div>Powered by <span className="text-green-600">GreenLens AI</span></div>
         </h2>
-        <h4 className="text-xs sm:text-sm lg:text-base text-black text-center max-w-4xl px-2">
+        <h4 className="text-xs sm:text-sm lg:text-base text-black text-center max-w-4xl px-1 sm:px-2">
           Upload your Plant Photo and get Instant Information about Your Plant
         </h4>
       </div>

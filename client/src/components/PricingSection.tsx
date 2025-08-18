@@ -241,11 +241,11 @@ export default function PricingSection() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 max-w-5xl mx-auto mt-6 px-1 sm:px-2">
           {sortedPlans.map((plan: PricingPlan) => (
             <Card
               key={plan.id}
-              className={`relative transition-all duration-300 hover:shadow-lg w-full flex flex-col h-auto min-h-[300px] sm:min-h-[320px] ${
+              className={`relative transition-all duration-300 hover:shadow-lg w-full flex flex-col h-auto min-h-[280px] sm:min-h-[300px] lg:min-h-[320px] ${
                 plan.isPopular
                   ? 'ring-2 ring-primary border-primary shadow-xl'
                   : 'border-gray-200 dark:border-gray-700'
