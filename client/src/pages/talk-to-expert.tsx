@@ -170,55 +170,49 @@ export default function TalkToExpert() {
 
         {/* Consultation Request Form */}
         <Card>
-          <CardHeader>
-            <CardTitle>Book Your Consultation</CardTitle>
-            <CardDescription>
-              Fill out the form below to schedule your expert consultation session.
-            </CardDescription>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl">Book Your Consultation</CardTitle>
+            <CardDescription>Complete the form to schedule your expert consultation session.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  {/* Name Field */}
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                {/* Personal Information */}
+                <div className="grid md:grid-cols-3 gap-3">
                   <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          <User className="h-4 w-4" />
-                          Full Name
-                        </FormLabel>
+                        <FormLabel className="text-sm">Full Name *</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="Enter your full name"
-                            {...field}
-                            data-testid="input-name"
-                          />
+                          <Input placeholder="Your name" {...field} data-testid="input-name" className="h-9" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
-                  {/* Email Field */}
                   <FormField
                     control={form.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          <Mail className="h-4 w-4" />
-                          Email ID
-                        </FormLabel>
+                        <FormLabel className="text-sm">Email ID *</FormLabel>
                         <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="Enter your email address"
-                            {...field}
-                            data-testid="input-email"
-                          />
+                          <Input type="email" placeholder="your@email.com" {...field} data-testid="input-email" className="h-9" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm">Phone Number *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="+1234567890" {...field} data-testid="input-phone" className="h-9" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -226,107 +220,60 @@ export default function TalkToExpert() {
                   />
                 </div>
 
-                {/* Phone Number (Mandatory) */}
-                <FormField
-                  control={form.control}
-                  name="phoneNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        📞 Phone Number *
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter your phone number"
-                          {...field}
-                          data-testid="input-phone"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Address Section */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-4">
-                    <MapPin className="h-4 w-4" />
-                    <h3 className="text-lg font-semibold">Address Details</h3>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {/* House Number */}
+                {/* Address Details */}
+                <div className="border-t pt-4">
+                  <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />Address Details
+                  </h3>
+                  
+                  <div className="grid md:grid-cols-4 gap-3 mb-3">
                     <FormField
                       control={form.control}
                       name="houseNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>House/Flat Number</FormLabel>
+                          <FormLabel className="text-xs text-gray-600">House/Flat No.</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="e.g., 123, A-45"
-                              {...field}
-                              data-testid="input-house-number"
-                            />
+                            <Input placeholder="123, A-45" {...field} data-testid="input-house-number" className="h-9" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
-                    {/* Building Name */}
                     <FormField
                       control={form.control}
                       name="buildingName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Building Name</FormLabel>
+                          <FormLabel className="text-xs text-gray-600">Building Name</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="e.g., Green Apartments"
-                              {...field}
-                              data-testid="input-building-name"
-                            />
+                            <Input placeholder="Green Apartments" {...field} data-testid="input-building-name" className="h-9" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {/* Road Number */}
                     <FormField
                       control={form.control}
                       name="roadNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Road/Street Number</FormLabel>
+                          <FormLabel className="text-xs text-gray-600">Road/Street</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="e.g., Road 15, Street 7"
-                              {...field}
-                              data-testid="input-road-number"
-                            />
+                            <Input placeholder="Road 15" {...field} data-testid="input-road-number" className="h-9" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
-                    {/* Colony */}
                     <FormField
                       control={form.control}
                       name="colony"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Colony/Locality</FormLabel>
+                          <FormLabel className="text-xs text-gray-600">Colony/Locality</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="e.g., Model Town"
-                              {...field}
-                              data-testid="input-colony"
-                            />
+                            <Input placeholder="Model Town" {...field} data-testid="input-colony" className="h-9" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -334,98 +281,67 @@ export default function TalkToExpert() {
                     />
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {/* Area */}
+                  <div className="grid md:grid-cols-5 gap-3">
                     <FormField
                       control={form.control}
                       name="area"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Area/Sector</FormLabel>
+                          <FormLabel className="text-xs text-gray-600">Area/Sector</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="e.g., Sector 21"
-                              {...field}
-                              data-testid="input-area"
-                            />
+                            <Input placeholder="Sector 21" {...field} data-testid="input-area" className="h-9" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
-                    {/* City */}
                     <FormField
                       control={form.control}
                       name="city"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>City *</FormLabel>
+                          <FormLabel className="text-xs text-gray-600">City *</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="e.g., New Delhi"
-                              {...field}
-                              data-testid="input-city"
-                            />
+                            <Input placeholder="New Delhi" {...field} data-testid="input-city" className="h-9" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  </div>
-
-                  <div className="grid md:grid-cols-3 gap-4">
-                    {/* State */}
                     <FormField
                       control={form.control}
                       name="state"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>State/Province *</FormLabel>
+                          <FormLabel className="text-xs text-gray-600">State *</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="e.g., Delhi"
-                              {...field}
-                              data-testid="input-state"
-                            />
+                            <Input placeholder="Delhi" {...field} data-testid="input-state" className="h-9" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
-                    {/* Country */}
                     <FormField
                       control={form.control}
                       name="country"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Country *</FormLabel>
+                          <FormLabel className="text-xs text-gray-600">Country *</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="e.g., India"
-                              {...field}
-                              data-testid="input-country"
-                            />
+                            <Input placeholder="India" {...field} data-testid="input-country" className="h-9" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
-                    {/* PIN/ZIP */}
                     <FormField
                       control={form.control}
                       name="pinZip"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>PIN/ZIP Code *</FormLabel>
+                          <FormLabel className="text-xs text-gray-600">PIN/ZIP *</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="e.g., 110001"
-                              {...field}
-                              data-testid="input-pin-zip"
-                            />
+                            <Input placeholder="110001" {...field} data-testid="input-pin-zip" className="h-9" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -434,121 +350,107 @@ export default function TalkToExpert() {
                   </div>
                 </div>
 
-                {/* Problem Description */}
-                <FormField
-                  control={form.control}
-                  name="problemDescription"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4" />
-                        Brief Description of the Problem (Max 60 words)
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Describe your plant-related problem or question..."
-                          className="min-h-[100px]"
-                          maxLength={300}
-                          {...field}
-                          data-testid="input-problem"
-                        />
-                      </FormControl>
-                      <div className="text-sm text-gray-500 text-right">
-                        {field.value?.length || 0}/300 characters
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Date and Time Selection */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  {/* Preferred Date */}
+                {/* Problem Description & Scheduling */}
+                <div className="border-t pt-4 space-y-3">
                   <FormField
                     control={form.control}
-                    name="preferredDate"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel className="flex items-center gap-2">
-                          <CalendarIcon className="h-4 w-4" />
-                          Preferred Date
-                        </FormLabel>
-                        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                                data-testid="button-date-picker"
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={(date) => {
-                                field.onChange(date);
-                                setIsCalendarOpen(false);
-                              }}
-                              disabled={(date) =>
-                                date < new Date() || date < new Date("1900-01-01")
-                              }
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Time Slot */}
-                  <FormField
-                    control={form.control}
-                    name="preferredTimeSlot"
+                    name="problemDescription"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          Preferred Time Slot
+                        <FormLabel className="text-sm flex items-center gap-2">
+                          <MessageSquare className="h-4 w-4" />Problem Description (Max 60 words)
                         </FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger data-testid="select-time-slot">
-                              <SelectValue placeholder="Select a time slot" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {timeSlots.map((slot) => (
-                              <SelectItem key={slot} value={slot}>
-                                {slot}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Describe your plant-related problem or question..."
+                            className="min-h-[80px] text-sm"
+                            maxLength={300}
+                            {...field}
+                            data-testid="input-problem"
+                          />
+                        </FormControl>
+                        <div className="text-xs text-gray-500 text-right">{field.value?.length || 0}/300 characters</div>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <FormField
+                      control={form.control}
+                      name="preferredDate"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel className="text-sm flex items-center gap-2">
+                            <CalendarIcon className="h-4 w-4" />Preferred Date
+                          </FormLabel>
+                          <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  className={cn(
+                                    "h-9 pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                  data-testid="button-date-picker"
+                                >
+                                  {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={(date) => {
+                                  field.onChange(date);
+                                  setIsCalendarOpen(false);
+                                }}
+                                disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="preferredTimeSlot"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm flex items-center gap-2">
+                            <Clock className="h-4 w-4" />Time Slot
+                          </FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger data-testid="select-time-slot" className="h-9">
+                                <SelectValue placeholder="Select time slot" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {timeSlots.map((slot) => (
+                                <SelectItem key={slot} value={slot}>{slot}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
 
                 {/* Submit Button */}
-                <div className="pt-6">
+                <div className="pt-4 border-t">
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white h-11"
                     disabled={createConsultationMutation.isPending}
                     data-testid="button-submit-consultation"
                   >
@@ -558,7 +460,7 @@ export default function TalkToExpert() {
                         Processing...
                       </div>
                     ) : (
-                      "Book Consultation & Proceed to Payment"
+                      "Book Consultation ($29.99) - Proceed to Payment"
                     )}
                   </Button>
                 </div>
