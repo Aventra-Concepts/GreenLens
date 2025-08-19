@@ -123,7 +123,6 @@ function Router() {
         <>
           <Route path="/account" component={Account} />
           <Route path="/garden-monitoring" component={GardenMonitoring} />
-          <Route path="/plant-care-dashboard" component={PlantCareDashboard} />
           {user.isAdmin && (
             <>
               <Route path="/admin" component={Admin} />
