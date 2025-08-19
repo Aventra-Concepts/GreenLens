@@ -55,6 +55,13 @@ export const users = pgTable("users", {
   freeTierStartedAt: timestamp("free_tier_started_at"),
   preferredLanguage: varchar("preferred_language", { length: 10 }).default('en'),
   timezone: varchar("timezone", { length: 50 }).default('UTC'),
+  // Stripe subscription fields
+  stripeCustomerId: varchar("stripe_customer_id"),
+  stripeSubscriptionId: varchar("stripe_subscription_id"),
+  // Garden Monitoring Premium Add-on
+  gardenMonitoringSubscriptionId: varchar("garden_monitoring_subscription_id"),
+  gardenMonitoringActive: boolean("garden_monitoring_active").default(false),
+  gardenMonitoringExpiresAt: timestamp("garden_monitoring_expires_at"),
 });
 
 export type UpsertUser = typeof users.$inferInsert;
@@ -184,6 +191,152 @@ export const insertSocialMediaPostSchema = createInsertSchema(socialMediaPosts).
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+
+// Premium Garden Monitoring Tables
+export const gardenPlants = pgTable("garden_plants", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: varchar("name").notNull(),
+  species: varchar("species"),
+  variety: varchar("variety"),
+  dateAdded: timestamp("date_added").defaultNow(),
+  location: varchar("location"), // Indoor/Outdoor/Greenhouse
+  status: varchar("status", { enum: ["healthy", "warning", "critical", "dormant"] }).default("healthy"),
+  photoUrl: varchar("photo_url"),
+  notes: text("notes"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const careActivities = pgTable("care_activities", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  plantId: varchar("plant_id").notNull().references(() => gardenPlants.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  activityType: varchar("activity_type", { 
+    enum: ["watering", "fertilizing", "pruning", "repotting", "pest_treatment", "observation"] 
+  }).notNull(),
+  scheduledDate: timestamp("scheduled_date").notNull(),
+  completedDate: timestamp("completed_date"),
+  isCompleted: boolean("is_completed").default(false),
+  notes: text("notes"),
+  reminderSent: boolean("reminder_sent").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const plantMeasurements = pgTable("plant_measurements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  plantId: varchar("plant_id").notNull().references(() => gardenPlants.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  height: decimal("height", { precision: 8, scale: 2 }),
+  width: decimal("width", { precision: 8, scale: 2 }),
+  leafCount: integer("leaf_count"),
+  flowerCount: integer("flower_count"),
+  fruitCount: integer("fruit_count"),
+  healthScore: integer("health_score"), // 1-100
+  photoUrl: varchar("photo_url"),
+  notes: text("notes"),
+  measurementDate: timestamp("measurement_date").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const environmentalReadings = pgTable("environmental_readings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  plantId: varchar("plant_id").references(() => gardenPlants.id, { onDelete: "cascade" }), // Optional - can be garden-wide
+  location: varchar("location").notNull(), // Indoor/Outdoor/Greenhouse
+  temperature: decimal("temperature", { precision: 5, scale: 2 }),
+  humidity: decimal("humidity", { precision: 5, scale: 2 }),
+  lightLevel: decimal("light_level", { precision: 8, scale: 2 }), // in lux
+  soilMoisture: decimal("soil_moisture", { precision: 5, scale: 2 }), // percentage
+  phLevel: decimal("ph_level", { precision: 4, scale: 2 }),
+  readingDate: timestamp("reading_date").defaultNow(),
+  deviceId: varchar("device_id"), // For IoT sensors
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const gardenReports = pgTable("garden_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  reportType: varchar("report_type", { 
+    enum: ["weekly", "monthly", "seasonal", "annual", "custom"] 
+  }).notNull(),
+  title: varchar("title").notNull(),
+  content: text("content").notNull(),
+  plantCount: integer("plant_count"),
+  activitiesCompleted: integer("activities_completed"),
+  healthScore: integer("health_score"), // Average garden health
+  pdfUrl: varchar("pdf_url"),
+  generatedAt: timestamp("generated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Garden Monitoring Subscription Plans
+export const gardenSubscriptionPlans = pgTable("garden_subscription_plans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  description: text("description"),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("USD"),
+  interval: varchar("interval", { enum: ["month", "year"] }).default("year"),
+  maxPlants: integer("max_plants").default(50),
+  features: jsonb("features").default("[]"),
+  stripePriceId: varchar("stripe_price_id"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Type exports for Garden Monitoring
+export type GardenPlant = typeof gardenPlants.$inferSelect;
+export type InsertGardenPlant = typeof gardenPlants.$inferInsert;
+
+export type CareActivity = typeof careActivities.$inferSelect;
+export type InsertCareActivity = typeof careActivities.$inferInsert;
+
+export type PlantMeasurement = typeof plantMeasurements.$inferSelect;
+export type InsertPlantMeasurement = typeof plantMeasurements.$inferInsert;
+
+export type EnvironmentalReading = typeof environmentalReadings.$inferSelect;
+export type InsertEnvironmentalReading = typeof environmentalReadings.$inferInsert;
+
+export type GardenReport = typeof gardenReports.$inferSelect;
+export type InsertGardenReport = typeof gardenReports.$inferInsert;
+
+export type GardenSubscriptionPlan = typeof gardenSubscriptionPlans.$inferSelect;
+export type InsertGardenSubscriptionPlan = typeof gardenSubscriptionPlans.$inferInsert;
+
+// Zod schemas for Garden Monitoring
+export const insertGardenPlantSchema = createInsertSchema(gardenPlants).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCareActivitySchema = createInsertSchema(careActivities).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+});
+
+export const insertPlantMeasurementSchema = createInsertSchema(plantMeasurements).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+});
+
+export const insertEnvironmentalReadingSchema = createInsertSchema(environmentalReadings).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+});
+
+export const insertGardenReportSchema = createInsertSchema(gardenReports).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+});
 
 // Login schema
 export const loginUserSchema = z.object({

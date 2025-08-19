@@ -83,6 +83,24 @@ import {
   type InsertStudentProfile,
   type InsertBlogView,
   type InsertCatalogCache,
+  // Garden Monitoring types
+  gardenPlants,
+  careActivities,
+  plantMeasurements,
+  environmentalReadings,
+  gardenReports,
+  gardenSubscriptionPlans,
+  type GardenPlant,
+  type InsertGardenPlant,
+  type CareActivity,
+  type InsertCareActivity,
+  type PlantMeasurement,
+  type InsertPlantMeasurement,
+  type EnvironmentalReading,
+  type InsertEnvironmentalReading,
+  type GardenReport,
+  type InsertGardenReport,
+  type GardenSubscriptionPlan,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, gt, lt, gte, lte, asc, desc, like, sql, ne, inArray, count, sum, isNull } from "drizzle-orm";
@@ -99,6 +117,8 @@ export interface IStorage {
   getAllUsers(): Promise<User[]>;
   updateUserAdminStatus(userId: string, isAdmin: boolean): Promise<User>;
   updateUserActiveStatus(userId: string, isActive: boolean): Promise<User>;
+  updateUserStripeInfo(userId: string, stripeInfo: { customerId?: string; subscriptionId?: string }): Promise<User>;
+  updateGardenSubscription(userId: string, subscriptionInfo: { subscriptionId: string; active: boolean; expiresAt: Date }): Promise<User>;
   
   // User Activity operations
   logUserActivity(activity: InsertUserActivity): Promise<UserActivity>;
@@ -247,6 +267,22 @@ export interface IStorage {
   updateAuthorProfile(id: string, updates: Partial<AuthorProfile>): Promise<AuthorProfile>;
   getAuthorProfiles(status?: string, limit?: number, offset?: number): Promise<AuthorProfile[]>;
   updateAuthorApplicationStatus(id: string, status: string, adminNotes?: string, reviewedBy?: string): Promise<AuthorProfile>;
+
+  // Garden Monitoring operations
+  getGardenPlants(userId: string): Promise<GardenPlant[]>;
+  createGardenPlant(plant: InsertGardenPlant): Promise<GardenPlant>;
+  updateGardenPlant(plantId: string, userId: string, updates: Partial<InsertGardenPlant>): Promise<GardenPlant | null>;
+  deleteGardenPlant(plantId: string, userId: string): Promise<void>;
+  getCareActivities(userId: string, plantId?: string, upcomingOnly?: boolean): Promise<CareActivity[]>;
+  createCareActivity(activity: InsertCareActivity): Promise<CareActivity>;
+  completeCareActivity(activityId: string, userId: string, notes?: string): Promise<CareActivity | null>;
+  getPlantMeasurements(plantId: string, userId: string): Promise<PlantMeasurement[]>;
+  createPlantMeasurement(measurement: InsertPlantMeasurement): Promise<PlantMeasurement>;
+  getEnvironmentalReadings(userId: string, location?: string, plantId?: string, days?: number): Promise<EnvironmentalReading[]>;
+  createEnvironmentalReading(reading: InsertEnvironmentalReading): Promise<EnvironmentalReading>;
+  getGardenDashboardStats(userId: string): Promise<any>;
+  generateGardenReport(userId: string, reportType: string, title: string): Promise<GardenReport>;
+  getGardenReports(userId: string): Promise<GardenReport[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1788,6 +1824,193 @@ export class DatabaseStorage implements IStorage {
       orderBy: [desc(aiContentLogs.createdAt)],
       limit
     });
+  }
+
+  // Garden Monitoring implementations
+  async getGardenPlants(userId: string): Promise<GardenPlant[]> {
+    return await db.select()
+      .from(gardenPlants)
+      .where(and(eq(gardenPlants.userId, userId), eq(gardenPlants.isActive, true)))
+      .orderBy(desc(gardenPlants.createdAt));
+  }
+
+  async createGardenPlant(plant: InsertGardenPlant): Promise<GardenPlant> {
+    const [result] = await db
+      .insert(gardenPlants)
+      .values(plant)
+      .returning();
+    return result;
+  }
+
+  async updateGardenPlant(plantId: string, userId: string, updates: Partial<InsertGardenPlant>): Promise<GardenPlant | null> {
+    const [result] = await db
+      .update(gardenPlants)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(and(eq(gardenPlants.id, plantId), eq(gardenPlants.userId, userId)))
+      .returning();
+    return result || null;
+  }
+
+  async deleteGardenPlant(plantId: string, userId: string): Promise<void> {
+    await db
+      .update(gardenPlants)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(and(eq(gardenPlants.id, plantId), eq(gardenPlants.userId, userId)));
+  }
+
+  async getCareActivities(userId: string, plantId?: string, upcomingOnly?: boolean): Promise<CareActivity[]> {
+    let query = db.select().from(careActivities).where(eq(careActivities.userId, userId));
+    
+    if (plantId) {
+      query = query.where(eq(careActivities.plantId, plantId));
+    }
+    
+    if (upcomingOnly) {
+      query = query.where(and(
+        eq(careActivities.isCompleted, false),
+        gte(careActivities.scheduledDate, new Date())
+      ));
+    }
+    
+    return await query.orderBy(asc(careActivities.scheduledDate));
+  }
+
+  async createCareActivity(activity: InsertCareActivity): Promise<CareActivity> {
+    const [result] = await db
+      .insert(careActivities)
+      .values(activity)
+      .returning();
+    return result;
+  }
+
+  async completeCareActivity(activityId: string, userId: string, notes?: string): Promise<CareActivity | null> {
+    const [result] = await db
+      .update(careActivities)
+      .set({ 
+        isCompleted: true, 
+        completedDate: new Date(),
+        notes: notes || null
+      })
+      .where(and(eq(careActivities.id, activityId), eq(careActivities.userId, userId)))
+      .returning();
+    return result || null;
+  }
+
+  async getPlantMeasurements(plantId: string, userId: string): Promise<PlantMeasurement[]> {
+    return await db.select()
+      .from(plantMeasurements)
+      .where(and(eq(plantMeasurements.plantId, plantId), eq(plantMeasurements.userId, userId)))
+      .orderBy(desc(plantMeasurements.measurementDate));
+  }
+
+  async createPlantMeasurement(measurement: InsertPlantMeasurement): Promise<PlantMeasurement> {
+    const [result] = await db
+      .insert(plantMeasurements)
+      .values(measurement)
+      .returning();
+    return result;
+  }
+
+  async getEnvironmentalReadings(userId: string, location?: string, plantId?: string, days: number = 7): Promise<EnvironmentalReading[]> {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    
+    let query = db.select()
+      .from(environmentalReadings)
+      .where(and(
+        eq(environmentalReadings.userId, userId),
+        gte(environmentalReadings.readingDate, startDate)
+      ));
+    
+    if (location) {
+      query = query.where(eq(environmentalReadings.location, location));
+    }
+    
+    if (plantId) {
+      query = query.where(eq(environmentalReadings.plantId, plantId));
+    }
+    
+    return await query.orderBy(desc(environmentalReadings.readingDate));
+  }
+
+  async createEnvironmentalReading(reading: InsertEnvironmentalReading): Promise<EnvironmentalReading> {
+    const [result] = await db
+      .insert(environmentalReadings)
+      .values(reading)
+      .returning();
+    return result;
+  }
+
+  async getGardenDashboardStats(userId: string): Promise<any> {
+    const [plantsCount] = await db
+      .select({ count: count() })
+      .from(gardenPlants)
+      .where(and(eq(gardenPlants.userId, userId), eq(gardenPlants.isActive, true)));
+
+    const [upcomingActivities] = await db
+      .select({ count: count() })
+      .from(careActivities)
+      .where(and(
+        eq(careActivities.userId, userId),
+        eq(careActivities.isCompleted, false),
+        gte(careActivities.scheduledDate, new Date())
+      ));
+
+    const [completedThisWeek] = await db
+      .select({ count: count() })
+      .from(careActivities)
+      .where(and(
+        eq(careActivities.userId, userId),
+        eq(careActivities.isCompleted, true),
+        gte(careActivities.completedDate, new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+      ));
+
+    return {
+      totalPlants: plantsCount.count,
+      upcomingActivities: upcomingActivities.count,
+      completedThisWeek: completedThisWeek.count
+    };
+  }
+
+  async generateGardenReport(userId: string, reportType: string, title: string): Promise<GardenReport> {
+    // Get basic garden stats for the report content
+    const stats = await this.getGardenDashboardStats(userId);
+    const plants = await this.getGardenPlants(userId);
+    
+    const content = `
+Garden Report - ${title}
+Generated on: ${new Date().toLocaleDateString()}
+
+Summary:
+- Total Plants: ${stats.totalPlants}
+- Completed Activities This Week: ${stats.completedThisWeek}
+- Upcoming Activities: ${stats.upcomingActivities}
+
+Plants in Garden:
+${plants.map(plant => `- ${plant.name} (${plant.species}) - Status: ${plant.status}`).join('\n')}
+    `.trim();
+
+    const [report] = await db
+      .insert(gardenReports)
+      .values({
+        userId,
+        reportType,
+        title,
+        content,
+        plantCount: stats.totalPlants,
+        activitiesCompleted: stats.completedThisWeek,
+        healthScore: Math.round(Math.random() * 100), // Placeholder - implement proper health calculation
+      })
+      .returning();
+    
+    return report;
+  }
+
+  async getGardenReports(userId: string): Promise<GardenReport[]> {
+    return await db.select()
+      .from(gardenReports)
+      .where(eq(gardenReports.userId, userId))
+      .orderBy(desc(gardenReports.generatedAt));
   }
 }
 

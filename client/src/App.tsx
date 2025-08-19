@@ -34,6 +34,7 @@ import AuthorRegistration from "@/pages/author-registration";
 import StudentVerification from "@/pages/student-verification-new";
 import StudentDashboard from "@/pages/student-dashboard";
 import MyGarden from "@/pages/my-garden";
+import GardenMonitoring from "@/pages/garden-monitoring";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 
 // E-book Category Pages
@@ -116,6 +117,7 @@ function Router() {
       {user && (
         <>
           <Route path="/account" component={Account} />
+          <Route path="/garden-monitoring" component={GardenMonitoring} />
           {user.isAdmin && (
             <>
               <Route path="/admin" component={Admin} />

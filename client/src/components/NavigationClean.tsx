@@ -19,7 +19,8 @@ import {
   DollarSign,
   Star,
   MessageCircle,
-  Settings
+  Settings,
+  Activity
 } from "lucide-react";
 
 export default function NavigationClean() {
@@ -48,6 +49,7 @@ export default function NavigationClean() {
     { name: "Home", href: "/", icon: Home },
     { name: "Identify Plants", href: "/identify", icon: Leaf },
     { name: "E-Books", href: "/ebook-marketplace", icon: BookOpen },
+    { name: "Garden Monitoring", href: "/garden-monitoring", icon: Activity },
     { name: "Pricing", href: "/pricing", icon: DollarSign },
     { name: "Reviews", href: "/reviews", icon: Star },
   ];
