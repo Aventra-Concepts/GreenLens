@@ -72,12 +72,9 @@ export default function NavigationEnhanced() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 dark:border-gray-700/50 bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/90 dark:bg-gray-900/95 dark:supports-[backdrop-filter]:bg-gray-900/90">
       <div className="container mx-auto px-2 sm:px-4 lg:px-8">
-        <div className="flex items-center h-14 sm:h-16 w-full lg:grid lg:grid-cols-3">
-          {/* Left section - empty spacer on desktop for centering */}
-          <div className="hidden lg:flex"></div>
-          
-          {/* Center - Logo (always visible) */}
-          <div className="flex items-center justify-center lg:justify-center">
+        <div className="flex items-center justify-between h-14 sm:h-16 w-full max-w-6xl mx-auto">
+          {/* Logo */}
+          <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2 group flex-shrink-0">
               <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center transition-all group-hover:scale-105">
                 <Leaf className="w-5 h-5 text-white" />
@@ -88,10 +85,10 @@ export default function NavigationEnhanced() {
             </Link>
           </div>
 
-          {/* Right section - Desktop Navigation & Actions */}
-          <div className="hidden lg:flex items-center justify-end space-x-1">
+          {/* Desktop Navigation & Actions */}
+          <div className="hidden lg:flex items-center space-x-6">
             {/* Desktop Navigation */}
-            <nav className="flex items-center space-x-1 mr-4">
+            <nav className="flex items-center space-x-1">
               {navigationItems.map((item) => (
                 <Link key={item.name} href={item.href}>
                   <button
@@ -112,6 +109,7 @@ export default function NavigationEnhanced() {
             </nav>
 
             {/* Desktop Action Buttons */}
+            <div className="flex items-center space-x-3">
             {/* Tools Link */}
             <Link href="/tools">
               <button
@@ -122,14 +120,15 @@ export default function NavigationEnhanced() {
               </button>
             </Link>
             
-            {/* Menu Button for Account Access */}
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
-              data-testid="nav-menu"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+              {/* Menu Button for Account Access */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
+                data-testid="nav-menu"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Mobile Right Section */}

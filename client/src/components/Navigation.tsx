@@ -15,13 +15,10 @@ export default function Navigation() {
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50 backdrop-blur-sm bg-white/95 dark:bg-gray-900/95">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Left spacer for desktop centering */}
-          <div className="hidden lg:flex flex-1"></div>
-          
-          {/* Centered brand logo */}
-          <div className="flex items-center justify-center lg:justify-center">
+          {/* Brand logo */}
+          <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
                 <Leaf className="w-5 h-5 text-white" />
@@ -31,7 +28,7 @@ export default function Navigation() {
           </div>
 
           {/* Right section - tools and user actions */}
-          <div className="flex items-center space-x-4 flex-1 lg:justify-end">
+          <div className="flex items-center space-x-4">
             {/* Tools Link */}
             <Link href="/tools">
               <Button variant="ghost" data-testid="tools-link">
