@@ -25,6 +25,7 @@ import blogRoutes from "./routes/blogRoutes";
 import { registerAuthorRoutes } from "./routes/authorRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import studentAdminRoutes from "./routes/studentAdminRoutes";
+import gardenSubscriptionRoutes from "./routes/gardenSubscriptionRoutes";
 
 import { GeographicRestrictionService } from "./services/geographicRestrictionService";
 import { socialMediaService } from "./services/socialMediaService";
@@ -93,6 +94,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register garden monitoring premium routes
   app.use('/api/garden-monitoring', gardenMonitoringRoutes);
+  
+  // Register garden subscription routes
+  app.use('/api/garden/subscription', gardenSubscriptionRoutes);
   
   // Geographic restrictions routes
   app.get('/api/geographic/check-product/:productId', async (req, res) => {

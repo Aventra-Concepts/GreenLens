@@ -119,6 +119,7 @@ export interface IStorage {
   updateUserActiveStatus(userId: string, isActive: boolean): Promise<User>;
   updateUserStripeInfo(userId: string, stripeInfo: { customerId?: string; subscriptionId?: string }): Promise<User>;
   updateGardenSubscription(userId: string, subscriptionInfo: { subscriptionId: string; active: boolean; expiresAt: Date }): Promise<User>;
+  updateUserGardenSubscription(userId: string, updates: { gardenMonitoringActive?: boolean; gardenMonitoringExpiresAt?: Date | null; gardenMonitoringSubscriptionId?: string | null }): Promise<User>;
   
   // User Activity operations
   logUserActivity(activity: InsertUserActivity): Promise<UserActivity>;
@@ -380,6 +381,15 @@ export class DatabaseStorage implements IStorage {
     const [result] = await db
       .update(users)
       .set({ isActive, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return result;
+  }
+
+  async updateUserGardenSubscription(userId: string, updates: { gardenMonitoringActive?: boolean; gardenMonitoringExpiresAt?: Date | null; gardenMonitoringSubscriptionId?: string | null }): Promise<User> {
+    const [result] = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning();
     return result;
