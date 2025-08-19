@@ -77,6 +77,13 @@ export const gardenContent = pgTable("garden_content", {
 export type GardenContent = typeof gardenContent.$inferSelect;
 export type InsertGardenContent = typeof gardenContent.$inferInsert;
 
+// Garden Content schema
+export const insertGardenContentSchema = createInsertSchema(gardenContent).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // AI Garden Content Generation Logs
 export const aiContentLogs = pgTable("ai_content_logs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

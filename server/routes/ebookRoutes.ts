@@ -2,7 +2,7 @@ import { Router } from "express";
 import { ebookService } from "../services/ebookService";
 import { paymentService } from "../services/paymentService";
 import { emailService } from "../services/emailService";
-import { isAuthenticated } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 import { insertEbookSchema, insertAuthorProfileSchema } from "@shared/schema";
 import { z } from "zod";
 import multer from "multer";
@@ -52,9 +52,9 @@ const upload = multer({
 });
 
 // Author registration route
-router.post('/author/register', isAuthenticated, async (req, res) => {
+router.post('/author/register', requireAuth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user!.id;
     
     // Validate request body
     const profileData = insertAuthorProfileSchema.parse(req.body);
@@ -83,9 +83,9 @@ router.post('/author/register', isAuthenticated, async (req, res) => {
 });
 
 // Start e-book upload session
-router.post('/upload/start', isAuthenticated, async (req, res) => {
+router.post('/upload/start', requireAuth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user!.id;
     
     // Check if user is an approved author
     // This would be validated in the middleware or service
@@ -107,7 +107,7 @@ router.post('/upload/start', isAuthenticated, async (req, res) => {
 });
 
 // Update upload step
-router.put('/upload/:sessionId/step', isAuthenticated, async (req, res) => {
+router.put('/upload/:sessionId/step', requireAuth, async (req, res) => {
   try {
     const { sessionId } = req.params;
     const { step, data } = req.body;
@@ -129,7 +129,7 @@ router.put('/upload/:sessionId/step', isAuthenticated, async (req, res) => {
 
 // Upload files (cover image and manuscript)
 router.post('/upload/:sessionId/files', 
-  isAuthenticated,
+  requireAuth,
   upload.fields([
     { name: 'coverImage', maxCount: 1 },
     { name: 'manuscript', maxCount: 1 }
@@ -175,14 +175,14 @@ router.post('/upload/:sessionId/files',
 );
 
 // Complete e-book upload and submit for review
-router.post('/upload/:sessionId/complete', isAuthenticated, async (req, res) => {
+router.post('/upload/:sessionId/complete', requireAuth, async (req, res) => {
   try {
     const { sessionId } = req.params;
     const ebookData = insertEbookSchema.parse(req.body);
     
     const ebook = await ebookService.completeUpload(sessionId, {
       ...ebookData,
-      authorId: req.user.id,
+      authorId: req.user!.id,
     });
     
     res.status(201).json({
@@ -363,10 +363,10 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create payment intent for e-book purchase
-router.post('/:id/purchase', isAuthenticated, async (req, res) => {
+router.post('/:id/purchase', requireAuth, async (req, res) => {
   try {
     const { id: ebookId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user!.id;
     const { currency = 'USD' } = req.body;
     
     const paymentData = await paymentService.createEbookPaymentIntent(
@@ -412,9 +412,9 @@ router.post('/webhook/stripe', async (req, res) => {
 });
 
 // Get author's e-books
-router.get('/author/my-books', isAuthenticated, async (req, res) => {
+router.get('/author/my-books', requireAuth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user!.id;
     
     const ebooks = await ebookService.getAuthorEbooks(userId);
     
@@ -432,10 +432,10 @@ router.get('/author/my-books', isAuthenticated, async (req, res) => {
 });
 
 // Admin routes for e-book management
-router.put('/:id/approve', isAuthenticated, async (req, res) => {
+router.put('/:id/approve', requireAuth, async (req, res) => {
   try {
     // Check if user is admin (implement admin middleware)
-    if (!req.user.isAdmin) {
+    if (!req.user!.isAdmin) {
       return res.status(403).json({
         success: false,
         message: 'Admin access required',
@@ -443,7 +443,7 @@ router.put('/:id/approve', isAuthenticated, async (req, res) => {
     }
     
     const { id } = req.params;
-    const adminId = req.user.id;
+    const adminId = req.user!.id;
     
     const ebook = await ebookService.publishEbook(id, adminId);
     
@@ -461,10 +461,10 @@ router.put('/:id/approve', isAuthenticated, async (req, res) => {
   }
 });
 
-router.put('/:id/reject', isAuthenticated, async (req, res) => {
+router.put('/:id/reject', requireAuth, async (req, res) => {
   try {
     // Check if user is admin
-    if (!req.user.isAdmin) {
+    if (!req.user!.isAdmin) {
       return res.status(403).json({
         success: false,
         message: 'Admin access required',
@@ -473,7 +473,7 @@ router.put('/:id/reject', isAuthenticated, async (req, res) => {
     
     const { id } = req.params;
     const { reason } = req.body;
-    const adminId = req.user.id;
+    const adminId = req.user!.id;
     
     if (!reason) {
       return res.status(400).json({

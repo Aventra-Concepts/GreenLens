@@ -31,7 +31,7 @@ router.post('/', requireAuth, requireAdmin, async (req, res) => {
     const validatedData = insertGardenContentSchema.parse(req.body);
     const content = await storage.createGardenContent({
       ...validatedData,
-      lastEditedBy: req.user.id,
+      lastEditedBy: req.user!.id,
     });
     res.status(201).json(content);
   } catch (error) {
@@ -49,7 +49,7 @@ router.patch('/:id', requireAuth, requireAdmin, async (req, res) => {
     const updatedContent = await storage.updateGardenContent(id, {
       title,
       content,
-      lastEditedBy: req.user.id,
+      lastEditedBy: req.user!.id,
       updatedAt: new Date(),
     });
     
@@ -152,7 +152,7 @@ router.post('/ai/generate', requireAuth, requireAdmin, async (req, res) => {
         prompt,
         generatedAt: new Date().toISOString() 
       },
-      lastEditedBy: req.user.id,
+      lastEditedBy: req.user!.id,
     });
 
     res.json({
