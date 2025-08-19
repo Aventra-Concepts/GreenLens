@@ -1108,36 +1108,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Return default content if none exists
         res.json({
           sectionTitle: "All you need to know about the Right Gardening Tools",
-          sectionDescription: "Everything you need for successful gardening, from essential tools to expert soil preparation techniques",
+          sectionDescription: "Master the essential tools and techniques that make gardening easier and more productive. Learn proper usage, maintenance, and selection of quality gardening equipment.",
           tools: [
             {
               id: "1",
-              name: "Premium Garden Spade",
-              description: "Durable stainless steel spade perfect for soil preparation and planting",
+              name: "Garden Spade",
+              description: "The foundation tool for any gardener. Essential for digging, transplanting, and soil preparation with its sharp, angled blade design.",
               category: "Digging Tools",
-              price: "$34.99",
+              imageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop",
+              usageTips: "Hold firmly with both hands. Push blade straight down using your foot, then angle back to lift soil. Keep your back straight and use leg power.",
+              bestFor: ["Digging holes", "Transplanting", "Soil breaking", "Edging"],
               isRecommended: true
             },
             {
               id: "2", 
               name: "Pruning Shears",
-              description: "Sharp, ergonomic pruning shears for precise plant trimming and care",
+              description: "Sharp, bypass pruning shears for clean cuts that promote healthy plant growth. Essential for maintaining plant health and shape.",
               category: "Cutting Tools",
-              price: "$24.99"
+              imageUrl: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400&h=300&fit=crop",
+              usageTips: "Make clean cuts at 45-degree angles just above growth nodes. Clean blades between plants to prevent disease spread. Cut branches no thicker than your thumb.",
+              bestFor: ["Deadheading flowers", "Trimming branches", "Harvesting", "Shaping plants"]
             },
             {
               id: "3",
-              name: "Watering Can with Spout",
-              description: "2-gallon watering can with precision spout for targeted watering",
+              name: "Watering Can",
+              description: "Provides controlled watering with adjustable flow. The removable spout allows for different watering patterns from gentle shower to focused stream.",
               category: "Watering Tools",
-              price: "$19.99"
+              imageUrl: "https://images.unsplash.com/photo-1615671524827-c1fe3973b648?w=400&h=300&fit=crop",
+              usageTips: "Water early morning or evening to reduce evaporation. Remove spout for gentle shower effect on seedlings. Water at soil level to avoid wet foliage.",
+              bestFor: ["Seedling care", "Container plants", "Precise watering", "Fertilizer application"]
             },
             {
               id: "4",
               name: "Hand Cultivator",
-              description: "Essential tool for breaking up soil and removing weeds",
+              description: "Three-pronged tool perfect for loosening soil, removing weeds, and aerating around plants without damaging roots.",
               category: "Soil Tools",
-              price: "$16.99"
+              imageUrl: "https://images.unsplash.com/photo-1617419808381-e8c041c3c7ce?w=400&h=300&fit=crop",
+              usageTips: "Use gentle scratching motions near plant roots. Work when soil is slightly moist, not wet or bone dry. Clean tines regularly to prevent soil buildup.",
+              bestFor: ["Weed removal", "Soil aeration", "Surface cultivation", "Mixing compost"]
+            },
+            {
+              id: "5",
+              name: "Garden Rake",
+              description: "Multi-purpose tool for leveling soil, gathering debris, and breaking up clods. The long handle provides leverage for larger areas.",
+              category: "Soil Tools",
+              imageUrl: "https://images.unsplash.com/photo-1621467705323-1300cfc1e671?w=400&h=300&fit=crop",
+              usageTips: "Pull towards you to level soil and gather debris. Use back of rake to break up soil clods. Work systematically across garden beds.",
+              bestFor: ["Soil leveling", "Debris removal", "Seedbed preparation", "Spreading mulch"]
+            },
+            {
+              id: "6",
+              name: "Garden Hose with Nozzle",
+              description: "Flexible watering solution with adjustable spray patterns. Essential for reaching all areas of your garden efficiently.",
+              category: "Watering Tools",
+              imageUrl: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop",
+              usageTips: "Use soaker setting for deep watering. Mist setting for delicate plants. Always drain hose completely in winter to prevent freezing damage.",
+              bestFor: ["Large area watering", "Washing tools", "Filling containers", "Cleaning walkways"],
+              isRecommended: true
             }
           ],
           soilPreparation: [
