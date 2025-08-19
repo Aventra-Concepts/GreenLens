@@ -72,52 +72,53 @@ export default function NavigationEnhanced() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 dark:border-gray-700/50 bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/90 dark:bg-gray-900/95 dark:supports-[backdrop-filter]:bg-gray-900/90">
       <div className="container mx-auto px-2 sm:px-4 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-16 w-full">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group flex-shrink-0">
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center transition-all group-hover:scale-105">
-              <Leaf className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-lg font-semibold text-gray-800 dark:text-gray-100 tracking-tight whitespace-nowrap">
-              GreenLens
-            </span>
-          </Link>
+        <div className="flex items-center h-14 sm:h-16 w-full lg:grid lg:grid-cols-3">
+          {/* Left section - empty spacer on desktop for centering */}
+          <div className="hidden lg:flex"></div>
+          
+          {/* Center - Logo (always visible) */}
+          <div className="flex items-center justify-center lg:justify-center">
+            <Link href="/" className="flex items-center space-x-2 group flex-shrink-0">
+              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center transition-all group-hover:scale-105">
+                <Leaf className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-lg font-semibold text-gray-800 dark:text-gray-100 tracking-tight whitespace-nowrap">
+                GreenLens
+              </span>
+            </Link>
+          </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1">
-            {navigationItems.map((item) => (
-              <Link key={item.name} href={item.href}>
-                <button
-                  className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                    isActive(item.href)
-                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
-                      : "text-gray-600 dark:text-gray-300 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20"
-                  }`}
-                  data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
-                >
-                  <span className="flex items-center space-x-2">
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </span>
-                </button>
-              </Link>
-            ))}
-          </nav>
+          {/* Right section - Desktop Navigation & Actions */}
+          <div className="hidden lg:flex items-center justify-end space-x-1">
+            {/* Desktop Navigation */}
+            <nav className="flex items-center space-x-1 mr-4">
+              {navigationItems.map((item) => (
+                <Link key={item.name} href={item.href}>
+                  <button
+                    className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                      isActive(item.href)
+                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
+                        : "text-gray-600 dark:text-gray-300 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20"
+                    }`}
+                    data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    <span className="flex items-center space-x-2">
+                      <item.icon className="w-4 h-4" />
+                      <span>{item.name}</span>
+                    </span>
+                  </button>
+                </Link>
+              ))}
+            </nav>
 
-          {/* Desktop Right Section */}
-          <div className="hidden lg:flex items-center space-x-3">
-            {/* Shopping Cart */}
-            <Link href="/shop">
+            {/* Desktop Action Buttons */}
+            {/* Tools Link */}
+            <Link href="/tools">
               <button
                 className="relative p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
-                data-testid="nav-cart"
+                data-testid="nav-tools"
               >
-                <ShoppingCart className="w-5 h-5" />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs font-medium bg-red-500 text-white rounded-full">
-                    {cartItemCount}
-                  </span>
-                )}
+                <Store className="w-5 h-5" />
               </button>
             </Link>
             
@@ -132,19 +133,14 @@ export default function NavigationEnhanced() {
           </div>
 
           {/* Mobile Right Section */}
-          <div className="flex lg:hidden items-center space-x-2 flex-shrink-0">
-            {/* Mobile Cart */}
-            <Link href="/shop">
+          <div className="flex lg:hidden items-center space-x-2 flex-shrink-0 ml-auto">
+            {/* Mobile Tools */}
+            <Link href="/tools">
               <button
                 className="relative p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 transition-all duration-200"
-                data-testid="nav-mobile-cart"
+                data-testid="nav-mobile-tools"
               >
-                <ShoppingCart className="w-4 h-4" />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 flex items-center justify-center text-xs font-medium bg-red-500 text-white rounded-full">
-                    {cartItemCount}
-                  </span>
-                )}
+                <Store className="w-4 h-4" />
               </button>
             </Link>
             
