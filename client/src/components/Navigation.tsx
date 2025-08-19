@@ -15,8 +15,8 @@ export default function Navigation() {
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50 backdrop-blur-sm bg-white/95 dark:bg-gray-900/95">
-      <div className="w-full px-4 sm:px-6">
-        <div className="flex justify-between items-center h-16 lg:max-w-5xl lg:mx-auto lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
           {/* Brand logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
