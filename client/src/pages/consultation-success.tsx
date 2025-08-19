@@ -45,9 +45,14 @@ export default function ConsultationSuccess({ consultationId }: ConsultationSucc
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Consultation Not Found
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
             The consultation request you're looking for doesn't exist or you don't have access to it.
           </p>
+          <div className="flex justify-center">
+            <Button onClick={() => setLocation('/')} data-testid="button-go-home">
+              Go Back to Home
+            </Button>
+          </div>
         </div>
       </Layout>
     );

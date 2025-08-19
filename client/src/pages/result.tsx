@@ -1,10 +1,12 @@
-import { useParams } from "wouter";
+import { useParams, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import ResultsDashboard from "@/components/ResultsDashboard";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Home } from "lucide-react";
 
 export default function Result() {
   const { id } = useParams<{ id: string }>();
@@ -49,7 +51,13 @@ export default function Result() {
             <Card>
               <CardContent className="p-6 text-center">
                 <h1 className="text-2xl font-bold text-gray-900 mb-4">Plant Result Not Found</h1>
-                <p className="text-gray-600">The plant identification result could not be found.</p>
+                <p className="text-gray-600 mb-6">The plant identification result could not be found.</p>
+                <Link href="/">
+                  <Button data-testid="button-go-home">
+                    <Home className="w-4 h-4 mr-2" />
+                    Go Back to Home
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>

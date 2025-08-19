@@ -20,7 +20,8 @@ import {
   BookOpen,
   Award,
   MessageSquare,
-  ThumbsUp
+  ThumbsUp,
+  Home
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -191,11 +192,19 @@ export default function EbookDetail({ id }: EbookDetailProps) {
           <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-600 mb-2">E-book not found</h1>
           <p className="text-gray-500 mb-4">The e-book you're looking for doesn't exist or has been removed.</p>
-          <Link href="/ebook-marketplace">
-            <Button className="bg-green-600 hover:bg-green-700">
-              Browse E-books
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/ebook-marketplace">
+              <Button className="bg-green-600 hover:bg-green-700">
+                Browse E-books
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button variant="outline" data-testid="button-go-home">
+                <Home className="w-4 h-4 mr-2" />
+                Go Back to Home
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     );
