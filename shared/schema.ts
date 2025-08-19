@@ -287,6 +287,96 @@ export const gardenSubscriptionPlans = pgTable("garden_subscription_plans", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Achievement System Tables
+export const achievements = pgTable("achievements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  description: text("description").notNull(),
+  icon: varchar("icon").notNull(), // Icon name or emoji
+  category: varchar("category", { enum: ["care", "growth", "consistency", "social", "learning"] }).notNull(),
+  points: integer("points").default(10),
+  requirement: jsonb("requirement").notNull(), // Condition to unlock
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userAchievements = pgTable("user_achievements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  achievementId: varchar("achievement_id").notNull().references(() => achievements.id, { onDelete: "cascade" }),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+  plantId: varchar("plant_id").references(() => gardenPlants.id), // Optional - specific plant achievement
+  sharedAt: timestamp("shared_at"), // When user shared this achievement
+});
+
+// Weather Integration Table
+export const weatherData = pgTable("weather_data", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  location: varchar("location").notNull(),
+  temperature: decimal("temperature", { precision: 5, scale: 2 }),
+  humidity: decimal("humidity", { precision: 5, scale: 2 }),
+  uvIndex: decimal("uv_index", { precision: 4, scale: 2 }),
+  precipitation: decimal("precipitation", { precision: 6, scale: 2 }),
+  windSpeed: decimal("wind_speed", { precision: 5, scale: 2 }),
+  condition: varchar("condition"), // sunny, cloudy, rainy, etc.
+  forecastDate: date("forecast_date").notNull(),
+  isActual: boolean("is_actual").default(true), // true for current weather, false for forecast
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Plant Health Predictions Table
+export const plantHealthPredictions = pgTable("plant_health_predictions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  plantId: varchar("plant_id").notNull().references(() => gardenPlants.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  predictionDate: date("prediction_date").notNull(),
+  healthScore: integer("health_score"), // 1-100
+  riskFactors: jsonb("risk_factors").default("[]"), // Array of risk factors
+  recommendations: jsonb("recommendations").default("[]"), // AI recommendations
+  weatherImpact: jsonb("weather_impact"), // How weather affects this plant
+  confidenceLevel: decimal("confidence_level", { precision: 5, scale: 2 }), // AI confidence %
+  actualOutcome: integer("actual_outcome"), // User reported actual health (for learning)
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Social Sharing Table
+export const plantMilestoneShares = pgTable("plant_milestone_shares", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  plantId: varchar("plant_id").notNull().references(() => gardenPlants.id, { onDelete: "cascade" }),
+  achievementId: varchar("achievement_id").references(() => achievements.id),
+  milestoneType: varchar("milestone_type", { 
+    enum: ["growth", "flowering", "fruiting", "achievement", "care_streak", "health_improvement"] 
+  }).notNull(),
+  title: varchar("title").notNull(),
+  description: text("description"),
+  imageUrl: varchar("image_url"),
+  platform: varchar("platform", { enum: ["twitter", "facebook", "instagram", "internal"] }).notNull(),
+  shareData: jsonb("share_data"), // Platform specific data
+  isPublic: boolean("is_public").default(true),
+  likes: integer("likes").default(0),
+  shares: integer("shares").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User Stats for Gamification
+export const userGardenStats = pgTable("user_garden_stats", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
+  totalPoints: integer("total_points").default(0),
+  level: integer("level").default(1),
+  plantsOwned: integer("plants_owned").default(0),
+  achievementsUnlocked: integer("achievements_unlocked").default(0),
+  careStreak: integer("care_streak").default(0), // Days in a row with plant care
+  longestStreak: integer("longest_streak").default(0),
+  lastCareDate: date("last_care_date"),
+  experiencePoints: integer("experience_points").default(0),
+  rank: varchar("rank", { enum: ["seedling", "sprout", "gardener", "expert", "botanist"] }).default("seedling"),
+  badgeCount: integer("badge_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Type exports for Garden Monitoring
 export type GardenPlant = typeof gardenPlants.$inferSelect;
 export type InsertGardenPlant = typeof gardenPlants.$inferInsert;
@@ -336,6 +426,61 @@ export const insertGardenReportSchema = createInsertSchema(gardenReports).omit({
   id: true,
   userId: true,
   createdAt: true,
+});
+
+// Type exports for new gamification and social features
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = typeof achievements.$inferInsert;
+
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type InsertUserAchievement = typeof userAchievements.$inferInsert;
+
+export type WeatherData = typeof weatherData.$inferSelect;
+export type InsertWeatherData = typeof weatherData.$inferInsert;
+
+export type PlantHealthPrediction = typeof plantHealthPredictions.$inferSelect;
+export type InsertPlantHealthPrediction = typeof plantHealthPredictions.$inferInsert;
+
+export type PlantMilestoneShare = typeof plantMilestoneShares.$inferSelect;
+export type InsertPlantMilestoneShare = typeof plantMilestoneShares.$inferInsert;
+
+export type UserGardenStats = typeof userGardenStats.$inferSelect;
+export type InsertUserGardenStats = typeof userGardenStats.$inferInsert;
+
+// Zod schemas for new features
+export const insertAchievementSchema = createInsertSchema(achievements).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({
+  id: true,
+  unlockedAt: true,
+});
+
+export const insertWeatherDataSchema = createInsertSchema(weatherData).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPlantHealthPredictionSchema = createInsertSchema(plantHealthPredictions).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+});
+
+export const insertPlantMilestoneShareSchema = createInsertSchema(plantMilestoneShares).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+  likes: true,
+  shares: true,
+});
+
+export const insertUserGardenStatsSchema = createInsertSchema(userGardenStats).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 // Login schema

@@ -76,6 +76,9 @@ export function Layout({
               </div>
             )}
             
+            <a href="/plant-care-dashboard" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors" data-testid="link-plant-care-dashboard">
+              🌱 Plant Care
+            </a>
             <a href="/account" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors" data-testid="link-account">
               Account
             </a>

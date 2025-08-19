@@ -1564,6 +1564,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Register plant care dashboard routes
+  const { registerPlantCareRoutes } = await import("./routes/plantCareRoutes");
+  registerPlantCareRoutes(app);
+
   const httpServer = createServer(app);
   return httpServer;
 }

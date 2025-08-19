@@ -35,6 +35,7 @@ import StudentVerification from "@/pages/student-verification-new";
 import StudentDashboard from "@/pages/student-dashboard";
 import MyGarden from "@/pages/my-garden";
 import GardenMonitoring from "@/pages/garden-monitoring";
+import PlantCareDashboard from "@/pages/PlantCareDashboard";
 import Tools from "@/pages/tools";
 import Disclosure from "@/pages/disclosure";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
@@ -122,6 +123,7 @@ function Router() {
         <>
           <Route path="/account" component={Account} />
           <Route path="/garden-monitoring" component={GardenMonitoring} />
+          <Route path="/plant-care-dashboard" component={PlantCareDashboard} />
           {user.isAdmin && (
             <>
               <Route path="/admin" component={Admin} />

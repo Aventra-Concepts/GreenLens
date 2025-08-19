@@ -117,5 +117,16 @@ app.use((req, res, next) => {
     // Start scheduled services for automatic student conversion
     scheduledService.start();
     log('Scheduled services started - automatic student conversion enabled');
+    
+    // Seed achievements for plant care dashboard
+    (async () => {
+      try {
+        const { seedAchievements } = await import('./services/achievementSeeder');
+        await seedAchievements();
+        log('Achievement seeding completed');
+      } catch (error) {
+        console.error('Error seeding achievements:', error);
+      }
+    })();
   });
 })();
