@@ -1165,6 +1165,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
               usageTips: "Use soaker setting for deep watering. Mist setting for delicate plants. Always drain hose completely in winter to prevent freezing damage.",
               bestFor: ["Large area watering", "Washing tools", "Filling containers", "Cleaning walkways"],
               isRecommended: true
+            },
+            {
+              id: "7",
+              name: "Garden Gloves",
+              description: "Durable protective gloves that shield hands from thorns, dirt, and chemicals while maintaining dexterity for detailed work.",
+              category: "Protection",
+              imageUrl: "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400&h=300&fit=crop",
+              usageTips: "Choose the right thickness for the task. Thin gloves for delicate work, thick for thorny plants. Always let gloves dry completely after use.",
+              bestFor: ["Rose pruning", "Soil handling", "Chemical application", "General protection"],
+              isRecommended: true
+            },
+            {
+              id: "8",
+              name: "Wheelbarrow",
+              description: "Essential for transporting soil, plants, tools, and garden waste. Saves time and reduces physical strain during garden work.",
+              category: "Transport",
+              imageUrl: "https://images.unsplash.com/photo-1574263867128-3d6b5e15e2e0?w=400&h=300&fit=crop",
+              usageTips: "Load weight evenly and don't overfill. Keep the wheel properly inflated. Clean after each use to prevent rust and soil buildup.",
+              bestFor: ["Soil transport", "Plant moving", "Debris removal", "Tool storage"]
             }
           ],
           soilPreparation: [

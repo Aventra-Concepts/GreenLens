@@ -15,7 +15,9 @@ interface GardeningTool {
   name: string;
   description: string;
   category: string;
-  price?: string;
+  imageUrl?: string;
+  usageTips?: string;
+  bestFor?: string[];
   isRecommended?: boolean;
 }
 
@@ -103,7 +105,9 @@ export default function GardeningToolsManager() {
       name: "",
       description: "",
       category: "",
-      price: "",
+      imageUrl: "",
+      usageTips: "",
+      bestFor: [],
       isRecommended: false
     };
     setFormData({
@@ -112,7 +116,7 @@ export default function GardeningToolsManager() {
     });
   };
 
-  const updateTool = (index: number, field: keyof GardeningTool, value: string | boolean) => {
+  const updateTool = (index: number, field: keyof GardeningTool, value: string | boolean | string[]) => {
     const updatedTools = formData.tools.map((tool, i) => 
       i === index ? { ...tool, [field]: value } : tool
     );
@@ -288,25 +292,45 @@ export default function GardeningToolsManager() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor={`tool-price-${index}`}>Price (optional)</Label>
+                        <Label htmlFor={`tool-image-${index}`}>Image URL</Label>
                         <Input
-                          id={`tool-price-${index}`}
-                          value={tool.price || ""}
-                          onChange={(e) => updateTool(index, 'price', e.target.value)}
-                          placeholder="$34.99"
-                          data-testid={`input-tool-price-${index}`}
+                          id={`tool-image-${index}`}
+                          value={tool.imageUrl || ""}
+                          onChange={(e) => updateTool(index, 'imageUrl', e.target.value)}
+                          placeholder="https://example.com/image.jpg"
+                          data-testid={`input-tool-image-${index}`}
                         />
                       </div>
-                      <div></div>
                       <div className="md:col-span-2">
                         <Label htmlFor={`tool-description-${index}`}>Description</Label>
                         <Textarea
                           id={`tool-description-${index}`}
                           value={tool.description}
                           onChange={(e) => updateTool(index, 'description', e.target.value)}
-                          placeholder="Durable stainless steel spade perfect for soil preparation..."
+                          placeholder="Essential tool for digging, transplanting, and soil preparation..."
                           rows={2}
                           data-testid={`textarea-tool-description-${index}`}
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label htmlFor={`tool-usage-tips-${index}`}>Usage Tips</Label>
+                        <Textarea
+                          id={`tool-usage-tips-${index}`}
+                          value={tool.usageTips || ""}
+                          onChange={(e) => updateTool(index, 'usageTips', e.target.value)}
+                          placeholder="Hold firmly with both hands. Push blade straight down using your foot..."
+                          rows={2}
+                          data-testid={`textarea-tool-usage-tips-${index}`}
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label htmlFor={`tool-best-for-${index}`}>Best For (comma-separated)</Label>
+                        <Input
+                          id={`tool-best-for-${index}`}
+                          value={tool.bestFor?.join(', ') || ""}
+                          onChange={(e) => updateTool(index, 'bestFor', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                          placeholder="Digging holes, Transplanting, Soil breaking"
+                          data-testid={`input-tool-best-for-${index}`}
                         />
                       </div>
                     </div>
