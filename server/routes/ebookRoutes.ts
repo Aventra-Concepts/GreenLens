@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { ebookService } from "../services/ebookService";
-import { paymentService } from "../services/paymentService";
+
 import { emailService } from "../services/emailService";
 import { requireAuth } from "../middleware/auth";
 import { insertEbookSchema, insertAuthorProfileSchema } from "@shared/schema";
@@ -362,53 +362,20 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Create payment intent for e-book purchase
+// Create payment intent for e-book purchase (disabled - migrated to affiliate system)
 router.post('/:id/purchase', requireAuth, async (req, res) => {
-  try {
-    const { id: ebookId } = req.params;
-    const userId = req.user!.id;
-    const { currency = 'USD' } = req.body;
-    
-    const paymentData = await paymentService.createEbookPaymentIntent(
-      userId,
-      ebookId,
-      currency
-    );
-    
-    res.json({
-      success: true,
-      ...paymentData,
-    });
-  } catch (error) {
-    console.error('Create payment intent error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Failed to create payment intent',
-    });
-  }
+  res.status(503).json({
+    success: false,
+    message: 'E-book purchases temporarily unavailable. Please check back later.',
+  });
 });
 
-// Webhook for Stripe payment events
+// Webhook for Stripe payment events (disabled - migrated to affiliate system)
 router.post('/webhook/stripe', async (req, res) => {
-  try {
-    const signature = req.headers['stripe-signature'];
-    
-    // Verify webhook signature (implement proper verification)
-    // const event = stripe.webhooks.constructEvent(req.body, signature, process.env.STRIPE_WEBHOOK_SECRET);
-    
-    // For now, accept the event (in production, always verify)
-    const event = req.body;
-    
-    await paymentService.handleStripeWebhook(event);
-    
-    res.json({ received: true });
-  } catch (error) {
-    console.error('Stripe webhook error:', error);
-    res.status(400).json({
-      success: false,
-      message: 'Webhook error',
-    });
-  }
+  res.status(503).json({
+    success: false,
+    message: 'Payment webhooks temporarily unavailable.',
+  });
 });
 
 // Get author's e-books

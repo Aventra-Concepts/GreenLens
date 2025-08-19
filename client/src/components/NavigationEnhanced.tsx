@@ -44,7 +44,7 @@ export default function NavigationEnhanced() {
     { name: "Home", href: "/", icon: Home },
     { name: "Identify Plants", href: "/identify", icon: Leaf },
     { name: "E-book Marketplace", href: "/ebook-marketplace", icon: BookOpen },
-    { name: "Shop", href: "/shop", icon: Store },
+    { name: "Buy The Best Gardening Tools", href: "/tools", icon: Store },
     { name: "Pricing", href: "/pricing", icon: DollarSign },
     { name: "Reviews", href: "/reviews", icon: Star },
   ];

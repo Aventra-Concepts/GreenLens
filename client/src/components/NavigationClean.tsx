@@ -49,9 +49,9 @@ export default function NavigationClean() {
     { name: "Home", href: "/", icon: Home },
     { name: "Identify Plants", href: "/identify", icon: Leaf },
     { name: "E-Books", href: "/ebook-marketplace", icon: BookOpen },
+    { name: "Buy The Best Gardening Tools", href: "/tools", icon: Star },
     { name: "Garden Monitoring", href: "/garden-monitoring", icon: Activity },
     { name: "Pricing", href: "/pricing", icon: DollarSign },
-    { name: "Reviews", href: "/reviews", icon: Star },
   ];
 
   const isActive = (href: string) => {

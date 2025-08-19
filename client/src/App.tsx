@@ -35,6 +35,8 @@ import StudentVerification from "@/pages/student-verification-new";
 import StudentDashboard from "@/pages/student-dashboard";
 import MyGarden from "@/pages/my-garden";
 import GardenMonitoring from "@/pages/garden-monitoring";
+import Tools from "@/pages/tools";
+import Disclosure from "@/pages/disclosure";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 
 // E-book Category Pages
@@ -112,6 +114,8 @@ function Router() {
       <Route path="/student-verification" component={StudentVerification} />
       <Route path="/student-dashboard" component={StudentDashboard} />
       <Route path="/experts-register" component={ExpertsRegister} />
+      <Route path="/tools" component={Tools} />
+      <Route path="/disclosure" component={Disclosure} />
       
       {/* Protected routes that require authentication */}
       {user && (

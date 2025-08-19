@@ -10,14 +10,14 @@ import { plantsCatalogService } from "./services/plantsCatalog";
 import openaiService from "./services/openai";
 import { carePlannerService } from "./services/carePlanner";
 import { pdfService } from "./services/pdf";
-import { paymentService } from "./services/payments";
+
 import { plantNamesService } from "./services/plantNames";
 import { pricingService } from "./services/pricing";
 import { PlantAnalysisService } from "./services/plantAnalysisService";
 import { PDFReportService } from "./services/pdfReportService";
 import { insertPlantResultSchema, insertBlogPostSchema, insertReviewSchema } from "@shared/schema";
 import { trackUserLogin, trackPlantIdentification, trackSubscriptionPurchase, trackPdfDownload } from "./middleware/activityTracker";
-import { registerEcommerceRoutes } from "./routes/ecommerce";
+import { registerAffiliateRoutes } from "./routes/affiliate";
 import ebookRoutes from "./routes/ebookRoutes";
 import expertRoutes from "./routes/expertRoutes";
 import consultationRoutes from "./routes/consultationRoutes";
@@ -25,7 +25,7 @@ import blogRoutes from "./routes/blogRoutes";
 import { registerAuthorRoutes } from "./routes/authorRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import studentAdminRoutes from "./routes/studentAdminRoutes";
-import enhancedPaymentRoutes from "./routes/enhancedPaymentRoutes";
+
 import { GeographicRestrictionService } from "./services/geographicRestrictionService";
 import { socialMediaService } from "./services/socialMediaService";
 import gardenContentRoutes from "./routes/gardenContentRoutes";
@@ -54,7 +54,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
 
   // Register e-commerce routes
-  registerEcommerceRoutes(app);
+  registerAffiliateRoutes(app);
   
   // Register e-book marketplace routes
   app.use('/api/ebooks', ebookRoutes);
@@ -87,9 +87,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register student admin routes
   app.use('/api/admin', studentAdminRoutes);
-  
-  // Register enhanced payment gateway routes
-  app.use('/api/payments', enhancedPaymentRoutes);
   
   // Register garden content management routes
   app.use('/api/garden-content', gardenContentRoutes);

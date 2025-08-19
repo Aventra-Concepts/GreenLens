@@ -1,0 +1,195 @@
+Got it! Here’s a copy-paste prompt you can drop into Replit to (1) remove the old in-app store and (2) build a clean, compliant Amazon Affiliate shop that auto-localizes by country.
+
+---
+
+# 🔧 **Project change request (very explicit): Remove physical shop + add Amazon Affiliate marketplace**
+
+You are my senior full-stack engineer working inside this Replit project. Implement everything below precisely and output all created/changed file paths at the end.
+
+## 0) Detect stack & constraints
+
+* First, **detect the current stack** (framework, router, build tool). If React/Next/Vite/Flask/FastAPI/Node/Express/etc., **adapt your code accordingly**.
+* Use **TypeScript** where applicable. If the project is JS, convert only the new files to TSX/TS and keep interop clean.
+
+---
+
+## 1) Remove the existing physical “Shop” feature completely
+
+* Remove/replace:
+
+  * All **routes/pages/components** dedicated to selling physical items (product lists, cart, checkout, payments).
+  * Any **server endpoints** related to stock, orders, cart, checkout, or payment.
+  * Any **DB tables/collections** solely used by the old shop. If the DB is shared, write a one-time **safe migration** that drops only orphan tables/fields.
+  * **Navigation**: Replace the “Shop” nav item with **“Buy The Best Gardening Tools”** (points to the new affiliate page).
+* Add **301 redirects** from the old shop routes → new affiliate page (to preserve SEO and avoid dead links).
+* Ensure no dead imports, unused env vars, or failing tests remain.
+
+---
+
+## 2) Add an Amazon Affiliate marketplace page (fully compliant)
+
+### Page requirements
+
+* Route: **/tools** (path can differ if the framework needs).
+* **H1:** “Buy The Best Gardening Tools”
+* **Tagline (beneath H1):** read from a config constant `AFFILIATE_TAGLINE` (default: “Hand-picked essentials for every gardener”).
+* **Go Back** button: top-left, returns to previous route (router.back()) and falls back to homepage if no history.
+
+### Country/localization logic
+
+* Detect visitor marketplace from **ISO country** using:
+
+  1. server-side IP geo (if SSR available) OR
+  2. browser `navigator.language` + TLD fallback.
+* Supported marketplaces at minimum: **US (.com), India (.in), UK (.co.uk)**. Make it easy to add more (CA, AU, DE).
+* Persist the resolved marketplace in a cookie `amz_market` with 30-day TTL and offer a **marketplace switcher** (dropdown in page header).
+
+### Amazon Associates linking
+
+* Read marketplace-specific affiliate tags from **environment variables**:
+
+  * `AMZ_TAG_US`, `AMZ_TAG_IN`, `AMZ_TAG_UK`, etc.
+* Utility to build compliant affiliate URLs:
+
+  * **If PA-API available** (see below), use returned ASIN/URL.
+  * Else, construct links as `https://www.amazon.{tld}/dp/{ASIN}?tag={TAG}&linkCode=osi&th=1&psc=1`.
+* Append UTM params `utm_source=site&utm_medium=affiliate&utm_campaign=gardening-tools`.
+
+### Product data source (two modes)
+
+**Mode A — PA-API v5 (preferred & most compliant)**
+
+* Use Amazon **Product Advertising API v5** if env vars exist:
+
+  * `AMZ_ACCESS_KEY`, `AMZ_SECRET_KEY`, `AMZ_ASSOC_TAG_DEFAULT`, `AMZ_PARTNER_ID` (if required by region).
+* Implement signed requests via AWS SigV4.
+* Endpoints:
+
+  * **SearchItems** by keywords per category (e.g., “pruning shears”, “hose nozzle”, “gardening gloves”, “hand trowel”, “soil pH meter”, “watering can”, “sprayer”, “loppers”, “garden fork”).
+  * **GetItems** for specific curated ASINs.
+* **Display rules** (compliance):
+
+  * Show **Title, Primary Image, Star Rating, Review Count, Price, Availability** exactly as returned.
+  * Next to price, show small text: **“Price and availability are accurate as of the indicated date/time and are subject to change.”**
+  * Show **timestamp** of the API fetch: “Updated: {local datetime}”.
+  * **Do NOT hardcode prices**; always use PA-API values and refresh (see caching below).
+* **Caching**:
+
+  * Cache API responses server-side (e.g., in a JSON file or KV/Redis if available) for **30–60 minutes** per category/ASIN to avoid rate-limit issues.
+  * Stale-while-revalidate pattern: render cached data instantly; refresh in background.
+
+**Mode B — No PA-API available (fallback)**
+
+* If PA-API credentials are missing:
+
+  * **Do NOT display prices or review counts** (to avoid policy violations).
+  * Display **Title, Image (from Amazon link if allowed) OR a neutral placeholder**, short description from our curated list, and the **Buy** button with correct affiliate link.
+  * Show banner: “Some details are omitted because live Amazon data isn’t available. Links still support our site at no extra cost.”
+
+### Compliance & disclosures (must-have)
+
+* In page footer and above product grid, include:
+
+  * **Disclosure:** “As an Amazon Associate, we earn from qualifying purchases.”
+  * Link to **Affiliate Disclosure** page `/disclosure` (create it).
+* Avoid using Amazon logos beyond permitted usage. No claims like “best price on Amazon”.
+* Respect localization: each marketplace uses its own **tag** and **tld**.
+* Do not store or display scraped price data.
+
+---
+
+## 3) UI/UX for the affiliate page
+
+* Layout: responsive **grid** with filters:
+
+  * Filters: Category (hand tools, watering, soil care, protective gear), Price range (if PA-API), Ratings (≥4, ≥4.5), Prime (if available in PA-API).
+  * Sort: Relevance, Rating, Price (low→high, high→low) when PA-API present.
+* **Card design**:
+
+  * Image (lazy-loaded), Title (2-line clamp), small badges (e.g., “Bestseller” if available), Star rating + review count, Price (PA-API mode), short usage tip (“Great for pruning roses and small branches.”).
+  * **Buy** button: primary CTA, opens affiliate URL in new tab (`rel="nofollow sponsored noopener"`).
+* Accessibility: semantic headings, alt text from product title, tab order, ARIA labels.
+* SEO: unique `<title>` and meta description per category; canonical tag to `/tools`.
+
+---
+
+## 4) Developer ergonomics & content management
+
+* Create `config/affiliate.ts`:
+
+  * Marketplace map: `{ region: 'US'|'IN'|'UK', tld, tagEnvVar }`.
+  * Default curated **keywords per category** and an optional **curated ASIN list** we can expand.
+  * `AFFILIATE_TAGLINE` string.
+* Create **server route** `/api/affiliate/products`:
+
+  * Inputs: `{ market: 'US'|'IN'|'UK', category?: string, q?: string, sort?: string, minRating?: number }`.
+  * Output: normalized product objects `{ asin, title, image, url, rating, reviewCount, price, currency, badges, lastUpdated }`.
+  * Implements Mode A (PA-API) or Mode B (fallback) transparently.
+* Add **unit tests** for URL builder, market resolver, and API normalizer.
+
+---
+
+## 5) Content ﬁles/pages to add
+
+* `/pages/tools` (or framework equivalent) – the marketplace page.
+* `/pages/disclosure` – short page with the exact disclosure text + brief explanation of affiliate links.
+* If there’s a global footer, add the disclosure line there too.
+
+---
+
+## 6) Navigation & theming
+
+* Replace the old “Shop” nav item with **“Buy The Best Gardening Tools”** pointing to `/tools`.
+* Keep site styling consistent; reuse theme tokens.
+* Include a compact **marketplace switcher** (US/IN/UK) in the page header.
+
+---
+
+## 7) Environment variables (document in README)
+
+* `AMZ_TAG_US`, `AMZ_TAG_IN`, `AMZ_TAG_UK` (strings)
+* `AMZ_ACCESS_KEY`, `AMZ_SECRET_KEY` (for PA-API mode)
+* Optional: `AMZ_PARTNER_TAG_DEFAULT` (fallback), `REDIS_URL` (if caching via Redis)
+
+Add an `.env.example` and update README with setup steps for both modes.
+
+---
+
+## 8) Analytics & events (privacy-safe)
+
+* Fire custom events on:
+
+  * Impression of product card,
+  * Filter/sort changes,
+  * Click on **Buy** (include `asin`, `market`, `position`).
+* If no analytics exists, implement a lightweight event logger to console for now.
+
+---
+
+## 9) Acceptance criteria (verify before finishing)
+
+* No references to the old shop, no dead links, tests pass.
+* `/tools` renders localized products with correct **affiliate links per market**.
+* **Disclosure** visible and compliant.
+* **Go Back** button works.
+* With PA-API env vars set: shows **price, rating, review count, last updated timestamp**, with caching.
+* Without PA-API: hides price/reviews, still shows clean cards and working affiliate links.
+* Lighthouse: performance ≥ 85 on mobile for `/tools`.
+
+---
+
+## 10) Deliverables at the end
+
+* List all **created/modified/deleted** files.
+* Print **instructions** to set env vars, run locally, and test both modes.
+* Provide **example `.env`** contents.
+* Provide **two screenshots** (or mock HTML snippets) of the `/tools` page:
+
+  * One in **US** market with PA-API enabled,
+  * One in **IN** market without PA-API (fallback).
+
+If anything is ambiguous, choose the option that is **more compliant with Amazon Associates policies** and explain the decision in a short note at the end.
+
+---
+
+**Now, implement all of the above.**

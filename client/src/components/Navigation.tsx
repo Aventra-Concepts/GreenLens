@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { queryClient } from "@/lib/queryClient";
 import { Leaf, Menu, X } from "lucide-react";
-import { ShoppingCart } from "@/components/ecommerce/ShoppingCart";
+
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,15 +29,12 @@ export default function Navigation() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* Shop Link */}
-            <Link href="/shop">
-              <Button variant="ghost" data-testid="shop-link">
-                Shop
+            {/* Tools Link */}
+            <Link href="/tools">
+              <Button variant="ghost" data-testid="tools-link">
+                Buy The Best Gardening Tools
               </Button>
             </Link>
-            
-            {/* Shopping Cart */}
-            <ShoppingCart />
             
 
             
@@ -155,11 +152,11 @@ export default function Navigation() {
                 Blog
               </Link>
               <Link 
-                href="/shop" 
+                href="/tools" 
                 className="text-gray-700 hover:text-green-600 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Shop
+                Buy The Best Gardening Tools
               </Link>
               
               {/* E-book Marketplace - Mobile Menu */}
@@ -182,11 +179,14 @@ export default function Navigation() {
                 Experts Register
               </Link>
               
-              {/* Shopping Cart - Mobile Menu */}
-              <div className="pt-2 flex items-center">
-                <span className="text-gray-700 font-medium mr-3">Cart:</span>
-                <ShoppingCart />
-              </div>
+              {/* Tools Link - Mobile Menu */}
+              <Link 
+                href="/tools"
+                className="text-gray-700 hover:text-green-600 font-medium transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Buy The Best Gardening Tools
+              </Link>
               
               {user && (
                 <Link 

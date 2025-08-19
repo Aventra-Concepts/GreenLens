@@ -9,7 +9,7 @@ GreenLens is a production-grade web application that leverages AI technology for
 
 **UI TERMINOLOGY UPDATES**: Renamed "E-book Marketplace" to "E-Books" throughout the application per user preference for cleaner, more concise terminology.
 
-**SHOP FUNCTIONALITY REMOVED**: Completely removed all shopping cart functionality, shop links, and related routes as requested by user.
+**AMAZON AFFILIATE MARKETPLACE IMPLEMENTED**: Successfully replaced the old e-commerce system with a comprehensive Amazon Affiliate marketplace featuring curated gardening tools, multi-market support (US, IN, UK), and proper disclosure compliance. Navigation updated to "Buy The Best Gardening Tools".
 
 **MIGRATION COMPLETE**: Successfully migrated from Google Gemini to OpenAI API across all AI services including plant identification, care planning, disease diagnosis, and blog generation.
 
@@ -52,8 +52,8 @@ The AI pipeline involves **OpenAI API** for image quality assessment, care plan 
 
 **Error Handling**: Comprehensive error sanitization system where detailed API errors are logged for admin debugging but users receive friendly, actionable error messages. Error codes include SERVICE_QUOTA_EXCEEDED, AI_SERVICE_ERROR for proper categorization.
 
-### Payment Processing
-The system supports multi-provider payments with **Stripe, Razorpay, and Cashfree** using an adapter pattern, loaded lazily. It handles subscription management, recurring billing, and webhooks. Dynamic pricing with real-time currency conversion is supported via a dedicated `/api/pricing` endpoint.
+### Amazon Affiliate Integration
+The system features a comprehensive **Amazon Affiliate marketplace** with multi-region support (US, India, UK). It includes intelligent product search, curated product categories (hand tools, watering, soil care, protective gear), market-specific pricing, and automated affiliate link generation. The system handles API fallbacks and includes proper FTC disclosure compliance.
 
 ### Content Management
 Content management includes a Markdown-based blog system, **Puppeteer** for PDF report generation (e.g., detailed plant care reports), and **Google Cloud Storage** for uploaded images and PDFs. A `PlantNamesService` provides multilingual plant names in 12 languages.
