@@ -74,7 +74,7 @@ export default function NavigationEnhanced() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center pl-4 lg:pl-8">
             <Link href="/" className="flex items-center space-x-2 group flex-shrink-0">
               <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center transition-all group-hover:scale-105">
                 <Leaf className="w-5 h-5 text-white" />
@@ -109,7 +109,7 @@ export default function NavigationEnhanced() {
             </nav>
 
             {/* Desktop Action Buttons */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 pr-4 lg:pr-8">
             {/* Tools Link */}
             <Link href="/tools">
               <button
@@ -132,7 +132,7 @@ export default function NavigationEnhanced() {
           </div>
 
           {/* Mobile Right Section */}
-          <div className="flex lg:hidden items-center space-x-2 flex-shrink-0 ml-auto">
+          <div className="flex lg:hidden items-center space-x-2 flex-shrink-0 ml-auto pr-4">
             {/* Mobile Tools */}
             <Link href="/tools">
               <button

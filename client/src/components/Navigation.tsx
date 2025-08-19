@@ -18,7 +18,7 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Brand logo */}
-          <div className="flex items-center">
+          <div className="flex items-center pl-4 lg:pl-8">
             <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
                 <Leaf className="w-5 h-5 text-white" />
@@ -28,7 +28,7 @@ export default function Navigation() {
           </div>
 
           {/* Right section - tools and user actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 pr-4 lg:pr-8">
             {/* Tools Link */}
             <Link href="/tools">
               <Button variant="ghost" data-testid="tools-link">
