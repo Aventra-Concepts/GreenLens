@@ -1,0 +1,41 @@
+Here’s a **clear, explicit prompt** you can paste into Replit to fix the alignment issue. This version is very specific so Replit doesn’t just return the same thing again:
+
+---
+
+# 🔧 Navigation Bar Alignment Fix (Desktop)
+
+You are my frontend developer. Right now, the **brand name, logo, and hamburger icon** are all pushed to the extreme left/right edges of the navigation top bar. I want them moved slightly **towards the center** in the **desktop version only**.
+
+## Requirements:
+
+1. **Do not** remove or break responsiveness. The mobile version (with hamburger menu collapse) must stay the same.
+2. On desktop widths (`min-width: 1024px` or similar breakpoint):
+
+   * The **brand name + logo** should appear closer to the center, not stuck to the extreme left.
+   * The **hamburger icon** (if visible on desktop) should also be moved inward slightly from the extreme right, aligning visually in a balanced way.
+3. Use **flexbox or CSS grid** adjustments, not absolute positioning hacks.
+
+   * Example: wrap the nav content in a container with `max-width` and `margin: auto`.
+   * Apply `justify-content: space-between` or `center` as needed so the items sit balanced.
+4. Ensure padding/margins are applied consistently so it looks professional and not cramped.
+5. The change must affect **desktop layout only** (not mobile). Use a proper **media query** such as:
+
+   ```css
+   @media screen and (min-width: 1024px) {
+     /* adjustments here */
+   }
+   ```
+6. Show me the **exact CSS/JSX/HTML changes** required (not just a description).
+
+   * If it’s React/Next, modify the nav component accordingly.
+   * If plain HTML+CSS, update the `<nav>` structure and CSS rules directly.
+
+## Acceptance Criteria:
+
+* On desktop: brand/logo and hamburger are **visually centered-ish**, not stuck on the edges.
+* On mobile: hamburger still stays on the right edge, logo/brand still on left.
+* No broken responsiveness.
+
+---
+
+👉 Would you like me to also give you the **exact CSS snippet** you can test right away (independent of Replit) so you can check alignment before asking Replit again?
