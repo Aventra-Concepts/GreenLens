@@ -73,13 +73,19 @@ import {
   type InsertEbookReview,
   type AuthorProfile,
   type InsertAuthorProfile,
+  gardenContent,
+  aiContentLogs,
+  type GardenContent,
+  type InsertGardenContent,
+  type AiContentLog,
+  type InsertAiContentLog,
   type StudentProfile,
   type InsertStudentProfile,
   type InsertBlogView,
   type InsertCatalogCache,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, or, gt, lt, gte, lte, asc, desc, like, sql } from "drizzle-orm";
+import { eq, and, or, gt, lt, gte, lte, asc, desc, like, sql, ne, inArray, count, sum, isNull } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -1729,6 +1735,59 @@ export class DatabaseStorage implements IStorage {
     }
     
     return expiredStudents.length;
+  }
+
+  // Garden Content Management Methods
+  async getGardenContent(): Promise<GardenContent[]> {
+    return await this.db.query.gardenContent.findMany({
+      orderBy: [asc(gardenContent.order), asc(gardenContent.createdAt)]
+    });
+  }
+
+  async getGardenContentById(id: string): Promise<GardenContent | null> {
+    return await this.db.query.gardenContent.findFirst({
+      where: eq(gardenContent.id, id)
+    }) || null;
+  }
+
+  async createGardenContent(data: InsertGardenContent): Promise<GardenContent> {
+    const [content] = await this.db
+      .insert(gardenContent)
+      .values(data)
+      .returning();
+    return content;
+  }
+
+  async updateGardenContent(id: string, data: Partial<InsertGardenContent>): Promise<GardenContent | null> {
+    const [updatedContent] = await this.db
+      .update(gardenContent)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(gardenContent.id, id))
+      .returning();
+    return updatedContent || null;
+  }
+
+  async deleteGardenContent(id: string): Promise<boolean> {
+    const result = await this.db
+      .delete(gardenContent)
+      .where(eq(gardenContent.id, id));
+    return result.rowCount > 0;
+  }
+
+  // AI Content Logs Methods
+  async createAiContentLog(data: InsertAiContentLog): Promise<AiContentLog> {
+    const [log] = await this.db
+      .insert(aiContentLogs)
+      .values(data)
+      .returning();
+    return log;
+  }
+
+  async getAiContentLogs(limit = 50): Promise<AiContentLog[]> {
+    return await this.db.query.aiContentLogs.findMany({
+      orderBy: [desc(aiContentLogs.createdAt)],
+      limit
+    });
   }
 }
 

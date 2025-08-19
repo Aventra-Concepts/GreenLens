@@ -60,6 +60,38 @@ export const users = pgTable("users", {
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 
+// Garden Content Management Table for Admin Editing
+export const gardenContent = pgTable("garden_content", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sectionType: varchar("section_type").notNull(), // 'hero', 'features', 'tips', 'statistics'
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  metadata: jsonb("metadata"), // For additional configuration
+  isActive: boolean("is_active").default(true),
+  order: integer("order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastEditedBy: varchar("last_edited_by").references(() => users.id),
+});
+
+export type GardenContent = typeof gardenContent.$inferSelect;
+export type InsertGardenContent = typeof gardenContent.$inferInsert;
+
+// AI Garden Content Generation Logs
+export const aiContentLogs = pgTable("ai_content_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  contentType: varchar("content_type").notNull(), // 'garden_tip', 'plant_care', 'seasonal_advice'
+  prompt: text("prompt").notNull(),
+  generatedContent: text("generated_content").notNull(),
+  status: varchar("status").default('generated'), // 'generated', 'approved', 'published'
+  approvedBy: varchar("approved_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  metadata: jsonb("metadata"), // Store additional AI response data
+});
+
+export type AiContentLog = typeof aiContentLogs.$inferSelect;
+export type InsertAiContentLog = typeof aiContentLogs.$inferInsert;
+
 // Auth schemas for registration and login
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,

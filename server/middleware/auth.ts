@@ -1,57 +1,37 @@
 import { Request, Response, NextFunction } from 'express';
-import { User } from '@shared/schema';
 
-// Extend Express Request interface to include user
+// Type declarations for extended request object
 declare global {
   namespace Express {
-    interface Request {
-      user?: User;
+    interface User {
+      id: string;
+      email: string;
+      isAdmin: boolean;
+      isActive: boolean;
     }
   }
 }
 
-/**
- * Authentication middleware - ensures user is logged in
- */
-export function isAuthenticated(req: Request, res: Response, next: NextFunction) {
-  if (req.isAuthenticated() && req.user) {
-    return next();
+// Middleware to check if user is authenticated
+export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.isAuthenticated() || !req.user) {
+    return res.status(401).json({ error: 'Authentication required' });
   }
-  return res.status(401).json({ 
-    success: false,
-    message: "Authentication required" 
-  });
-}
+  next();
+};
 
-/**
- * Admin authentication middleware - ensures user is admin
- */
-export function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  if (req.isAuthenticated() && req.user && req.user.isSuperAdmin) {
-    return next();
+// Middleware to check if user is admin
+export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user?.isAdmin) {
+    return res.status(403).json({ error: 'Admin access required' });
   }
-  return res.status(403).json({ 
-    success: false,
-    message: "Admin access required" 
-  });
-}
+  next();
+};
 
-/**
- * Author authentication middleware - ensures user is verified author
- */
-export function requireAuthor(req: Request, res: Response, next: NextFunction) {
-  if (req.isAuthenticated() && req.user && req.user.isAuthor && req.user.authorVerified) {
-    return next();
+// Middleware to check if user account is active
+export const requireActiveUser = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user?.isActive) {
+    return res.status(403).json({ error: 'Account is inactive' });
   }
-  return res.status(403).json({ 
-    success: false,
-    message: "Verified author access required" 
-  });
-}
-
-/**
- * General auth middleware - same as isAuthenticated but with different naming
- */
-export function requireAuth(req: Request, res: Response, next: NextFunction) {
-  return isAuthenticated(req, res, next);
-}
+  next();
+};

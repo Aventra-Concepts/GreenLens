@@ -26,10 +26,14 @@ import {
   MapPin,
   Target,
   Zap,
-  Settings
+  Settings,
+  Edit3,
+  Sparkles,
+  Save
 } from 'lucide-react';
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
 interface Plant {
   id: string;
@@ -81,72 +85,75 @@ interface GardenStats {
   upcomingTasks: number;
 }
 
+interface GardenContentSection {
+  id: string;
+  sectionType: string;
+  title: string;
+  content: string;
+  metadata?: any;
+  isActive: boolean;
+  order: number;
+}
+
 export default function MyGarden() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
+  const [editingContent, setEditingContent] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({ title: '', content: '' });
 
-  // Mock data for demonstration - replace with real API calls
+  // Fetch garden content sections (admin-editable)
+  const { data: gardenContentSections = [] } = useQuery<GardenContentSection[]>({
+    queryKey: ['/api/garden-content'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/garden-content');
+      return response.json();
+    }
+  });
+
+  // User's plants data - no copyrighted content, only original demo data
   const { data: plants = [], isLoading: plantsLoading } = useQuery<Plant[]>({
     queryKey: ['/api/my-garden/plants'],
-    queryFn: () => Promise.resolve([
-      {
-        id: '1',
-        name: 'Morning Glory',
-        species: 'Ipomoea purpurea',
-        dateAdded: '2024-03-15',
-        location: 'Living Room - South Window',
-        status: 'healthy',
-        lastWatered: '2024-08-17',
-        nextWatering: '2024-08-19',
-        height: 15.5,
-        notes: 'Growing rapidly, showing new blooms',
-        careSchedule: [
-          { id: '1', type: 'watering', date: '2024-08-19', notes: 'Regular watering', completed: false },
-          { id: '2', type: 'fertilizing', date: '2024-08-20', notes: 'Monthly fertilizer', completed: false }
-        ],
-        growthData: [
-          { date: '2024-08-01', height: 12.0, width: 8.0, leafCount: 15, notes: 'Good growth' },
-          { date: '2024-08-08', height: 13.5, width: 9.0, leafCount: 18, notes: 'New leaves appearing' },
-          { date: '2024-08-15', height: 15.5, width: 10.0, leafCount: 22, notes: 'First flowers!' }
-        ],
-        environmentalData: [
-          { date: '2024-08-17', temperature: 22.5, humidity: 60, lightLevel: 85, soilMoisture: 45 }
-        ]
-      },
-      {
-        id: '2',
-        name: 'Snake Plant',
-        species: 'Sansevieria trifasciata',
-        dateAdded: '2024-02-10',
-        location: 'Bedroom - North Corner',
-        status: 'warning',
-        lastWatered: '2024-08-10',
-        nextWatering: '2024-08-18',
-        height: 45.0,
-        notes: 'Slight yellowing on lower leaves - may need less water',
-        careSchedule: [
-          { id: '3', type: 'watering', date: '2024-08-18', notes: 'Water sparingly', completed: false }
-        ],
-        growthData: [
-          { date: '2024-08-01', height: 43.0, width: 25.0, leafCount: 12, notes: 'Stable growth' },
-          { date: '2024-08-15', height: 45.0, width: 25.0, leafCount: 12, notes: 'Minimal growth as expected' }
-        ],
-        environmentalData: [
-          { date: '2024-08-17', temperature: 20.0, humidity: 55, lightLevel: 30, soilMoisture: 30 }
-        ]
-      }
-    ])
+    queryFn: async () => {
+      // Original, non-copyrighted demo data
+      return [
+        {
+          id: '1',
+          name: 'Sample Indoor Plant',
+          species: 'Fictional planticus',
+          dateAdded: '2024-03-15',
+          location: 'Indoor Location',
+          status: 'healthy',
+          lastWatered: '2024-08-17',
+          nextWatering: '2024-08-19',
+          height: 15.5,
+          notes: 'Sample plant for demonstration',
+          careSchedule: [
+            { id: '1', type: 'watering', date: '2024-08-19', notes: 'Regular care', completed: false },
+            { id: '2', type: 'fertilizing', date: '2024-08-20', notes: 'Monthly care', completed: false }
+          ],
+          growthData: [
+            { date: '2024-08-01', height: 12.0, width: 8.0, leafCount: 15, notes: 'Sample growth data' },
+            { date: '2024-08-08', height: 13.5, width: 9.0, leafCount: 18, notes: 'Continued growth' },
+            { date: '2024-08-15', height: 15.5, width: 10.0, leafCount: 22, notes: 'Latest measurement' }
+          ],
+          environmentalData: [
+            { date: '2024-08-17', temperature: 22.5, humidity: 60, lightLevel: 85, soilMoisture: 45 }
+          ]
+        }
+      ];
+    }
   });
 
   const { data: gardenStats } = useQuery<GardenStats>({
     queryKey: ['/api/my-garden/stats'],
     queryFn: () => Promise.resolve({
-      totalPlants: 2,
-      healthyPlants: 1,
-      plantsNeedingCare: 1,
+      totalPlants: plants.length,
+      healthyPlants: plants.filter(p => p.status === 'healthy').length,
+      plantsNeedingCare: plants.filter(p => p.status !== 'healthy').length,
       averageGrowthRate: 12.5,
       weeklyGrowth: 8.2,
       upcomingTasks: 3
@@ -166,12 +173,34 @@ export default function MyGarden() {
 
   const updateCareMutation = useMutation({
     mutationFn: async ({ plantId, activityId }: { plantId: string; activityId: string }) => {
-      // Replace with actual API call
       return apiRequest('PATCH', `/api/my-garden/plants/${plantId}/care/${activityId}`, { completed: true });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/my-garden/plants'] });
       toast({ title: "Care activity completed!" });
+    }
+  });
+
+  // Admin content editing mutations
+  const updateContentMutation = useMutation({
+    mutationFn: async ({ id, title, content }: { id: string; title: string; content: string }) => {
+      return apiRequest('PATCH', `/api/garden-content/${id}`, { title, content });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/garden-content'] });
+      setEditingContent(null);
+      toast({ title: "Content updated successfully!" });
+    }
+  });
+
+  // AI content generation mutation
+  const generateAiContentMutation = useMutation({
+    mutationFn: async ({ prompt, contentType }: { prompt: string; contentType: string }) => {
+      return apiRequest('POST', '/api/ai/generate-garden-content', { prompt, contentType });
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/garden-content'] });
+      toast({ title: "AI content generated successfully!" });
     }
   });
 
@@ -202,12 +231,79 @@ export default function MyGarden() {
   return (
     <div className="container mx-auto p-6 max-w-7xl" data-testid="my-garden-page">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-green-800 dark:text-green-200 mb-2">
-          My Garden Dashboard
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300">
-          Track, monitor, and optimize your plant collection with scientific precision
-        </p>
+        {gardenContentSections.find(section => section.sectionType === 'hero') ? (
+          <div className="relative">
+            {gardenContentSections
+              .filter(section => section.sectionType === 'hero' && section.isActive)
+              .sort((a, b) => a.order - b.order)
+              .map((section) => (
+                <div key={section.id} className="relative group">
+                  <h1 className="text-4xl font-bold text-green-800 dark:text-green-200 mb-2">
+                    {section.title}
+                  </h1>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {section.content}
+                  </p>
+                  
+                  {/* Admin Edit Controls */}
+                  {user?.isAdmin && (
+                    <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setEditingContent(section.id);
+                            setEditForm({ title: section.title, content: section.content });
+                          }}
+                          data-testid={`edit-content-${section.id}`}
+                        >
+                          <Edit3 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => generateAiContentMutation.mutate({ 
+                            prompt: `Generate engaging garden dashboard hero content about: ${section.title}`,
+                            contentType: 'hero'
+                          })}
+                          disabled={generateAiContentMutation.isPending}
+                          data-testid={`ai-generate-${section.id}`}
+                        >
+                          <Sparkles className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+          </div>
+        ) : (
+          <div>
+            <h1 className="text-4xl font-bold text-green-800 dark:text-green-200 mb-2">
+              My Garden Dashboard
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300">
+              Track, monitor, and optimize your plant collection with scientific precision
+            </p>
+            {user?.isAdmin && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-2"
+                onClick={() => generateAiContentMutation.mutate({ 
+                  prompt: 'Generate engaging hero content for a garden management dashboard',
+                  contentType: 'hero'
+                })}
+                disabled={generateAiContentMutation.isPending}
+                data-testid="ai-generate-hero"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Generate AI Content
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Garden Statistics Overview */}
@@ -264,12 +360,15 @@ export default function MyGarden() {
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className={`grid w-full ${user?.isAdmin ? 'grid-cols-6' : 'grid-cols-5'}`}>
           <TabsTrigger value="dashboard" data-testid="tab-dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="plants" data-testid="tab-plants">My Plants</TabsTrigger>
           <TabsTrigger value="analytics" data-testid="tab-analytics">Analytics</TabsTrigger>
           <TabsTrigger value="care" data-testid="tab-care">Care Schedule</TabsTrigger>
           <TabsTrigger value="journal" data-testid="tab-journal">Garden Journal</TabsTrigger>
+          {user?.isAdmin && (
+            <TabsTrigger value="admin" data-testid="tab-admin">Admin</TabsTrigger>
+          )}
         </TabsList>
 
         {/* Dashboard Tab */}
@@ -626,7 +725,162 @@ export default function MyGarden() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Admin Content Management Tab */}
+        {user?.isAdmin && (
+          <TabsContent value="admin" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-purple-600" />
+                  Content Management
+                </CardTitle>
+                <CardDescription>
+                  Manage and generate AI content for the My Garden page
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">AI Content Generation</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="ai-prompt">Content Prompt</Label>
+                          <Textarea
+                            id="ai-prompt"
+                            placeholder="Describe the content you want to generate..."
+                            data-testid="input-ai-prompt"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="content-type">Content Type</Label>
+                          <Select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select content type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="hero">Hero Section</SelectItem>
+                              <SelectItem value="features">Feature Description</SelectItem>
+                              <SelectItem value="tips">Garden Tips</SelectItem>
+                              <SelectItem value="statistics">Statistics Info</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <Button 
+                          className="w-full"
+                          disabled={generateAiContentMutation.isPending}
+                          data-testid="button-generate-ai-content"
+                        >
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          {generateAiContentMutation.isPending ? 'Generating...' : 'Generate AI Content'}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Existing Content</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {gardenContentSections.map((section) => (
+                          <div key={section.id} className="flex items-center justify-between p-3 border rounded-lg">
+                            <div>
+                              <p className="font-medium">{section.title}</p>
+                              <p className="text-sm text-gray-500 capitalize">{section.sectionType}</p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setEditingContent(section.id);
+                                  setEditForm({ title: section.title, content: section.content });
+                                }}
+                                data-testid={`edit-section-${section.id}`}
+                              >
+                                <Edit3 className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => generateAiContentMutation.mutate({ 
+                                  prompt: `Improve this content: ${section.content}`,
+                                  contentType: section.sectionType
+                                })}
+                                disabled={generateAiContentMutation.isPending}
+                                data-testid={`ai-improve-${section.id}`}
+                              >
+                                <Sparkles className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
+
+      {/* Content Edit Modal */}
+      {editingContent && (
+        <Dialog open={!!editingContent} onOpenChange={() => setEditingContent(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Edit Content</DialogTitle>
+              <DialogDescription>
+                Update the title and content for this section
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-title">Title</Label>
+                <Input
+                  id="edit-title"
+                  value={editForm.title}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, title: e.target.value }))}
+                  data-testid="input-edit-title"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-content">Content</Label>
+                <Textarea
+                  id="edit-content"
+                  value={editForm.content}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, content: e.target.value }))}
+                  className="min-h-[200px]"
+                  data-testid="input-edit-content"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setEditingContent(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => updateContentMutation.mutate({ 
+                    id: editingContent, 
+                    title: editForm.title, 
+                    content: editForm.content 
+                  })}
+                  disabled={updateContentMutation.isPending}
+                  data-testid="button-save-content"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {updateContentMutation.isPending ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Plant Detail Modal */}
       {selectedPlant && (

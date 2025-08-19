@@ -28,6 +28,7 @@ import studentAdminRoutes from "./routes/studentAdminRoutes";
 import enhancedPaymentRoutes from "./routes/enhancedPaymentRoutes";
 import { GeographicRestrictionService } from "./services/geographicRestrictionService";
 import { socialMediaService } from "./services/socialMediaService";
+import gardenContentRoutes from "./routes/gardenContentRoutes";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -88,6 +89,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register enhanced payment gateway routes
   app.use('/api/payments', enhancedPaymentRoutes);
+  
+  // Register garden content management routes
+  app.use('/api/garden-content', gardenContentRoutes);
   
   // Geographic restrictions routes
   app.get('/api/geographic/check-product/:productId', async (req, res) => {
