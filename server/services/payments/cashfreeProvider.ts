@@ -19,11 +19,15 @@ export class CashfreeProvider implements PaymentProvider {
   private tokenExpiry?: Date;
 
   constructor() {
-    this.clientId = process.env.CASHFREE_CLIENT_ID || '';
-    this.clientSecret = process.env.CASHFREE_CLIENT_SECRET || '';
+    this.clientId = process.env.CASHFREE_CLIENT_ID || 'demo_client_id';
+    this.clientSecret = process.env.CASHFREE_CLIENT_SECRET || 'demo_client_secret';
     this.baseUrl = process.env.NODE_ENV === 'production' 
       ? 'https://api.cashfree.com' 
       : 'https://sandbox.cashfree.com';
+      
+    if (!process.env.CASHFREE_CLIENT_ID || !process.env.CASHFREE_CLIENT_SECRET) {
+      console.warn('Cashfree credentials not configured. Using demo mode - payments will not work until keys are added.');
+    }
   }
 
   supportsCurrency(currency: string): boolean {
@@ -40,6 +44,11 @@ export class CashfreeProvider implements PaymentProvider {
     }
 
     try {
+      // Return demo token if no credentials are configured
+      if (!process.env.CASHFREE_CLIENT_ID || !process.env.CASHFREE_CLIENT_SECRET) {
+        return 'demo_token';
+      }
+
       const response = await fetch(`${this.baseUrl}/payout/v1/authorize`, {
         method: 'POST',
         headers: {
@@ -68,8 +77,19 @@ export class CashfreeProvider implements PaymentProvider {
   }
 
   async createCheckout(params: CreateCheckoutParams): Promise<CheckoutResponse> {
-    const token = await this.getAccessToken();
     const orderId = `garden_sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    // Return demo response if no credentials configured
+    if (!process.env.CASHFREE_CLIENT_ID || !process.env.CASHFREE_CLIENT_SECRET) {
+      return {
+        checkoutUrl: '/demo-payment?amount=' + params.amount + '&currency=' + params.currency,
+        sessionId: 'demo_session_' + Date.now(),
+        paymentId: 'demo_payment_' + Date.now(),
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+      };
+    }
+
+    const token = await this.getAccessToken();
 
     const orderData = {
       order_id: orderId,

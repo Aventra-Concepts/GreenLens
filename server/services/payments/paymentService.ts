@@ -1,5 +1,4 @@
 import { CashfreeProvider } from './cashfreeProvider';
-import { RazorpayProvider } from './razorpayProvider';
 import { 
   PaymentProvider, 
   CreateCheckoutParams, 
@@ -22,24 +21,14 @@ export class PaymentService {
   private initializeProviders(): void {
     // Initialize available payment providers
     try {
-      if (process.env.CASHFREE_CLIENT_ID && process.env.CASHFREE_CLIENT_SECRET) {
-        this.providers.push(new CashfreeProvider());
-      }
+      // Initialize Cashfree provider (works without keys initially for demo)
+      this.providers.push(new CashfreeProvider());
     } catch (error) {
       console.warn('Failed to initialize Cashfree provider:', (error as Error).message);
     }
 
-    try {
-      if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
-        this.providers.push(new RazorpayProvider());
-      }
-    } catch (error) {
-      console.warn('Failed to initialize Razorpay provider:', (error as Error).message);
-    }
-
-    // Set primary provider based on priority and availability
-    this.primaryProvider = this.providers.find(p => p.name === 'razorpay') || 
-                          this.providers.find(p => p.name === 'cashfree') || 
+    // Set Cashfree as primary provider
+    this.primaryProvider = this.providers.find(p => p.name === 'cashfree') || 
                           this.providers[0] || 
                           null;
 
@@ -63,15 +52,10 @@ export class PaymentService {
       return null;
     }
 
-    // Priority order: Razorpay for INR, Cashfree as fallback
-    if (currency === 'INR') {
-      return suitableProviders.find(p => p.name === 'razorpay') || 
-             suitableProviders.find(p => p.name === 'cashfree') || 
-             suitableProviders[0];
-    }
+    // Use Cashfree for all transactions
+    return suitableProviders.find(p => p.name === 'cashfree') || 
+           suitableProviders[0];
 
-    // For other currencies, use any available provider
-    return suitableProviders[0];
   }
 
   async createGardenSubscriptionCheckout(params: {

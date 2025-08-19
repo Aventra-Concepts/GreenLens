@@ -36,6 +36,8 @@ import StudentDashboard from "@/pages/student-dashboard";
 import MyGarden from "@/pages/my-garden";
 import GardenMonitoring from "@/pages/garden-monitoring";
 import PlantCareDashboard from "@/pages/PlantCareDashboard";
+import GardenSubscription from "@/pages/GardenSubscription";
+import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
 import Tools from "@/pages/tools";
 import Disclosure from "@/pages/disclosure";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
@@ -78,6 +80,8 @@ function Router() {
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/reviews" component={Reviews} />
       <Route path="/my-garden" component={MyGarden} />
+      <Route path="/garden/subscription" component={GardenSubscription} />
+      <Route path="/garden/subscription/success" component={SubscriptionSuccess} />
       <Route path="/expert-onboarding" component={ExpertOnboarding} />
       <Route path="/talk-to-expert" component={TalkToExpert} />
       <Route path="/payment/consultation/:id">
@@ -123,6 +127,8 @@ function Router() {
         <>
           <Route path="/account" component={Account} />
           <Route path="/garden-monitoring" component={GardenMonitoring} />
+          <Route path="/garden/monitoring" component={GardenMonitoring} />
+          <Route path="/garden/dashboard" component={PlantCareDashboard} />
           {user.isAdmin && (
             <>
               <Route path="/admin" component={Admin} />

@@ -284,31 +284,7 @@ router.post('/webhook/cashfree', async (req, res) => {
   }
 });
 
-router.post('/webhook/razorpay', async (req, res) => {
-  try {
-    const signature = req.headers['x-razorpay-signature'] as string;
-    const result = await paymentService.handleWebhook('razorpay', req.body, signature);
 
-    if (result.success && result.customerId) {
-      // Find user by email and update subscription
-      const user = await storage.getUserByEmail(result.customerId);
-      if (user) {
-        await storage.updateUserGardenSubscription(user.id, {
-          gardenMonitoringActive: result.status === 'active',
-          gardenMonitoringExpiresAt: result.expiresAt || null,
-          gardenMonitoringSubscriptionId: result.subscriptionId || null,
-        });
-
-        console.log(`Razorpay webhook: Updated subscription for user ${user.email}`);
-      }
-    }
-
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Razorpay webhook error:', error);
-    res.status(400).json({ success: false, error: (error as Error).message });
-  }
-});
 
 // Get subscription analytics (admin only)
 router.get('/analytics', requireAuth, async (req, res) => {
