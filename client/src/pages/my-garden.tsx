@@ -37,11 +37,14 @@ import {
   Heart,
   Cloud,
   CloudRain,
-  ThermometerSun
+  ThermometerSun,
+  ArrowLeft,
+  Home
 } from 'lucide-react';
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { Link } from "wouter";
 
 interface Plant {
   id: string;
@@ -400,6 +403,14 @@ export default function MyGarden() {
           </div>
         ) : (
           <div>
+            <div className="flex items-center gap-4 mb-4">
+              <Link href="/">
+                <Button variant="outline" className="flex items-center gap-2" data-testid="button-back-home">
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Home
+                </Button>
+              </Link>
+            </div>
             <h1 className="text-4xl font-bold text-green-800 dark:text-green-200 mb-2">
               My Garden Dashboard
             </h1>
