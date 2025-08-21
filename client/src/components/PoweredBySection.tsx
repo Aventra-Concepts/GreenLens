@@ -63,8 +63,6 @@ export function PoweredBySection({ className = "" }: PoweredBySectionProps) {
             );
           })}
         </div>
-
-
       </div>
     </section>
   );
