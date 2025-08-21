@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
 import { Plus, Eye, Trash2 } from "lucide-react";
+import { GardeningToolsMarketplace } from "./GardeningToolsMarketplace";
 
 export default function MyGardenSection() {
   const { user } = useAuth();
@@ -140,6 +141,11 @@ export default function MyGardenSection() {
             </Link>
           </div>
         )}
+
+        {/* Gardening Tools Marketplace Section */}
+        <div className="mt-16 border-t border-gray-200 pt-16">
+          <GardeningToolsMarketplace plantResults={userPlants} />
+        </div>
       </div>
     </section>
   );
