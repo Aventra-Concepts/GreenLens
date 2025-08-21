@@ -139,7 +139,7 @@ export default function GardeningToolsSection() {
             </h3>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="tools-grid">
             {gardeningContent.tools.map((tool) => (
               <Card 
                 key={tool.id} 
@@ -261,16 +261,28 @@ export default function GardeningToolsSection() {
                   
                   <div className="space-y-6">
                     {/* Tool Image */}
-                    {selectedTool.imageUrl && (
-                      <div className="relative h-64 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 overflow-hidden rounded-lg">
-                        <img 
-                          src={selectedTool.imageUrl} 
-                          alt={selectedTool.name}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                      </div>
-                    )}
+                    <div className="relative h-64 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 overflow-hidden rounded-lg">
+                      {selectedTool.imageUrl ? (
+                        <>
+                          <img 
+                            src={selectedTool.imageUrl} 
+                            alt={selectedTool.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                        </>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <div className="w-20 h-20 bg-green-200 dark:bg-green-700 rounded-full flex items-center justify-center">
+                            <Shovel className="w-10 h-10 text-green-600 dark:text-green-300" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     
                     {/* Description */}
                     <div>
