@@ -1345,27 +1345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Gardening content settings
-  app.get("/api/admin/gardening-content", async (req, res) => {
-    try {
-      const [sectionTitle, sectionDescription, tools, soilPreparation] = await Promise.all([
-        storage.getAdminSetting('gardening_section_title'),
-        storage.getAdminSetting('gardening_section_description'),
-        storage.getAdminSetting('gardening_tools'),
-        storage.getAdminSetting('soil_preparation')
-      ]);
-      
-      res.json({
-        sectionTitle: sectionTitle?.settingValue || "Gardening Tools & Soil Preparation",
-        sectionDescription: sectionDescription?.settingValue || "Everything you need for successful gardening, from essential tools to expert soil preparation techniques",
-        tools: tools?.settingValue ? JSON.parse(tools.settingValue) : null,
-        soilPreparation: soilPreparation?.settingValue ? JSON.parse(soilPreparation.settingValue) : null,
-      });
-    } catch (error) {
-      console.error("Error fetching gardening content:", error);
-      res.status(500).json({ error: "Failed to fetch gardening content" });
-    }
-  });
+  // Removed duplicate gardening content route - using the first one with hardcoded working image data
 
   // Plant analysis routes
   app.post("/api/plant-analysis/analyze", requireAuth, upload.array('images', 3), async (req: any, res) => {
