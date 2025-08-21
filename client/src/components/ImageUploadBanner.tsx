@@ -148,7 +148,7 @@ export function ImageUploadBanner() {
       
       <div className="h-full flex flex-col justify-center items-center px-2 sm:px-6 py-4 sm:py-8 relative z-10">
         <h2 className="text-base sm:text-xl lg:text-2xl xl:text-3xl font-bold text-black text-center mb-2 sm:mb-4 leading-tight">
-          <div>Welcome to GreenLens</div>
+          <div>Welcome to <span className="text-green-600">GreenLens</span></div>
           <div>Your perfect companion for a Scientific Garden</div>
         </h2>
         <h4 className="text-sm sm:text-base lg:text-lg text-black text-center max-w-4xl px-1 sm:px-2">
