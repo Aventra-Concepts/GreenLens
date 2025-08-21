@@ -61,12 +61,9 @@ function Router() {
 
   return (
     <Switch>
-      {/* Landing/Home page - different based on auth status */}
-      {isLoading || !user ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <Route path="/" component={Home} />
-      )}
+      {/* Landing/Home page - show Home for all users */}
+      <Route path="/" component={Home} />
+      <Route path="/landing" component={Landing} />
       
       {/* Auth page is always available */}
       <Route path="/auth" component={AuthPage} />
