@@ -367,8 +367,23 @@
 
 /* Compact tool cards styling */
 .compact-tool-card {
-  min-height: 220px;
-  max-height: 280px;
+  min-height: 200px;
+  max-height: 260px;
+}
+
+/* Responsive adjustments for compact cards */
+@media (max-width: 640px) {
+  .compact-tool-card {
+    min-height: 180px;
+    max-height: 220px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .compact-tool-card {
+    min-height: 220px;
+    max-height: 280px;
+  }
 }
 
 /* Line clamp utility for text truncation */

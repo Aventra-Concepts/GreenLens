@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shovel, Star, CheckCircle, ChevronRight } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Shovel, Star, CheckCircle, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -32,6 +34,8 @@ interface GardeningContentData {
 }
 
 export default function GardeningToolsSection() {
+  const [selectedTool, setSelectedTool] = useState<GardeningTool | null>(null);
+  
   const { data: gardeningContent, isLoading, error } = useQuery<GardeningContentData>({
     queryKey: ["/api/admin/gardening-content"],
     retry: false,
@@ -135,9 +139,14 @@ export default function GardeningToolsSection() {
             </h3>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {gardeningContent.tools.map((tool) => (
-              <Card key={tool.id} className="hover:shadow-md transition-all duration-300 relative border-l-4 border-green-500 compact-tool-card" data-testid={`tool-card-${tool.id}`}>
+              <Card 
+                key={tool.id} 
+                className="hover:shadow-md transition-all duration-300 relative border-l-4 border-green-500 compact-tool-card cursor-pointer" 
+                data-testid={`tool-card-${tool.id}`}
+                onClick={() => setSelectedTool(tool)}
+              >
                 {tool.isRecommended && (
                   <div className="absolute -top-1 -right-1 z-10">
                     <Badge className="bg-green-600 text-white flex items-center gap-1 px-1 py-0.5 text-xs">
@@ -221,6 +230,87 @@ export default function GardeningToolsSection() {
               </Card>
             ))}
           </div>
+
+          {/* Tool Detail Modal */}
+          <Dialog open={!!selectedTool} onOpenChange={(open) => !open && setSelectedTool(null)}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              {selectedTool && (
+                <>
+                  <DialogHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <DialogTitle className="text-xl text-green-800 dark:text-green-200 flex items-center gap-2">
+                          {selectedTool.name}
+                          {selectedTool.isRecommended && (
+                            <Badge className="bg-green-600 text-white flex items-center gap-1">
+                              <Star className="w-3 h-3" />
+                              Essential
+                            </Badge>
+                          )}
+                        </DialogTitle>
+                        <Badge variant="secondary" className="mt-2">{selectedTool.category}</Badge>
+                      </div>
+                    </div>
+                  </DialogHeader>
+                  
+                  <div className="space-y-6">
+                    {/* Tool Image */}
+                    {selectedTool.imageUrl && (
+                      <div className="relative h-64 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 overflow-hidden rounded-lg">
+                        <img 
+                          src={selectedTool.imageUrl} 
+                          alt={selectedTool.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                      </div>
+                    )}
+                    
+                    {/* Description */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                        About This Tool
+                      </h3>
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                        {selectedTool.description}
+                      </p>
+                    </div>
+                    
+                    {/* Usage Tips */}
+                    {selectedTool.usageTips && (
+                      <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
+                        <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-3 flex items-center gap-2">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          How to Use
+                        </h3>
+                        <p className="text-green-700 dark:text-green-300 leading-relaxed">
+                          {selectedTool.usageTips}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Best For */}
+                    {selectedTool.bestFor && selectedTool.bestFor.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                          Best Used For
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedTool.bestFor.map((use, index) => (
+                            <Badge key={index} variant="outline" className="px-3 py-1">
+                              {use}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Soil Preparation Guides */}
