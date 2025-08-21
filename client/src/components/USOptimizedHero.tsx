@@ -81,15 +81,10 @@ export function USOptimizedHero() {
     <section className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-4">
-            <MapPin className="w-6 h-6 text-green-600 dark:text-green-400 mr-2" />
-            <Badge variant="outline" className="text-green-700 dark:text-green-300 border-green-300 dark:border-green-600">
-              {region.name} Region • {region.growingZone}
-            </Badge>
-          </div>
+
           
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            {content.welcomeMessage}
+            Welcome to GreenLens. Your perfect companion for a Scientific Garden.
           </h1>
           
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">

@@ -8,11 +8,10 @@ import Footer from "@/components/Footer";
 
 export default function Landing() {
   return (
-    <Layout showImageBanner={false} showSidebarAds={true}>
-      <div className="space-y-6">
-        <USOptimizedHero />
+    <Layout showImageBanner={true} showSidebarAds={true}>
+      <div className="space-y-4">
+        <HeroSection />
         <PricingSection />
-        <InArticleAd />
         <BlogPreviewSection />
       </div>
       <Footer />

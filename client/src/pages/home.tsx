@@ -20,9 +20,9 @@ export default function Home() {
   }
 
   return (
-    <Layout showImageBanner={false} showSidebarAds={true}>
+    <Layout showImageBanner={true} showSidebarAds={true}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-        <USOptimizedHero />
+        <HeroSection />
         
         {/* Powered by GreenLens AI Technology section */}
         <PoweredBySection />
