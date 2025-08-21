@@ -25,14 +25,16 @@ export default function Home() {
 
   return (
     <Layout showImageBanner={true} showSidebarAds={true}>
-      <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="space-y-2 sm:space-y-4 md:space-y-6 lg:space-y-8">
         <HeroSection />
         
         {/* Powered by GreenLens AI Technology section */}
         <PoweredBySection />
         
-        {/* In-article ad between sections */}
-        <InArticleAd />
+        {/* In-article ad between sections - only on larger screens */}
+        <div className="hidden sm:block">
+          <InArticleAd />
+        </div>
         
         {/* Featured E-books Section */}
         <FeaturedEbooksSection />

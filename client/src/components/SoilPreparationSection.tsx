@@ -157,30 +157,31 @@ export function SoilPreparationSection() {
   };
 
   return (
-    <section className="py-16 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+    <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div className="text-center mb-8 sm:mb-10 lg:mb-12">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 leading-tight">
             Seasonal Soil Preparation Guide
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-2 leading-relaxed">
             Optimize your soil health throughout the year with our comprehensive seasonal preparation guide. 
             Healthy soil is the foundation of a thriving garden.
           </p>
         </div>
 
         <Tabs defaultValue="spring" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-6 sm:mb-8 h-auto">
             {seasons.map((season) => {
               const Icon = season.icon;
               return (
                 <TabsTrigger 
                   key={season.id} 
                   value={season.id}
-                  className="flex items-center gap-2"
+                  className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 text-xs sm:text-sm"
                 >
-                  <Icon className={`w-4 h-4 ${season.color}`} />
-                  <span>{season.name}</span>
+                  <Icon className={`w-3 h-3 sm:w-4 sm:h-4 ${season.color}`} />
+                  <span className="hidden sm:inline">{season.name}</span>
+                  <span className="sm:hidden text-xs">{season.name.slice(0, 3)}</span>
                 </TabsTrigger>
               );
             })}
@@ -198,12 +199,12 @@ export function SoilPreparationSection() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                       {season.tasks.map((task, index) => (
                         <Card key={index} className="bg-white dark:bg-gray-800 hover:shadow-lg transition-shadow">
-                          <CardContent className="p-6">
+                          <CardContent className="p-4 sm:p-6">
                             <div className="flex items-start justify-between mb-3">
-                              <h4 className="font-semibold text-gray-900 dark:text-white text-lg">
+                              <h4 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white leading-tight">
                                 {task.title}
                               </h4>
                               <Badge className={getDifficultyColor(task.difficulty)}>
@@ -211,21 +212,21 @@ export function SoilPreparationSection() {
                               </Badge>
                             </div>
                             
-                            <p className="text-gray-600 dark:text-gray-300 mb-4">
+                            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
                               {task.description}
                             </p>
                             
                             <div className="space-y-3">
                               <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-gray-500" />
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
+                                <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
                                   {task.timing}
                                 </span>
                               </div>
                               
-                              <div className="flex flex-wrap gap-2">
+                              <div className="flex flex-wrap gap-1 sm:gap-2">
                                 {task.tools.map((tool, toolIndex) => (
-                                  <Badge key={toolIndex} variant="outline" className="text-xs">
+                                  <Badge key={toolIndex} variant="outline" className="text-xs leading-tight px-2 py-1">
                                     {tool}
                                   </Badge>
                                 ))}

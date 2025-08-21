@@ -107,18 +107,18 @@ export function GardeningToolsPreview() {
   };
 
   return (
-    <div className="bg-white py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">
+    <div className="bg-white py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
             Buy Gardening Tools
           </h3>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600 px-2">
             Hand-picked essentials for every gardener
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {categories.map((category) => (
             <Card
               key={category.id}
@@ -128,7 +128,7 @@ export function GardeningToolsPreview() {
                 <img
                   src={category.customImage || category.defaultImage}
                   alt={category.name}
-                  className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-32 sm:h-36 lg:h-40 object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = category.defaultImage;
                   }}
@@ -186,13 +186,13 @@ export function GardeningToolsPreview() {
               </div>
               
               <CardContent 
-                className="p-4 cursor-pointer hover:bg-gray-50 transition-colors" 
+                className="p-3 sm:p-4 cursor-pointer hover:bg-gray-50 transition-colors" 
                 onClick={() => window.open(`/tools?category=${category.id}`, '_blank')}
               >
-                <h4 className="font-semibold text-gray-900 mb-1 text-center">
+                <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 text-center leading-tight">
                   {category.name}
                 </h4>
-                <p className="text-xs text-gray-600 text-center">
+                <p className="text-xs text-gray-600 text-center leading-relaxed">
                   {category.description}
                 </p>
               </CardContent>
@@ -200,9 +200,9 @@ export function GardeningToolsPreview() {
           ))}
         </div>
 
-        <div className="text-center mt-6">
+        <div className="text-center mt-6 sm:mt-8">
           <Button
-            className="bg-green-600 hover:bg-green-700 text-white"
+            className="bg-green-600 hover:bg-green-700 text-white text-sm sm:text-base px-6 sm:px-8 py-2 sm:py-3"
             onClick={() => window.open('/tools', '_blank')}
           >
             Shop All Gardening Tools

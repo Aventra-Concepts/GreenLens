@@ -152,55 +152,55 @@ export function SoilTestingSection() {
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+    <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div className="text-center mb-8 sm:mb-10 lg:mb-12">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 leading-tight">
             Complete Soil Testing Guide
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-2 leading-relaxed">
             Understand your soil's health with comprehensive testing. Get the insights you need to 
             create the perfect growing environment for your plants.
           </p>
         </div>
 
         <Tabs defaultValue="tests" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-6 sm:mb-8 h-auto text-xs sm:text-sm">
             <TabsTrigger value="tests">Test Types</TabsTrigger>
             <TabsTrigger value="factors">Soil Factors</TabsTrigger>
             <TabsTrigger value="process">Testing Process</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tests">
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid sm:grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {testTypes.map((test, index) => {
                 const Icon = test.icon;
                 return (
                   <Card key={test.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader className="text-center">
-                      <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Icon className="w-8 h-8 text-blue-600" />
+                    <CardHeader className="text-center pb-4">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                        <Icon className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-blue-600" />
                       </div>
-                      <CardTitle className="text-xl">{test.name}</CardTitle>
-                      <div className="flex justify-center gap-2 mt-2">
-                        <Badge variant="outline">{test.price}</Badge>
-                        <Badge variant="outline">{test.duration}</Badge>
+                      <CardTitle className="text-lg sm:text-xl leading-tight">{test.name}</CardTitle>
+                      <div className="flex flex-col sm:flex-row justify-center gap-1 sm:gap-2 mt-2">
+                        <Badge variant="outline" className="text-xs">{test.price}</Badge>
+                        <Badge variant="outline" className="text-xs">{test.duration}</Badge>
                       </div>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    <CardContent className="pt-0">
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 leading-relaxed px-2">
                         {test.description}
                       </p>
                       
                       <div className="space-y-4">
                         <div>
-                          <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2">
+                          <h4 className="font-semibold text-xs sm:text-sm text-gray-700 dark:text-gray-300 mb-2">
                             Includes:
                           </h4>
                           <div className="space-y-1">
                             {test.includes.map((item, idx) => (
-                              <div key={idx} className="flex items-center gap-2 text-sm">
-                                <CheckCircle className="w-3 h-3 text-green-500" />
+                              <div key={idx} className="flex items-start gap-2 text-xs sm:text-sm leading-relaxed">
+                                <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0 mt-0.5" />
                                 <span>{item}</span>
                               </div>
                             ))}
@@ -208,17 +208,17 @@ export function SoilTestingSection() {
                         </div>
                         
                         <div className="pt-2 border-t">
-                          <div className="flex justify-between text-sm">
+                          <div className="flex justify-between text-xs sm:text-sm">
                             <span className="text-gray-600">Frequency:</span>
-                            <span className="font-medium">{test.frequency}</span>
+                            <span className="font-medium text-right">{test.frequency}</span>
                           </div>
-                          <div className="flex justify-between text-sm mt-1">
+                          <div className="flex justify-between items-center text-xs sm:text-sm mt-1">
                             <span className="text-gray-600">Difficulty:</span>
-                            <Badge className={
+                            <Badge className={`text-xs ${
                               test.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' :
                               test.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
                               'bg-red-100 text-red-800'
-                            }>
+                            }`}>
                               {test.difficulty}
                             </Badge>
                           </div>
@@ -232,7 +232,7 @@ export function SoilTestingSection() {
           </TabsContent>
 
           <TabsContent value="factors">
-            <div className="grid lg:grid-cols-2 gap-8">
+            <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
               {soilFactors.map((factor, index) => {
                 const Icon = factor.icon;
                 return (

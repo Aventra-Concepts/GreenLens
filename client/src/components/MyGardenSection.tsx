@@ -27,26 +27,26 @@ export default function MyGardenSection() {
   }
 
   return (
-    <section className="py-8 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-8">
+    <section className="py-6 sm:py-8 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">My Garden</h2>
-            <p className="text-gray-600 mt-2">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">My Garden</h2>
+            <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">
               {hasActiveSubscription 
                 ? "Track and manage your identified plants" 
                 : "Premium plant tracking and management"}
             </p>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 text-sm">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center w-full sm:w-auto gap-3 sm:gap-4">
+            <div className="bg-white px-3 sm:px-4 py-2 rounded-lg border border-gray-200 text-xs sm:text-sm w-full sm:w-auto">
               <span className="text-gray-600">Subscription:</span>
               <span className={`font-semibold ml-2 ${hasActiveSubscription ? 'text-green-600' : 'text-gray-600'}`}>
                 {(subscription as any)?.planName || 'Free Plan'}
               </span>
             </div>
-            <Link href="/account">
-              <Button className="bg-green-500 hover:bg-green-600" data-testid="account-settings-button">
+            <Link href="/account" className="w-full sm:w-auto">
+              <Button className="bg-green-500 hover:bg-green-600 w-full sm:w-auto text-sm sm:text-base" data-testid="account-settings-button">
                 Account Settings
               </Button>
             </Link>
