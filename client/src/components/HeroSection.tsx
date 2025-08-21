@@ -170,14 +170,20 @@ export default function HeroSection() {
               </div>
               
               {/* Image upload boxes */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-6 justify-items-center max-w-[300px] sm:max-w-2xl mx-auto px-2 sm:px-4 hero-upload-area">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-3 lg:gap-6 justify-items-center max-w-sm sm:max-w-2xl mx-auto px-2 sm:px-4 hero-upload-area">
                 {[1, 2, 3].map((slot) => {
                   const uploadedImage = getImageForSlot(slot);
                   return (
                     <div key={slot} className="flex flex-col items-center w-full">
                       <div 
-                        className="w-full h-20 sm:h-32 lg:h-40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md sm:rounded-lg flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors cursor-pointer relative upload-slot-mobile"
-                        onClick={() => fileInputRefs[slot - 1].current?.click()}
+                        className="w-full h-32 sm:h-32 lg:h-40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md sm:rounded-lg flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors cursor-pointer relative upload-slot-mobile"
+                        onClick={() => {
+                          const input = fileInputRefs[slot - 1].current;
+                          if (input) {
+                            input.removeAttribute('capture');
+                            input.click();
+                          }
+                        }}
                       >
                         {uploadedImage ? (
                           <>
@@ -202,9 +208,9 @@ export default function HeroSection() {
                           </>
                         ) : (
                           <>
-                            <Upload className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-gray-400 dark:text-gray-500 mb-1" />
-                            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Image {slot}</span>
-                            <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:block">≤100KB</span>
+                            <Upload className="w-6 h-6 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-gray-400 dark:text-gray-500 mb-1" />
+                            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center">Image {slot}</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500 text-center">≤100KB</span>
                           </>
                         )}
                       </div>
@@ -212,22 +218,44 @@ export default function HeroSection() {
                         ref={fileInputRefs[slot - 1]}
                         type="file"
                         accept="image/*"
-                        capture="environment"
                         onChange={(e) => handleFileSelect(e, slot)}
                         className="hidden"
                         data-testid={`file-input-${slot}`}
                       />
-                      <Button 
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700 text-white px-2 sm:px-3 py-1 sm:py-2 rounded text-xs sm:text-sm mt-1 sm:mt-2 transition-colors w-full flex items-center justify-center hero-upload-button"
-                        onClick={() => fileInputRefs[slot - 1].current?.click()}
-                        data-testid={`upload-image-${slot}-button`}
-                      >
-                        <Camera className="w-3 h-3 mr-1 sm:hidden" />
-                        <Upload className="w-3 h-3 mr-1 hidden sm:inline" />
-                        <span className="block sm:hidden text-xs">{uploadedImage ? 'Change' : 'Camera'}</span>
-                        <span className="hidden sm:inline">{uploadedImage ? 'Change Image' : 'Upload/Camera'}</span>
-                      </Button>
+                      <div className="flex flex-col gap-1 mt-1 sm:mt-2 w-full">
+                        <Button 
+                          size="sm"
+                          className="hero-upload-button"
+                          onClick={() => {
+                            const input = fileInputRefs[slot - 1].current;
+                            if (input) {
+                              input.setAttribute('capture', 'environment');
+                              input.click();
+                            }
+                          }}
+                          data-testid={`camera-image-${slot}-button`}
+                        >
+                          <Camera className="w-3 h-3 mr-1" />
+                          <span>Camera</span>
+                        </Button>
+                        <Button 
+                          size="sm"
+                          variant="outline"
+                          className="hero-upload-button"
+                          data-variant="outline"
+                          onClick={() => {
+                            const input = fileInputRefs[slot - 1].current;
+                            if (input) {
+                              input.removeAttribute('capture');
+                              input.click();
+                            }
+                          }}
+                          data-testid={`upload-image-${slot}-button`}
+                        >
+                          <Upload className="w-3 h-3 mr-1" />
+                          <span>Upload</span>
+                        </Button>
+                      </div>
                     </div>
                   );
                 })}

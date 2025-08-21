@@ -1,0 +1,45 @@
+/* Hero Section Button Fixes */
+.hero-upload-button {
+  min-height: 32px;
+  padding: 6px 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.hero-upload-button span {
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  font-weight: 500 !important;
+  color: inherit !important;
+}
+
+.hero-upload-area .upload-slot-mobile {
+  position: relative;
+}
+
+@media (max-width: 640px) {
+  .hero-upload-button {
+    min-height: 28px;
+    font-size: 11px !important;
+    padding: 4px 6px !important;
+  }
+}
+
+/* Make sure buttons are visible */
+.hero-upload-button .lucide {
+  flex-shrink: 0;
+}
+
+/* Improve contrast for outlined buttons */
+.hero-upload-button[variant="outline"] {
+  border-width: 1.5px !important;
+  background-color: white !important;
+}
+
+.hero-upload-button[variant="outline"]:hover {
+  background-color: rgb(240 253 244) !important;
+}
