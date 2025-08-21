@@ -177,11 +177,10 @@ export function SoilPreparationSection() {
                 <TabsTrigger 
                   key={season.id} 
                   value={season.id}
-                  className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 text-xs sm:text-sm"
+                  className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-1 sm:p-3 text-xs sm:text-sm min-h-[44px] sm:min-h-[auto]"
                 >
-                  <Icon className={`w-3 h-3 sm:w-4 sm:h-4 ${season.color}`} />
-                  <span className="hidden sm:inline">{season.name}</span>
-                  <span className="sm:hidden text-xs">{season.name.slice(0, 3)}</span>
+                  <Icon className={`w-3 h-3 sm:w-4 sm:h-4 ${season.color} flex-shrink-0`} />
+                  <span className="text-xs sm:text-sm leading-tight text-center">{season.name}</span>
                 </TabsTrigger>
               );
             })}
