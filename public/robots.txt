@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /auth
+Allow: /pricing
+Allow: /ebooks
+Allow: /garden
+Allow: /blog
+Disallow: /admin
+Disallow: /api
+Disallow: /uploads
+
+# Sitemap location
+Sitemap: https://greenlens.replit.app/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1

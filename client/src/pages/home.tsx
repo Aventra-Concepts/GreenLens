@@ -11,6 +11,7 @@ import PricingSection from "@/components/PricingSection";
 import { GardeningToolsPreview } from "@/components/GardeningToolsPreview";
 import { SoilPreparationSection } from "@/components/SoilPreparationSection";
 import { SoilTestingSection } from "@/components/SoilTestingSection";
+import { PerformanceOptimizedUSASection } from "@/components/PerformanceOptimized";
 
 
 export default function Home() {
@@ -51,6 +52,9 @@ export default function Home() {
         
         {/* Soil Testing Guide */}
         <SoilTestingSection />
+        
+        {/* USA SEO Enhanced Section - Performance Optimized */}
+        <PerformanceOptimizedUSASection />
         
         <MyGardenSection />
       </div>

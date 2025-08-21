@@ -16,47 +16,56 @@ export class GeolocationService {
     }
   }
 
-  // Get available products based on country
+  // Get available products based on country - USA optimized
   static getAvailableProducts(country: string) {
+    const isUS = country === 'US';
     const isIndia = country === 'IN';
+    const hasGardeningTools = isUS || isIndia;
     
     return {
       country,
       canAccessEbooks: true, // E-books are available globally
-      canAccessGardeningTools: isIndia, // Gardening tools only in India
-      restrictedMessage: isIndia 
+      canAccessGardeningTools: hasGardeningTools, // Now available in USA and India
+      restrictedMessage: hasGardeningTools 
         ? null 
-        : 'Gardening tools are currently only available for customers in India. E-books are available worldwide.',
+        : 'Gardening tools are currently available for customers in the United States and India. E-books are available worldwide.',
       availableCategories: {
         ebooks: [
-          'Gardening Guides',
-          'Plant Care',
-          'Organic Farming',
+          'American Gardening Guides',
+          'Plant Care for US Zones',
+          'Organic Farming USA',
           'Indoor Plants',
-          'Landscaping',
+          'American Landscaping',
           'Hydroponics',
           'Permaculture',
           'Pest Control',
-          'Soil Management',
-          'Seasonal Gardening',
-          'Herb Gardens',
-          'Vegetable Growing'
+          'US Soil Management',
+          'Seasonal Gardening by Zone',
+          'American Herb Gardens',
+          'Vegetable Growing in USA'
         ],
-        gardeningTools: isIndia ? [
+        gardeningTools: hasGardeningTools ? (isUS ? [
+          'American Hand Tools',
+          'Irrigation Systems',
+          'Planters & Containers',
+          'US Organic Fertilizers',
+          'Native American Seeds',
+          'Premium Soil Mixes'
+        ] : [
           'Hand Tools',
           'Watering Equipment',
           'Plant Pots',
           'Fertilizers',
           'Seeds',
           'Soil & Compost'
-        ] : []
+        ]) : []
       }
     };
   }
 
-  // Check if gardening tools are available in user's country
+  // Check if gardening tools are available in user's country - USA optimized
   static isGardeningToolsAvailable(country: string): boolean {
-    return country === 'IN';
+    return country === 'US' || country === 'IN';
   }
 
   // Check if e-books are available in user's country

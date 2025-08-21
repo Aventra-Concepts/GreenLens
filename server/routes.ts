@@ -55,6 +55,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   setupAuth(app);
 
+  // SEO Routes - Serve sitemap and robots.txt
+  app.get('/sitemap.xml', (req, res) => {
+    res.sendFile('sitemap.xml', { root: 'public' });
+  });
+  
+  app.get('/robots.txt', (req, res) => {
+    res.sendFile('robots.txt', { root: 'public' });
+  });
+
   // Register e-commerce routes
   registerAffiliateRoutes(app);
   

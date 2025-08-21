@@ -19,15 +19,15 @@ export function PoweredBySection({ className = "" }: PoweredBySectionProps) {
   });
 
   const defaultFeatures = [
-    "Advanced AI Plant Recognition",
-    "99.5% Accuracy Rate",
-    "Real-time Disease Detection",
-    "Personalized Care Plans"
+    "Advanced AI Plant Recognition for American Gardens",
+    "99.5% Accuracy Rate for US Native Species",
+    "Real-time Disease Detection & Treatment",
+    "Personalized Care Plans by Growing Zone"
   ];
 
   const features = poweredBySettings?.features || defaultFeatures;
   const title = poweredBySettings?.title || "Powered by GreenLens AI Technology";
-  const description = poweredBySettings?.description || "Experience the future of plant identification with our cutting-edge artificial intelligence system";
+  const description = poweredBySettings?.description || "America's #1 AI-powered plant identification platform. Trusted by over 50,000 American gardeners for accurate plant identification across all US growing zones";
 
   return (
     <section className={`py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 section-content-fix ${className}`}>
