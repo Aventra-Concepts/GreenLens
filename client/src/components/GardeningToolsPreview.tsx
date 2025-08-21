@@ -111,7 +111,7 @@ export function GardeningToolsPreview() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <h3 className="text-2xl font-bold text-gray-900 mb-2">
-            Gardening Tools Marketplace
+            Buy Gardening Tools
           </h3>
           <p className="text-gray-600">
             Hand-picked essentials for every gardener
