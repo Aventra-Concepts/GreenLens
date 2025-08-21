@@ -5,7 +5,7 @@ import { InArticleAd } from "@/components/AdSense";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { PoweredBySection } from "@/components/PoweredBySection";
-import GardeningToolsSection from "@/components/GardeningToolsSection";
+
 import { FeaturedEbooksSection } from "@/components/FeaturedEbooksSection";
 
 export default function Home() {
@@ -30,8 +30,7 @@ export default function Home() {
         {/* In-article ad between sections */}
         <InArticleAd />
         
-        {/* Gardening tools and soil preparation section */}
-        <GardeningToolsSection />
+
         
         {/* Featured E-books Section */}
         <FeaturedEbooksSection />

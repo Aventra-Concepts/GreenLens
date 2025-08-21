@@ -10,7 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Upload, X, Loader2, Camera } from "lucide-react";
 import { CameraCapture } from "@/components/CameraCapture";
 import { PoweredBySection } from "@/components/PoweredBySection";
-import GardeningToolsSection from "@/components/GardeningToolsSection";
+
 import MyGardenSection from "@/components/MyGardenSection";
 import { InArticleAd } from "@/components/AdSense";
 import { useAuth } from "@/hooks/use-auth";
@@ -388,7 +388,7 @@ export default function Identify() {
         
         <InArticleAd />
         
-        <GardeningToolsSection />
+
         
         <MyGardenSection />
       </section>
