@@ -7,6 +7,8 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { PoweredBySection } from "@/components/PoweredBySection";
 import { FeaturedEbooksSection } from "@/components/FeaturedEbooksSection";
+import { SoilPreparationSection } from "@/components/SoilPreparationSection";
+import { SoilTestingSection } from "@/components/SoilTestingSection";
 
 
 export default function Home() {
@@ -33,6 +35,12 @@ export default function Home() {
         
         {/* Featured E-books Section */}
         <FeaturedEbooksSection />
+        
+        {/* Soil Preparation Guide */}
+        <SoilPreparationSection />
+        
+        {/* Soil Testing Guide */}
+        <SoilTestingSection />
         
         <MyGardenSection />
       </div>

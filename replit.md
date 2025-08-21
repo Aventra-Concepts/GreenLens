@@ -16,10 +16,11 @@ GreenLens is a production-grade web application that leverages AI technology for
 **PAGE CLEANUP COMPLETE**: 
 - Removed "Advanced Neural Networks" section from PoweredBySection 
 - Completely eliminated all "Gardening Tools Marketplace" components from home page
-- Removed "No products found!" affiliate section  
+- Removed "No products found!" affiliate section and "Demo Mode" text
 - Fixed "Powered by GreenLens AI Technology" section layout and spacing
 - Moved affiliate disclosure from main page to footer under "Amazon Affiliate"
-- Clean, streamlined home page with: Hero → AI Technology → E-books → My Garden
+- Added comprehensive soil preparation and testing sections
+- Clean, educational home page: Hero → AI Technology → E-books → Soil Prep → Soil Testing → My Garden
 
 **SECURITY ENHANCEMENTS COMPLETE**: 
 - Comprehensive input sanitization using DOMPurify to prevent XSS attacks
