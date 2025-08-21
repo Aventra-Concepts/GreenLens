@@ -191,14 +191,14 @@ export function GardeningToolsMarketplace({ plantResults }: { plantResults?: any
 
           {/* Category Filter */}
           <Select
-            value={searchParams.category}
-            onValueChange={(value) => setSearchParams(prev => ({ ...prev, category: value }))}
+            value={searchParams.category || "all"}
+            onValueChange={(value) => setSearchParams(prev => ({ ...prev, category: value === "all" ? "" : value }))}
           >
             <SelectTrigger>
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {categories.map(cat => (
                 <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
               ))}
@@ -242,7 +242,6 @@ export function GardeningToolsMarketplace({ plantResults }: { plantResults?: any
         {/* Category Cards */}
         <div className="grid md:grid-cols-4 gap-4 mb-6">
           {categories.map((category) => {
-            const IconComponent = typeof category.icon === 'string' ? () => <span className="text-2xl">{category.icon}</span> : category.icon;
             const isActive = searchParams.category === category.id;
             
             return (
@@ -254,7 +253,13 @@ export function GardeningToolsMarketplace({ plantResults }: { plantResults?: any
                 onClick={() => setSearchParams(prev => ({ ...prev, category: category.id }))}
               >
                 <CardContent className="p-4 text-center">
-                  <IconComponent className={`w-8 h-8 mx-auto mb-2 ${isActive ? 'text-green-600' : 'text-gray-600'}`} />
+                  <div className={`w-8 h-8 mx-auto mb-2 ${isActive ? 'text-green-600' : 'text-gray-600'} flex items-center justify-center`}>
+                    {typeof category.icon === 'string' ? (
+                      <span className="text-2xl">{category.icon}</span>
+                    ) : (
+                      <category.icon className="w-8 h-8" />
+                    )}
+                  </div>
                   <h4 className={`font-medium text-sm ${isActive ? 'text-green-800' : 'text-gray-800'}`}>
                     {category.name}
                   </h4>

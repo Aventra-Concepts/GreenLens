@@ -36,7 +36,7 @@ export default function MyGardenSection() {
 
   if (subscriptionLoading) {
     return (
-      <div className="py-16 bg-gray-50">
+      <div className="py-8 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="animate-spin w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-gray-600">Checking subscription status...</p>
@@ -46,7 +46,7 @@ export default function MyGardenSection() {
   }
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-8 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -164,7 +164,7 @@ export default function MyGardenSection() {
         )}
 
         {/* Gardening Tools Marketplace Section */}
-        <div className="mt-16 border-t border-gray-200 pt-16">
+        <div className="mt-8 border-t border-gray-200 pt-8">
           <GardeningToolsMarketplace plantResults={userPlants} />
         </div>
       </div>

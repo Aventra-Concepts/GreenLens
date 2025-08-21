@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { PoweredBySection } from "@/components/PoweredBySection";
 import { FeaturedEbooksSection } from "@/components/FeaturedEbooksSection";
+import { GardeningToolsPreview } from "@/components/GardeningToolsPreview";
 
 export default function Home() {
   const { user, isLoading } = useAuth();
@@ -32,6 +33,9 @@ export default function Home() {
         
         {/* Featured E-books Section */}
         <FeaturedEbooksSection />
+        
+        {/* Gardening Tools Preview */}
+        <GardeningToolsPreview />
         
         <MyGardenSection />
       </div>

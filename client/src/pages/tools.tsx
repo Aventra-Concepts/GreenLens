@@ -219,12 +219,12 @@ export default function Tools() {
                     <Label htmlFor="category" className="text-sm font-medium mb-2 block">
                       Category
                     </Label>
-                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <Select value={selectedCategory || "all"} onValueChange={(value) => setSelectedCategory(value === "all" ? "" : value)}>
                       <SelectTrigger data-testid="select-category">
                         <SelectValue placeholder="All Categories" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Categories</SelectItem>
+                        <SelectItem value="all">All Categories</SelectItem>
                         {categoriesData && Object.entries(categoriesData.categories).map(([key, category]: [string, any]) => (
                           <SelectItem key={key} value={key}>
                             {category.name}
@@ -262,12 +262,12 @@ export default function Tools() {
                       <Label htmlFor="rating" className="text-sm font-medium mb-2 block">
                         Minimum Rating
                       </Label>
-                      <Select value={minRating?.toString() || ''} onValueChange={(value) => setMinRating(value ? Number(value) : undefined)}>
+                      <Select value={minRating?.toString() || 'all'} onValueChange={(value) => setMinRating(value === 'all' ? undefined : Number(value))}>
                         <SelectTrigger data-testid="select-rating">
                           <SelectValue placeholder="Any Rating" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Any Rating</SelectItem>
+                          <SelectItem value="all">Any Rating</SelectItem>
                           <SelectItem value="4">4+ Stars</SelectItem>
                           <SelectItem value="4.5">4.5+ Stars</SelectItem>
                         </SelectContent>

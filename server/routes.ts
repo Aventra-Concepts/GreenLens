@@ -1690,6 +1690,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const { registerPlantCareRoutes } = await import("./routes/plantCareRoutes");
   registerPlantCareRoutes(app);
 
+  // Admin garden tool images management
+  app.get('/api/admin/tool-images', requireAdmin, async (req, res) => {
+    try {
+      const setting = await storage.getAdminSetting('tool_images_settings');
+      const settings = setting ? JSON.parse(setting.settingValue) : { images: {} };
+      res.json(settings);
+    } catch (error) {
+      console.error('Error fetching tool images:', error);
+      res.status(500).json({ error: 'Failed to fetch tool images' });
+    }
+  });
+
+  app.put('/api/admin/tool-images', requireAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { categoryId, imageUrl } = req.body;
+      
+      if (!categoryId) {
+        return res.status(400).json({ error: 'Category ID is required' });
+      }
+
+      // Get current settings
+      const currentSetting = await storage.getAdminSetting('tool_images_settings');
+      const currentSettings = currentSetting ? JSON.parse(currentSetting.settingValue) : { images: {} };
+      
+      // Update the specific category
+      const updatedSettings = {
+        ...currentSettings,
+        images: {
+          ...currentSettings.images,
+          [categoryId]: imageUrl || null
+        }
+      };
+
+      // Save back to storage
+      await storage.setAdminSetting({
+        settingKey: 'tool_images_settings',
+        settingValue: JSON.stringify(updatedSettings),
+        description: 'Garden tools category image settings',
+        lastUpdatedBy: userId,
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating tool image:', error);
+      res.status(500).json({ error: 'Failed to update tool image' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
