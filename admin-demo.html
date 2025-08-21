@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenLens Admin Dashboard Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #f8fafc;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .demo-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .demo-card-header {
+            background: #f1f5f9;
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .demo-card-content {
+            padding: 20px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature-item {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #16a34a;
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .instructions {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .screenshot-placeholder {
+            background: #e5e7eb;
+            border: 2px dashed #9ca3af;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            color: #6b7280;
+            margin: 20px 0;
+        }
+        
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .btn-demo {
+            display: inline-block;
+            background: #16a34a;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            margin: 10px 10px 10px 0;
+            transition: background 0.2s;
+        }
+        
+        .btn-demo:hover {
+            background: #15803d;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .access-levels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .access-level {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .premium-access {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+        }
+        
+        .free-access {
+            background: #d1fae5;
+            border: 2px solid #16a34a;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌿 GreenLens Admin Dashboard Demo</h1>
+        <p>Complete platform management and AI-powered garden tools preview system</p>
+    </div>
+
+    <div class="instructions">
+        <h3>🚀 Live Demo Available</h3>
+        <p>The admin dashboard is fully functional with these improvements:</p>
+        <ul>
+            <li><strong>AI-Generated Garden Tools Images:</strong> Hand tools, watering equipment, soil care, and protective gear</li>
+            <li><strong>Admin-Editable Image System:</strong> Hover over category images as admin to see edit controls</li>
+            <li><strong>Tiered Access Control:</strong> My Garden premium-only, E-books and marketplace for all registered users</li>
+            <li><strong>Visual Density Improvements:</strong> Reduced spacing between sections for better layout</li>
+        </ul>
+    </div>
+
+    <div class="demo-card">
+        <div class="demo-card-header">
+            <h2>🖼️ Garden Tools Image Management System</h2>
+        </div>
+        <div class="demo-card-content">
+            <p>The home page now features a "Gardening Tools Marketplace" section with 4 AI-generated category images:</p>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🔧</div>
+                    <h4>Hand Tools</h4>
+                    <p>Essential hand tools for precision gardening</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🚿</div>
+                    <h4>Watering Equipment</h4>
+                    <p>Keep your plants perfectly hydrated</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🌱</div>
+                    <h4>Soil Care</h4>
+                    <p>Nurture healthy soil for thriving plants</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🥽</div>
+                    <h4>Protective Gear</h4>
+                    <p>Stay safe while tending your garden</p>
+                </div>
+            </div>
+
+            <div class="instructions">
+                <strong>Admin Functionality:</strong> When logged in as admin, hover over any category image to reveal an "Edit" button. Click it to open a dialog where you can update the image URL. Images automatically fall back to the AI-generated defaults if custom URLs fail to load.
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-card">
+        <div class="demo-card-header">
+            <h2>🎯 Access Control System</h2>
+        </div>
+        <div class="demo-card-content">
+            <div class="access-levels">
+                <div class="access-level premium-access">
+                    <h3>🔒 My Garden (Premium Only)</h3>
+                    <ul style="text-align: left; margin: 15px 0;">
+                        <li>Personal plant collection tracking</li>
+                        <li>Unlimited plant identifications</li>
+                        <li>Health monitoring & disease alerts</li>
+                        <li>Personalized care recommendations</li>
+                    </ul>
+                    <div class="highlight">Requires $9/month subscription</div>
+                </div>
+                
+                <div class="access-level free-access">
+                    <h3>✅ Free for All Registered Users</h3>
+                    <ul style="text-align: left; margin: 15px 0;">
+                        <li>E-Books marketplace</li>
+                        <li>Amazon Affiliate tools</li>
+                        <li>Blog and educational content</li>
+                        <li>Basic plant identification (3 free uses)</li>
+                    </ul>
+                    <div class="highlight">Available after free registration</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-card">
+        <div class="demo-card-header">
+            <h2>⚡ Performance Improvements</h2>
+        </div>
+        <div class="demo-card-content">
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🔧</div>
+                    <h4>Runtime Error Fixes</h4>
+                    <p>Fixed Select component crashes by replacing empty string values with "all" defaults</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📏</div>
+                    <h4>Visual Density</h4>
+                    <p>Reduced spacing between sections for improved visual hierarchy and content density</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎨</div>
+                    <h4>AI-Generated Assets</h4>
+                    <p>Beautiful category images generated and integrated for the garden tools marketplace</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">👨‍💻</div>
+                    <h4>Admin Controls</h4>
+                    <p>Complete image management system with real-time updates and fallback handling</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-card">
+        <div class="demo-card-header">
+            <h2>📋 Admin Dashboard Features</h2>
+        </div>
+        <div class="demo-card-content">
+            <p>The admin dashboard includes comprehensive management tools:</p>
+            <ul>
+                <li><strong>Banner Management:</strong> Update main banner images, headlines, and subheadings</li>
+                <li><strong>Garden Tools Management:</strong> Edit category images with live preview</li>
+                <li><strong>Pricing Management:</strong> Manage subscription plans and multi-currency pricing</li>
+                <li><strong>Feature Controls:</strong> Enable/disable platform features and marketplace visibility</li>
+                <li><strong>User Management:</strong> Monitor subscriptions and user analytics</li>
+                <li><strong>Content Management:</strong> Blog posts, e-books, and educational content</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin: 40px 0;">
+        <a href="/" class="btn-demo">🏠 View Live Application</a>
+        <a href="/tools" class="btn-demo btn-secondary">🛠️ Garden Tools Marketplace</a>
+    </div>
+</body>
+</html>
