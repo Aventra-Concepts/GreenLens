@@ -77,9 +77,7 @@ export function Layout({
             )}
             
 
-            <a href="/account" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors" data-testid="link-account">
-              Account
-            </a>
+
             <a href="/pricing" className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors" data-testid="link-pricing">
               Pricing
             </a>

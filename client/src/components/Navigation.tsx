@@ -42,13 +42,7 @@ export default function Navigation() {
               <>
                 {user ? (
                   <>
-                    <Button 
-                      variant="ghost"
-                      onClick={() => setLocation('/account')}
-                      data-testid="account-button"
-                    >
-                      Account
-                    </Button>
+
                     {user.isAdmin && (
                       <Button 
                         variant="ghost"
