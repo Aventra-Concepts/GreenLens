@@ -372,23 +372,7 @@ export function GardeningToolsMarketplace({ plantResults }: { plantResults?: any
               </Card>
             ))}
           </div>
-        ) : (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <Package className="w-16 h-16 mx-auto" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-            <p className="text-gray-500">Try adjusting your search criteria or category selection.</p>
-          </div>
-        )}
-
-        {/* Affiliate Disclosure */}
-        <div className="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
-          <p className="text-xs text-gray-600">
-            🔗 <strong>Affiliate Disclosure:</strong> As an Amazon Associate, we earn from qualifying purchases. 
-            Prices and availability are subject to change. Product recommendations are based on your plant analysis results.
-          </p>
-        </div>
+        ) : null}
       </div>
     </div>
   );

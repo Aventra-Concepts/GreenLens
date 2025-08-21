@@ -64,52 +64,7 @@ export function PoweredBySection({ className = "" }: PoweredBySectionProps) {
           })}
         </div>
 
-        {/* AI Technology Showcase */}
-        <div className="mt-16 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-green-100 dark:border-green-800">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Advanced Neural Networks
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Our AI system uses state-of-the-art deep learning models trained on millions of plant images 
-                to provide you with accurate identification and comprehensive care recommendations.
-              </p>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Multi-angle image analysis</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Species classification accuracy</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Health assessment capabilities</span>
-                </div>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl p-8 text-white">
-                <div className="text-center">
-                  <div className="text-4xl font-bold mb-2">99.5%</div>
-                  <div className="text-sm opacity-90">Identification Accuracy</div>
-                </div>
-                <div className="mt-6 grid grid-cols-2 gap-4 text-center">
-                  <div>
-                    <div className="text-2xl font-bold">50K+</div>
-                    <div className="text-xs opacity-90">Plant Species</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold">1M+</div>
-                    <div className="text-xs opacity-90">Identifications</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+
       </div>
     </section>
   );

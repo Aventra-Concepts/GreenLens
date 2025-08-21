@@ -134,8 +134,11 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-sm mb-1.5">Registration</h3>
+              <h3 className="font-semibold text-sm mb-1.5">Amazon Affiliate</h3>
               <ul className="space-y-1 text-gray-400 text-xs">
+                <li className="text-gray-400">
+                  As an Amazon Associate, we earn from qualifying purchases. No extra cost to you.
+                </li>
                 <li>
                   <Link 
                     href="/student-registration" 

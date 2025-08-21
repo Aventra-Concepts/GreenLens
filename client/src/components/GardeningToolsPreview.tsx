@@ -185,7 +185,10 @@ export function GardeningToolsPreview() {
                 )}
               </div>
               
-              <CardContent className="p-4">
+              <CardContent 
+                className="p-4 cursor-pointer hover:bg-gray-50 transition-colors" 
+                onClick={() => window.open(`/tools?category=${category.id}`, '_blank')}
+              >
                 <h4 className="font-semibold text-gray-900 mb-1 text-center">
                   {category.name}
                 </h4>
@@ -200,9 +203,9 @@ export function GardeningToolsPreview() {
         <div className="text-center mt-6">
           <Button
             className="bg-green-600 hover:bg-green-700 text-white"
-            onClick={() => window.location.href = '/tools'}
+            onClick={() => window.open('/tools', '_blank')}
           >
-            Explore All Tools
+            Shop All Gardening Tools
           </Button>
         </div>
       </div>
