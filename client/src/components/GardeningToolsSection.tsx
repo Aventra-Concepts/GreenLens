@@ -157,24 +157,30 @@ export default function GardeningToolsSection() {
                 )}
                 
                 {/* Tool Image */}
-                <div className="relative h-24 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 overflow-hidden">
+                <div className="relative h-32 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 overflow-hidden group-hover:shadow-inner">
                   {tool.imageUrl ? (
-                    <img 
-                      src={tool.imageUrl} 
-                      alt={tool.name}
-                      className="w-full h-full object-cover"
-                      data-testid={`tool-image-${tool.id}`}
-                    />
+                    <>
+                      <img 
+                        src={tool.imageUrl} 
+                        alt={tool.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        data-testid={`tool-image-${tool.id}`}
+                        loading="lazy"
+                      />
+                      <div className="absolute top-2 right-2">
+                        <div className="bg-white/80 dark:bg-gray-800/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <ChevronRight className="w-3 h-3 text-green-600" />
+                        </div>
+                      </div>
+                    </>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <div className="w-10 h-10 bg-green-200 dark:bg-green-700 rounded-full flex items-center justify-center">
-                        <svg className="w-5 h-5 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                      <div className="w-10 h-10 bg-green-200 dark:bg-green-700 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                        <Shovel className="w-5 h-5 text-green-600 dark:text-green-300" />
                       </div>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                 </div>
 
                 <CardHeader className="pb-1 px-3 pt-2">

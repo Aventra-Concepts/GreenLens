@@ -1113,77 +1113,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
             {
               id: "1",
               name: "Garden Spade",
-              description: "The foundation tool for any gardener. Essential for digging, transplanting, and soil preparation with its sharp, angled blade design.",
+              description: "A garden spade is the cornerstone of any gardener's toolkit. This precision-engineered tool features a sharp, flat blade designed for cutting through tough soil, creating clean edges, and transplanting plants with minimal root disturbance. The long handle provides excellent leverage for digging deeper holes with less effort, while the stepped blade allows for safe foot pressure.",
               category: "Digging Tools",
-              imageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop",
-              usageTips: "Hold firmly with both hands. Push blade straight down using your foot, then angle back to lift soil. Keep your back straight and use leg power.",
-              bestFor: ["Digging holes", "Transplanting", "Soil breaking", "Edging"],
+              imageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&h=400&fit=crop&auto=format",
+              usageTips: "Position the blade vertically against the soil and use your foot to push down on the step (shoulder of the blade). Keep your back straight and use your legs for power. For transplanting, dig around the plant in a circle first, then angle the spade under the root ball. Clean the blade after use to prevent soil buildup and rust. Choose a spade with a comfortable grip and appropriate blade size for your strength.",
+              bestFor: ["Digging precise planting holes", "Transplanting shrubs and perennials", "Cutting through tough compacted soil", "Creating clean garden bed edges", "Breaking up hardpan soil"],
               isRecommended: true
             },
             {
               id: "2", 
               name: "Pruning Shears",
-              description: "Sharp, bypass pruning shears for clean cuts that promote healthy plant growth. Essential for maintaining plant health and shape.",
+              description: "High-quality bypass pruning shears are essential for maintaining plant health and promoting vigorous growth. The sharp, curved blades create clean cuts that heal quickly, preventing disease entry. These professional-grade shears feature an ergonomic design that reduces hand fatigue during extended use and a safety lock for secure storage.",
               category: "Cutting Tools",
-              imageUrl: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400&h=300&fit=crop",
-              usageTips: "Make clean cuts at 45-degree angles just above growth nodes. Clean blades between plants to prevent disease spread. Cut branches no thicker than your thumb.",
-              bestFor: ["Deadheading flowers", "Trimming branches", "Harvesting", "Shaping plants"]
+              imageUrl: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&h=400&fit=crop&auto=format",
+              usageTips: "Make clean cuts at 45-degree angles just above growth nodes or buds. Position the cutting blade closest to the main plant. Clean blades with rubbing alcohol between plants to prevent disease spread. Cut branches no thicker than your thumb - use loppers for larger branches. Keep blades sharp with regular sharpening for best results.",
+              bestFor: ["Deadheading spent flowers", "Trimming small branches and stems", "Harvesting fruits and vegetables", "Shaping and training plants", "Removing diseased or damaged growth"]
             },
             {
               id: "3",
               name: "Watering Can",
-              description: "Provides controlled watering with adjustable flow. The removable spout allows for different watering patterns from gentle shower to focused stream.",
+              description: "A traditional watering can provides precise water control and gentle application that's perfect for delicate plants and seedlings. The removable rose (spout head) allows for different watering patterns - from a gentle shower for sensitive plants to a focused stream for deep watering. The balanced design ensures comfortable carrying even when full.",
               category: "Watering Tools",
-              imageUrl: "https://images.unsplash.com/photo-1615671524827-c1fe3973b648?w=400&h=300&fit=crop",
-              usageTips: "Water early morning or evening to reduce evaporation. Remove spout for gentle shower effect on seedlings. Water at soil level to avoid wet foliage.",
-              bestFor: ["Seedling care", "Container plants", "Precise watering", "Fertilizer application"]
+              imageUrl: "https://images.unsplash.com/photo-1615671524827-c1fe3973b648?w=600&h=400&fit=crop&auto=format",
+              usageTips: "Water early morning (6-8 AM) or evening (6-8 PM) to reduce evaporation. Remove the rose for gentle shower effect on seedlings and young plants. Water at soil level to avoid wet foliage which can lead to fungal diseases. Fill can completely for better weight distribution. Hold close to plants to minimize splash and water waste.",
+              bestFor: ["Caring for delicate seedlings", "Watering container and potted plants", "Applying liquid fertilizers", "Precise watering in tight spaces", "Indoor plant care"]
             },
             {
               id: "4",
               name: "Hand Cultivator",
-              description: "Three-pronged tool perfect for loosening soil, removing weeds, and aerating around plants without damaging roots.",
+              description: "This essential three-pronged hand tool is designed for precise soil cultivation around established plants. The sharp, curved tines easily penetrate compacted soil to improve aeration and water infiltration. Perfect for working in tight spaces where larger tools would damage plant roots or nearby vegetation.",
               category: "Soil Tools",
-              imageUrl: "https://images.unsplash.com/photo-1617419808381-e8c041c3c7ce?w=400&h=300&fit=crop",
-              usageTips: "Use gentle scratching motions near plant roots. Work when soil is slightly moist, not wet or bone dry. Clean tines regularly to prevent soil buildup.",
-              bestFor: ["Weed removal", "Soil aeration", "Surface cultivation", "Mixing compost"]
+              imageUrl: "https://images.unsplash.com/photo-1617419808381-e8c041c3c7ce?w=600&h=400&fit=crop&auto=format",
+              usageTips: "Use gentle scratching motions, working the tines 2-3 inches deep around plant roots. Work when soil is slightly moist - not wet (muddy) or bone dry (hard). Clean tines regularly to prevent soil buildup and rust. Work in circular motions around plants, staying at least 6 inches from the main stem. Perfect for breaking up surface crusts that prevent water penetration.",
+              bestFor: ["Removing small weeds by the roots", "Aerating compacted soil around plants", "Surface cultivation without disturbing roots", "Mixing compost into existing soil", "Breaking up surface crusts"]
             },
             {
               id: "5",
               name: "Garden Rake",
-              description: "Multi-purpose tool for leveling soil, gathering debris, and breaking up clods. The long handle provides leverage for larger areas.",
+              description: "A versatile garden rake is indispensable for creating smooth, level planting surfaces and maintaining garden tidiness. The sturdy steel tines effectively break up soil clods, remove debris, and create the perfect seedbed texture. The long hardwood handle provides excellent leverage, reducing back strain during extended use.",
               category: "Soil Tools",
-              imageUrl: "https://images.unsplash.com/photo-1621467705323-1300cfc1e671?w=400&h=300&fit=crop",
-              usageTips: "Pull towards you to level soil and gather debris. Use back of rake to break up soil clods. Work systematically across garden beds.",
-              bestFor: ["Soil leveling", "Debris removal", "Seedbed preparation", "Spreading mulch"]
+              imageUrl: "https://images.unsplash.com/photo-1621467705323-1300cfc1e671?w=600&h=400&fit=crop&auto=format",
+              usageTips: "Pull the rake towards you with long, smooth strokes to level soil and gather debris. Use the back (flat) side to break up large soil clods and smooth surfaces. Work systematically across garden beds in overlapping passes. Keep tines clean of debris for maximum effectiveness. Store hanging up to prevent tine damage.",
+              bestFor: ["Creating smooth planting surfaces", "Removing leaves and garden debris", "Breaking up compacted soil clods", "Preparing seedbeds for fine seeds", "Spreading and leveling mulch"]
             },
             {
               id: "6",
               name: "Garden Hose with Nozzle",
-              description: "Flexible watering solution with adjustable spray patterns. Essential for reaching all areas of your garden efficiently.",
+              description: "A quality garden hose with adjustable nozzle is the backbone of efficient garden watering. Modern hoses resist kinking and UV damage, while multi-pattern nozzles provide everything from gentle mist for seedlings to powerful jet for cleaning. Choose a hose length that reaches all garden areas without excess coiling.",
               category: "Watering Tools",
-              imageUrl: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop",
-              usageTips: "Use soaker setting for deep watering. Mist setting for delicate plants. Always drain hose completely in winter to prevent freezing damage.",
-              bestFor: ["Large area watering", "Washing tools", "Filling containers", "Cleaning walkways"],
+              imageUrl: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=600&h=400&fit=crop&auto=format",
+              usageTips: "Use soaker or shower setting for deep, gentle watering of established plants. Mist setting works best for seedlings and delicate foliage. Jet setting is perfect for cleaning tools and walkways. Always drain hose completely in winter to prevent freeze damage. Store coiled or on a reel to prevent kinking. Check connections regularly for leaks.",
+              bestFor: ["Watering large garden areas efficiently", "Cleaning garden tools and equipment", "Filling watering cans and containers", "Washing down garden paths and patios", "Emergency watering during dry spells"],
               isRecommended: true
             },
             {
               id: "7",
               name: "Garden Gloves",
-              description: "Durable protective gloves that shield hands from thorns, dirt, and chemicals while maintaining dexterity for detailed work.",
+              description: "Quality garden gloves are essential protection for hands during all gardening activities. Look for gloves with reinforced palms and fingertips, breathable materials, and proper fit. Different thicknesses serve different purposes - thin nitrile for precision work, thick leather for thorny plants, and waterproof versions for wet conditions.",
               category: "Protection",
-              imageUrl: "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400&h=300&fit=crop",
-              usageTips: "Choose the right thickness for the task. Thin gloves for delicate work, thick for thorny plants. Always let gloves dry completely after use.",
-              bestFor: ["Rose pruning", "Soil handling", "Chemical application", "General protection"],
+              imageUrl: "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=600&h=400&fit=crop&auto=format",
+              usageTips: "Choose appropriate thickness for your task - thin gloves for delicate transplanting, thick leather gloves for thorny roses and brambles. Always let gloves dry completely after use to prevent mold and odor. Keep multiple pairs for different jobs. Replace when worn through for continued protection. Store in a dry, ventilated area.",
+              bestFor: ["Protecting hands during rose and berry pruning", "Handling soil and compost safely", "Applying fertilizers and garden chemicals", "General garden maintenance and weeding", "Protecting against cuts and scrapes"],
               isRecommended: true
             },
             {
               id: "8",
               name: "Wheelbarrow",
-              description: "Essential for transporting soil, plants, tools, and garden waste. Saves time and reduces physical strain during garden work.",
+              description: "A sturdy wheelbarrow is indispensable for moving heavy materials around the garden efficiently. Modern wheelbarrows feature deep bins, comfortable grips, and pneumatic tires that roll smoothly over various terrain. The single-wheel design provides excellent maneuverability in tight spaces between plants and raised beds.",
               category: "Transport",
-              imageUrl: "https://images.unsplash.com/photo-1574263867128-3d6b5e15e2e0?w=400&h=300&fit=crop",
-              usageTips: "Load weight evenly and don't overfill. Keep the wheel properly inflated. Clean after each use to prevent rust and soil buildup.",
-              bestFor: ["Soil transport", "Plant moving", "Debris removal", "Tool storage"]
+              imageUrl: "https://images.unsplash.com/photo-1574263867128-3d6b5e15e2e0?w=600&h=400&fit=crop&auto=format",
+              usageTips: "Load weight evenly in the bin and avoid overfilling - a half-full wheelbarrow is easier and safer to handle. Keep the tire properly inflated for smooth rolling. Lift using your legs, not your back. Clean after each use to prevent rust and soil buildup. Store under cover to extend life. Balance the load over the wheel for easier pushing.",
+              bestFor: ["Transporting soil, compost, and mulch", "Moving large plants and containers", "Collecting and removing garden debris", "Carrying multiple tools to work areas", "Mixing concrete for garden projects"]
             }
           ],
           soilPreparation: [

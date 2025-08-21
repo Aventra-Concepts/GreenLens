@@ -367,8 +367,14 @@
 
 /* Compact tool cards styling */
 .compact-tool-card {
-  min-height: 200px;
-  max-height: 260px;
+  min-height: 280px;
+  max-height: 320px;
+  transition: all 0.3s ease;
+}
+
+.compact-tool-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 /* Responsive adjustments for compact cards */
