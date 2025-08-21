@@ -1,8 +1,8 @@
 # Admin Dashboard Demo Instructions
 
 ## Admin Login Credentials
-- **Email**: admin@greenlens.com
-- **Password**: admin123
+- **Email**: admin@greenlens.ai
+- **Password**: GreenAdmin123!
 
 ## Demo Steps to Test Admin Features
 
