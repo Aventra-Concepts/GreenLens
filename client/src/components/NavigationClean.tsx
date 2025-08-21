@@ -178,17 +178,7 @@ export default function NavigationClean() {
                       <div className="px-3 py-2 text-sm text-gray-600 dark:text-gray-300">
                         Welcome, {(user as any)?.firstName || (user as any)?.email}
                       </div>
-                      <Link href="/account">
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start text-left"
-                          onClick={closeMobileMenu}
-                          data-testid="menu-account"
-                        >
-                          <User className="w-4 h-4 mr-3" />
-                          My Account
-                        </Button>
-                      </Link>
+
                       {(user as any)?.isAdmin && (
                         <Link href="/admin/dashboard">
                           <Button
