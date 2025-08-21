@@ -1,11 +1,11 @@
 import { Layout } from "@/components/Layout";
 import HeroSection from "@/components/HeroSection";
+import USOptimizedHero from "@/components/USOptimizedHero";
 import MyGardenSection from "@/components/MyGardenSection";
 import { InArticleAd } from "@/components/AdSense";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { PoweredBySection } from "@/components/PoweredBySection";
-
 import { FeaturedEbooksSection } from "@/components/FeaturedEbooksSection";
 
 export default function Home() {
@@ -20,17 +20,15 @@ export default function Home() {
   }
 
   return (
-    <Layout showImageBanner={true} showSidebarAds={true}>
+    <Layout showImageBanner={false} showSidebarAds={true}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-        <HeroSection />
+        <USOptimizedHero />
         
         {/* Powered by GreenLens AI Technology section */}
         <PoweredBySection />
         
         {/* In-article ad between sections */}
         <InArticleAd />
-        
-
         
         {/* Featured E-books Section */}
         <FeaturedEbooksSection />

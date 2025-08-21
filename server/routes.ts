@@ -29,6 +29,7 @@ import gardenSubscriptionRoutes from "./routes/gardenSubscriptionRoutes";
 
 import { GeographicRestrictionService } from "./services/geographicRestrictionService";
 import { socialMediaService } from "./services/socialMediaService";
+import { usOptimizationService } from "./services/usOptimizationService";
 import gardenContentRoutes from "./routes/gardenContentRoutes";
 import gardenMonitoringRoutes from "./routes/gardenMonitoringRoutes";
 
@@ -202,6 +203,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error initializing restrictions:', error);
       res.status(500).json({ success: false, message: 'Failed to initialize restrictions' });
+    }
+  });
+
+  // US-specific optimization routes
+  app.get('/api/us/regional-info', async (req, res) => {
+    try {
+      const region = usOptimizationService.detectUSRegion(req);
+      const localizedContent = usOptimizationService.getUSLocalizedContent(region);
+      const plantRecommendations = usOptimizationService.getUSPlantRecommendations(region);
+      const defaults = usOptimizationService.getUSLocalizedDefaults();
+      
+      res.json({
+        success: true,
+        region,
+        content: localizedContent,
+        plantRecommendations,
+        defaults,
+        timestamp: usOptimizationService.formatUSDateTime(new Date(), region.timezone)
+      });
+    } catch (error) {
+      console.error('Error getting US regional info:', error);
+      res.status(500).json({ success: false, message: 'Failed to get regional information' });
+    }
+  });
+
+  app.get('/api/us/plant-recommendations', async (req, res) => {
+    try {
+      const region = usOptimizationService.detectUSRegion(req);
+      const recommendations = usOptimizationService.getUSPlantRecommendations(region);
+      
+      res.json({
+        success: true,
+        region: region.name,
+        recommendations,
+        growingZone: region.growingZone,
+        popularPlants: region.popularPlants
+      });
+    } catch (error) {
+      console.error('Error getting US plant recommendations:', error);
+      res.status(500).json({ success: false, message: 'Failed to get plant recommendations' });
     }
   });
   
@@ -422,15 +463,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Multi-currency pricing API
+  // Multi-currency pricing API - US optimized
   app.get("/api/pricing", async (req, res) => {
     try {
       const { currency = 'USD', location } = req.query;
       
-      // Auto-detect currency based on location if provided
-      const detectedCurrency = location 
-        ? pricingService.detectCurrencyByLocation(location as string)
-        : currency as string;
+      // Auto-detect currency based on location if provided, defaulting to USD for US optimization
+      let detectedCurrency = currency as string;
+      if (location) {
+        detectedCurrency = pricingService.detectCurrencyByLocation(location as string);
+      } else {
+        // Detect US region and default to USD
+        const region = usOptimizationService.detectUSRegion(req);
+        if (region) {
+          detectedCurrency = 'USD';
+        }
+      }
       
       const pricingArray = pricingService.getAllPlanPricing(detectedCurrency);
       const supportedCurrencies = pricingService.getSupportedCurrencies();

@@ -54,7 +54,9 @@ export const users = pgTable("users", {
   freeTierUsed: integer("free_tier_used").default(0),
   freeTierStartedAt: timestamp("free_tier_started_at"),
   preferredLanguage: varchar("preferred_language", { length: 10 }).default('en'),
-  timezone: varchar("timezone", { length: 50 }).default('UTC'),
+  timezone: varchar("timezone", { length: 50 }).default('America/New_York'),
+  preferredCurrency: varchar("preferred_currency", { length: 3 }).default('USD'),
+  region: varchar("region", { length: 10 }).default('US'),
   // Stripe subscription fields
   stripeCustomerId: varchar("stripe_customer_id"),
   stripeSubscriptionId: varchar("stripe_subscription_id"),

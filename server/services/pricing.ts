@@ -600,6 +600,7 @@ export class MultiCurrencyPricingService {
   }
 
   public detectCurrencyByLocation(userLocation?: string): string {
+    // Default to USD for US optimization
     if (!userLocation) return 'USD';
 
     const locationToCurrency: Record<string, string> = {

@@ -9,9 +9,11 @@ GreenLens is a production-grade web application that leverages AI technology for
 
 **UI TERMINOLOGY UPDATES**: Renamed "E-book Marketplace" to "E-Books" throughout the application per user preference for cleaner, more concise terminology.
 
-**RESPONSIVE GARDENING TOOLS SECTION**: Successfully implemented compact, responsive tool boxes arranged in 2 rows of 4 with click-to-view post functionality. Features include modal dialogs for detailed tool information, admin-editable content with Image URLs, Usage Tips, and Best For categories, and responsive breakpoints for mobile/tablet/desktop viewing.
+**US MARKET OPTIMIZATION COMPLETE**: Application now fully optimized for US users with default USD currency, Eastern timezone (America/New_York), imperial units (Fahrenheit/inches), regional plant recommendations, US growing zones, and localized content. Features include regional plant detection for Northeast, Southeast, Midwest, Southwest, and West regions with zone-specific growing advice.
 
 **MIGRATION COMPLETE**: Successfully migrated from Google Gemini to OpenAI API across all AI services including plant identification, care planning, disease diagnosis, and blog generation.
+
+**GARDENING TOOLS SECTION REMOVED**: Completely removed GardeningToolsSection component from all pages due to persistent image loading issues. This improves application performance and eliminates problematic components.
 
 **SECURITY ENHANCEMENTS COMPLETE**: 
 - Comprehensive input sanitization using DOMPurify to prevent XSS attacks
@@ -42,6 +44,8 @@ The backend is an **Express.js with TypeScript** RESTful API server. It features
 
 ### Database Design
 **PostgreSQL with Neon** serves as the cloud-hosted database. Core entities include Users, Subscriptions, PlantResults, BlogPosts, CatalogCache, and Sessions. The Users table includes authentication fields, admin flags, location, and fields for tracking free tier usage. PlantResults stores localized species information. A TTL-based caching strategy is implemented for the plant catalog. New tables support e-commerce (products, cart_items, orders), consultations (consultation_requests), and multi-currency transactions.
+
+**US Optimization Fields**: Users table now includes preferredCurrency (default: 'USD'), timezone (default: 'America/New_York'), and region (default: 'US') for localized experience.
 
 ### AI Integration Pipeline
 The AI pipeline involves **OpenAI API** for image quality assessment, care plan synthesis, disease treatment advice, and structured content generation. **Plant.id API v3** is the primary service for species identification and health assessment. Structured output schemas ensure consistent JSON responses from AI services.
