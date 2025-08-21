@@ -11,13 +11,19 @@ import { GardeningToolsMarketplace } from "./GardeningToolsMarketplace";
 export default function MyGardenSection() {
   const { user } = useAuth();
 
-  // Removed subscription query to prevent auth loops - show Free Plan as default
-  const subscription = { status: 'none', planName: 'Free Plan' };
+  // Check subscription status to determine access to My Garden features
+  const { data: subscription, isLoading: subscriptionLoading } = useQuery({
+    queryKey: ['/api/subscription/status'],
+    retry: false,
+  });
 
   const { data: userPlants, isLoading } = useQuery({
     queryKey: ['/api/my-garden'],
     retry: false,
+    enabled: (subscription as any)?.hasActiveSubscription === true, // Only load if subscribed
   });
+
+  const hasActiveSubscription = (subscription as any)?.hasActiveSubscription === true;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -28,19 +34,34 @@ export default function MyGardenSection() {
     }
   };
 
+  if (subscriptionLoading) {
+    return (
+      <div className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full mx-auto mb-4" />
+          <p className="text-gray-600">Checking subscription status...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-3xl font-bold text-gray-900">My Garden</h2>
-            <p className="text-gray-600 mt-2">Track and manage your identified plants</p>
+            <p className="text-gray-600 mt-2">
+              {hasActiveSubscription 
+                ? "Track and manage your identified plants" 
+                : "Premium plant tracking and management"}
+            </p>
           </div>
           <div className="flex items-center space-x-4">
             <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 text-sm">
               <span className="text-gray-600">Subscription:</span>
-              <span className={`font-semibold ml-2 ${getStatusColor(subscription?.status || 'none')}`}>
-                {subscription?.planName || 'Free Plan'}
+              <span className={`font-semibold ml-2 ${getStatusColor((subscription as any)?.status || 'none')}`}>
+                {(subscription as any)?.planName || 'Free Plan'}
               </span>
             </div>
             <Link href="/account">

@@ -13,6 +13,7 @@ interface Product {
   asin: string;
   title: string;
   image: string;
+  images?: string[];
   url: string;
   price?: string;
   currency?: string;
@@ -21,6 +22,11 @@ interface Product {
   badges?: string[];
   usageTip?: string;
   lastUpdated: Date;
+  isRecommended?: boolean;
+  reviewSummary?: string;
+  features?: string[];
+  dimensions?: string;
+  weight?: string;
 }
 
 interface ProductSearchParams {
@@ -36,6 +42,12 @@ const categories = [
   { id: 'watering', name: 'Watering & Irrigation', icon: Droplets, description: 'Complete watering solutions for healthy plants' },
   { id: 'soil-care', name: 'Soil Care', icon: Package, description: 'Tools to keep your soil healthy and fertile' },
   { id: 'protective-gear', name: 'Protective Gear', icon: Shield, description: 'Stay safe and comfortable while gardening' },
+  { id: 'power-tools', name: 'Power Tools', icon: '🔋', description: 'Motorized tools for efficient large-scale gardening' },
+  { id: 'mechanized-tools', name: 'Mechanized Tools', icon: '🚜', description: 'Heavy-duty mechanical equipment for serious gardeners' },
+  { id: 'greenhouse', name: 'Greenhouse & Structures', icon: '🏠', description: 'Structures to extend growing seasons and protect plants' },
+  { id: 'pest-control', name: 'Pest & Disease Control', icon: '🐛', description: 'Organic and effective pest management solutions' },
+  { id: 'seeds-plants', name: 'Seeds & Plants', icon: '🌿', description: 'Quality seeds and live plants for your garden' },
+  { id: 'fertilizers', name: 'Fertilizers & Nutrients', icon: '🌾', description: 'Nutrients to keep your plants healthy and productive' },
 ];
 
 export function GardeningToolsMarketplace({ plantResults }: { plantResults?: any[] }) {
@@ -134,7 +146,7 @@ export function GardeningToolsMarketplace({ plantResults }: { plantResults?: any
       <div className="text-center mb-8">
         <h3 className="text-2xl font-bold text-gray-900 mb-2">Gardening Tools Marketplace</h3>
         <p className="text-gray-600">Hand-picked essentials for every gardener</p>
-        {!marketplacesData?.hasApiAccess && (
+        {!(marketplacesData as any)?.hasApiAccess && (
           <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p className="text-sm text-yellow-700">
               🔧 Demo Mode: Real products require Amazon Associate credentials
@@ -218,7 +230,7 @@ export function GardeningToolsMarketplace({ plantResults }: { plantResults?: any
               <SelectValue placeholder="Market" />
             </SelectTrigger>
             <SelectContent>
-              {marketplacesData?.marketplaces?.map((market: any) => (
+              {(marketplacesData as any)?.marketplaces?.map((market: any) => (
                 <SelectItem key={market.region} value={market.region}>
                   {market.displayName} ({market.currency})
                 </SelectItem>
@@ -230,7 +242,7 @@ export function GardeningToolsMarketplace({ plantResults }: { plantResults?: any
         {/* Category Cards */}
         <div className="grid md:grid-cols-4 gap-4 mb-6">
           {categories.map((category) => {
-            const IconComponent = category.icon;
+            const IconComponent = typeof category.icon === 'string' ? () => <span className="text-2xl">{category.icon}</span> : category.icon;
             const isActive = searchParams.category === category.id;
             
             return (

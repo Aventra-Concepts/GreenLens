@@ -793,6 +793,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get current user info
+  app.get("/api/user", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Remove sensitive information
+      const { password, ...safeUser } = user;
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Subscription status endpoint - for My Garden access control
+  app.get('/api/subscription/status', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user has active subscription for My Garden access
+      const hasActiveSubscription = user.subscriptionStatus === 'active' || 
+                                   user.subscriptionStatus === 'trialing';
+      
+      res.json({
+        hasActiveSubscription,
+        status: user.subscriptionStatus || 'none',
+        planName: user.subscriptionPlan || 'Free Plan',
+        planId: user.subscriptionPlanId || 'free'
+      });
+    } catch (error) {
+      console.error("Error fetching subscription status:", error);
+      res.status(500).json({ message: "Failed to fetch subscription status" });
+    }
+  });
+
   // Plant care tips endpoint
   app.get("/api/care-tips/:speciesId", async (req, res) => {
     try {
