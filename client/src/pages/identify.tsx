@@ -226,11 +226,11 @@ export default function Identify() {
         </Link>
       </div>
 
-      <div className="space-y-2 sm:space-y-4 md:space-y-6 lg:space-y-8">
+      <div className="space-y-1 sm:space-y-2 md:space-y-3 lg:space-y-4">
 
         {/* Plant Identification Header Section */}
-        <section className="py-8 sm:py-12 lg:py-16">
-          <div className="text-center space-y-6 mb-8">
+        <section className="py-4 sm:py-6 lg:py-8">
+          <div className="text-center space-y-4 mb-4">
             {/* Centered Plant Identification Image */}
             <div className="flex justify-center mb-6">
               <div className="relative">
@@ -451,7 +451,7 @@ export default function Identify() {
             </Button>
             
             {!isAuthenticated && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                 <span className="text-orange-600 dark:text-orange-400 font-medium">Login required:</span> Please{" "}
                 <button 
                   onClick={() => setLocation("/auth")}
@@ -467,7 +467,9 @@ export default function Identify() {
         </section>
         
         {/* Additional Sections */}
-        <PoweredBySection />
+        <div className="-mt-4">
+          <PoweredBySection />
+        </div>
         
         <InArticleAd />
       </div>
