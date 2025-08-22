@@ -24,15 +24,12 @@ export default function MyGardenPage() {
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between py-4">
-              <div className="flex items-center space-x-4">
-                <Link href="/">
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                    <ArrowLeft className="w-4 h-4" />
-                    <span>Back to Home</span>
-                  </Button>
-                </Link>
-                <h1 className="text-2xl font-bold text-gray-900">My Garden Dashboard</h1>
-              </div>
+              <Link href="/">
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Back to Home</span>
+                </Button>
+              </Link>
               {!user && (
                 <div className="flex items-center space-x-4">
                   <Link href="/auth">
@@ -49,27 +46,61 @@ export default function MyGardenPage() {
         {/* Content */}
         <div className="py-8">
           {user ? (
-            <MyGardenSection />
-          ) : (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Welcome to GreenLens Garden Tools</h2>
-                <p className="text-lg text-gray-600 mb-6">Discover professional gardening tools to enhance your plant care journey</p>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 inline-block">
-                  <p className="text-blue-700 mb-4">
-                    <strong>Sign in to unlock advanced features:</strong>
-                  </p>
-                  <ul className="text-blue-600 text-left space-y-2">
-                    <li>• Personalized tool recommendations based on your plants</li>
-                    <li>• Plant identification history and care tracking</li>
-                    <li>• Custom gardening calendar and reminders</li>
-                    <li>• Expert plant analysis with AI insights</li>
-                  </ul>
-                </div>
+            <div>
+              {/* Title */}
+              <div className="text-center mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-4">My Garden</h1>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                  Welcome to your personal garden dashboard. Track your plants, monitor their health, 
+                  and get personalized care recommendations powered by AI technology.
+                </p>
               </div>
-              
-              {/* Amazon Affiliate Marketplace for non-authenticated users */}
-              <GardeningToolsMarketplace plantResults={[]} />
+              <MyGardenSection />
+            </div>
+          ) : (
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              {/* Title */}
+              <div className="text-center mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-4">My Garden</h1>
+                <p className="text-lg text-gray-600 mb-8">
+                  Your personal garden management dashboard. Track your plants, get AI-powered care recommendations, 
+                  and build your dream garden with professional tools and insights.
+                </p>
+              </div>
+
+              {/* Sign In Button */}
+              <div className="text-center mb-8">
+                <Link href="/auth">
+                  <Button className="bg-green-600 hover:bg-green-700 px-8 py-3 text-lg">
+                    Sign In
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Features List */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-8 mb-12">
+                <p className="text-green-800 font-semibold mb-6 text-center text-lg">
+                  Sign in to unlock advanced features:
+                </p>
+                <ul className="text-green-700 space-y-3 max-w-2xl mx-auto">
+                  <li className="flex items-start">
+                    <span className="text-green-600 mr-3">•</span>
+                    <span>Personalized tool recommendations based on your plants</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-600 mr-3">•</span>
+                    <span>Plant identification history and care tracking</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-600 mr-3">•</span>
+                    <span>Custom gardening calendar and reminders</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-600 mr-3">•</span>
+                    <span>Expert plant analysis with AI insights</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           )}
         </div>

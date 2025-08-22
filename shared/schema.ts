@@ -37,7 +37,7 @@ export const users = pgTable("users", {
   location: varchar("location"),
   password: varchar("password"), // Hashed password - nullable for OAuth users
   // OAuth provider fields
-  googleId: varchar("google_id"),
+  gmail: varchar("gmail"),
   facebookId: varchar("facebook_id"),
   githubId: varchar("github_id"),
   twitterId: varchar("twitter_id"),

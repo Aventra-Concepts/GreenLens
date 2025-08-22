@@ -374,7 +374,7 @@ export class DatabaseStorage implements IStorage {
     let condition;
     switch (provider) {
       case 'google':
-        condition = eq(users.googleId, providerId);
+        condition = eq(users.gmail, providerId);
         break;
       case 'facebook':
         condition = eq(users.facebookId, providerId);
@@ -417,7 +417,7 @@ export class DatabaseStorage implements IStorage {
       preferredCurrency: 'USD',
       region: 'US',
       // Set the appropriate OAuth ID field
-      googleId: userData.googleId || null,
+      gmail: userData.gmail || null,
       facebookId: userData.facebookId || null,
       githubId: userData.githubId || null,
       twitterId: userData.twitterId || null,
@@ -436,7 +436,7 @@ export class DatabaseStorage implements IStorage {
     
     switch (provider) {
       case 'google':
-        updateData.googleId = providerId;
+        updateData.gmail = providerId;
         break;
       case 'facebook':
         updateData.facebookId = providerId;
