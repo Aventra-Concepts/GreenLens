@@ -220,8 +220,15 @@ export default function PricingSection() {
   return (
     <section id="pricing" className="pt-2 pb-4">
       <div className="max-w-4xl mx-auto px-4">
+        {/* Plans Title */}
+        <div className="text-center mb-3">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Choose Your Plan
+          </h2>
+        </div>
+        
         {/* Currency Selector */}
-        <div className="flex justify-center items-center gap-2 mb-2">
+        <div className="flex justify-center items-center gap-2 mb-1">
           <Globe className="w-4 h-4 text-gray-500" />
           <div className="w-48">
             <CurrencySelector
