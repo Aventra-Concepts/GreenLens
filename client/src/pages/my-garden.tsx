@@ -20,22 +20,18 @@ export default function MyGardenPage() {
   return (
     <Layout showImageBanner={false} showSidebarAds={true}>
       <div className="min-h-screen bg-gray-50">
-        {/* Header Navigation */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center py-3">
-              <Link href="/">
-                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Back to Home</span>
-                </Button>
-              </Link>
-            </div>
-          </div>
+        {/* Back Button */}
+        <div className="px-4 sm:px-6 lg:px-8 pt-2">
+          <Link href="/">
+            <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to Home</span>
+            </Button>
+          </Link>
         </div>
 
         {/* Content */}
-        <div className="py-4">
+        <div className="py-2">
           {user ? (
             <div>
               {/* Title */}
