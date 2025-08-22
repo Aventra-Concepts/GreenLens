@@ -294,14 +294,14 @@ export default function Identify() {
               </div>
             </div>
             
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white text-center">
               Identify <span className="text-green-600">American Plants</span> with <span className="text-green-600">AI Precision</span>
             </h1>
-            <div className="space-y-2">
-              <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300">
+            <div className="space-y-2 text-center">
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300">
                 Upload up to 3 photos for instant plant identification across all US growing zones.
               </p>
-              <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 Get personalized care plans and expert disease diagnosis designed for American gardens.
               </p>
             </div>
