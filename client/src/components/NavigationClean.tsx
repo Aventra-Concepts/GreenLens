@@ -50,7 +50,7 @@ export default function NavigationClean() {
     { name: "Identify Plants", href: "/identify", icon: Leaf },
     { name: "E-Books", href: "/ebook-marketplace", icon: BookOpen },
     { name: "Buy The Best Gardening Tools", href: "/tools", icon: Star },
-    { name: "Garden Monitoring", href: "/garden-monitoring", icon: Activity },
+    { name: "My Garden", href: "/my-garden", icon: Activity },
     { name: "Pricing", href: "/pricing", icon: DollarSign },
   ];
 
