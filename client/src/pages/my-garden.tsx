@@ -23,7 +23,7 @@ export default function MyGardenPage() {
         {/* Back Button */}
         <div className="px-4 sm:px-6 lg:px-8 pt-2">
           <Link href="/">
-            <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+            <Button variant="outline" size="sm" className="flex items-center space-x-1 bg-green-50 border-green-200 hover:bg-green-100 hover:border-green-300 text-green-700">
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Home</span>
             </Button>
