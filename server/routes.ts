@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import { storage } from "./storage";
 import { setupAuth, requireAuth, requireAdmin } from "./auth";
+import passport from "passport";
 import { z } from "zod";
 import { insertUserSchema, loginUserSchema } from "@shared/schema";
 // plantIdService imported lazily when needed
@@ -54,6 +55,56 @@ const upload = multer({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   setupAuth(app);
+
+  // OAuth Routes
+  // Google OAuth
+  app.get('/auth/google',
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+  );
+
+  app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login?error=google_auth_failed' }),
+    (req, res) => {
+      // Successful authentication, redirect to home
+      res.redirect('/?welcome=true');
+    }
+  );
+
+  // Facebook OAuth
+  app.get('/auth/facebook',
+    passport.authenticate('facebook', { scope: ['email'] })
+  );
+
+  app.get('/auth/facebook/callback',
+    passport.authenticate('facebook', { failureRedirect: '/login?error=facebook_auth_failed' }),
+    (req, res) => {
+      res.redirect('/?welcome=true');
+    }
+  );
+
+  // GitHub OAuth
+  app.get('/auth/github',
+    passport.authenticate('github', { scope: ['user:email'] })
+  );
+
+  app.get('/auth/github/callback',
+    passport.authenticate('github', { failureRedirect: '/login?error=github_auth_failed' }),
+    (req, res) => {
+      res.redirect('/?welcome=true');
+    }
+  );
+
+  // Twitter OAuth
+  app.get('/auth/twitter',
+    passport.authenticate('twitter')
+  );
+
+  app.get('/auth/twitter/callback',
+    passport.authenticate('twitter', { failureRedirect: '/login?error=twitter_auth_failed' }),
+    (req, res) => {
+      res.redirect('/?welcome=true');
+    }
+  );
 
   // SEO Routes - Serve sitemap and robots.txt
   app.get('/sitemap.xml', (req, res) => {

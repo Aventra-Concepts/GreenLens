@@ -13,6 +13,7 @@ import { Loader2, Eye, EyeOff, Mail, Lock, User, MapPin, AlertCircle } from "luc
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
+import { SocialLoginButtons } from "@/components/SocialLoginButtons";
 
 // Registration form schema
 const registerSchema = z.object({
@@ -302,6 +303,9 @@ export default function AuthPage() {
                         </Button>
                       </form>
                     </Form>
+                    
+                    {/* Social Login Options */}
+                    <SocialLoginButtons mode="login" />
                   </TabsContent>
 
                   {/* Registration Form */}
@@ -474,6 +478,9 @@ export default function AuthPage() {
                         </Button>
                       </form>
                     </Form>
+                    
+                    {/* Social Login Options */}
+                    <SocialLoginButtons mode="signup" />
                   </TabsContent>
                 </Tabs>
 

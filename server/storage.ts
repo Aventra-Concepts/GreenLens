@@ -116,6 +116,11 @@ export interface IStorage {
   updateUserLastLogin(userId: string): Promise<void>;
   getAllUsers(): Promise<User[]>;
   updateUserAdminStatus(userId: string, isAdmin: boolean): Promise<User>;
+  
+  // OAuth operations
+  getUserByProviderId(provider: string, providerId: string): Promise<User | undefined>;
+  createOAuthUser(userData: any): Promise<User>;
+  linkOAuthAccount(userId: string, provider: string, providerId: string): Promise<User>;
   updateUserActiveStatus(userId: string, isActive: boolean): Promise<User>;
   updateUserStripeInfo(userId: string, stripeInfo: { customerId?: string; subscriptionId?: string }): Promise<User>;
   updateGardenSubscription(userId: string, subscriptionInfo: { subscriptionId: string; active: boolean; expiresAt: Date }): Promise<User>;
@@ -362,6 +367,96 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date()
       })
       .where(eq(users.id, userId));
+  }
+
+  // OAuth operations
+  async getUserByProviderId(provider: string, providerId: string): Promise<User | undefined> {
+    let condition;
+    switch (provider) {
+      case 'google':
+        condition = eq(users.googleId, providerId);
+        break;
+      case 'facebook':
+        condition = eq(users.facebookId, providerId);
+        break;
+      case 'github':
+        condition = eq(users.githubId, providerId);
+        break;
+      case 'twitter':
+        condition = eq(users.twitterId, providerId);
+        break;
+      default:
+        return undefined;
+    }
+
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(condition);
+    return user;
+  }
+
+  async createOAuthUser(userData: any): Promise<User> {
+    const newUser = {
+      email: userData.email,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      profileImageUrl: userData.profileImageUrl,
+      provider: userData.provider,
+      emailVerified: userData.emailVerified || false,
+      isActive: true,
+      isAdmin: false,
+      isSuperAdmin: false,
+      isAuthor: false,
+      authorVerified: false,
+      twoFactorEnabled: false,
+      failedLoginAttempts: 0,
+      lockedUntil: null,
+      preferredLanguage: 'en',
+      timezone: 'America/New_York',
+      preferredCurrency: 'USD',
+      region: 'US',
+      // Set the appropriate OAuth ID field
+      googleId: userData.googleId || null,
+      facebookId: userData.facebookId || null,
+      githubId: userData.githubId || null,
+      twitterId: userData.twitterId || null,
+      password: null, // OAuth users don't have passwords
+    };
+
+    const [user] = await db
+      .insert(users)
+      .values(newUser)
+      .returning();
+    return user;
+  }
+
+  async linkOAuthAccount(userId: string, provider: string, providerId: string): Promise<User> {
+    let updateData: any = {};
+    
+    switch (provider) {
+      case 'google':
+        updateData.googleId = providerId;
+        break;
+      case 'facebook':
+        updateData.facebookId = providerId;
+        break;
+      case 'github':
+        updateData.githubId = providerId;
+        break;
+      case 'twitter':
+        updateData.twitterId = providerId;
+        break;
+      default:
+        throw new Error(`Unsupported OAuth provider: ${provider}`);
+    }
+
+    const [user] = await db
+      .update(users)
+      .set(updateData)
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
   }
 
   async getAllUsers(): Promise<User[]> {

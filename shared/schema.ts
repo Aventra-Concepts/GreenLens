@@ -35,7 +35,13 @@ export const users = pgTable("users", {
   firstName: varchar("first_name").notNull(),
   lastName: varchar("last_name").notNull(),
   location: varchar("location"),
-  password: varchar("password").notNull(), // Hashed password
+  password: varchar("password"), // Hashed password - nullable for OAuth users
+  // OAuth provider fields
+  googleId: varchar("google_id"),
+  facebookId: varchar("facebook_id"),
+  githubId: varchar("github_id"),
+  twitterId: varchar("twitter_id"),
+  provider: varchar("provider").default('local'), // 'local', 'google', 'facebook', 'github', 'twitter'
   profileImageUrl: varchar("profile_image_url"),
   country: varchar("country"),
   isAdmin: boolean("is_admin").default(false),

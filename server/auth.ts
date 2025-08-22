@@ -1,5 +1,9 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as FacebookStrategy } from "passport-facebook";
+import { Strategy as GitHubStrategy } from "passport-github2";
+import { Strategy as TwitterStrategy } from "passport-twitter";
 import { Express } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
@@ -48,6 +52,9 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  // Configure OAuth strategies
+  setupOAuthStrategies();
+
   passport.use(
     new LocalStrategy(
       {
@@ -59,6 +66,11 @@ export function setupAuth(app: Express) {
           const user = await storage.getUserByEmail(email);
           if (!user || !user.isActive) {
             return done(null, false, { message: 'Invalid credentials' });
+          }
+          
+          // Check if user has a password (local auth) or is OAuth only
+          if (!user.password) {
+            return done(null, false, { message: 'Please sign in with your social account' });
           }
           
           const isPasswordValid = await comparePasswords(password, user.password);
@@ -258,3 +270,157 @@ export function requireAuth(req: any, res: any, next: any) {
   next();
 }
 
+// OAuth Strategy Setup
+function setupOAuthStrategies() {
+  // Google OAuth Strategy
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    passport.use(new GoogleStrategy({
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "/auth/google/callback"
+    }, async (accessToken, refreshToken, profile, done) => {
+      try {
+        // Check if user exists with Google ID
+        let user = await storage.getUserByProviderId('google', profile.id);
+        
+        if (!user) {
+          // Check if user exists with same email
+          const emailUser = await storage.getUserByEmail(profile.emails?.[0]?.value || '');
+          
+          if (emailUser) {
+            // Link Google account to existing user
+            user = await storage.linkOAuthAccount(emailUser.id, 'google', profile.id);
+          } else {
+            // Create new user
+            user = await storage.createOAuthUser({
+              googleId: profile.id,
+              email: profile.emails?.[0]?.value || '',
+              firstName: profile.name?.givenName || '',
+              lastName: profile.name?.familyName || '',
+              profileImageUrl: profile.photos?.[0]?.value,
+              provider: 'google',
+              emailVerified: true
+            });
+          }
+        }
+        
+        await storage.updateUserLastLogin(user.id);
+        return done(null, user);
+      } catch (error) {
+        return done(error, null);
+      }
+    }));
+  }
+
+  // Facebook OAuth Strategy
+  if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
+    passport.use(new FacebookStrategy({
+      clientID: process.env.FACEBOOK_APP_ID,
+      clientSecret: process.env.FACEBOOK_APP_SECRET,
+      callbackURL: "/auth/facebook/callback",
+      profileFields: ['id', 'emails', 'name', 'picture.type(large)']
+    }, async (accessToken, refreshToken, profile, done) => {
+      try {
+        let user = await storage.getUserByProviderId('facebook', profile.id);
+        
+        if (!user) {
+          const emailUser = await storage.getUserByEmail(profile.emails?.[0]?.value || '');
+          
+          if (emailUser) {
+            user = await storage.linkOAuthAccount(emailUser.id, 'facebook', profile.id);
+          } else {
+            user = await storage.createOAuthUser({
+              facebookId: profile.id,
+              email: profile.emails?.[0]?.value || '',
+              firstName: profile.name?.givenName || '',
+              lastName: profile.name?.familyName || '',
+              profileImageUrl: profile.photos?.[0]?.value,
+              provider: 'facebook',
+              emailVerified: true
+            });
+          }
+        }
+        
+        await storage.updateUserLastLogin(user.id);
+        return done(null, user);
+      } catch (error) {
+        return done(error, null);
+      }
+    }));
+  }
+
+  // GitHub OAuth Strategy
+  if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+    passport.use(new GitHubStrategy({
+      clientID: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: "/auth/github/callback"
+    }, async (accessToken, refreshToken, profile, done) => {
+      try {
+        let user = await storage.getUserByProviderId('github', profile.id);
+        
+        if (!user) {
+          const emailUser = await storage.getUserByEmail(profile.emails?.[0]?.value || '');
+          
+          if (emailUser) {
+            user = await storage.linkOAuthAccount(emailUser.id, 'github', profile.id);
+          } else {
+            user = await storage.createOAuthUser({
+              githubId: profile.id,
+              email: profile.emails?.[0]?.value || '',
+              firstName: profile.displayName?.split(' ')[0] || '',
+              lastName: profile.displayName?.split(' ').slice(1).join(' ') || '',
+              profileImageUrl: profile.photos?.[0]?.value,
+              provider: 'github',
+              emailVerified: true
+            });
+          }
+        }
+        
+        await storage.updateUserLastLogin(user.id);
+        return done(null, user);
+      } catch (error) {
+        return done(error, null);
+      }
+    }));
+  }
+
+  // Twitter OAuth Strategy
+  if (process.env.TWITTER_CONSUMER_KEY && process.env.TWITTER_CONSUMER_SECRET) {
+    passport.use(new TwitterStrategy({
+      consumerKey: process.env.TWITTER_CONSUMER_KEY,
+      consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+      callbackURL: "/auth/twitter/callback",
+      includeEmail: true
+    }, async (token, tokenSecret, profile, done) => {
+      try {
+        let user = await storage.getUserByProviderId('twitter', profile.id);
+        
+        if (!user) {
+          const emailUser = await storage.getUserByEmail(profile.emails?.[0]?.value || '');
+          
+          if (emailUser) {
+            user = await storage.linkOAuthAccount(emailUser.id, 'twitter', profile.id);
+          } else {
+            user = await storage.createOAuthUser({
+              twitterId: profile.id,
+              email: profile.emails?.[0]?.value || '',
+              firstName: profile.displayName?.split(' ')[0] || '',
+              lastName: profile.displayName?.split(' ').slice(1).join(' ') || '',
+              profileImageUrl: profile.photos?.[0]?.value,
+              provider: 'twitter',
+              emailVerified: true
+            });
+          }
+        }
+        
+        await storage.updateUserLastLogin(user.id);
+        return done(null, user);
+      } catch (error) {
+        return done(error, null);
+      }
+    }));
+  }
+}
+
+export { hashPassword, comparePasswords, setupOAuthStrategies };
