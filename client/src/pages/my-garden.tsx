@@ -23,34 +23,25 @@ export default function MyGardenPage() {
         {/* Header Navigation */}
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between py-4">
+            <div className="flex items-center py-3">
               <Link href="/">
                 <Button variant="ghost" size="sm" className="flex items-center space-x-2">
                   <ArrowLeft className="w-4 h-4" />
                   <span>Back to Home</span>
                 </Button>
               </Link>
-              {!user && (
-                <div className="flex items-center space-x-4">
-                  <Link href="/auth">
-                    <Button className="bg-green-600 hover:bg-green-700">
-                      Sign In for Full Access
-                    </Button>
-                  </Link>
-                </div>
-              )}
             </div>
           </div>
         </div>
 
         {/* Content */}
-        <div className="py-8">
+        <div className="py-4">
           {user ? (
             <div>
               {/* Title */}
-              <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">My Garden</h1>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <div className="text-center mb-4">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">My Garden</h1>
+                <p className="text-sm text-gray-600 max-w-2xl mx-auto">
                   Welcome to your personal garden dashboard. Track your plants, monitor their health, 
                   and get personalized care recommendations powered by AI technology.
                 </p>
@@ -60,16 +51,16 @@ export default function MyGardenPage() {
           ) : (
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
               {/* Title */}
-              <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">My Garden</h1>
-                <p className="text-lg text-gray-600 mb-8">
+              <div className="text-center mb-4">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">My Garden</h1>
+                <p className="text-sm text-gray-600 mb-6">
                   Your personal garden management dashboard. Track your plants, get AI-powered care recommendations, 
                   and build your dream garden with professional tools and insights.
                 </p>
               </div>
 
               {/* Sign In Button */}
-              <div className="text-center mb-8">
+              <div className="text-center mb-6">
                 <Link href="/auth">
                   <Button className="bg-green-600 hover:bg-green-700 px-8 py-3 text-lg">
                     Sign In
@@ -78,8 +69,8 @@ export default function MyGardenPage() {
               </div>
 
               {/* Features List */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-8 mb-12">
-                <p className="text-green-800 font-semibold mb-6 text-center text-lg">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                <p className="text-green-800 font-semibold mb-4 text-center text-lg">
                   Sign in to unlock advanced features:
                 </p>
                 <ul className="text-green-700 space-y-3 max-w-2xl mx-auto">
