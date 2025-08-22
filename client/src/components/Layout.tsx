@@ -99,18 +99,19 @@ export function Layout({
       {showImageBanner && (
         <div className="h-40 sm:h-48 lg:h-56 py-2 sm:py-4">
           <div className="flex">
-            {/* Left Spacer to balance the right sidebar */}
+            {/* Left Spacer to balance the right sidebar - only when sidebar is enabled */}
             {showSidebarAds && (
               <div className="hidden lg:block w-64 flex-shrink-0"></div>
             )}
             
             <div className="flex-1">
+              {/* Match main content container width and padding */}
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
                 <ImageUploadBanner />
               </div>
             </div>
             
-            {/* Right spacer equivalent to sidebar width */}
+            {/* Right spacer equivalent to sidebar width - only when sidebar is enabled */}
             {showSidebarAds && (
               <div className="hidden lg:block w-64 flex-shrink-0"></div>
             )}

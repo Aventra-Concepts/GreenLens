@@ -11,7 +11,7 @@ import { Upload, X, Loader2, Camera } from "lucide-react";
 import { CameraCapture } from "@/components/CameraCapture";
 import { PoweredBySection } from "@/components/PoweredBySection";
 
-import MyGardenSection from "@/components/MyGardenSection";
+
 import { InArticleAd } from "@/components/AdSense";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -387,10 +387,6 @@ export default function Identify() {
         <PoweredBySection />
         
         <InArticleAd />
-        
-
-        
-        <MyGardenSection />
       </section>
       <Footer />
       
