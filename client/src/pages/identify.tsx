@@ -216,31 +216,33 @@ export default function Identify() {
 
   return (
     <Layout showImageBanner={true} showSidebarAds={false}>
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="space-y-2 sm:space-y-4 md:space-y-6 lg:space-y-8">
 
-          <div className="text-center space-y-4 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Upload Plant Images</h2>
-            <p className="text-gray-600 dark:text-gray-300">Add up to 3 photos for the most accurate identification</p>
-            {!isAuthenticated && !isAuthLoading && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
-                <p className="text-sm text-blue-800 dark:text-blue-200">
-                  <strong>Login Required:</strong> Please sign in to identify plants and track your garden collection.
-                  <a href="/auth" className="underline hover:no-underline ml-1">Sign In Now</a>
-                </p>
-              </div>
-            )}
-            {isAuthenticated && (
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-4">
-                <p className="text-sm text-amber-800 dark:text-amber-200">
-                  <strong>Free Tier:</strong> Limited to 45 AI analysis requests per day. 
-                  <a href="/pricing" className="underline hover:no-underline ml-1">Upgrade for unlimited access</a>
-                </p>
-              </div>
-            )}
-          </div>
+        {/* Upload Plant Images Section */}
+        <section className="py-8 sm:py-12 lg:py-16">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center space-y-4 mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Upload Plant Images</h2>
+              <p className="text-gray-600 dark:text-gray-300">Add up to 3 photos for the most accurate identification</p>
+              {!isAuthenticated && !isAuthLoading && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>Login Required:</strong> Please sign in to identify plants and track your garden collection.
+                    <a href="/auth" className="underline hover:no-underline ml-1">Sign In Now</a>
+                  </p>
+                </div>
+              )}
+              {isAuthenticated && (
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-4">
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    <strong>Free Tier:</strong> Limited to 45 AI analysis requests per day. 
+                    <a href="/pricing" className="underline hover:no-underline ml-1">Upgrade for unlimited access</a>
+                  </p>
+                </div>
+              )}
+            </div>
 
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
             {Array.from({ length: 3 }, (_, index) => (
               <Card key={index} className="relative border-2 border-dashed border-green-300 hover:border-green-500 transition-colors bg-green-50 dark:bg-green-900/20">
                 <CardContent className="p-6">
@@ -382,12 +384,13 @@ export default function Identify() {
             )}
           </div>
         </div>
+        </section>
         
         {/* Additional Sections */}
         <PoweredBySection />
         
         <InArticleAd />
-      </section>
+      </div>
       <Footer />
       
       {/* Camera Capture Modal */}
