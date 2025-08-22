@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Settings, Image, Type, Save, DollarSign, Package, Shovel, Share2 } from "lucide-react";
+import { Settings, Image, Camera, Type, Save, DollarSign, Package, Shovel, Share2 } from "lucide-react";
 import PricingManagement from "@/components/PricingManagement";
 import PricingPlanManager from "@/components/admin/PricingPlanManager";
 import GardeningToolsManager from "@/components/admin/GardeningToolsManager";
@@ -172,7 +172,7 @@ export default function Admin() {
           </div>
 
           <Tabs defaultValue="banner" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="banner" className="flex items-center gap-2">
                 <Image className="w-4 h-4" />
                 Banner Settings
@@ -180,6 +180,10 @@ export default function Admin() {
               <TabsTrigger value="features" className="flex items-center gap-2">
                 <Settings className="w-4 h-4" />
                 Feature Control
+              </TabsTrigger>
+              <TabsTrigger value="plant-id" className="flex items-center gap-2">
+                <Camera className="w-4 h-4" />
+                Plant ID Image
               </TabsTrigger>
               <TabsTrigger value="gardening" className="flex items-center gap-2">
                 <Shovel className="w-4 h-4" />
@@ -325,6 +329,10 @@ export default function Admin() {
 
             <TabsContent value="features">
               <FeatureControlManager />
+            </TabsContent>
+
+            <TabsContent value="plant-id">
+              <PlantIdImageManager />
             </TabsContent>
 
             <TabsContent value="gardening">
@@ -530,5 +538,255 @@ function FeatureControlManager() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+// Plant ID Image Manager Component
+function PlantIdImageManager() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [plantIdFormData, setPlantIdFormData] = useState({
+    imageType: "svg", // "svg" or "url"
+    imageUrl: "",
+    svgContent: ""
+  });
+
+  // Fetch current plant ID image settings
+  const { data: plantIdSettings, isLoading: plantIdLoading } = useQuery<{
+    imageType?: string;
+    imageUrl?: string;
+    svgContent?: string;
+  }>({
+    queryKey: ["/api/admin/plant-id-image-settings"],
+  });
+
+  // Update form data when settings are loaded
+  useEffect(() => {
+    if (plantIdSettings) {
+      setPlantIdFormData({
+        imageType: plantIdSettings.imageType || "svg",
+        imageUrl: plantIdSettings.imageUrl || "",
+        svgContent: plantIdSettings.svgContent || ""
+      });
+    }
+  }, [plantIdSettings]);
+
+  // Update plant ID image settings mutation
+  const updatePlantIdImageMutation = useMutation({
+    mutationFn: async (data: typeof plantIdFormData) => {
+      const response = await apiRequest("POST", "/api/admin/plant-id-image-settings", {
+        settingKey: "plantIdImage",
+        settingValue: JSON.stringify(data),
+        settingType: "json",
+        category: "ui",
+        description: "Plant identification page image settings",
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/plant-id-image-settings"] });
+      toast({
+        title: "Image Settings Updated",
+        description: "Plant identification image has been updated successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update image settings",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handlePlantIdInputChange = (key: string, value: string) => {
+    setPlantIdFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handlePlantIdSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updatePlantIdImageMutation.mutate(plantIdFormData);
+  };
+
+  const resetPlantIdToDefaults = () => {
+    setPlantIdFormData({
+      imageType: "svg",
+      imageUrl: "",
+      svgContent: ""
+    });
+    updatePlantIdImageMutation.mutate({
+      imageType: "svg",
+      imageUrl: "",
+      svgContent: ""
+    });
+  };
+
+  if (plantIdLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <form onSubmit={handlePlantIdSubmit} className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Camera className="w-5 h-5" />
+            Plant Identification Illustration
+          </CardTitle>
+          <CardDescription>
+            Customize the illustration shown on the plant identification page. You can use the default SVG design or upload a custom image.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Image Type Selection */}
+          <div className="space-y-3">
+            <Label>Image Type</Label>
+            <div className="flex gap-4">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  name="imageType"
+                  value="svg"
+                  checked={plantIdFormData.imageType === "svg"}
+                  onChange={(e) => handlePlantIdInputChange("imageType", e.target.value)}
+                  className="w-4 h-4 text-green-600"
+                />
+                <span className="text-sm">Default SVG Illustration</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  name="imageType"
+                  value="url"
+                  checked={plantIdFormData.imageType === "url"}
+                  onChange={(e) => handlePlantIdInputChange("imageType", e.target.value)}
+                  className="w-4 h-4 text-green-600"
+                />
+                <span className="text-sm">Custom Image URL</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Custom Image URL Input */}
+          {plantIdFormData.imageType === "url" && (
+            <div className="space-y-2">
+              <Label htmlFor="plantIdImageUrl">Custom Image URL</Label>
+              <Input
+                id="plantIdImageUrl"
+                type="url"
+                placeholder="https://example.com/plant-scanner-image.jpg"
+                value={plantIdFormData.imageUrl}
+                onChange={(e) => handlePlantIdInputChange("imageUrl", e.target.value)}
+                data-testid="plant-id-image-url-input"
+              />
+              <p className="text-sm text-gray-500">
+                Recommended: 320x200px or larger for best quality. JPEG or PNG format.
+              </p>
+              
+              {/* Image Preview */}
+              {plantIdFormData.imageUrl && (
+                <div className="mt-4">
+                  <Label>Preview</Label>
+                  <div className="mt-2 border rounded-lg overflow-hidden max-w-md">
+                    <img 
+                      src={plantIdFormData.imageUrl} 
+                      alt="Plant ID illustration preview" 
+                      className="w-full h-auto max-h-48 object-contain"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* SVG Preview */}
+          {plantIdFormData.imageType === "svg" && (
+            <div className="space-y-2">
+              <Label>Current SVG Illustration</Label>
+              <div className="border rounded-lg p-4 bg-green-50 dark:bg-green-900/20">
+                <div className="flex justify-center">
+                  <svg width="320" height="200" viewBox="0 0 320 200" className="border rounded-lg">
+                    <rect width="320" height="200" fill="#f0fdf4" rx="8"/>
+                    
+                    <path d="M120 120 Q140 100 160 120 Q180 100 200 120" stroke="#16a34a" strokeWidth="2" fill="none" />
+                    <circle cx="140" cy="110" r="8" fill="#22c55e" opacity="0.8" />
+                    <circle cx="180" cy="110" r="6" fill="#4ade80" opacity="0.6" />
+                    
+                    <path d="M144 100 Q152 108 160 100 Q168 108 176 100" stroke="#15803d" strokeWidth="1" fill="none" />
+                    <line x1="160" y1="100" x2="160" y2="115" stroke="#15803d" strokeWidth="1.5" />
+                    
+                    <rect x="132" y="135" width="56" height="6" rx="3" fill="#16a34a" opacity="0.8" />
+                    <rect x="132" y="142" width="40" height="5" rx="2" fill="#22c55e" opacity="0.6" />
+                    <rect x="132" y="148" width="48" height="5" rx="2" fill="#4ade80" opacity="0.4" />
+                    
+                    <line x1="105" y1="88" x2="125" y2="88" stroke="#22c55e" strokeWidth="1.5" opacity="0.7" />
+                    <line x1="195" y1="104" x2="215" y2="104" stroke="#22c55e" strokeWidth="1.5" opacity="0.7" />
+                    <line x1="105" y1="120" x2="125" y2="120" stroke="#16a34a" strokeWidth="1.5" opacity="0.5" />
+                    <line x1="195" y1="136" x2="215" y2="136" stroke="#16a34a" strokeWidth="1.5" opacity="0.5" />
+                    
+                    <path d="M124 68 L124 76 M124 68 L132 68" stroke="#22c55e" strokeWidth="1.5" fill="none" />
+                    <path d="M196 68 L188 68 M196 68 L196 76" stroke="#22c55e" strokeWidth="1.5" fill="none" />
+                    <path d="M124 172 L124 164 M124 172 L132 172" stroke="#22c55e" strokeWidth="1.5" fill="none" />
+                    <path d="M196 172 L188 172 M196 172 L196 164" stroke="#22c55e" strokeWidth="1.5" fill="none" />
+                    
+                    <text x="160" y="32" textAnchor="middle" fill="#16a34a" fontSize="14" fontWeight="bold">AI Plant Scanner</text>
+                    <text x="160" y="48" textAnchor="middle" fill="#22c55e" fontSize="10">Instant Plant Identification</text>
+                  </svg>
+                </div>
+                <p className="text-sm text-gray-600 mt-2 text-center">
+                  Default SVG illustration with AI plant scanning theme
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-4 justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={resetPlantIdToDefaults}
+              data-testid="reset-plant-id-defaults-button"
+            >
+              Reset to Default
+            </Button>
+            <Button
+              type="submit"
+              disabled={updatePlantIdImageMutation.isPending}
+              className="bg-green-600 hover:bg-green-700"
+              data-testid="save-plant-id-settings-button"
+            >
+              {updatePlantIdImageMutation.isPending ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </form>
   );
 }

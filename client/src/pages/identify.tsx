@@ -277,20 +277,7 @@ export default function Identify() {
                     <text x="160" y="48" textAnchor="middle" fill="#22c55e" fontSize="10">Instant Plant Identification</text>
                   </svg>
                 </div>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="absolute top-2 right-2 bg-white/80 hover:bg-white/90 text-gray-700"
-                  onClick={() => {
-                    // This would open an image editor or file picker in a real implementation
-                    toast({
-                      title: "Edit Image",
-                      description: "Image editing feature - replace with your own plant identification image",
-                    });
-                  }}
-                >
-                  <Edit className="w-4 h-4" />
-                </Button>
+
               </div>
             </div>
             

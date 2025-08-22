@@ -432,6 +432,37 @@ router.get('/branding/preview', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+// Plant ID Image Settings Routes
+router.get('/plant-id-image-settings', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const settings = await storage.getAdminSetting('plantIdImage');
+    res.json(settings || { imageType: "svg", imageUrl: "", svgContent: "" });
+  } catch (error) {
+    console.error('Get plant ID image settings error:', error);
+    res.status(500).json({ error: 'Failed to fetch plant ID image settings' });
+  }
+});
+
+router.post('/plant-id-image-settings', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { settingKey, settingValue, settingType, category, description } = req.body;
+    
+    await storage.setAdminSetting(settingKey, JSON.parse(settingValue));
+    
+    await AdminAuthService.logAdminAction(
+      req.user!.id,
+      'update_plant_id_image_settings',
+      { settingKey, settingType, category },
+      req.ip
+    );
+    
+    res.json({ success: true, message: 'Plant ID image settings updated successfully' });
+  } catch (error) {
+    console.error('Update plant ID image settings error:', error);
+    res.status(500).json({ error: 'Failed to update plant ID image settings' });
+  }
+});
+
 router.post('/branding/generate-preview', requireAuth, requireAdmin, async (req, res) => {
   try {
     const preview = await AdminAuthService.generateBrandingPreview();
