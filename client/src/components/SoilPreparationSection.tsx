@@ -160,7 +160,7 @@ export function SoilPreparationSection() {
     <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
         <div className="text-center mb-8 sm:mb-10 lg:mb-12">
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 leading-tight">
             Seasonal Soil Preparation Guide
           </h2>
           <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-2 leading-relaxed">
@@ -192,7 +192,7 @@ export function SoilPreparationSection() {
               <TabsContent key={season.id} value={season.id}>
                 <Card className={`${season.bgColor} ${season.borderColor} border-2`}>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-3 text-2xl">
+                    <CardTitle className="flex items-center gap-3 text-xl">
                       <Icon className={`w-8 h-8 ${season.color}`} />
                       {season.name} Soil Preparation
                     </CardTitle>
