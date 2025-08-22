@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Layout } from "@/components/Layout";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import { Upload, X, Loader2, Camera, Edit } from "lucide-react";
+import { Upload, X, Loader2, Camera, Edit, ArrowLeft } from "lucide-react";
 import { CameraCapture } from "@/components/CameraCapture";
 import { PoweredBySection } from "@/components/PoweredBySection";
 
@@ -216,6 +216,16 @@ export default function Identify() {
 
   return (
     <Layout showImageBanner={false} showSidebarAds={false}>
+      {/* Back Button */}
+      <div className="px-4 sm:px-6 lg:px-8 pt-2">
+        <Link href="/">
+          <Button variant="outline" size="sm" className="flex items-center space-x-1 bg-green-50 border-green-200 hover:bg-green-100 hover:border-green-300 text-green-700">
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Home</span>
+          </Button>
+        </Link>
+      </div>
+
       <div className="space-y-2 sm:space-y-4 md:space-y-6 lg:space-y-8">
 
         {/* Plant Identification Header Section */}
