@@ -221,7 +221,7 @@ export default function PricingSection() {
     <section id="pricing" className="pt-2 pb-4">
       <div className="max-w-4xl mx-auto px-4">
         {/* Currency Selector */}
-        <div className="flex justify-center items-center gap-2 mb-4">
+        <div className="flex justify-center items-center gap-2 mb-2">
           <Globe className="w-4 h-4 text-gray-500" />
           <div className="w-48">
             <CurrencySelector
