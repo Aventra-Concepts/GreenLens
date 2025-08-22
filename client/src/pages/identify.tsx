@@ -224,16 +224,35 @@ export default function Identify() {
             {/* Centered Plant Identification Image */}
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <div className="w-64 h-36 sm:w-80 sm:h-45 lg:w-96 lg:h-54 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg shadow-lg flex items-center justify-center border-2 border-green-200 dark:border-green-700">
-                  <div className="text-center space-y-3">
-                    <div className="w-16 h-16 mx-auto bg-green-500 rounded-full flex items-center justify-center">
-                      <Camera className="w-8 h-8 text-white" />
+                <div className="w-64 h-36 sm:w-80 sm:h-45 lg:w-96 lg:h-54 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg shadow-lg flex items-center justify-center border-2 border-green-200 dark:border-green-700 relative overflow-hidden">
+                  {/* Background pattern */}
+                  <div className="absolute inset-0 opacity-10">
+                    <svg className="w-full h-full" viewBox="0 0 400 200" fill="none">
+                      <path d="M50 120 Q80 80 120 120 Q160 160 200 120 Q240 80 280 120 Q320 160 350 120" stroke="currentColor" strokeWidth="2" className="text-green-500"/>
+                      <path d="M30 140 Q60 100 100 140 Q140 180 180 140 Q220 100 260 140 Q300 180 340 140" stroke="currentColor" strokeWidth="2" className="text-green-400"/>
+                    </svg>
+                  </div>
+                  
+                  {/* Main content */}
+                  <div className="text-center space-y-3 z-10 relative">
+                    <div className="flex items-center justify-center space-x-2 mb-2">
+                      <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                        <Camera className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="text-2xl">📱</div>
+                      <div className="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center">
+                        <div className="w-4 h-4 bg-green-600 rounded-full"></div>
+                      </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-green-700 dark:text-green-300 font-semibold text-sm">AI Plant Identification</p>
-                      <p className="text-green-600 dark:text-green-400 text-xs">Scan • Analyze • Identify</p>
+                      <p className="text-green-700 dark:text-green-300 font-bold text-sm">AI Plant Identification</p>
+                      <p className="text-green-600 dark:text-green-400 text-xs font-medium">Scan • Analyze • Identify</p>
                     </div>
                   </div>
+                  
+                  {/* Corner elements */}
+                  <div className="absolute top-2 left-2 w-3 h-3 bg-green-400 rounded-full"></div>
+                  <div className="absolute bottom-2 right-2 w-2 h-2 bg-green-300 rounded-full"></div>
                 </div>
                 <Button
                   variant="secondary"
