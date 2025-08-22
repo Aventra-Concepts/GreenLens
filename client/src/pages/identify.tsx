@@ -224,11 +224,17 @@ export default function Identify() {
             {/* Centered Plant Identification Image */}
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <img 
-                  src="/plant-identification-image.png"
-                  alt="Plant Identification with AI"
-                  className="w-64 h-36 sm:w-80 sm:h-45 lg:w-96 lg:h-54 object-cover rounded-lg shadow-lg"
-                />
+                <div className="w-64 h-36 sm:w-80 sm:h-45 lg:w-96 lg:h-54 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg shadow-lg flex items-center justify-center border-2 border-green-200 dark:border-green-700">
+                  <div className="text-center space-y-3">
+                    <div className="w-16 h-16 mx-auto bg-green-500 rounded-full flex items-center justify-center">
+                      <Camera className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-green-700 dark:text-green-300 font-semibold text-sm">AI Plant Identification</p>
+                      <p className="text-green-600 dark:text-green-400 text-xs">Scan • Analyze • Identify</p>
+                    </div>
+                  </div>
+                </div>
                 <Button
                   variant="secondary"
                   size="sm"
