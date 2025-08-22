@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import { Upload, X, Loader2, Camera } from "lucide-react";
+import { Upload, X, Loader2, Camera, Edit } from "lucide-react";
 import { CameraCapture } from "@/components/CameraCapture";
 import { PoweredBySection } from "@/components/PoweredBySection";
 
@@ -215,15 +215,40 @@ export default function Identify() {
   };
 
   return (
-    <Layout showImageBanner={true} showSidebarAds={false}>
+    <Layout showImageBanner={false} showSidebarAds={false}>
       <div className="space-y-2 sm:space-y-4 md:space-y-6 lg:space-y-8">
 
-        {/* Upload Plant Images Section */}
+        {/* Plant Identification Header Section */}
         <section className="py-8 sm:py-12 lg:py-16">
-          <div className="text-center space-y-4 mb-8">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white">
+          <div className="text-center space-y-6 mb-8">
+            {/* Centered Plant Identification Image */}
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <img 
+                  src="/attached_assets/generated_images/Plant_identification_concept_image_afa91e09.png"
+                  alt="Plant Identification with AI"
+                  className="w-64 h-36 sm:w-80 sm:h-45 lg:w-96 lg:h-54 object-cover rounded-lg shadow-lg"
+                />
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="absolute top-2 right-2 bg-white/80 hover:bg-white/90 text-gray-700"
+                  onClick={() => {
+                    // This would open an image editor or file picker in a real implementation
+                    toast({
+                      title: "Edit Image",
+                      description: "Image editing feature - replace with your own plant identification image",
+                    });
+                  }}
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white">
               Identify <span className="text-green-600">American Plants</span> with <span className="text-green-600">AI Precision</span>
-            </h2>
+            </h1>
             <div className="space-y-2">
               <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300">
                 Upload up to 3 photos for instant plant identification across all US growing zones.
