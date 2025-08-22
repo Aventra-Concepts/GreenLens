@@ -225,7 +225,7 @@ export default function Identify() {
             <div className="flex justify-center mb-6">
               <div className="relative">
                 <img 
-                  src="/attached_assets/generated_images/Plant_identification_concept_image_afa91e09.png"
+                  src="/plant-identification-image.png"
                   alt="Plant Identification with AI"
                   className="w-64 h-36 sm:w-80 sm:h-45 lg:w-96 lg:h-54 object-cover rounded-lg shadow-lg"
                 />
