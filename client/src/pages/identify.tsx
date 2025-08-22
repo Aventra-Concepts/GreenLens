@@ -224,8 +224,8 @@ export default function Identify() {
             {/* Centered Plant Identification Image */}
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <div className="w-64 h-36 sm:w-80 sm:h-45 lg:w-96 lg:h-54 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-                  <svg className="w-full h-full" viewBox="0 0 400 225" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div className="w-48 h-28 sm:w-56 sm:h-32 lg:w-64 lg:h-36 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                  <svg className="w-full h-full" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
                     {/* Background gradient */}
                     <defs>
                       <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -239,42 +239,42 @@ export default function Identify() {
                     </defs>
                     
                     {/* Background */}
-                    <rect width="400" height="225" fill="url(#bg-gradient)" />
+                    <rect width="320" height="180" fill="url(#bg-gradient)" />
                     
                     {/* Hand illustration */}
-                    <ellipse cx="320" cy="180" rx="45" ry="25" fill="#fbbf24" opacity="0.8"/>
-                    <ellipse cx="315" cy="170" rx="35" ry="20" fill="#f59e0b" opacity="0.9"/>
+                    <ellipse cx="260" cy="140" rx="35" ry="20" fill="#fbbf24" opacity="0.8"/>
+                    <ellipse cx="256" cy="132" rx="28" ry="16" fill="#f59e0b" opacity="0.9"/>
                     
                     {/* Phone */}
-                    <rect x="150" y="80" width="100" height="160" rx="15" fill="url(#phone-gradient)" />
-                    <rect x="155" y="90" width="90" height="140" rx="5" fill="#000000" />
-                    <rect x="160" y="95" width="80" height="120" rx="3" fill="#22c55e" />
+                    <rect x="120" y="60" width="80" height="120" rx="12" fill="url(#phone-gradient)" />
+                    <rect x="124" y="68" width="72" height="104" rx="4" fill="#000000" />
+                    <rect x="128" y="72" width="64" height="88" rx="2" fill="#22c55e" />
                     
                     {/* Plant leaf on phone screen */}
-                    <path d="M180 120 Q200 100 220 120 Q200 140 180 120" fill="#16a34a" />
-                    <path d="M180 120 Q190 130 200 120 Q210 130 220 120" stroke="#15803d" strokeWidth="1" fill="none" />
-                    <line x1="200" y1="120" x2="200" y2="140" stroke="#15803d" strokeWidth="2" />
+                    <path d="M144 100 Q160 85 176 100 Q160 115 144 100" fill="#16a34a" />
+                    <path d="M144 100 Q152 108 160 100 Q168 108 176 100" stroke="#15803d" strokeWidth="1" fill="none" />
+                    <line x1="160" y1="100" x2="160" y2="115" stroke="#15803d" strokeWidth="1.5" />
                     
                     {/* AI analysis elements */}
-                    <rect x="165" y="175" width="70" height="8" rx="4" fill="#16a34a" opacity="0.8" />
-                    <rect x="165" y="185" width="50" height="6" rx="3" fill="#22c55e" opacity="0.6" />
-                    <rect x="165" y="195" width="60" height="6" rx="3" fill="#4ade80" opacity="0.4" />
+                    <rect x="132" y="135" width="56" height="6" rx="3" fill="#16a34a" opacity="0.8" />
+                    <rect x="132" y="142" width="40" height="5" rx="2" fill="#22c55e" opacity="0.6" />
+                    <rect x="132" y="148" width="48" height="5" rx="2" fill="#4ade80" opacity="0.4" />
                     
                     {/* Scanning lines */}
-                    <line x1="140" y1="110" x2="170" y2="110" stroke="#22c55e" strokeWidth="2" opacity="0.7" />
-                    <line x1="240" y1="130" x2="270" y2="130" stroke="#22c55e" strokeWidth="2" opacity="0.7" />
-                    <line x1="140" y1="150" x2="170" y2="150" stroke="#16a34a" strokeWidth="2" opacity="0.5" />
-                    <line x1="240" y1="170" x2="270" y2="170" stroke="#16a34a" strokeWidth="2" opacity="0.5" />
+                    <line x1="105" y1="88" x2="125" y2="88" stroke="#22c55e" strokeWidth="1.5" opacity="0.7" />
+                    <line x1="195" y1="104" x2="215" y2="104" stroke="#22c55e" strokeWidth="1.5" opacity="0.7" />
+                    <line x1="105" y1="120" x2="125" y2="120" stroke="#16a34a" strokeWidth="1.5" opacity="0.5" />
+                    <line x1="195" y1="136" x2="215" y2="136" stroke="#16a34a" strokeWidth="1.5" opacity="0.5" />
                     
                     {/* Corner scanning brackets */}
-                    <path d="M155 90 L155 100 M155 90 L165 90" stroke="#22c55e" strokeWidth="2" fill="none" />
-                    <path d="M245 90 L235 90 M245 90 L245 100" stroke="#22c55e" strokeWidth="2" fill="none" />
-                    <path d="M155 220 L155 210 M155 220 L165 220" stroke="#22c55e" strokeWidth="2" fill="none" />
-                    <path d="M245 220 L235 220 M245 220 L245 210" stroke="#22c55e" strokeWidth="2" fill="none" />
+                    <path d="M124 68 L124 76 M124 68 L132 68" stroke="#22c55e" strokeWidth="1.5" fill="none" />
+                    <path d="M196 68 L188 68 M196 68 L196 76" stroke="#22c55e" strokeWidth="1.5" fill="none" />
+                    <path d="M124 172 L124 164 M124 172 L132 172" stroke="#22c55e" strokeWidth="1.5" fill="none" />
+                    <path d="M196 172 L188 172 M196 172 L196 164" stroke="#22c55e" strokeWidth="1.5" fill="none" />
                     
                     {/* Text */}
-                    <text x="200" y="40" textAnchor="middle" fill="#16a34a" fontSize="18" fontWeight="bold">AI Plant Scanner</text>
-                    <text x="200" y="60" textAnchor="middle" fill="#22c55e" fontSize="12">Instant Plant Identification</text>
+                    <text x="160" y="32" textAnchor="middle" fill="#16a34a" fontSize="14" fontWeight="bold">AI Plant Scanner</text>
+                    <text x="160" y="48" textAnchor="middle" fill="#22c55e" fontSize="10">Instant Plant Identification</text>
                   </svg>
                 </div>
                 <Button
@@ -325,13 +325,13 @@ export default function Identify() {
               </div>
             )}
 
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="grid md:grid-cols-3 gap-4 mb-8 max-w-3xl mx-auto">
             {Array.from({ length: 3 }, (_, index) => (
               <Card key={index} className="relative border-2 border-dashed border-green-300 hover:border-green-500 transition-colors bg-green-50 dark:bg-green-900/20">
-                <CardContent className="p-6">
+                <CardContent className="p-3">
                   {uploadedFiles[index] ? (
                     <div className="relative">
-                      <div className="aspect-square bg-green-100 dark:bg-green-800/20 rounded-lg overflow-hidden mb-3">
+                      <div className="aspect-square bg-green-100 dark:bg-green-800/20 rounded-lg overflow-hidden mb-2 h-24">
                         {previews[index] ? (
                           <img 
                             src={previews[index]} 
@@ -340,21 +340,21 @@ export default function Identify() {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
+                            <Loader2 className="w-6 h-6 text-green-500 animate-spin" />
                           </div>
                         )}
                       </div>
-                      <p className="text-sm text-green-700 dark:text-green-300 text-center truncate mb-2">
+                      <p className="text-xs text-green-700 dark:text-green-300 text-center truncate mb-1">
                         {uploadedFiles[index].name}
                       </p>
                       <Button
                         variant="destructive"
                         size="sm"
-                        className="absolute top-2 right-2 w-6 h-6 p-0"
+                        className="absolute top-1 right-1 w-5 h-5 p-0"
                         onClick={() => removeFile(index)}
                         data-testid={`remove-file-${index}`}
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3 h-3" />
                       </Button>
                     </div>
                   ) : (
@@ -370,15 +370,15 @@ export default function Identify() {
                         className="hidden"
                         data-testid={`file-input-${index}`}
                       />
-                      <div className="w-16 h-16 bg-green-200 dark:bg-green-700 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-300 dark:group-hover:bg-green-600 transition-colors">
-                        <Upload className="w-8 h-8 text-green-600 dark:text-green-300 group-hover:text-green-700 dark:group-hover:text-green-200" />
+                      <div className="w-12 h-12 bg-green-200 dark:bg-green-700 rounded-full flex items-center justify-center mb-2 group-hover:bg-green-300 dark:group-hover:bg-green-600 transition-colors">
+                        <Upload className="w-6 h-6 text-green-600 dark:text-green-300 group-hover:text-green-700 dark:group-hover:text-green-200" />
                       </div>
-                      <h3 className="font-medium text-green-900 dark:text-green-100 mb-2">Image {index + 1}</h3>
-                      <p className="text-sm text-green-700 dark:text-green-300 mb-4">JPEG/PNG • Max 100KB</p>
-                      <div className="flex gap-2 justify-center">
+                      <h3 className="font-medium text-green-900 dark:text-green-100 mb-1 text-sm">Image {index + 1}</h3>
+                      <p className="text-xs text-green-700 dark:text-green-300 mb-2">JPEG/PNG • Max 100KB</p>
+                      <div className="flex gap-1 justify-center">
                         <Button
                           size="sm"
-                          className="text-xs bg-green-500 hover:bg-green-600 text-white"
+                          className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1"
                           data-testid={`upload-file-${index}`}
                         >
                           <Upload className="w-3 h-3 mr-1" />
@@ -390,7 +390,7 @@ export default function Identify() {
                             e.stopPropagation();
                             openCamera(index);
                           }}
-                          className="text-xs bg-green-700 hover:bg-green-800 text-white"
+                          className="text-xs bg-green-700 hover:bg-green-800 text-white px-2 py-1"
                           data-testid={`camera-${index}`}
                         >
                           <Camera className="w-3 h-3 mr-1" />
