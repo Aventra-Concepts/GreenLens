@@ -68,7 +68,7 @@ export default function NavigationClean() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 dark:border-gray-700/50 bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/90 dark:bg-gray-900/95 dark:supports-[backdrop-filter]:bg-gray-900/90">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-8 sm:px-10 lg:px-16">
         <div className="flex items-center h-14 sm:h-16 w-full">
           {/* Logo */}
           <div className="flex-shrink-0">

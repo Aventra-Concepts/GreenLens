@@ -1,7 +1,6 @@
 import { Layout } from "@/components/Layout";
 import HeroSection from "@/components/HeroSection";
 import USOptimizedHero from "@/components/USOptimizedHero";
-import MyGardenSection from "@/components/MyGardenSection";
 import { InArticleAd } from "@/components/AdSense";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
@@ -55,8 +54,6 @@ export default function Home() {
         
         {/* USA SEO Enhanced Section - Performance Optimized */}
         <PerformanceOptimizedUSASection />
-        
-        <MyGardenSection />
       </div>
       <Footer />
     </Layout>
