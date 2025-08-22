@@ -263,13 +263,7 @@
   }
 }
 
-/* Fix content visibility in cards and boxes */
-.card-content-fix {
-  padding: 1.5rem !important;
-  min-height: fit-content !important;
-  height: auto !important;
-  overflow: visible !important;
-}
+/* Fix content visibility in cards and boxes - removed excessive padding */
 
 /* Ensure text in cards is not clipped */
 .card-text-fix {
@@ -278,20 +272,7 @@
   overflow-wrap: break-word !important;
 }
 
-/* Fix hidden content in sections */
-.section-content-fix {
-  min-height: fit-content !important;
-  height: auto !important;
-  padding-bottom: 2rem !important;
-  overflow: visible !important;
-}
-
-/* Fix for powered by section cards */
-.powered-by-card {
-  height: auto !important;
-  min-height: 200px !important;
-  padding: 1.5rem !important;
-}
+/* Removed problematic CSS classes that were causing excessive padding and overlapping */
 
 /* Fix for gardening tools section */
 .gardening-tools-card {
