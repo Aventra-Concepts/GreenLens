@@ -224,35 +224,58 @@ export default function Identify() {
             {/* Centered Plant Identification Image */}
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <div className="w-64 h-36 sm:w-80 sm:h-45 lg:w-96 lg:h-54 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg shadow-lg flex items-center justify-center border-2 border-green-200 dark:border-green-700 relative overflow-hidden">
-                  {/* Background pattern */}
-                  <div className="absolute inset-0 opacity-10">
-                    <svg className="w-full h-full" viewBox="0 0 400 200" fill="none">
-                      <path d="M50 120 Q80 80 120 120 Q160 160 200 120 Q240 80 280 120 Q320 160 350 120" stroke="currentColor" strokeWidth="2" className="text-green-500"/>
-                      <path d="M30 140 Q60 100 100 140 Q140 180 180 140 Q220 100 260 140 Q300 180 340 140" stroke="currentColor" strokeWidth="2" className="text-green-400"/>
-                    </svg>
-                  </div>
-                  
-                  {/* Main content */}
-                  <div className="text-center space-y-3 z-10 relative">
-                    <div className="flex items-center justify-center space-x-2 mb-2">
-                      <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-                        <Camera className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="text-2xl">📱</div>
-                      <div className="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center">
-                        <div className="w-4 h-4 bg-green-600 rounded-full"></div>
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-green-700 dark:text-green-300 font-bold text-sm">AI Plant Identification</p>
-                      <p className="text-green-600 dark:text-green-400 text-xs font-medium">Scan • Analyze • Identify</p>
-                    </div>
-                  </div>
-                  
-                  {/* Corner elements */}
-                  <div className="absolute top-2 left-2 w-3 h-3 bg-green-400 rounded-full"></div>
-                  <div className="absolute bottom-2 right-2 w-2 h-2 bg-green-300 rounded-full"></div>
+                <div className="w-64 h-36 sm:w-80 sm:h-45 lg:w-96 lg:h-54 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                  <svg className="w-full h-full" viewBox="0 0 400 225" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* Background gradient */}
+                    <defs>
+                      <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#f0fdf4" />
+                        <stop offset="100%" stopColor="#dcfce7" />
+                      </linearGradient>
+                      <linearGradient id="phone-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#1f2937" />
+                        <stop offset="100%" stopColor="#374151" />
+                      </linearGradient>
+                    </defs>
+                    
+                    {/* Background */}
+                    <rect width="400" height="225" fill="url(#bg-gradient)" />
+                    
+                    {/* Hand illustration */}
+                    <ellipse cx="320" cy="180" rx="45" ry="25" fill="#fbbf24" opacity="0.8"/>
+                    <ellipse cx="315" cy="170" rx="35" ry="20" fill="#f59e0b" opacity="0.9"/>
+                    
+                    {/* Phone */}
+                    <rect x="150" y="80" width="100" height="160" rx="15" fill="url(#phone-gradient)" />
+                    <rect x="155" y="90" width="90" height="140" rx="5" fill="#000000" />
+                    <rect x="160" y="95" width="80" height="120" rx="3" fill="#22c55e" />
+                    
+                    {/* Plant leaf on phone screen */}
+                    <path d="M180 120 Q200 100 220 120 Q200 140 180 120" fill="#16a34a" />
+                    <path d="M180 120 Q190 130 200 120 Q210 130 220 120" stroke="#15803d" strokeWidth="1" fill="none" />
+                    <line x1="200" y1="120" x2="200" y2="140" stroke="#15803d" strokeWidth="2" />
+                    
+                    {/* AI analysis elements */}
+                    <rect x="165" y="175" width="70" height="8" rx="4" fill="#16a34a" opacity="0.8" />
+                    <rect x="165" y="185" width="50" height="6" rx="3" fill="#22c55e" opacity="0.6" />
+                    <rect x="165" y="195" width="60" height="6" rx="3" fill="#4ade80" opacity="0.4" />
+                    
+                    {/* Scanning lines */}
+                    <line x1="140" y1="110" x2="170" y2="110" stroke="#22c55e" strokeWidth="2" opacity="0.7" />
+                    <line x1="240" y1="130" x2="270" y2="130" stroke="#22c55e" strokeWidth="2" opacity="0.7" />
+                    <line x1="140" y1="150" x2="170" y2="150" stroke="#16a34a" strokeWidth="2" opacity="0.5" />
+                    <line x1="240" y1="170" x2="270" y2="170" stroke="#16a34a" strokeWidth="2" opacity="0.5" />
+                    
+                    {/* Corner scanning brackets */}
+                    <path d="M155 90 L155 100 M155 90 L165 90" stroke="#22c55e" strokeWidth="2" fill="none" />
+                    <path d="M245 90 L235 90 M245 90 L245 100" stroke="#22c55e" strokeWidth="2" fill="none" />
+                    <path d="M155 220 L155 210 M155 220 L165 220" stroke="#22c55e" strokeWidth="2" fill="none" />
+                    <path d="M245 220 L235 220 M245 220 L245 210" stroke="#22c55e" strokeWidth="2" fill="none" />
+                    
+                    {/* Text */}
+                    <text x="200" y="40" textAnchor="middle" fill="#16a34a" fontSize="18" fontWeight="bold">AI Plant Scanner</text>
+                    <text x="200" y="60" textAnchor="middle" fill="#22c55e" fontSize="12">Instant Plant Identification</text>
+                  </svg>
                 </div>
                 <Button
                   variant="secondary"
