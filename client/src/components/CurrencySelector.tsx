@@ -133,7 +133,7 @@ export function CurrencySelector({ value, onChange, userLocation }: CurrencySele
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-        Currency
+        Currency Selector
       </label>
       <Select value={value} onValueChange={onChange} data-testid="select-currency">
         <SelectTrigger className="w-full">
