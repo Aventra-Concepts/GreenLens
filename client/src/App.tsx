@@ -123,7 +123,9 @@ function Router() {
       <Route path="/faq" component={FAQ} />
       
       {/* Admin login should be public - accessible before logging in */}
-      <Route path="/admin-login" component={AdminLogin} />
+      <Route path="/admin-login">
+        {() => <AdminLogin />}
+      </Route>
       
       {/* Protected routes that require authentication */}
       {user && (
