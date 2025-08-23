@@ -5,7 +5,7 @@ import { FaXTwitter } from "react-icons/fa6";
 export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white py-6">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-8 sm:px-12 lg:px-16">
         {/* Logo and Description */}
         <div className="text-left mb-4">
           <div className="flex items-center space-x-2 mb-3">
@@ -72,8 +72,8 @@ export default function Footer() {
         </div>
 
         {/* Menu Columns - Below Social Icons */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-1 mb-6">
-          <div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-0 mb-6">
+          <div className="pr-4">
             <h3 className="font-semibold text-sm mb-3">Product</h3>
             <ul className="space-y-2 text-gray-400 text-xs">
               <li>
@@ -93,7 +93,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div>
+          <div className="pr-4">
             <h3 className="font-semibold text-sm mb-3">Resources</h3>
             <ul className="space-y-2 text-gray-400 text-xs">
               <li>
@@ -118,7 +118,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div>
+          <div className="pr-4">
             <h3 className="font-semibold text-sm mb-3">Company</h3>
             <ul className="space-y-2 text-gray-400 text-xs">
               <li>
