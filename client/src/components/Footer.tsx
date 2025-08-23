@@ -5,9 +5,10 @@ import { FaXTwitter } from "react-icons/fa6";
 export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white py-6">
-      {/* Footer container matching main page content alignment */}
+      {/* Main container - exactly matching PoweredBySection alignment */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Logo, Description, and Social Media - Left Aligned within container */}
+        
+        {/* Brand section - left aligned within container margins */}
         <div className="mb-6">
           <div className="flex items-center space-x-2 mb-3">
             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
@@ -19,7 +20,7 @@ export default function Footer() {
             AI-powered plant identification and care guidance for plant enthusiasts worldwide.
           </p>
           
-          {/* Social Media Icons - Left Aligned within container */}
+          {/* Social media icons - left aligned */}
           <div className="flex space-x-3 mb-6">
             <a 
               href="https://facebook.com/greenlens" 
@@ -72,104 +73,106 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Menu Columns - Properly Contained Grid Layout */}
-        <div className="mb-6 text-center">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            <div className="space-y-3">
-              <h3 className="font-semibold text-sm mb-3">Product</h3>
-              <ul className="space-y-2 text-gray-400 text-xs">
-                <li>
-                  <Link href="/identify" className="hover:text-white transition-colors">
-                    Plant Identification
-                  </Link>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">Care Plans</a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">Disease Diagnosis</a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">API Access</a>
-                </li>
-              </ul>
-            </div>
+        {/* Menu columns - centered within the same container */}
+        <div className="mb-6">
+          <div className="flex justify-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center max-w-4xl">
+              <div className="space-y-3">
+                <h3 className="font-semibold text-sm mb-3">Product</h3>
+                <ul className="space-y-2 text-gray-400 text-xs">
+                  <li>
+                    <Link href="/identify" className="hover:text-white transition-colors">
+                      Plant Identification
+                    </Link>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">Care Plans</a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">Disease Diagnosis</a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">API Access</a>
+                  </li>
+                </ul>
+              </div>
 
-            <div className="space-y-3">
-              <h3 className="font-semibold text-sm mb-3">Resources</h3>
-              <ul className="space-y-2 text-gray-400 text-xs">
-                <li>
-                  <Link href="/blog" className="hover:text-white transition-colors">
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/reviews" className="hover:text-white transition-colors">
-                    Reviews
-                  </Link>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">Plant Database</a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">Help Center</a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">Community</a>
-                </li>
-              </ul>
-            </div>
+              <div className="space-y-3">
+                <h3 className="font-semibold text-sm mb-3">Resources</h3>
+                <ul className="space-y-2 text-gray-400 text-xs">
+                  <li>
+                    <Link href="/blog" className="hover:text-white transition-colors">
+                      Blog
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/reviews" className="hover:text-white transition-colors">
+                      Reviews
+                    </Link>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">Plant Database</a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">Help Center</a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">Community</a>
+                  </li>
+                </ul>
+              </div>
 
-            <div className="space-y-3">
-              <h3 className="font-semibold text-sm mb-3">Company</h3>
-              <ul className="space-y-2 text-gray-400 text-xs">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">About Us</a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">Contact</a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-                </li>
-              </ul>
-            </div>
+              <div className="space-y-3">
+                <h3 className="font-semibold text-sm mb-3">Company</h3>
+                <ul className="space-y-2 text-gray-400 text-xs">
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">About Us</a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">Contact</a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                  </li>
+                </ul>
+              </div>
 
-            <div className="space-y-3">
-              <h3 className="font-semibold text-sm mb-3">Amazon Affiliate</h3>
-              <ul className="space-y-2 text-gray-400 text-xs">
-                <li className="text-gray-400 text-xs">
-                  As an Amazon Associate, we earn from qualifying purchases. No extra cost to you.
-                </li>
-                <li>
-                  <Link 
-                    href="/student-registration" 
-                    className="text-blue-400 hover:text-blue-300 font-bold transition-colors block"
-                    style={{ fontFamily: '"Arial Narrow", sans-serif', fontWeight: 'bold' }}
-                    data-testid="footer-student-registration"
-                  >
-                    🎓 Students Register
-                  </Link>
-                </li>
-                <li>
-                  <Link 
-                    href="/author-registration" 
-                    className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors block"
-                    style={{ fontFamily: '"Arial Narrow", sans-serif', fontWeight: 'bold' }}
-                    data-testid="footer-author-registration"
-                  >
-                    ✍️ Authors Register
-                  </Link>
-                </li>
-              </ul>
+              <div className="space-y-3">
+                <h3 className="font-semibold text-sm mb-3">Amazon Affiliate</h3>
+                <ul className="space-y-2 text-gray-400 text-xs">
+                  <li className="text-gray-400 text-xs">
+                    As an Amazon Associate, we earn from qualifying purchases. No extra cost to you.
+                  </li>
+                  <li>
+                    <Link 
+                      href="/student-registration" 
+                      className="text-blue-400 hover:text-blue-300 font-bold transition-colors block"
+                      style={{ fontFamily: '"Arial Narrow", sans-serif', fontWeight: 'bold' }}
+                      data-testid="footer-student-registration"
+                    >
+                      🎓 Students Register
+                    </Link>
+                  </li>
+                  <li>
+                    <Link 
+                      href="/author-registration" 
+                      className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors block"
+                      style={{ fontFamily: '"Arial Narrow", sans-serif', fontWeight: 'bold' }}
+                      data-testid="footer-author-registration"
+                    >
+                      ✍️ Authors Register
+                    </Link>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* E-books Promotional Button - Centered and Contained */}
+        {/* E-books promotional section - centered */}
         <div className="text-center mb-6">
           <Link href="/ebook-marketplace">
             <div className="inline-block bg-gradient-to-r from-emerald-600 to-green-600 text-white px-4 py-2 rounded-lg shadow hover:shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer">
@@ -181,11 +184,12 @@ export default function Footer() {
           </Link>
         </div>
 
-        {/* Copyright Footer - Center Aligned */}
+        {/* Copyright section - centered */}
         <div className="border-t border-gray-800 pt-4 text-center">
           <p className="text-gray-400 text-sm mb-2">&copy; 2024 GreenLens. All rights reserved.</p>
           <p className="text-gray-400 text-sm">Made with 🌱 for plant lovers everywhere</p>
         </div>
+
       </div>
     </footer>
   );
