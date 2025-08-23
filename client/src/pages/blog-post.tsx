@@ -12,7 +12,14 @@ import { Link } from "wouter";
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
 
-  const { data: post, isLoading, error } = useQuery({
+  const { data: post, isLoading, error } = useQuery<{
+    id: string;
+    title: string;
+    content: string;
+    excerpt?: string;
+    category?: string;
+    createdAt: string;
+  }>({
     queryKey: ['/api/blog', slug],
     enabled: !!slug,
   });
@@ -80,8 +87,8 @@ export default function BlogPost() {
           <article>
             <header className="mb-8">
               <div className="flex items-center space-x-2 text-sm text-gray-600 mb-4">
-                <Badge variant="secondary">{post.category || 'General'}</Badge>
-                <span>{new Date(post.createdAt).toLocaleDateString('en-US', { 
+                <Badge variant="secondary">{post?.category || 'General'}</Badge>
+                <span>{post?.createdAt && new Date(post.createdAt).toLocaleDateString('en-US', { 
                   year: 'numeric', 
                   month: 'long', 
                   day: 'numeric' 
@@ -89,10 +96,10 @@ export default function BlogPost() {
               </div>
               
               <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                {post.title}
+                {post?.title}
               </h1>
               
-              {post.excerpt && (
+              {post?.excerpt && (
                 <p className="text-xl text-gray-600 leading-relaxed">
                   {post.excerpt}
                 </p>
@@ -107,7 +114,7 @@ export default function BlogPost() {
               <CardContent className="p-8">
                 <div 
                   className="prose prose-lg max-w-none prose-green prose-headings:text-gray-900 prose-a:text-green-600 prose-strong:text-gray-900"
-                  dangerouslySetInnerHTML={{ __html: post.content }}
+                  dangerouslySetInnerHTML={{ __html: post?.content || '' }}
                 />
               </CardContent>
             </Card>

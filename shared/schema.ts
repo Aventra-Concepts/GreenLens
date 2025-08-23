@@ -1190,7 +1190,7 @@ export const experts = pgTable("experts", {
   
   // Performance Metrics
   totalConsultations: integer("total_consultations").default(0),
-  averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default(0),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default('0'),
   responseTime: integer("response_time"), // Average response time in minutes
   
   // Profile Information (copied from application for quick access)
@@ -1407,8 +1407,8 @@ export const ebooks = pgTable("ebooks", {
   minimumPrice: decimal("minimum_price", { precision: 10, scale: 2 }),
   maximumPrice: decimal("maximum_price", { precision: 10, scale: 2 }),
   currency: varchar("currency", { length: 3 }).default('USD'),
-  royaltyRate: decimal("royalty_rate", { precision: 5, scale: 4 }).default(0.7000), // 70% default
-  platformCommissionRate: decimal("platform_commission_rate", { precision: 5, scale: 4 }).default(0.3000), // 30% platform fee
+  royaltyRate: decimal("royalty_rate", { precision: 5, scale: 4 }).default('0.7000'), // 70% default
+  platformCommissionRate: decimal("platform_commission_rate", { precision: 5, scale: 4 }).default('0.3000'), // 30% platform fee
   
   // Files and Media
   coverImageUrl: varchar("cover_image_url").notNull(),
@@ -1438,9 +1438,9 @@ export const ebooks = pgTable("ebooks", {
   
   // Sales and Performance Analytics
   totalSales: integer("total_sales").default(0),
-  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).default(0),
-  authorEarnings: decimal("author_earnings", { precision: 12, scale: 2 }).default(0),
-  platformEarnings: decimal("platform_earnings", { precision: 12, scale: 2 }).default(0),
+  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).default('0'),
+  authorEarnings: decimal("author_earnings", { precision: 12, scale: 2 }).default('0'),
+  platformEarnings: decimal("platform_earnings", { precision: 12, scale: 2 }).default('0'),
   downloadCount: integer("download_count").default(0),
   viewCount: integer("view_count").default(0),
   wishlistCount: integer("wishlist_count").default(0),
@@ -1585,7 +1585,7 @@ export const ebookCategories = pgTable("ebook_categories", {
   name: varchar("name").notNull().unique(),
   slug: varchar("slug").notNull().unique(),
   description: text("description"),
-  parentId: varchar("parent_id").references(() => ebookCategories.id),
+  parentId: varchar("parent_id"), // Remove self-reference for now
   icon: varchar("icon"),
   isActive: boolean("is_active").default(true),
   sortOrder: integer("sort_order").default(0),
@@ -1719,8 +1719,8 @@ export const authorProfiles = pgTable("author_profiles", {
   // Performance Metrics
   totalEbooks: integer("total_ebooks").default(0),
   totalSales: integer("total_sales").default(0),
-  averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default(0),
-  totalEarnings: decimal("total_earnings", { precision: 12, scale: 2 }).default(0),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default('0'),
+  totalEarnings: decimal("total_earnings", { precision: 12, scale: 2 }).default('0'),
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -1758,7 +1758,7 @@ export const termsAndConditions = pgTable("terms_and_conditions", {
   requiresAcceptance: boolean("requires_acceptance").default(true),
   
   // Tracking changes
-  previousVersionId: varchar("previous_version_id").references(() => termsAndConditions.id),
+  previousVersionId: varchar("previous_version_id"), // Remove self-reference for now
   changeNotes: text("change_notes"),
   
   createdAt: timestamp("created_at").defaultNow(),
@@ -1798,16 +1798,16 @@ export const salesAnalytics = pgTable("sales_analytics", {
   
   // Sales Metrics
   totalSales: integer("total_sales").default(0),
-  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).default(0),
-  totalDiscounts: decimal("total_discounts", { precision: 12, scale: 2 }).default(0),
-  totalTaxes: decimal("total_taxes", { precision: 12, scale: 2 }).default(0),
-  totalPlatformFees: decimal("total_platform_fees", { precision: 12, scale: 2 }).default(0),
-  totalAuthorEarnings: decimal("total_author_earnings", { precision: 12, scale: 2 }).default(0),
+  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).default('0'),
+  totalDiscounts: decimal("total_discounts", { precision: 12, scale: 2 }).default('0'),
+  totalTaxes: decimal("total_taxes", { precision: 12, scale: 2 }).default('0'),
+  totalPlatformFees: decimal("total_platform_fees", { precision: 12, scale: 2 }).default('0'),
+  totalAuthorEarnings: decimal("total_author_earnings", { precision: 12, scale: 2 }).default('0'),
   
   // Performance Metrics
-  averageDailyDownloads: decimal("avg_daily_downloads", { precision: 8, scale: 2 }).default(0),
+  averageDailyDownloads: decimal("avg_daily_downloads", { precision: 8, scale: 2 }).default('0'),
   peakSalesDay: date("peak_sales_day"),
-  conversionRate: decimal("conversion_rate", { precision: 5, scale: 4 }).default(0), // views to purchases
+  conversionRate: decimal("conversion_rate", { precision: 5, scale: 4 }).default('0'), // views to purchases
   
   // Geographic breakdown (top 5 countries)
   topCountriesData: jsonb("top_countries_data").default("[]"),
@@ -1841,7 +1841,7 @@ export const authorPayments = pgTable("author_payments", {
   paymentNotes: text("payment_notes"),
   
   // Tax Information
-  taxWithheld: decimal("tax_withheld", { precision: 10, scale: 2 }).default(0),
+  taxWithheld: decimal("tax_withheld", { precision: 10, scale: 2 }).default('0'),
   taxDocumentPath: varchar("tax_document_path"), // Path to tax document
   
   createdAt: timestamp("created_at").defaultNow(),
@@ -1893,14 +1893,14 @@ export const publishingSettings = pgTable("publishing_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   
   // Royalty and Commission Rates
-  defaultRoyaltyRate: decimal("default_royalty_rate", { precision: 5, scale: 4 }).default(0.7000), // 70%
-  platformCommissionRate: decimal("platform_commission_rate", { precision: 5, scale: 4 }).default(0.3000), // 30%
-  minimumRoyaltyRate: decimal("minimum_royalty_rate", { precision: 5, scale: 4 }).default(0.3500), // 35%
-  maximumRoyaltyRate: decimal("maximum_royalty_rate", { precision: 5, scale: 4 }).default(0.7000), // 70%
+  defaultRoyaltyRate: decimal("default_royalty_rate", { precision: 5, scale: 4 }).default('0.7000'), // 70%
+  platformCommissionRate: decimal("platform_commission_rate", { precision: 5, scale: 4 }).default('0.3000'), // 30%
+  minimumRoyaltyRate: decimal("minimum_royalty_rate", { precision: 5, scale: 4 }).default('0.3500'), // 35%
+  maximumRoyaltyRate: decimal("maximum_royalty_rate", { precision: 5, scale: 4 }).default('0.7000'), // 70%
   
   // Pricing Limits
-  minimumBookPrice: decimal("minimum_book_price", { precision: 8, scale: 2 }).default(0.99),
-  maximumBookPrice: decimal("maximum_book_price", { precision: 8, scale: 2 }).default(999.99),
+  minimumBookPrice: decimal("minimum_book_price", { precision: 8, scale: 2 }).default('0.99'),
+  maximumBookPrice: decimal("maximum_book_price", { precision: 8, scale: 2 }).default('999.99'),
   
   // Publishing Requirements
   minimumPageCount: integer("minimum_page_count").default(10),
@@ -1914,7 +1914,7 @@ export const publishingSettings = pgTable("publishing_settings", {
   
   // Payment Processing
   paymentSchedule: varchar("payment_schedule").default('monthly'), // weekly, monthly, quarterly
-  minimumPayoutAmount: decimal("minimum_payout_amount", { precision: 8, scale: 2 }).default(25.00),
+  minimumPayoutAmount: decimal("minimum_payout_amount", { precision: 8, scale: 2 }).default('25.00'),
   
   // Content Guidelines
   allowAdultContent: boolean("allow_adult_content").default(false),
@@ -1923,7 +1923,7 @@ export const publishingSettings = pgTable("publishing_settings", {
   
   // Tax Settings
   collectTaxes: boolean("collect_taxes").default(true),
-  defaultTaxRate: decimal("default_tax_rate", { precision: 5, scale: 4 }).default(0.0000),
+  defaultTaxRate: decimal("default_tax_rate", { precision: 5, scale: 4 }).default('0.0000'),
   taxByLocation: boolean("tax_by_location").default(true),
   
   lastUpdatedBy: varchar("last_updated_by").references(() => users.id),
