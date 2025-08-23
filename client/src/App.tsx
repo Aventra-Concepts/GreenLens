@@ -122,6 +122,9 @@ function Router() {
       <Route path="/disclosure" component={Disclosure} />
       <Route path="/faq" component={FAQ} />
       
+      {/* Admin login should be public - accessible before logging in */}
+      <Route path="/admin-login" component={AdminLogin} />
+      
       {/* Protected routes that require authentication */}
       {user && (
         <>
@@ -132,7 +135,6 @@ function Router() {
           {user.isAdmin && (
             <>
               <Route path="/admin" component={Admin} />
-              <Route path="/admin-login" component={AdminLogin} />
               <Route path="/admin/dashboard" component={AdminDashboard} />
               <Route path="/admin/blog" component={AdminBlogManager} />
               <Route path="/admin/social-media" component={AdminSocialMedia} />
