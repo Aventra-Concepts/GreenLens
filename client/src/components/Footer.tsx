@@ -7,20 +7,20 @@ export default function Footer() {
     <footer className="bg-gray-900 text-white py-6">
       {/* Footer container matching main page content alignment */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Logo, Description, and Social Media - Center Aligned */}
-        <div className="mb-6 text-center">
-          <div className="flex items-center justify-center space-x-2 mb-3">
+        {/* Logo, Description, and Social Media - Left Aligned within container */}
+        <div className="mb-6">
+          <div className="flex items-center space-x-2 mb-3">
             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
               <Leaf className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold">GreenLens</span>
           </div>
-          <p className="text-gray-400 text-sm max-w-md mx-auto mb-4">
+          <p className="text-gray-400 text-sm max-w-md mb-4">
             AI-powered plant identification and care guidance for plant enthusiasts worldwide.
           </p>
           
-          {/* Social Media Icons - Center Aligned */}
-          <div className="flex justify-center space-x-3 mb-6">
+          {/* Social Media Icons - Left Aligned within container */}
+          <div className="flex space-x-3 mb-6">
             <a 
               href="https://facebook.com/greenlens" 
               target="_blank"
