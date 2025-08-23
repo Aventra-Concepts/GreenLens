@@ -143,6 +143,7 @@ export default function Footer() {
                   <Link 
                     href="/student-registration" 
                     className="text-blue-400 hover:text-blue-300 font-bold transition-colors block"
+                    style={{ fontFamily: '"Arial Narrow", sans-serif', fontWeight: 'bold' }}
                     data-testid="footer-student-registration"
                   >
                     🎓 Students Register
@@ -152,9 +153,10 @@ export default function Footer() {
                   <Link 
                     href="/author-registration" 
                     className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors block"
+                    style={{ fontFamily: '"Arial Narrow", sans-serif', fontWeight: 'bold' }}
                     data-testid="footer-author-registration"
                   >
-                    ✍️ Author Registration
+                    ✍️ Authors Register
                   </Link>
                 </li>
               </ul>
