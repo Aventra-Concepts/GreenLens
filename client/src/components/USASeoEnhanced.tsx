@@ -68,13 +68,14 @@ export function USASeoEnhanced() {
             <h3 className="text-xl sm:text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
               Accurate and Scientific Information On Plants Across All Regions
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
               {[
-                { zone: "Northeast", states: "NY, MA, CT, etc.", plants: "Maple, Oak, Pine" },
-                { zone: "Southeast", states: "FL, GA, NC, etc.", plants: "Magnolia, Palm, Azalea" },
-                { zone: "Midwest", states: "IL, OH, MI, etc.", plants: "Corn, Wheat, Soybean" },
+                { zone: "West Coast", states: "CA, WA, OR, etc.", plants: "Redwood, Eucalyptus, Fern" },
+                { zone: "East Coast", states: "ME, NH, VA, etc.", plants: "Saltgrass, Beach Rose, Cedar" },
                 { zone: "Southwest", states: "TX, AZ, NM, etc.", plants: "Cactus, Agave, Mesquite" },
-                { zone: "West Coast", states: "CA, WA, OR, etc.", plants: "Redwood, Eucalyptus, Fern" }
+                { zone: "Midwest", states: "IL, OH, MI, etc.", plants: "Corn, Wheat, Soybean" },
+                { zone: "Southeast", states: "FL, GA, NC, etc.", plants: "Magnolia, Palm, Azalea" },
+                { zone: "Northeast", states: "NY, MA, CT, etc.", plants: "Maple, Oak, Pine" }
               ].map((region, index) => (
                 <Card key={index} className="text-center bg-white dark:bg-gray-800">
                   <CardContent className="p-4">
