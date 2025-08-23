@@ -6,69 +6,73 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white py-6">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-          <div className="md:col-span-1">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold">GreenLens</span>
+        {/* Logo and Description */}
+        <div className="text-center mb-4">
+          <div className="flex items-center justify-center space-x-2 mb-3">
+            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+              <Leaf className="w-5 h-5 text-white" />
             </div>
-            <p className="text-gray-400 text-sm mb-4">
-              AI-powered plant identification and care guidance for plant enthusiasts worldwide.
-            </p>
-            <div className="flex space-x-3">
-              <a 
-                href="https://facebook.com/greenlens" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group"
-                data-testid="facebook-link"
-                title="Follow us on Facebook"
-              >
-                <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
-                  <Facebook className="w-3.5 h-3.5 text-white" />
-                </div>
-              </a>
-              <a 
-                href="https://wa.me/1234567890" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group"
-                data-testid="whatsapp-link"
-                title="Chat with us on WhatsApp"
-              >
-                <div className="w-7 h-7 bg-green-500 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
-                  <MessageCircle className="w-3.5 h-3.5 text-white" />
-                </div>
-              </a>
-              <a 
-                href="https://instagram.com/greenlens" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group"
-                data-testid="instagram-link"
-                title="Follow us on Instagram"
-              >
-                <div className="w-7 h-7 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
-                  <Instagram className="w-3.5 h-3.5 text-white" />
-                </div>
-              </a>
-              <a 
-                href="https://twitter.com/greenlens" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group"
-                data-testid="twitter-link"
-                title="Follow us on Twitter"
-              >
-                <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg border border-gray-300">
-                  <FaXTwitter className="w-3.5 h-3.5 text-black" />
-                </div>
-              </a>
-            </div>
+            <span className="text-xl font-bold">GreenLens</span>
           </div>
+          <p className="text-gray-400 text-sm max-w-md mx-auto mb-4">
+            AI-powered plant identification and care guidance for plant enthusiasts worldwide.
+          </p>
+          
+          {/* Social Media Icons */}
+          <div className="flex justify-center space-x-3 mb-6">
+            <a 
+              href="https://facebook.com/greenlens" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group"
+              data-testid="facebook-link"
+              title="Follow us on Facebook"
+            >
+              <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
+                <Facebook className="w-3.5 h-3.5 text-white" />
+              </div>
+            </a>
+            <a 
+              href="https://wa.me/1234567890" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group"
+              data-testid="whatsapp-link"
+              title="Chat with us on WhatsApp"
+            >
+              <div className="w-7 h-7 bg-green-500 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
+                <MessageCircle className="w-3.5 h-3.5 text-white" />
+              </div>
+            </a>
+            <a 
+              href="https://instagram.com/greenlens" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group"
+              data-testid="instagram-link"
+              title="Follow us on Instagram"
+            >
+              <div className="w-7 h-7 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg">
+                <Instagram className="w-3.5 h-3.5 text-white" />
+              </div>
+            </a>
+            <a 
+              href="https://twitter.com/greenlens" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group"
+              data-testid="twitter-link"
+              title="Follow us on Twitter"
+            >
+              <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg border border-gray-300">
+                <FaXTwitter className="w-3.5 h-3.5 text-black" />
+              </div>
+            </a>
+          </div>
+        </div>
 
+        {/* Menu Columns - Below Social Icons */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <div>
             <h3 className="font-semibold text-sm mb-3">Product</h3>
             <ul className="space-y-2 text-gray-400 text-xs">
@@ -162,19 +166,20 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Beautiful E-books Promotional Message */}
-        <div className="mt-8 text-center">
+        {/* Smaller E-books Promotional Button */}
+        <div className="text-center mb-6">
           <Link href="/ebook-marketplace">
-            <div className="inline-block bg-gradient-to-r from-emerald-600 to-green-600 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer">
-              <p className="text-lg font-semibold tracking-wide">
+            <div className="inline-block bg-gradient-to-r from-emerald-600 to-green-600 text-white px-4 py-2 rounded-lg shadow hover:shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer">
+              <p className="text-sm font-semibold">
                 ✨ Advance Your Knowledge - Buy e-Books ✨
               </p>
-              <p className="text-sm opacity-90 mt-1">Click Here</p>
+              <p className="text-xs opacity-90">Click Here</p>
             </div>
           </Link>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+        {/* Copyright */}
+        <div className="border-t border-gray-800 pt-4 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">&copy; 2024 GreenLens. All rights reserved.</p>
           <p className="text-gray-400 text-sm mt-2 md:mt-0">Made with 🌱 for plant lovers everywhere</p>
         </div>
