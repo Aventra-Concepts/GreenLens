@@ -4,7 +4,6 @@ import USOptimizedHero from "@/components/USOptimizedHero";
 import { InArticleAd } from "@/components/AdSense";
 import { useAuth } from "@/hooks/use-auth";
 import { PoweredBySection } from "@/components/PoweredBySection";
-import { FeaturedEbooksSection } from "@/components/FeaturedEbooksSection";
 import PricingSection from "@/components/PricingSection";
 import { GardeningToolsPreview } from "@/components/GardeningToolsPreview";
 import { SoilPreparationSection } from "@/components/SoilPreparationSection";
@@ -35,9 +34,6 @@ export default function Home() {
         <div className="hidden sm:block">
           <InArticleAd />
         </div>
-        
-        {/* Featured E-books Section */}
-        <FeaturedEbooksSection />
         
         {/* Pricing Plans Section */}
         <PricingSection />
