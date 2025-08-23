@@ -41,6 +41,7 @@ import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
 import Tools from "@/pages/tools";
 import Disclosure from "@/pages/disclosure";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
+import Footer from "@/components/Footer";
 
 // E-book Category Pages
 import GardeningBasicsPage from "@/pages/categories/gardening-basics";
@@ -148,9 +149,14 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
-          <Toaster />
-          <Router />
-          <PerformanceMetrics />
+          <div className="min-h-screen flex flex-col">
+            <Toaster />
+            <main className="flex-1">
+              <Router />
+            </main>
+            <Footer />
+            <PerformanceMetrics />
+          </div>
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
