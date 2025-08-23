@@ -3,7 +3,7 @@ import { Facebook, Instagram, Twitter, Leaf } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-800 text-white mr-6 ml-6 sm:mr-8 sm:ml-8 lg:mr-52 lg:ml-56 xl:mr-64 xl:ml-72 rounded-2xl">
+    <footer className="bg-slate-800 text-white mr-6 ml-6 sm:mr-8 sm:ml-8 lg:mr-52 lg:ml-56 xl:mr-64 xl:ml-72 rounded-2xl mb-6">
       <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-2">
         {/* Top Section - Logo, Description, and Social Media - Left Aligned */}
         <div className="mb-6">
