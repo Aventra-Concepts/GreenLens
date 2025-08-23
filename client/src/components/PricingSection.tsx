@@ -46,7 +46,7 @@ export default function PricingSection() {
     formatPrice 
   } = usePricing('USD', user?.location || undefined);
 
-  // Static plan definitions (since we only have pro/premium)
+  // Dynamic plan definitions using converted prices from API
   const staticPlans: PricingPlan[] = [
     {
       id: 'free',
@@ -72,7 +72,7 @@ export default function PricingSection() {
       id: 'pro',
       planId: 'pro',
       name: 'Pro',
-      price: '9',
+      price: getPlanPrice('pro')?.formattedPrice || '...',
       currency: selectedCurrency,
       billingInterval: 'month',
       description: 'Perfect for gardening enthusiasts',
@@ -92,7 +92,7 @@ export default function PricingSection() {
       id: 'premium',
       planId: 'premium',
       name: 'Premium',
-      price: '19',
+      price: getPlanPrice('premium')?.formattedPrice || '...',
       currency: selectedCurrency,
       billingInterval: 'month',
       description: 'For professional gardeners and landscapers',

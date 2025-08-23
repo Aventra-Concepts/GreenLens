@@ -172,37 +172,48 @@ export class PaymentService {
   }
 
   private getAmountForCurrency(currency: string): number {
-    // Base amount: $95 USD
-    const exchangeRates: Record<string, number> = {
-      USD: 95,
-      INR: 7900, // Approximately $95 USD
-      EUR: 85,
-      GBP: 75,
-      CAD: 130,
-      AUD: 145,
-    };
-
-    return exchangeRates[currency.toUpperCase()] || exchangeRates.USD;
+    // Use MultiCurrencyPricingService for consistency
+    const { MultiCurrencyPricingService } = require('../pricing');
+    const pricingService = MultiCurrencyPricingService.getInstance();
+    
+    // Base plan is "premium" at $19 USD, but for garden monitoring subscription we use a higher rate
+    const basePriceUSD = 95; // Garden monitoring annual subscription base price
+    const currencyInfo = pricingService.getCurrencyInfo(currency.toUpperCase());
+    
+    if (!currencyInfo || !currencyInfo.exchangeRate) {
+      return basePriceUSD; // Return USD amount as fallback
+    }
+    
+    const convertedAmount = basePriceUSD * currencyInfo.exchangeRate;
+    
+    // Apply rounding based on currency
+    switch (currency.toUpperCase()) {
+      case 'JPY':
+      case 'KRW':
+      case 'VND':
+      case 'IDR':
+        return Math.round(convertedAmount); // No decimals for these currencies
+      case 'INR':
+        return Math.round(convertedAmount); // Round to nearest rupee
+      default:
+        return Math.round(convertedAmount * 100) / 100; // Round to 2 decimal places
+    }
   }
 
   getCurrencySymbol(currency: string): string {
-    const symbols: Record<string, string> = {
-      USD: '$',
-      INR: '₹',
-      EUR: '€',
-      GBP: '£',
-      CAD: 'C$',
-      AUD: 'A$',
-    };
-
-    return symbols[currency.toUpperCase()] || currency;
+    const { MultiCurrencyPricingService } = require('../pricing');
+    const pricingService = MultiCurrencyPricingService.getInstance();
+    const currencyInfo = pricingService.getCurrencyInfo(currency.toUpperCase());
+    
+    return currencyInfo?.symbol || currency.toUpperCase();
   }
 
   getFormattedPrice(currency: string): string {
+    const { MultiCurrencyPricingService } = require('../pricing');
+    const pricingService = MultiCurrencyPricingService.getInstance();
     const amount = this.getAmountForCurrency(currency);
-    const symbol = this.getCurrencySymbol(currency);
     
-    return `${symbol}${amount.toLocaleString()}`;
+    return pricingService.formatPrice(amount, currency.toUpperCase());
   }
 }
 

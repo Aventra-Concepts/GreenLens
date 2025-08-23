@@ -635,12 +635,91 @@ export class MultiCurrencyPricingService {
     const currency = this.currencies[currencyCode];
     if (!currency) return `$${amount}`;
 
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currencyCode,
-      minimumFractionDigits: currencyCode === 'JPY' ? 0 : 2,
-      maximumFractionDigits: currencyCode === 'JPY' ? 0 : 2,
-    }).format(amount);
+    // Use appropriate locale for each currency for better formatting
+    const localeMap: Record<string, string> = {
+      'USD': 'en-US',
+      'EUR': 'de-DE',
+      'GBP': 'en-GB',
+      'JPY': 'ja-JP',
+      'CNY': 'zh-CN',
+      'INR': 'en-IN',
+      'CAD': 'en-CA',
+      'AUD': 'en-AU',
+      'NZD': 'en-NZ',
+      'SGD': 'en-SG',
+      'BRL': 'pt-BR',
+      'MXN': 'es-MX',
+      'ZAR': 'en-ZA',
+      'CHF': 'de-CH',
+      'SEK': 'sv-SE',
+      'NOK': 'nb-NO',
+      'DKK': 'da-DK',
+      'PLN': 'pl-PL',
+      'CZK': 'cs-CZ',
+      'HUF': 'hu-HU',
+      'RON': 'ro-RO',
+      'BGN': 'bg-BG',
+      'HRK': 'hr-HR',
+      'RUB': 'ru-RU',
+      'ARS': 'es-AR',
+      'CLP': 'es-CL',
+      'COP': 'es-CO',
+      'PEN': 'es-PE',
+      'UYU': 'es-UY',
+      'KRW': 'ko-KR',
+      'THB': 'th-TH',
+      'MYR': 'ms-MY',
+      'PHP': 'en-PH',
+      'IDR': 'id-ID',
+      'VND': 'vi-VN',
+      'HKD': 'zh-HK',
+      'TWD': 'zh-TW',
+      'SAR': 'ar-SA',
+      'AED': 'ar-AE',
+      'QAR': 'ar-QA',
+      'KWD': 'ar-KW',
+      'BHD': 'ar-BH',
+      'OMR': 'ar-OM',
+      'JOD': 'ar-JO',
+      'LBP': 'ar-LB',
+      'EGP': 'ar-EG',
+      'TRY': 'tr-TR',
+      'ILS': 'he-IL',
+      'PKR': 'ur-PK',
+      'BDT': 'bn-BD',
+      'LKR': 'si-LK',
+      'NPR': 'ne-NP',
+      'AFN': 'ps-AF',
+      'KES': 'sw-KE',
+      'UGX': 'en-UG',
+      'TZS': 'sw-TZ',
+      'GHS': 'en-GH',
+      'NGN': 'en-NG',
+      'MAD': 'ar-MA',
+      'ETB': 'am-ET',
+      'XOF': 'fr-SN',
+      'XAF': 'fr-CM'
+    };
+
+    const locale = localeMap[currencyCode] || 'en-US';
+    const isZeroDecimal = ['JPY', 'KRW', 'VND', 'CLP', 'IDR', 'XOF', 'XAF'].includes(currencyCode);
+
+    try {
+      return new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: currencyCode,
+        minimumFractionDigits: isZeroDecimal ? 0 : 2,
+        maximumFractionDigits: isZeroDecimal ? 0 : 2,
+      }).format(amount);
+    } catch (error) {
+      // Fallback to USD formatting if locale is not supported
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currencyCode,
+        minimumFractionDigits: isZeroDecimal ? 0 : 2,
+        maximumFractionDigits: isZeroDecimal ? 0 : 2,
+      }).format(amount);
+    }
   }
 }
 

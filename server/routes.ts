@@ -523,58 +523,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Multi-currency pricing API - US optimized
+  // Multi-currency pricing API with proper currency conversion
   app.get("/api/pricing", async (req, res) => {
     try {
       const { currency = 'USD', location } = req.query;
       
-      // Auto-detect currency based on location if provided, defaulting to USD for US optimization
-      let detectedCurrency = currency as string;
-      if (location) {
-        detectedCurrency = pricingService.detectCurrencyByLocation(location as string);
-      } else {
-        // Detect US region and default to USD
-        const region = usOptimizationService.detectUSRegion(req);
-        if (region) {
-          detectedCurrency = 'USD';
-        }
+      // Respect user's currency selection first
+      let selectedCurrency = currency as string;
+      
+      // Only auto-detect currency if no currency is explicitly provided and location is available
+      if (currency === 'USD' && location && !req.query.currency) {
+        selectedCurrency = pricingService.detectCurrencyByLocation(location as string);
       }
       
-      const pricingArray = pricingService.getAllPlanPricing(detectedCurrency);
+      // Validate the requested currency is supported
       const supportedCurrencies = pricingService.getSupportedCurrencies();
+      if (!supportedCurrencies.includes(selectedCurrency)) {
+        selectedCurrency = 'USD'; // Fallback to USD if unsupported
+      }
+      
+      const pricingArray = pricingService.getAllPlanPricing(selectedCurrency);
       
       console.log('🔧 Pricing API Debug:', {
         requestedCurrency: currency,
-        detectedCurrency,
+        selectedCurrency,
         pricingArrayLength: pricingArray.length,
         pricingArraySample: pricingArray[0],
         supportedCurrenciesLength: supportedCurrencies.length
       });
       
-      // Convert plans array to object format expected by frontend
+      // Convert plans array to object format expected by frontend with proper currency formatting
       const plansObject = pricingArray.reduce((acc, plan) => {
         acc[plan.planId] = {
           planId: plan.planId,
           amount: plan.amount,
-          formattedPrice: new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: detectedCurrency,
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 2,
-          }).format(plan.amount),
+          formattedPrice: pricingService.formatPrice(plan.amount, selectedCurrency),
           supportedProviders: plan.supportedProviders
         };
         return acc;
       }, {} as Record<string, any>);
       
       console.log('🔧 Final Response:', {
-        currency: detectedCurrency,
+        currency: selectedCurrency,
         plansObject,
         supportedCurrencies: supportedCurrencies.slice(0, 5) + '...'
       });
       
       res.json({
-        currency: detectedCurrency,
+        currency: selectedCurrency,
         plans: plansObject,
         supportedCurrencies,
       });
