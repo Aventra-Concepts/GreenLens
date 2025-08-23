@@ -9,7 +9,7 @@ import { Leaf, Menu, X } from "lucide-react";
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [location, setLocation] = useLocation();
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, logoutMutation } = useAuth();
 
   const isActive = (path: string) => location === path;
 
@@ -54,22 +54,11 @@ export default function Navigation() {
                     )}
                     <Button 
                       variant="outline"
-                      onClick={async () => {
-                        try {
-                          await fetch('/api/logout', { method: 'POST' });
-                          // Clear cached user data
-                          queryClient.setQueryData(["/api/auth/user"], null);
-                          queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-                          // Force redirect to home page
-                          window.location.href = '/';
-                        } catch (error) {
-                          console.error('Logout failed:', error);
-                          window.location.href = '/';
-                        }
-                      }}
+                      onClick={() => logoutMutation.mutate()}
+                      disabled={logoutMutation.isPending}
                       data-testid="sign-out-button"
                     >
-                      Sign Out
+                      {logoutMutation.isPending ? "Signing out..." : "Sign Out"}
                     </Button>
                   </>
                 ) : (
