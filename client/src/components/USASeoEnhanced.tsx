@@ -70,12 +70,12 @@ export function USASeoEnhanced() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
               {[
-                { zone: "West Coast", states: "CA, WA, OR, etc.", plants: "Redwood, Eucalyptus, Fern" },
-                { zone: "East Coast", states: "ME, NH, VA, etc.", plants: "Saltgrass, Beach Rose, Cedar" },
-                { zone: "Southwest", states: "TX, AZ, NM, etc.", plants: "Cactus, Agave, Mesquite" },
-                { zone: "Midwest", states: "IL, OH, MI, etc.", plants: "Corn, Wheat, Soybean" },
-                { zone: "Southeast", states: "FL, GA, NC, etc.", plants: "Magnolia, Palm, Azalea" },
-                { zone: "Northeast", states: "NY, MA, CT, etc.", plants: "Maple, Oak, Pine" }
+                { zone: "Northeast", states: "ME, NH, VT, MA, RI, CT, NY, NJ, PA", plants: "Maple, Oak, Pine" },
+                { zone: "Northwest", states: "WA, OR, ID, MT, WY, AK", plants: "Douglas Fir, Cedar, Spruce" },
+                { zone: "Mideast", states: "DE, MD, DC, VA, WV, KY, TN, NC", plants: "Dogwood, Hickory, Tulip Tree" },
+                { zone: "Midwest", states: "OH, MI, IN, IL, WI, MN, IA, MO, ND, SD, NE, KS", plants: "Corn, Wheat, Soybean" },
+                { zone: "Southeast", states: "SC, GA, FL, AL, MS, LA, AR", plants: "Magnolia, Palm, Azalea" },
+                { zone: "Southwest", states: "TX, OK, NM, AZ, CO, UT, NV, CA, HI", plants: "Cactus, Agave, Mesquite" }
               ].map((region, index) => (
                 <Card key={index} className="text-center bg-white dark:bg-gray-800">
                   <CardContent className="p-4">
