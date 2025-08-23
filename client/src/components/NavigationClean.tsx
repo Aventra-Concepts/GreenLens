@@ -27,21 +27,6 @@ export default function NavigationClean() {
   const [location] = useLocation();
   const { user, isAuthenticated, logoutMutation } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    const checkScreenSize = () => {
-      const isDesktopSize = window.innerWidth >= 1024;
-      setIsDesktop(isDesktopSize);
-    };
-    
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    
-    return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
 
 
 
@@ -167,7 +152,7 @@ export default function NavigationClean() {
                 </div>
 
                 {/* Authentication Section - ALL AUTH BUTTONS HERE */}
-                <div className={`space-y-2 ${isClient && !isDesktop ? 'border-t pt-4' : 'pt-0'}`}>
+                <div className="space-y-2 border-t pt-4">
                   <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Account
                   </h3>
