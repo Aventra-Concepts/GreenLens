@@ -7,20 +7,20 @@ export default function Footer() {
     <footer className="bg-gray-900 text-white py-6">
       {/* Footer container matching main page content alignment */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Logo, Description, and Social Media - Left Aligned */}
-        <div className="mb-6">
-          <div className="flex items-center space-x-2 mb-3">
+        {/* Logo, Description, and Social Media - Center Aligned */}
+        <div className="mb-6 text-center">
+          <div className="flex items-center justify-center space-x-2 mb-3">
             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
               <Leaf className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold">GreenLens</span>
           </div>
-          <p className="text-gray-400 text-sm max-w-md mb-4">
+          <p className="text-gray-400 text-sm max-w-md mx-auto mb-4">
             AI-powered plant identification and care guidance for plant enthusiasts worldwide.
           </p>
           
-          {/* Social Media Icons - Left Aligned */}
-          <div className="flex space-x-3 mb-6">
+          {/* Social Media Icons - Center Aligned */}
+          <div className="flex justify-center space-x-3 mb-6">
             <a 
               href="https://facebook.com/greenlens" 
               target="_blank"
@@ -73,7 +73,7 @@ export default function Footer() {
         </div>
 
         {/* Menu Columns - Properly Contained Grid Layout */}
-        <div className="mb-6">
+        <div className="mb-6 text-center">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             <div className="space-y-3">
               <h3 className="font-semibold text-sm mb-3">Product</h3>
@@ -181,10 +181,10 @@ export default function Footer() {
           </Link>
         </div>
 
-        {/* Copyright Footer - Properly Aligned */}
-        <div className="border-t border-gray-800 pt-4 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">&copy; 2024 GreenLens. All rights reserved.</p>
-          <p className="text-gray-400 text-sm mt-2 md:mt-0">Made with 🌱 for plant lovers everywhere</p>
+        {/* Copyright Footer - Center Aligned */}
+        <div className="border-t border-gray-800 pt-4 text-center">
+          <p className="text-gray-400 text-sm mb-2">&copy; 2024 GreenLens. All rights reserved.</p>
+          <p className="text-gray-400 text-sm">Made with 🌱 for plant lovers everywhere</p>
         </div>
       </div>
     </footer>
