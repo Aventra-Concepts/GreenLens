@@ -221,13 +221,13 @@ export default function PricingSection() {
     <section id="pricing" className="pt-2 pb-4">
       <div className="max-w-4xl mx-auto px-4">
         {/* Beautiful enclosed box with dotted background */}
-        <div className="relative rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-lg" 
+        <div className="relative rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 p-6 shadow-lg" 
              style={{
-               backgroundImage: `radial-gradient(circle, rgba(156, 163, 175, 0.15) 1px, transparent 1px)`,
+               backgroundImage: `radial-gradient(circle, rgba(34, 197, 94, 0.12) 1px, transparent 1px)`,
                backgroundSize: '8px 8px'
              }}>
           {/* Overlay to soften the dots */}
-          <div className="absolute inset-0 bg-white/40 dark:bg-gray-800/40 rounded-xl pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gray-50/60 dark:bg-gray-900/60 rounded-xl pointer-events-none"></div>
           
           {/* Content */}
           <div className="relative z-10">

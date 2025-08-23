@@ -117,56 +117,54 @@ export default function NavigationClean() {
             <SheetContent side="right" className="w-[300px] sm:w-80 overflow-y-auto">
               <div className="flex flex-col space-y-4 mt-6">
                 {/* Navigation Items - ALL DEVICES */}
-                {isClient && (
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Navigation
-                    </h3>
-                    {navigationItems.map((item) => (
-                      <Link key={item.name} href={item.href}>
-                        <Button
-                          variant={isActive(item.href) ? "default" : "ghost"}
-                          className={`w-full justify-start text-left ${
-                            isActive(item.href)
-                              ? "bg-green-600 text-white"
-                              : "text-gray-700 dark:text-gray-200"
-                          }`}
-                          onClick={closeMobileMenu}
-                          data-testid={`mobile-nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
-                        >
-                          <item.icon className="w-4 h-4 mr-3" />
-                          {item.name}
-                        </Button>
-                      </Link>
-                    ))}
-                    
-                    {/* Expert Consultation Links - ALL DEVICES */}
-                    <div className="border-t pt-2 space-y-2">
-                      <Link href="/experts-register">
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start text-left text-blue-600 dark:text-blue-400"
-                          onClick={closeMobileMenu}
-                          data-testid="mobile-nav-expert-registration"
-                        >
-                          <GraduationCap className="w-4 h-4 mr-3" />
-                          Experts Register
-                        </Button>
-                      </Link>
-                      <Link href="/talk-to-expert">
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start text-left text-green-600 dark:text-green-400"
-                          onClick={closeMobileMenu}
-                          data-testid="mobile-nav-talk-to-expert"
-                        >
-                          <MessageCircle className="w-4 h-4 mr-3" />
-                          Talk to Expert
-                        </Button>
-                      </Link>
-                    </div>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Navigation
+                  </h3>
+                  {navigationItems.map((item) => (
+                    <Link key={item.name} href={item.href}>
+                      <Button
+                        variant={isActive(item.href) ? "default" : "ghost"}
+                        className={`w-full justify-start text-left ${
+                          isActive(item.href)
+                            ? "bg-green-600 text-white"
+                            : "text-gray-700 dark:text-gray-200"
+                        }`}
+                        onClick={closeMobileMenu}
+                        data-testid={`mobile-nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                      >
+                        <item.icon className="w-4 h-4 mr-3" />
+                        {item.name}
+                      </Button>
+                    </Link>
+                  ))}
+                  
+                  {/* Expert Consultation Links - ALL DEVICES */}
+                  <div className="border-t pt-2 space-y-2">
+                    <Link href="/experts-register">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-left text-blue-600 dark:text-blue-400"
+                        onClick={closeMobileMenu}
+                        data-testid="mobile-nav-expert-registration"
+                      >
+                        <GraduationCap className="w-4 h-4 mr-3" />
+                        Experts Register
+                      </Button>
+                    </Link>
+                    <Link href="/talk-to-expert">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-left text-green-600 dark:text-green-400"
+                        onClick={closeMobileMenu}
+                        data-testid="mobile-nav-talk-to-expert"
+                      >
+                        <MessageCircle className="w-4 h-4 mr-3" />
+                        Talk to Expert
+                      </Button>
+                    </Link>
                   </div>
-                )}
+                </div>
 
                 {/* Authentication Section - ALL AUTH BUTTONS HERE */}
                 <div className={`space-y-2 ${isClient && !isDesktop ? 'border-t pt-4' : 'pt-0'}`}>

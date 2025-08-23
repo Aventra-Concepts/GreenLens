@@ -163,6 +163,17 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Beautiful E-books Promotional Message */}
+          <div className="mt-6 text-center">
+            <Link href="/ebook-marketplace">
+              <div className="inline-block bg-gradient-to-r from-emerald-600 to-green-600 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer">
+                <p className="text-lg font-semibold tracking-wide">
+                  ✨ Advance Your Knowledge - Buy e-Books ✨
+                </p>
+                <p className="text-sm opacity-90 mt-1">Click Here</p>
+              </div>
+            </Link>
+          </div>
 
         </div>
 
