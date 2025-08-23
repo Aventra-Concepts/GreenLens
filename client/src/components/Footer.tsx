@@ -142,21 +142,21 @@ export default function Footer() {
                 <li>
                   <Link 
                     href="/student-registration" 
-                    className="text-blue-400 hover:text-blue-300 font-bold transition-colors block"
+                    className="text-blue-400 hover:text-blue-300 font-bold transition-colors block whitespace-nowrap"
                     style={{ fontFamily: '"Arial Narrow", sans-serif', fontWeight: 'bold' }}
                     data-testid="footer-student-registration"
                   >
-                    🎓 Students Register
+                    🎓 Students&nbsp;Register
                   </Link>
                 </li>
                 <li>
                   <Link 
                     href="/author-registration" 
-                    className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors block"
+                    className="text-yellow-400 hover:text-yellow-300 font-bold transition-colors block whitespace-nowrap"
                     style={{ fontFamily: '"Arial Narrow", sans-serif', fontWeight: 'bold' }}
                     data-testid="footer-author-registration"
                   >
-                    ✍️ Authors Register
+                    ✍️ Authors&nbsp;Register
                   </Link>
                 </li>
               </ul>
