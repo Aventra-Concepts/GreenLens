@@ -220,24 +220,35 @@ export default function PricingSection() {
   return (
     <section id="pricing" className="pt-2 pb-4">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Plans Title */}
-        <div className="text-center mb-3">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Choose Your Plan
-          </h2>
-        </div>
-        
-        {/* Currency Selector */}
-        <div className="flex justify-center items-center gap-2 mb-1">
-          <Globe className="w-4 h-4 text-gray-500" />
-          <div className="w-48">
-            <CurrencySelector
-              value={selectedCurrency}
-              onChange={setSelectedCurrency}
-              userLocation={user?.location || undefined}
-            />
-          </div>
-        </div>
+        {/* Beautiful enclosed box with dotted background */}
+        <div className="relative rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-lg" 
+             style={{
+               backgroundImage: `radial-gradient(circle, rgba(156, 163, 175, 0.15) 1px, transparent 1px)`,
+               backgroundSize: '8px 8px'
+             }}>
+          {/* Overlay to soften the dots */}
+          <div className="absolute inset-0 bg-white/40 dark:bg-gray-800/40 rounded-xl pointer-events-none"></div>
+          
+          {/* Content */}
+          <div className="relative z-10">
+            {/* Plans Title */}
+            <div className="text-center mb-3">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                Choose Your Plan
+              </h2>
+            </div>
+            
+            {/* Currency Selector */}
+            <div className="flex justify-center items-center gap-2 mb-1">
+              <Globe className="w-4 h-4 text-gray-500" />
+              <div className="w-48">
+                <CurrencySelector
+                  value={selectedCurrency}
+                  onChange={setSelectedCurrency}
+                  userLocation={user?.location || undefined}
+                />
+              </div>
+            </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
           {sortedPlans.map((plan: PricingPlan) => (
@@ -347,10 +358,12 @@ export default function PricingSection() {
           ))}
         </div>
 
-        <div className="text-center mt-6">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            All plans include 30-day money-back guarantee. Cancel anytime.
-          </p>
+            <div className="text-center mt-6">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                All plans include 30-day money-back guarantee. Cancel anytime.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
