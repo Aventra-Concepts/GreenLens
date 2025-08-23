@@ -80,24 +80,6 @@ export default function Pricing() {
             </div>
           </div>
 
-          {/* FAQ Section */}
-          <div className="mt-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Frequently Asked Questions</h3>
-            <div className="space-y-4">
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-2">Can I cancel my subscription anytime?</h4>
-                <p className="text-sm text-gray-600">Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period.</p>
-              </div>
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-2">What happens to my plant data if I downgrade?</h4>
-                <p className="text-sm text-gray-600">Your plant identification history and basic care plans remain accessible. Advanced features like unlimited analysis and premium reports are restricted to paid plans.</p>
-              </div>
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-2">Do you offer refunds?</h4>
-                <p className="text-sm text-gray-600">We offer a 30-day money-back guarantee for all paid plans. Contact our support team for assistance with refund requests.</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </Layout>
