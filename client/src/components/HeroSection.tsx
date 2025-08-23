@@ -159,8 +159,8 @@ export default function HeroSection() {
             <div className="space-y-5 sm:space-y-7">
               <div className="space-y-3 sm:space-y-5">
                 <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-gray-900 dark:text-white leading-tight text-center px-2">
-                  Identify American Plants with{" "}
-                  <span className="text-green-600">AI Precision</span>
+                  Identify Plants Accurately Powered by{" "}
+                  <span className="text-green-600">GreenLen AI Precision</span>
                 </h1>
                 <div className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-300 leading-relaxed text-center px-4">
                   <div>Upload up to 3 photos for instant plant identification across all US growing zones.</div>

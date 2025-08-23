@@ -292,7 +292,7 @@ export default function Identify() {
             </div>
             
             <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white text-center">
-              Identify <span className="text-green-600">American Plants</span> with <span className="text-green-600">AI Precision</span>
+              Identify <span className="text-green-600">Plants Accurately</span> Powered by <span className="text-green-600">GreenLen AI Precision</span>
             </h1>
             <div className="space-y-2 text-center">
               <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300">
