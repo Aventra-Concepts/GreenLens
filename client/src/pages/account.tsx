@@ -4,7 +4,6 @@ import { useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
 import { Layout } from "@/components/Layout";
 import MyGardenSection from "@/components/MyGardenSection";
-import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -301,7 +300,6 @@ export default function Account() {
       </section>
 
       <MyGardenSection />
-      <Footer />
     </Layout>
   );
 }

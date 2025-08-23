@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import NavigationClean from "@/components/NavigationClean";
 import { ImageUploadBanner } from "@/components/ImageUploadBanner";
 import { SidebarAd } from "@/components/AdSense";
-import Footer from "@/components/Footer";
 
 interface LayoutProps {
   children: ReactNode;
@@ -132,8 +131,6 @@ export function Layout({
         )}
       </div>
       
-      {/* Footer - Appears on all pages */}
-      <Footer />
     </div>
   );
 }
