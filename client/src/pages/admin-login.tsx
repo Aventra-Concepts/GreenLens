@@ -29,7 +29,7 @@ export default function AdminLogin() {
           description: "Welcome to the admin dashboard",
         });
         
-        setLocation("/admin");
+        setLocation("/admin/dashboard");
       } else {
         toast({
           title: "Invalid Credentials",

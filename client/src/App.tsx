@@ -127,10 +127,10 @@ function Router() {
         {() => <AdminLogin />}
       </Route>
       
-      {/* Test route to debug routing */}
-      <Route path="/test-route">
-        {() => <div style={{padding: '20px', textAlign: 'center'}}><h1>Test Route Works!</h1><p>If you can see this, routing is working.</p></div>}
-      </Route>
+      {/* Admin routes - accessible with session-based auth */}
+      <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/admin/blog" component={AdminBlogManager} />
+      <Route path="/admin/social-media" component={AdminSocialMedia} />
       
       {/* Protected routes that require authentication */}
       {user && (
@@ -142,9 +142,6 @@ function Router() {
           {user.isAdmin && (
             <>
               <Route path="/admin" component={Admin} />
-              <Route path="/admin/dashboard" component={AdminDashboard} />
-              <Route path="/admin/blog" component={AdminBlogManager} />
-              <Route path="/admin/social-media" component={AdminSocialMedia} />
             </>
           )}
         </>
