@@ -1,0 +1,68 @@
+Here’s a detailed prompt you can use in Replit to communicate your footer alignment problem more clearly and give specific requirements for rectification. This is based on the image you provided and your description:
+
+***
+
+### Detailed Prompt to Fix Footer Alignment Issue in Replit
+
+I am facing an **alignment issue with the footer of my webpage**. As seen in the uploaded screenshot, the footer:
+
+- Stretches all the way to the left and right edges of the screen, overshooting the main page/container margin.
+- The columns inside the footer (Product, Resources, Company, Amazon Affiliate) are also misaligned, with the left columns touching/extending past the screen edge, and the right column content extending past the footer’s physical margin.
+- The main body of the page has a clear margin on both sides, but the footer ignores these margins and is not visually aligned with the rest of the content.
+
+#### Requirements for Correction
+
+1. **Footer Alignment:**
+    - The footer should have the **same left and right margins/padding as the main content/container** of the page.
+    - All columns in the footer should be visually contained within these margins and never extend past them.
+    - Ensure consistent gutter spacing inside the footer.
+
+2. **Responsive Design:**
+    - Footer must remain visually aligned and contained for all screen sizes (desktop/tablet/mobile).
+    - Avoid horizontal scroll or overflow for the footer on any device.
+
+3. **CSS Structure:**
+    - Use a parent container/wrapper for the footer (e.g., `<footer><div class="footer-container">...</div></footer>`), with a fixed max-width and auto margins to center it, *matching the main page container’s CSS properties*.
+    - All columns/content inside the footer must use flexbox or grid to stay aligned within this container.
+
+4. **No Overshooting:**
+    - No footer text or column content should go past the footer’s visible background or container margin, even on resize or small screens.
+    - The location of social/media icons and calls-to-action should also be inside this aligned container.
+
+#### Example CSS (to illustrate intent, not necessarily exact code):
+```css
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+footer {
+  background: #202534;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: flex; /* or grid */
+  justify-content: space-between;
+}
+
+.footer-column {
+  flex: 1;
+  /* add appropriate margin or padding */
+}
+```
+
+#### Additional Notes:
+- Please review the attached screenshot to see the misalignment issues.
+- Do not simply add padding to the footer; match the **overall page structure’s margin and width**.
+- If you use Bootstrap/Tailwind etc., apply the same container settings as the main content.
+- Please check on both desktop and mobile view to ensure proper alignment.
+
+***
+
+You can copy this prompt into Replit (or to your developer/designer) to clearly communicate the issue and desired fix. If you need help with actual CSS code based on your existing HTML structure, paste your code and I can provide a targeted solution.
+
+[1](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/22001758/08390f4c-492a-4666-9b81-f69deaa0dcbb/Screenshot-360.jpg)
