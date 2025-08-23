@@ -1,20 +1,23 @@
 import { Link } from "wouter";
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Facebook, Instagram, Twitter, Leaf } from "lucide-react";
 
 export default function Footer() {
   return (
     <footer className="bg-slate-800 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-          {/* Logo and Description */}
-          <div className="col-span-1 md:col-span-1">
+        {/* Top Section - Logo, Description, and Social Media */}
+        <div className="mb-8">
+          <div className="flex flex-col items-center text-center">
+            {/* Logo matching navigation bar */}
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">🌱</span>
+              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center">
+                <Leaf className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold text-white">GreenLens</span>
             </div>
-            <p className="text-gray-300 text-sm mb-6 leading-relaxed">
+            
+            {/* Description */}
+            <p className="text-gray-300 text-sm mb-6 leading-relaxed max-w-md">
               AI-powered plant identification and care guidance for plant enthusiasts worldwide.
             </p>
             
@@ -34,7 +37,10 @@ export default function Footer() {
               </div>
             </div>
           </div>
-          
+        </div>
+        
+        {/* Menu Columns */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Product Column */}
           <div>
             <h3 className="font-semibold text-white mb-4">Product</h3>
@@ -143,7 +149,7 @@ export default function Footer() {
         </div>
         
         {/* Bottom Section */}
-        <div className="border-t border-gray-600 mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center">
+        <div className="border-t border-gray-600 pt-6 flex flex-col sm:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm" data-testid="text-copyright">
             © {new Date().getFullYear()} GreenLens. All rights reserved.
           </p>
