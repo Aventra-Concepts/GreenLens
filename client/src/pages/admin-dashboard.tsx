@@ -56,26 +56,13 @@ export default function AdminDashboard() {
     }
   }, [setLocation]);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("adminAuthenticated");
-    toast({
-      title: "Logged Out",
-      description: "You have been logged out of the admin panel",
-    });
-    setLocation("/admin-login");
-  };
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  // Fetch consultation requests
+  // Fetch consultation requests - always call this hook
   const { data: consultations, isLoading: isLoadingConsultations } = useQuery({
     queryKey: ['/api/admin/consultation-requests'],
     enabled: isAuthenticated,
   });
 
-  // Update consultation status mutation
+  // Update consultation status mutation - always call this hook
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status, expertId }: { id: string; status: string; expertId?: string }) => {
       const response = await apiRequest("PUT", `/api/admin/consultation-requests/${id}/status`, {
@@ -100,6 +87,15 @@ export default function AdminDashboard() {
     },
   });
 
+  const handleLogout = () => {
+    sessionStorage.removeItem("adminAuthenticated");
+    toast({
+      title: "Logged Out",
+      description: "You have been logged out of the admin panel",
+    });
+    setLocation("/admin-login");
+  };
+
   const handleStatusUpdate = (id: string, newStatus: string) => {
     updateStatusMutation.mutate({ id, status: newStatus });
   };
@@ -111,6 +107,11 @@ export default function AdminDashboard() {
       expertId 
     });
   };
+
+  // Return early only after all hooks are called
+  if (!isAuthenticated) {
+    return null;
+  }
 
   if (isLoadingConsultations) {
     return (
