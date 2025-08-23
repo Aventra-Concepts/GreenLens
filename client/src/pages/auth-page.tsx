@@ -107,18 +107,17 @@ export default function AuthPage() {
   };
 
   const onLogin = async (data: LoginForm) => {
-    try {
-      await loginMutation.mutateAsync({
-        email: data.email,
-        password: data.password,
-      });
+    const result = await loginMutation.mutateAsync({
+      email: data.email,
+      password: data.password,
+    });
+    
+    if (result) {
       toast({
         title: "Login Successful",
         description: "Welcome back to GreenLens!",
       });
       setLocation("/");
-    } catch (error) {
-      console.error("Login error:", error);
     }
   };
 
