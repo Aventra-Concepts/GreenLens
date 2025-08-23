@@ -20,7 +20,7 @@ import {
   Star,
   MessageCircle,
   Settings,
-  Activity
+  TreeDeciduous
 } from "lucide-react";
 
 export default function NavigationClean() {
@@ -50,7 +50,7 @@ export default function NavigationClean() {
     { name: "Identify Plants", href: "/identify", icon: Leaf },
     { name: "E-Books", href: "/ebook-marketplace", icon: BookOpen },
     { name: "Buy The Best Gardening Tools", href: "/tools", icon: Star },
-    { name: "My Garden", href: "/my-garden", icon: Activity },
+    { name: "My Garden", href: "/my-garden", icon: TreeDeciduous },
     { name: "Pricing", href: "/pricing", icon: DollarSign },
   ];
 
