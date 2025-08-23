@@ -40,6 +40,7 @@ import GardenSubscription from "@/pages/GardenSubscription";
 import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
 import Tools from "@/pages/tools";
 import Disclosure from "@/pages/disclosure";
+import FAQ from "@/pages/faq";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 import Footer from "@/components/Footer";
 
@@ -119,6 +120,7 @@ function Router() {
       <Route path="/experts-register" component={ExpertsRegister} />
       <Route path="/tools" component={Tools} />
       <Route path="/disclosure" component={Disclosure} />
+      <Route path="/faq" component={FAQ} />
       
       {/* Protected routes that require authentication */}
       {user && (

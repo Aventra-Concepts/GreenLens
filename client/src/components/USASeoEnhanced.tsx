@@ -96,45 +96,6 @@ export function USASeoEnhanced() {
         </div>
       </section>
 
-      {/* SEO-optimized FAQ for gardeners worldwide */}
-      <section className="py-8 sm:py-12 bg-gray-50 dark:bg-gray-800">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">
-            Frequently Asked Questions - Plant Identification
-          </h2>
-          <div className="space-y-6">
-            {[
-              {
-                q: "How accurate is plant identification for native and exotic species?",
-                a: "GreenLens achieves 99.5% accuracy for plants worldwide including native species, ornamentals, and garden plants across all climate zones."
-              },
-              {
-                q: "Does GreenLens work for plants in all climate zones?",
-                a: "Yes! GreenLens is optimized for plants across all global climate zones, providing scientific information for diverse growing conditions worldwide."
-              },
-              {
-                q: "Can I identify weeds and invasive species in my garden?",
-                a: "Absolutely. GreenLens identifies common weeds, invasive species, and helps with proper removal and management strategies for your region."
-              },
-              {
-                q: "Is plant care advice customized for my growing conditions?",
-                a: "Yes, all care recommendations are tailored for various soil types, weather patterns, and seasonal changes specific to your geographic region."
-              }
-            ].map((faq, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <CardTitle className="text-lg text-gray-900 dark:text-white">
-                    {faq.q}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 dark:text-gray-300">{faq.a}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
     </>
   );
 }
