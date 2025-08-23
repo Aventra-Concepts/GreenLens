@@ -33,6 +33,7 @@ export default function NavigationClean() {
   const navigationItems = [
     { name: "Home", href: "/", icon: Home },
     { name: "Identify Plants", href: "/identify", icon: Leaf },
+    { name: "E-Books", href: "/ebook-marketplace", icon: BookOpen },
     { name: "Buy The Best Gardening Tools", href: "/tools", icon: Star },
     { name: "My Garden", href: "/my-garden", icon: TreeDeciduous },
     { name: "Pricing", href: "/pricing", icon: DollarSign },
