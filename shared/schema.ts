@@ -70,6 +70,10 @@ export const users = pgTable("users", {
   gardenMonitoringSubscriptionId: varchar("garden_monitoring_subscription_id"),
   gardenMonitoringActive: boolean("garden_monitoring_active").default(false),
   gardenMonitoringExpiresAt: timestamp("garden_monitoring_expires_at"),
+  // General subscription fields for plan management
+  subscriptionStatus: varchar("subscription_status").default('none'), // 'active', 'inactive', 'trialing', 'none'
+  subscriptionPlan: varchar("subscription_plan").default('Free Plan'),
+  subscriptionPlanId: varchar("subscription_plan_id").default('free'),
 });
 
 export type UpsertUser = typeof users.$inferInsert;

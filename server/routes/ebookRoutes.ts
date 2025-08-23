@@ -309,6 +309,68 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get featured e-books (public) - the endpoint the frontend is calling
+router.get('/featured', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 6;
+    
+    // Return sample featured e-books - filtering from our sample data
+    const sampleEbooks = [
+      {
+        id: '1',
+        title: 'Advanced Plant Care Guide',
+        authorId: 'author1',
+        authorName: 'Dr. Green Thumb',
+        description: 'A comprehensive guide to caring for indoor and outdoor plants with expert tips and techniques.',
+        category: 'gardening',
+        basePrice: '19.99',
+        coverImageUrl: '/placeholder-book-cover.jpg',
+        fileFormat: 'PDF',
+        copyrightStatus: 'copyrighted',
+        averageRating: 4.5,
+        totalRatings: 127,
+        downloadCount: 1250,
+        tags: ['plants', 'gardening', 'care'],
+        language: 'English',
+        publishedAt: new Date('2024-01-15'),
+        isFeatured: true,
+      },
+      {
+        id: '3',
+        title: 'Indoor Plant Encyclopedia',
+        authorId: 'author3',
+        authorName: 'John Smith',
+        description: 'A complete reference guide to over 200 indoor plants with care instructions.',
+        category: 'reference',
+        basePrice: '29.99',
+        coverImageUrl: '/placeholder-book-cover.jpg',
+        fileFormat: 'PDF',
+        copyrightStatus: 'copyrighted',
+        averageRating: 4.3,
+        totalRatings: 156,
+        downloadCount: 1560,
+        tags: ['indoor', 'plants', 'reference'],
+        language: 'English',
+        publishedAt: new Date('2024-03-10'),
+        isFeatured: true,
+      }
+    ];
+    
+    // Filter only featured books and apply limit
+    const featuredEbooks = sampleEbooks
+      .filter(ebook => ebook.isFeatured)
+      .slice(0, limit);
+    
+    res.json(featuredEbooks);
+  } catch (error) {
+    console.error('Get featured ebooks error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch featured e-books',
+    });
+  }
+});
+
 // Get published e-books (public)
 router.get('/published', async (req, res) => {
   try {

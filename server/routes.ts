@@ -16,6 +16,7 @@ import { plantNamesService } from "./services/plantNames";
 import { pricingService } from "./services/pricing";
 import { PlantAnalysisService } from "./services/plantAnalysisService";
 import { PDFReportService } from "./services/pdfReportService";
+import { paymentService } from "./services/payments/paymentService";
 import { insertPlantResultSchema, insertBlogPostSchema, insertReviewSchema } from "@shared/schema";
 import { trackUserLogin, trackPlantIdentification, trackSubscriptionPurchase, trackPdfDownload } from "./middleware/activityTracker";
 import { registerAffiliateRoutes } from "./routes/affiliate";
@@ -608,13 +609,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const checkoutUrl = await paymentService.createCheckout(selectedProvider, {
-        userId,
-        userEmail: user.email || '',
-        planId,
+      // Use garden subscription checkout for now as a placeholder
+      const checkoutResponse = await paymentService.createGardenSubscriptionCheckout({
+        customerEmail: user.email || '',
+        customerName: `${user.firstName} ${user.lastName}`,
         currency,
-        amount: pricing.amount,
+        returnUrl: `${process.env.BASE_URL || 'http://localhost:5000'}/success`,
+        cancelUrl: `${process.env.BASE_URL || 'http://localhost:5000'}/cancel`,
       });
+      
+      const checkoutUrl = checkoutResponse.checkoutUrl;
 
       res.json({ 
         checkoutUrl, 
@@ -653,13 +657,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create payment checkout URL using payment service
-      const checkoutUrl = await paymentService.createCheckout('stripe', {
-        userId: req.user.id,
-        userEmail: req.user.email || '',
-        planId: 'consultation',
+      const checkoutResponse = await paymentService.createGardenSubscriptionCheckout({
+        customerEmail: req.user.email || '',
+        customerName: `${req.user.firstName} ${req.user.lastName}`,
         currency,
-        amount: amount,
+        returnUrl: `${process.env.BASE_URL || 'http://localhost:5000'}/success`,
+        cancelUrl: `${process.env.BASE_URL || 'http://localhost:5000'}/cancel`,
       });
+      
+      const checkoutUrl = checkoutResponse.checkoutUrl;
 
       // Update consultation with payment intent ID
       await storage.updateConsultationRequest(consultationId, {
@@ -682,7 +688,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/webhooks/stripe", async (req, res) => {
     try {
-      await paymentService.handleWebhook('stripe', req.body, req.headers);
+      const signature = req.headers['stripe-signature'] as string;
+      await paymentService.handleWebhook('stripe', req.body, signature);
       res.json({ received: true });
     } catch (error) {
       console.error("Stripe webhook error:", error);
@@ -692,7 +699,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/webhooks/razorpay", async (req, res) => {
     try {
-      await paymentService.handleWebhook('razorpay', req.body, req.headers);
+      const signature = req.headers['x-razorpay-signature'] as string;
+      await paymentService.handleWebhook('razorpay', req.body, signature);
       res.json({ received: true });
     } catch (error) {
       console.error("Razorpay webhook error:", error);
@@ -702,7 +710,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/webhooks/cashfree", async (req, res) => {
     try {
-      await paymentService.handleWebhook('cashfree', req.body, req.headers);
+      const signature = req.headers['x-cashfree-signature'] as string;
+      await paymentService.handleWebhook('cashfree', req.body, signature);
       res.json({ received: true });
     } catch (error) {
       console.error("Cashfree webhook error:", error);
@@ -1750,7 +1759,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/admin/tool-images', requireAdmin, async (req, res) => {
     try {
       const setting = await storage.getAdminSetting('tool_images_settings');
-      const settings = setting ? JSON.parse(setting.settingValue) : { images: {} };
+      const settings = setting ? JSON.parse(setting.settingValue || '{}') : { images: {} };
       res.json(settings);
     } catch (error) {
       console.error('Error fetching tool images:', error);
@@ -1769,7 +1778,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get current settings
       const currentSetting = await storage.getAdminSetting('tool_images_settings');
-      const currentSettings = currentSetting ? JSON.parse(currentSetting.settingValue) : { images: {} };
+      const currentSettings = currentSetting ? JSON.parse(currentSetting.settingValue || '{}') : { images: {} };
       
       // Update the specific category
       const updatedSettings = {
