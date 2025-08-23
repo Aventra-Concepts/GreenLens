@@ -2,7 +2,6 @@ import { Layout } from "@/components/Layout";
 import HeroSection from "@/components/HeroSection";
 import USOptimizedHero from "@/components/USOptimizedHero";
 import { InArticleAd } from "@/components/AdSense";
-import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { PoweredBySection } from "@/components/PoweredBySection";
 import { FeaturedEbooksSection } from "@/components/FeaturedEbooksSection";
@@ -55,7 +54,6 @@ export default function Home() {
         {/* USA SEO Enhanced Section - Performance Optimized */}
         <PerformanceOptimizedUSASection />
       </div>
-      <Footer />
     </Layout>
   );
 }

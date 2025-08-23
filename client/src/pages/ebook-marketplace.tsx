@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useQuery } from "@tanstack/react-query";
 import { Search, Filter, BookOpen, Star, Download, Globe, Users, Award, Home, Menu, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import Footer from "@/components/Footer";
 
 interface Ebook {
   id: string;
@@ -303,7 +302,6 @@ export default function EbookMarketplace() {
           </div>
         </div>
       </div>
-      <Footer />
     </Layout>
   );
 }

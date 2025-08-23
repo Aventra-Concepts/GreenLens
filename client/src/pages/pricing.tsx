@@ -1,6 +1,5 @@
 import { Layout } from "@/components/Layout";
 import PricingSection from "@/components/PricingSection";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ArrowLeft, Check, Star, Shield, Clock, Users } from "lucide-react";
@@ -101,7 +100,6 @@ export default function Pricing() {
           </div>
         </div>
       </div>
-      <Footer />
     </Layout>
   );
 }

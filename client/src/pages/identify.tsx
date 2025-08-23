@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { Layout } from "@/components/Layout";
-import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -474,7 +473,6 @@ export default function Identify() {
         
         <InArticleAd />
       </div>
-      <Footer />
       
       {/* Camera Capture Modal */}
       <CameraCapture

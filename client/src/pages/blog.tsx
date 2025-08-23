@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
-import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -79,7 +78,6 @@ export default function Blog() {
         </div>
       </section>
 
-      <Footer />
     </Layout>
   );
 }

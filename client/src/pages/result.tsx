@@ -1,7 +1,6 @@
 import { useParams, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import ResultsDashboard from "@/components/ResultsDashboard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,7 +36,7 @@ export default function Result() {
             </Card>
           </div>
         </section>
-        <Footer />
+
       </div>
     );
   }
@@ -62,7 +61,7 @@ export default function Result() {
             </Card>
           </div>
         </section>
-        <Footer />
+
       </div>
     );
   }
@@ -71,7 +70,6 @@ export default function Result() {
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       <ResultsDashboard result={result} />
-      <Footer />
     </div>
   );
 }

@@ -4,7 +4,6 @@ import USOptimizedHero from "@/components/USOptimizedHero";
 import PricingSection from "@/components/PricingSection";
 import BlogPreviewSection from "@/components/BlogPreviewSection";
 import { InArticleAd } from "@/components/AdSense";
-import Footer from "@/components/Footer";
 
 export default function Landing() {
   return (
@@ -29,7 +28,6 @@ export default function Landing() {
           </div>
         </div>
       </div>
-      <Footer />
     </Layout>
   );
 }
