@@ -44,6 +44,7 @@ import FAQ from "@/pages/faq";
 import PlantDatabase from "@/pages/plant-database";
 import Community from "@/pages/community";
 import CarePlans from "@/pages/care-plans";
+import Privacy from "@/pages/privacy";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 import Footer from "@/components/Footer";
 
@@ -123,6 +124,7 @@ function Router() {
       <Route path="/experts-register" component={ExpertsRegister} />
       <Route path="/tools" component={Tools} />
       <Route path="/disclosure" component={Disclosure} />
+      <Route path="/privacy" component={Privacy} />
       <Route path="/faq" component={FAQ} />
       <Route path="/plant-database" component={PlantDatabase} />
       <Route path="/community" component={Community} />
