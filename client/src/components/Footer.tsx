@@ -1,9 +1,24 @@
 import { Link } from "wouter";
-import { Facebook, Instagram, Twitter, Leaf } from "lucide-react";
+import { Facebook, Instagram, Twitter, Leaf, QrCode } from "lucide-react";
 import { useFooterNavigation } from "@/hooks/useFooterNavigation";
+import { useQRCode } from "@/hooks/useQRCode";
+import { useState } from "react";
 
 export default function Footer() {
   const { navigateWithMessage } = useFooterNavigation();
+  const [showQR, setShowQR] = useState<string | null>(null);
+  
+  // Get current domain for QR codes
+  const baseUrl = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.host}` : '';
+  
+  // Generate QR codes for the created pages
+  const termsQR = useQRCode(`${baseUrl}/terms`);
+  const aboutQR = useQRCode(`${baseUrl}/about`);
+  const privacyQR = useQRCode(`${baseUrl}/privacy`);
+  
+  const toggleQR = (page: string) => {
+    setShowQR(showQR === page ? null : page);
+  };
   
   return (
     <footer className="bg-slate-800 text-white mr-6 ml-6 sm:mr-8 sm:ml-8 lg:mr-52 lg:ml-56 xl:mr-64 xl:ml-72 rounded-2xl mb-6">
@@ -155,13 +170,31 @@ export default function Footer() {
             <h3 className="font-semibold text-white mb-2 text-sm">Company</h3>
             <ul className="space-y-1">
               <li>
-                <button 
-                  onClick={() => navigateWithMessage("/about")}
-                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
-                  data-testid="link-about-us"
-                >
-                  About Us
-                </button>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => navigateWithMessage("/about")}
+                    className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                    data-testid="link-about-us"
+                  >
+                    About Us
+                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => toggleQR('about')}
+                      className="text-gray-400 hover:text-white transition-colors"
+                      data-testid="qr-about-toggle"
+                      title="Show QR Code"
+                    >
+                      <QrCode className="w-3 h-3" />
+                    </button>
+                    {showQR === 'about' && aboutQR && (
+                      <div className="absolute bottom-full left-0 mb-2 bg-white p-2 rounded-lg shadow-lg border z-50">
+                        <img src={aboutQR} alt="About Us QR Code" className="w-16 h-16" />
+                        <p className="text-xs text-gray-600 mt-1 text-center">About Us</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </li>
               <li>
                 <button 
@@ -173,22 +206,58 @@ export default function Footer() {
                 </button>
               </li>
               <li>
-                <button 
-                  onClick={() => navigateWithMessage("/privacy")}
-                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
-                  data-testid="link-privacy-policy"
-                >
-                  Privacy Policy
-                </button>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => navigateWithMessage("/privacy")}
+                    className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                    data-testid="link-privacy-policy"
+                  >
+                    Privacy Policy
+                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => toggleQR('privacy')}
+                      className="text-gray-400 hover:text-white transition-colors"
+                      data-testid="qr-privacy-toggle"
+                      title="Show QR Code"
+                    >
+                      <QrCode className="w-3 h-3" />
+                    </button>
+                    {showQR === 'privacy' && privacyQR && (
+                      <div className="absolute bottom-full left-0 mb-2 bg-white p-2 rounded-lg shadow-lg border z-50">
+                        <img src={privacyQR} alt="Privacy Policy QR Code" className="w-16 h-16" />
+                        <p className="text-xs text-gray-600 mt-1 text-center">Privacy Policy</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </li>
               <li>
-                <button 
-                  onClick={() => navigateWithMessage("/terms")}
-                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
-                  data-testid="link-terms-of-service"
-                >
-                  Terms of Service
-                </button>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => navigateWithMessage("/terms")}
+                    className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                    data-testid="link-terms-of-service"
+                  >
+                    Terms of Service
+                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => toggleQR('terms')}
+                      className="text-gray-400 hover:text-white transition-colors"
+                      data-testid="qr-terms-toggle"
+                      title="Show QR Code"
+                    >
+                      <QrCode className="w-3 h-3" />
+                    </button>
+                    {showQR === 'terms' && termsQR && (
+                      <div className="absolute bottom-full left-0 mb-2 bg-white p-2 rounded-lg shadow-lg border z-50">
+                        <img src={termsQR} alt="Terms of Service QR Code" className="w-16 h-16" />
+                        <p className="text-xs text-gray-600 mt-1 text-center">Terms of Service</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </li>
             </ul>
           </div>
