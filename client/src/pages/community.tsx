@@ -81,7 +81,7 @@ export default function Community() {
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/login";
+        window.location.href = "/auth";
       }, 1000);
       return;
     }
