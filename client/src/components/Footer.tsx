@@ -42,19 +42,10 @@ export default function Footer() {
             </div>
             
             {/* Social Media Icons */}
-            <div className="flex space-x-2">
-              <div className="w-7 h-7 bg-blue-600 rounded flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors">
-                <Facebook className="w-3.5 h-3.5 text-white" />
-              </div>
-              <div className="w-7 h-7 bg-green-500 rounded flex items-center justify-center cursor-pointer hover:bg-green-600 transition-colors">
-                <span className="text-white text-xs font-bold">Z</span>
-              </div>
-              <div className="w-7 h-7 bg-gradient-to-br from-purple-500 to-pink-500 rounded flex items-center justify-center cursor-pointer hover:from-purple-600 hover:to-pink-600 transition-colors">
-                <Instagram className="w-3.5 h-3.5 text-white" />
-              </div>
-              <div className="w-7 h-7 bg-black rounded flex items-center justify-center cursor-pointer hover:bg-gray-800 transition-colors">
-                <Twitter className="w-3.5 h-3.5 text-white" />
-              </div>
+            <div className="flex space-x-4">
+              <Facebook className="w-5 h-5 text-blue-400 hover:text-blue-500 cursor-pointer transition-colors" data-testid="social-facebook" />
+              <Instagram className="w-5 h-5 text-pink-400 hover:text-pink-500 cursor-pointer transition-colors" data-testid="social-instagram" />
+              <Twitter className="w-5 h-5 text-gray-300 hover:text-white cursor-pointer transition-colors" data-testid="social-twitter" />
             </div>
           </div>
         </div>
