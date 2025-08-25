@@ -117,6 +117,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/author-registration" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-author-registration">
+                  Author Registration
+                </Link>
+              </li>
+              <li>
                 <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-privacy-policy">
                   Privacy Policy
                 </Link>
