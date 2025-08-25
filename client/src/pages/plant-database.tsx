@@ -335,6 +335,114 @@ export default function PlantDatabase() {
         'Native plant gardening movements encourage the use of indigenous decorative species that support local wildlife and require fewer inputs. Native plants are pre-adapted to local soil and climate conditions, making them more sustainable choices for ornamental landscaping.',
         'Seasonal decorative plant rotation allows gardeners to maintain year-round visual interest by replacing summer annuals with cold-tolerant species. This practice maximizes garden aesthetics while working with natural plant life cycles and regional growing seasons.'
       ]
+    },
+    {
+      id: 'usa-flowering',
+      title: 'USA Flowering Plants',
+      icon: Sprout,
+      description: 'Native and cultivated flowering plants across American climate zones',
+      tables: [
+        {
+          title: 'Flowering Plants by US Climate Zones',
+          headers: ['USDA Zone', 'Region', 'Native Flowers', 'Popular Cultivars', 'Peak Bloom'],
+          rows: [
+            ['3-4', 'Northern Plains', 'Purple Coneflower, Black-eyed Susan', 'Hardy Hibiscus, Daylilies', 'July-August'],
+            ['5-6', 'Midwest/Northeast', 'Wild Bergamot, New England Aster', 'Peonies, Iris, Tulips', 'May-June'],
+            ['7-8', 'Mid-Atlantic/South', 'Cardinal Flower, Coral Honeysuckle', 'Azaleas, Dogwood, Magnolia', 'April-May'],
+            ['9-10', 'Deep South/Florida', 'Firebush, Coontie', 'Camellias, Gardenias, Oleander', 'Year-round'],
+            ['11', 'Hawaii/S. Florida', 'Hawaiian Hibiscus, Bird of Paradise', 'Plumeria, Bougainvillea', 'Year-round'],
+            ['Var.', 'California', 'California Poppy, Lupine', 'Roses, Lavender, Jasmine', 'Spring-Fall']
+          ]
+        }
+      ],
+      content: [
+        'The United States encompasses diverse flowering plant communities across multiple climate zones, from arctic tundra in Alaska to tropical rainforests in Hawaii. Native wildflower meadows once covered vast areas of the Great Plains, featuring species like purple coneflower and prairie blazingstar that have become popular in modern sustainable landscaping.',
+        'The Eastern deciduous forests harbor spectacular spring ephemeral displays, with trout lilies, bloodroot, and wild ginger carpeting forest floors before tree canopy closure. These native plants have adapted to complete their entire reproductive cycle during the brief window of early spring sunlight.',
+        'Desert Southwest flowering plants like desert marigold and ghost plant demonstrate remarkable drought adaptations, often remaining dormant for years until sufficient rainfall triggers mass blooming events. The Sonoran Desert spring wildflower displays can transform entire landscapes into colorful carpets visible from satellite imagery.',
+        'Pacific Coast regions support unique flowering plant communities including endemic California poppies and lupines that have co-evolved with Mediterranean-type climate patterns. Many California native plants require specific fire cycles for seed germination and population renewal.',
+        'Southeastern wetlands and coastal areas feature distinctive flowering plants like swamp hibiscus and cardinal flower that tolerate periodic flooding while providing critical habitat for migrating hummingbirds and butterflies along major flyway corridors.'
+      ]
+    },
+    {
+      id: 'usa-fruiting',
+      title: 'USA Fruiting Plants',
+      icon: TreePine,
+      description: 'Native and commercial fruit production across American agricultural regions',
+      tables: [
+        {
+          title: 'Major US Fruit Production by State',
+          headers: ['State', 'Primary Fruits', 'Native Species', 'Harvest Season', 'Production Value'],
+          rows: [
+            ['California', 'Grapes, Almonds, Citrus', 'Manzanita, Elderberry', 'Year-round', '$20+ billion'],
+            ['Florida', 'Oranges, Grapefruit', 'Saw Palmetto, Coontie', 'Oct-June', '$1.2 billion'],
+            ['Washington', 'Apples, Cherries, Pears', 'Salmonberry, Huckleberry', 'July-Oct', '$2.3 billion'],
+            ['Georgia', 'Peaches, Pecans', 'Muscadine Grape, Persimmon', 'June-Nov', '$1.1 billion'],
+            ['Michigan', 'Cherries, Blueberries, Apples', 'Wild Strawberry, Elderberry', 'July-Oct', '$900 million'],
+            ['New York', 'Apples, Grapes', 'Wild Black Cherry, Hawthorn', 'Aug-Oct', '$800 million']
+          ]
+        }
+      ],
+      content: [
+        'American fruit production spans diverse climatic regions, with California leading global production of almonds, grapes, and stone fruits due to its Mediterranean climate and extensive irrigation systems. The Central Valley produces over 80% of the world\'s almonds, requiring precise timing of bloom and harvest to maximize yield quality.',
+        'Native American fruit plants like elderberries, serviceberries, and wild plums provided essential nutrition for indigenous peoples and early settlers. Many of these species remain important for wildlife habitat and are experiencing renewed interest for sustainable food systems and permaculture applications.',
+        'The Great Lakes region specializes in cold-hardy fruits including tart cherries, blueberries, and cold-climate apples that require specific winter chill hours for proper fruit development. Lake effect climate moderation allows fruit cultivation further north than would otherwise be possible.',
+        'Southern states excel in warm-season and subtropical fruits, with Georgia peaches, Florida citrus, and Texas grapefruits representing major agricultural industries. These crops face increasing challenges from climate change, requiring development of heat and drought-tolerant varieties.',
+        'Pacific Northwest fruit production benefits from volcanic soils and consistent moisture, supporting premium apple, pear, and berry crops. The region\'s unique climate creates ideal conditions for wine grapes, establishing world-renowned viticultural areas in Washington, Oregon, and Northern California.'
+      ]
+    },
+    {
+      id: 'usa-vegetative',
+      title: 'USA Vegetative Plants',
+      icon: Leaf,
+      description: 'Leafy greens and vegetable crops cultivated across American farming regions',
+      tables: [
+        {
+          title: 'Vegetable Production by US Region',
+          headers: ['Region', 'Major Leafy Crops', 'Native Edibles', 'Growing Season', 'Soil Type'],
+          rows: [
+            ['California Central Valley', 'Lettuce, Spinach, Kale', 'Lamb\'s quarters, Purslane', 'Year-round', 'Alluvial loam'],
+            ['Southeast', 'Collards, Turnip greens', 'Pokeweed, Wild garlic', 'Fall-Spring', 'Sandy loam'],
+            ['Northeast', 'Cabbage, Swiss chard', 'Wild leeks, Watercress', 'Spring-Fall', 'Glacial till'],
+            ['Great Plains', 'Wheat grass, Sunflowers', 'Prairie turnip, Wild onion', 'Spring-Summer', 'Prairie soil'],
+            ['Southwest', 'Chard, Arugula', 'Desert sage, Epazote', 'Fall-Spring', 'Caliche/clay'],
+            ['Pacific Northwest', 'Lettuce, Asian greens', 'Salmonberry leaves, Nettle', 'Spring-Fall', 'Volcanic ash']
+          ]
+        }
+      ],
+      content: [
+        'California\'s Salinas Valley, known as "America\'s Salad Bowl," produces over 70% of the nation\'s lettuce and leafy greens through year-round cultivation enabled by Mediterranean climate and advanced irrigation technology. The region\'s cool coastal fog provides natural cooling that extends growing seasons for cool-season crops.',
+        'Traditional Native American leafy vegetables included lamb\'s quarters, purslane, and wild amaranth, which remain valuable nutritional sources and are being reintroduced into modern sustainable agriculture systems. These plants often outperform conventional crops in drought conditions and poor soils.',
+        'Southern states specialize in heat-tolerant leafy greens like collards, turnip greens, and mustard greens that thrive in hot, humid summers. These crops are deeply embedded in regional cuisine and culture, providing essential nutrients during periods when cool-season vegetables cannot survive.',
+        'Northeast organic farming has revitalized production of cold-hardy greens including kale, Brussels sprouts, and winter lettuce varieties that can survive freezing temperatures. Season extension techniques like cold frames and high tunnels allow year-round production even in northern climates.',
+        'Urban agriculture movements across American cities are promoting leafy green production in vertical farms, rooftop gardens, and community plots, reducing food miles and increasing access to fresh vegetables in urban food deserts while building community resilience.'
+      ]
+    },
+    {
+      id: 'usa-decorative',
+      title: 'USA Decorative Plants',
+      icon: FlaskConical,
+      description: 'Ornamental landscaping plants popular across American regions and climates',
+      tables: [
+        {
+          title: 'Popular US Landscaping Plants by Region',
+          headers: ['Region', 'Shade Trees', 'Flowering Shrubs', 'Perennials', 'Lawn Alternatives'],
+          rows: [
+            ['Northeast', 'Sugar Maple, Oak', 'Rhododendron, Lilac', 'Hosta, Daylily', 'Fine fescue'],
+            ['Southeast', 'Live Oak, Magnolia', 'Azalea, Camellia', 'Iris, Daffodil', 'Zoysia grass'],
+            ['Midwest', 'Burr Oak, Hackberry', 'Spirea, Forsythia', 'Purple Coneflower, Bee Balm', 'Buffalo grass'],
+            ['Southwest', 'Desert Willow, Mesquite', 'Palo Verde, Desert Broom', 'Desert Marigold, Brittlebush', 'Desert grass mix'],
+            ['Pacific Coast', 'Coast Redwood, Douglas Fir', 'Manzanita, Ceanothus', 'California Poppy, Lupine', 'Native sedges'],
+            ['Mountain West', 'Aspen, Blue Spruce', 'Serviceberry, Chokecherry', 'Indian Paintbrush, Penstemon', 'Buffalo grass']
+          ]
+        }
+      ],
+      content: [
+        'American residential landscaping traditions vary dramatically by region, with New England favoring formal foundation plantings of rhododendrons and boxwood, while Western xeriscaping emphasizes drought-tolerant natives like manzanita and ceanothus. Regional plant societies promote locally adapted species that support wildlife corridors.',
+        'The American lawn industry represents a $60 billion market, but increasing environmental awareness is driving adoption of native grass alternatives like buffalo grass in arid regions and fine fescue in cooler areas. These alternatives require significantly less water, fertilizer, and maintenance than traditional turf grass.',
+        'Native plant movements across the US promote indigenous species for landscaping, with organizations like the National Wildlife Federation encouraging homeowners to create certified wildlife habitats using regionally appropriate plants that support local pollinator populations and bird migration patterns.',
+        'Climate change adaptation in American landscaping increasingly emphasizes resilient plant selections that can tolerate temperature extremes, drought, and severe weather events. Many regions are updating plant hardiness recommendations as temperature zones shift northward.',
+        'Urban heat island mitigation through strategic tree planting has become a priority in American cities, with programs focusing on canopy coverage goals and species selection for maximum cooling benefits. Street tree diversity helps prevent widespread loss from species-specific diseases and pests.'
+      ]
     }
   ];
 
