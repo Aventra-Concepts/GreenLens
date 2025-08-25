@@ -4,11 +4,11 @@ import { Layout } from '@/components/Layout';
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 
-// Import generated images
-import PlantCellImage from '@assets/generated_images/Plant_cell_structure_diagram_1a666e09.png';
-import PhotosynthesisImage from '@assets/generated_images/Photosynthesis_process_diagram_98665ae6.png';
-import ClassificationTreeImage from '@assets/generated_images/Plant_classification_tree_b308df90.png';
-import RootAnatomyImage from '@assets/generated_images/Root_anatomy_diagram_9c5f037d.png';
+// Import generated images with correct spelling and numbering
+import ClassificationTreeImage from '@assets/generated_images/Figure_1_Plant_classification_9e2d76c1.png';
+import PhotosynthesisImage from '@assets/generated_images/Figure_2_Photosynthesis_process_77187dd0.png';
+import PlantCellImage from '@assets/generated_images/Figure_3_Plant_cell_056ba9a3.png';
+import RootAnatomyImage from '@assets/generated_images/Figure_4_Root_anatomy_e1520e9a.png';
 
 interface DatabaseSection {
   id: string;
