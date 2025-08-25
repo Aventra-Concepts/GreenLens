@@ -96,10 +96,13 @@ export default function Community() {
   // Create post mutation
   const createPostMutation = useMutation({
     mutationFn: async (data: InsertCommunityPostType) => {
-      return await apiRequest('/api/community/posts', {
+      const response = await fetch('/api/community/posts', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
+      if (!response.ok) throw new Error('Failed to create post');
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/community/posts'] });
@@ -122,9 +125,11 @@ export default function Community() {
   // Like post mutation
   const likePostMutation = useMutation({
     mutationFn: async (postId: string) => {
-      return await apiRequest(`/api/community/posts/${postId}/like`, {
+      const response = await fetch(`/api/community/posts/${postId}/like`, {
         method: 'POST',
       });
+      if (!response.ok) throw new Error('Failed to toggle like');
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/community/posts'] });
@@ -170,38 +175,41 @@ export default function Community() {
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-green-900/20">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8">
           {/* Header */}
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
-            <div className="flex items-center gap-4">
-              <Link href="/">
-                <Button
-                  variant="outline"
-                  className="px-4 py-2 border border-green-600 text-green-600 dark:text-green-400 rounded-lg font-medium hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors"
-                  data-testid="button-back-home"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Home
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
-                  Plant Community
-                </h1>
-                <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">
-                  Share experiences, barter plants, and promote the green revolution
-                </p>
+          <div className="flex flex-col gap-4 mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              <div className="flex flex-col gap-3">
+                <Link href="/">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-fit px-3 py-2 border border-green-600 text-green-600 dark:text-green-400 rounded-lg font-medium hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors"
+                    data-testid="button-back-home"
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back to Home
+                  </Button>
+                </Link>
+                <div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+                    Plant Community
+                  </h1>
+                  <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">
+                    Share experiences, barter plants, and promote the green revolution
+                  </p>
+                </div>
               </div>
             </div>
-            
+              
             <Dialog open={showCreatePost} onOpenChange={setShowCreatePost}>
-              <DialogTrigger asChild>
-                <Button className="bg-green-600 hover:bg-green-700 text-white" data-testid="button-create-post">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Post
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogTrigger asChild>
+                  <Button className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white" data-testid="button-create-post">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Post
+                  </Button>
+                </DialogTrigger>
+              <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto mx-auto">
                 <DialogHeader>
                   <DialogTitle>Create New Community Post</DialogTitle>
                 </DialogHeader>
@@ -279,7 +287,7 @@ export default function Community() {
                           </div>
                           <FormControl>
                             <Switch
-                              checked={field.value}
+                              checked={!!field.value}
                               onCheckedChange={field.onChange}
                               data-testid="switch-barter-post"
                             />
@@ -320,7 +328,7 @@ export default function Community() {
                             <FormItem>
                               <FormLabel>Plant Species</FormLabel>
                               <FormControl>
-                                <Input placeholder="e.g., Monstera Deliciosa, Snake Plant..." {...field} data-testid="input-plant-species" />
+                                <Input placeholder="e.g., Monstera Deliciosa, Snake Plant..." {...field} value={field.value || ''} data-testid="input-plant-species" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -334,7 +342,7 @@ export default function Community() {
                             <FormItem>
                               <FormLabel>Location</FormLabel>
                               <FormControl>
-                                <Input placeholder="Your city/area for local trades..." {...field} data-testid="input-location" />
+                                <Input placeholder="Your city/area for local trades..." {...field} value={field.value || ''} data-testid="input-location" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -363,7 +371,7 @@ export default function Community() {
                               <FormItem>
                                 <FormLabel>Contact Email</FormLabel>
                                 <FormControl>
-                                  <Input type="email" placeholder="contact@email.com" {...field} data-testid="input-contact-email" />
+                                  <Input type="email" placeholder="contact@email.com" {...field} value={field.value || ''} data-testid="input-contact-email" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -403,8 +411,8 @@ export default function Community() {
           </div>
 
           {/* Filters and Search */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg mb-8">
-            <div className="flex flex-col lg:flex-row gap-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 shadow-lg mb-6 sm:mb-8">
+            <div className="flex flex-col gap-4">
               <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -418,19 +426,19 @@ export default function Community() {
                 </div>
               </div>
               
-              <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full lg:w-auto">
-                <TabsList className="grid grid-cols-4 lg:grid-cols-8 w-full lg:w-auto">
+              <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
+                <TabsList className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 w-full h-auto p-1">
                   {categories.map((category) => {
                     const IconComponent = category.icon;
                     return (
                       <TabsTrigger
                         key={category.value}
                         value={category.value}
-                        className="text-xs flex items-center gap-1"
+                        className="text-xs xs:text-sm flex flex-col xs:flex-row items-center gap-1 p-2 h-auto min-h-[3rem] xs:min-h-[2.5rem]"
                         data-testid={`tab-${category.value}`}
                       >
-                        <IconComponent className="h-3 w-3" />
-                        <span className="hidden lg:inline">{category.label}</span>
+                        <IconComponent className="h-3 w-3 xs:h-4 xs:w-4" />
+                        <span className="text-[10px] xs:text-xs lg:text-sm leading-tight text-center xs:text-left">{category.label}</span>
                       </TabsTrigger>
                     );
                   })}
@@ -438,7 +446,7 @@ export default function Community() {
               </Tabs>
 
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-full lg:w-40" data-testid="select-sort-by">
+                <SelectTrigger className="w-full sm:w-48" data-testid="select-sort-by">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -457,7 +465,7 @@ export default function Community() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
                 <p>Loading community posts...</p>
               </div>
-            ) : posts.length === 0 ? (
+            ) : !posts || (posts as any[]).length === 0 ? (
               <div className="text-center py-12">
                 <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
@@ -476,9 +484,9 @@ export default function Community() {
                 </Button>
               </div>
             ) : (
-              posts.map((post: CommunityPostWithUser) => (
-                <Card key={post.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
+              (posts as CommunityPostWithUser[]).map((post: CommunityPostWithUser) => (
+                <Card key={post.id} className="hover:shadow-lg transition-shadow mx-2 sm:mx-0">
+                  <CardHeader className="pb-3 sm:pb-6">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <Avatar>
@@ -504,7 +512,7 @@ export default function Community() {
                           </div>
                           <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-1">
                             <Calendar className="h-3 w-3" />
-                            {new Date(post.createdAt).toLocaleDateString()}
+                            {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ''}
                             {post.location && (
                               <>
                                 <MapPin className="h-3 w-3 ml-2" />
@@ -515,11 +523,11 @@ export default function Community() {
                         </div>
                       </div>
                     </div>
-                    <CardTitle className="text-xl">{post.title}</CardTitle>
+                    <CardTitle className="text-lg sm:text-xl mt-2 sm:mt-0">{post.title}</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     <div className="space-y-4">
-                      <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                      <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
                         {post.content}
                       </p>
                       
