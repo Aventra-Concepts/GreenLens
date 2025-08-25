@@ -18,6 +18,8 @@ import RegionalFloweringImage from '@assets/generated_images/Figure_10_Regional_
 import RegionalFruitingImage from '@assets/generated_images/Figure_11_Regional_fruiting_plants_5bb63955.png';
 import RegionalVegetativeImage from '@assets/generated_images/Figure_12_Regional_vegetative_plants_e53fa2eb.png';
 import DecorativePlantsImage from '@assets/generated_images/Figure_13_Decorative_plants_c9b3a735.png';
+import MedicinalPlantsImage from '@assets/generated_images/Figure_18_Medicinal_plants_5f251769.png';
+import AnimalFodderImage from '@assets/generated_images/Figure_19_Animal_fodder_c525c847.png';
 
 interface DatabaseSection {
   id: string;
@@ -442,6 +444,90 @@ export default function PlantDatabase() {
         'Native plant movements across the US promote indigenous species for landscaping, with organizations like the National Wildlife Federation encouraging homeowners to create certified wildlife habitats using regionally appropriate plants that support local pollinator populations and bird migration patterns.',
         'Climate change adaptation in American landscaping increasingly emphasizes resilient plant selections that can tolerate temperature extremes, drought, and severe weather events. Many regions are updating plant hardiness recommendations as temperature zones shift northward.',
         'Urban heat island mitigation through strategic tree planting has become a priority in American cities, with programs focusing on canopy coverage goals and species selection for maximum cooling benefits. Street tree diversity helps prevent widespread loss from species-specific diseases and pests.'
+      ]
+    },
+    {
+      id: 'medicinal-plants',
+      title: 'Medicinal Plants and Ayurveda',
+      icon: FlaskConical,
+      description: 'Traditional and modern medicinal plants with focus on Ayurvedic science from India',
+      image: MedicinalPlantsImage,
+      tables: [
+        {
+          title: 'Major Ayurvedic Medicinal Plants from India',
+          headers: ['Plant Name', 'Sanskrit Name', 'Primary Uses', 'Active Compounds', 'Traditional Preparation'],
+          rows: [
+            ['Turmeric', 'Haridra', 'Anti-inflammatory, digestive', 'Curcumin', 'Powder, paste, milk'],
+            ['Neem', 'Nimba', 'Antibacterial, skin disorders', 'Azadirachtin', 'Leaf extract, oil'],
+            ['Ashwagandha', 'Ashvagandha', 'Stress, immunity, vitality', 'Withanolides', 'Root powder, churna'],
+            ['Tulsi', 'Tulasi', 'Respiratory, immunity', 'Eugenol, rosmarinic acid', 'Tea, fresh leaves'],
+            ['Brahmi', 'Brahmi', 'Memory, cognitive function', 'Bacosides', 'Powder, oil, juice'],
+            ['Amla', 'Amalaki', 'Vitamin C, rejuvenation', 'Ascorbic acid, tannins', 'Fresh fruit, powder'],
+            ['Ginger', 'Ardraka', 'Digestion, nausea', 'Gingerol', 'Fresh root, dried powder'],
+            ['Guduchi', 'Guduchi', 'Immunity, fever', 'Tinosporin', 'Stem extract, powder']
+          ]
+        },
+        {
+          title: 'Global Medicinal Plant Traditions',
+          headers: ['Region', 'Traditional System', 'Key Plants', 'Historical Period', 'Modern Recognition'],
+          rows: [
+            ['India', 'Ayurveda', 'Turmeric, Neem, Brahmi', '5000+ years', 'WHO recognition'],
+            ['China', 'Traditional Chinese Medicine', 'Ginseng, Ginkgo, Goji', '3000+ years', 'Global practice'],
+            ['Europe', 'Herbalism', 'Echinacea, St. Johns Wort', '2000+ years', 'Scientific validation'],
+            ['Africa', 'Traditional healing', 'African Potato, Sutherlandia', '1000+ years', 'Research ongoing'],
+            ['Americas', 'Indigenous medicine', 'Willow bark, Echinacea', '500+ years', 'Pharmaceutical adoption'],
+            ['Australia', 'Aboriginal medicine', 'Tea tree, Eucalyptus', '40,000+ years', 'Modern applications']
+          ]
+        }
+      ],
+      content: [
+        'India stands as the ancient cradle of medicinal plant science through Ayurveda, the world\'s oldest comprehensive medical system dating back over 5,000 years. This profound tradition, documented in sacred texts like the Charaka Samhita and Sushruta Samhita, represents India\'s invaluable gift to global healthcare, systematically cataloging over 1,400 medicinal plants with precise therapeutic applications.',
+        'Ayurveda\'s holistic approach recognizes plants not merely as sources of chemical compounds, but as complete healing entities that work synergistically with human physiology. The ancient Indian rishis (sages) understood that medicinal plants possess intelligence and consciousness, capable of restoring balance to the human body\'s three doshas (Vata, Pitta, Kapha) - a concept millennia ahead of modern personalized medicine.',
+        'India\'s contribution to global medicinal plant knowledge is immeasurable, having identified and systematized the therapeutic properties of plants like turmeric (containing curcumin), neem (nature\'s pharmacy), ashwagandha (the Indian ginseng), and thousands of others now validated by modern science. Indian traditional knowledge has provided the foundation for numerous pharmaceutical discoveries, with over 25% of modern medicines derived from plants first documented in Ayurvedic texts.',
+        'The greatness of Ayurveda lies in its systematic approach to plant medicine, establishing principles of plant collection timing (considering lunar cycles and planetary positions), preparation methods (like the 108 different processing techniques), and precise dosage calculations based on individual constitution. This sophisticated understanding of plant pharmacology predates Western medicine by millennia and continues to guide modern phytotherapy research.',
+        'Modern scientific validation increasingly confirms the wisdom of Ayurvedic plant selections, with plants like Brahmi enhancing cognitive function, Guduchi boosting immunity, and Amla providing potent antioxidant protection. India\'s ancient gift of Ayurvedic plant science continues to heal the world, offering sustainable, side-effect-free alternatives to synthetic pharmaceuticals while honoring the sacred relationship between humans and the plant kingdom.',
+        'The World Health Organization now recognizes Ayurveda as a complete medical system, acknowledging India\'s pioneering role in establishing evidence-based herbal medicine. Indian medicinal plants are cultivated globally, and Ayurvedic principles guide modern integrative medicine practices worldwide, demonstrating how India\'s ancient wisdom continues to illuminate pathways to health and healing for all humanity.'
+      ]
+    },
+    {
+      id: 'animal-fodder',
+      title: 'Animal Fodder Plants',
+      icon: Leaf,
+      description: 'Feed crops and forage plants essential for livestock nutrition and agriculture',
+      image: AnimalFodderImage,
+      tables: [
+        {
+          title: 'Major Fodder Crops by Animal Type',
+          headers: ['Animal Type', 'Primary Fodder', 'Nutritional Content', 'Growing Season', 'Yield per Acre'],
+          rows: [
+            ['Dairy Cattle', 'Alfalfa, Clover, Corn silage', 'High protein, calcium', 'Spring-Fall', '4-6 tons'],
+            ['Beef Cattle', 'Grass hay, Sorghum, Barley', 'Energy-rich, fiber', 'Summer', '2-4 tons'],
+            ['Sheep/Goats', 'Timothy, Orchard grass, Legumes', 'Moderate protein', 'Spring-Fall', '2-3 tons'],
+            ['Horses', 'Timothy hay, Oats, Brome grass', 'Low protein, high fiber', 'Summer', '2-4 tons'],
+            ['Poultry', 'Corn, Soybeans, Wheat', 'High energy, protein', 'Summer', '3-5 tons'],
+            ['Swine', 'Corn, Barley, Peas', 'Digestible energy', 'Summer-Fall', '4-6 tons']
+          ]
+        },
+        {
+          title: 'Fodder Plants by Climate Zone',
+          headers: ['Climate Zone', 'Cool Season Crops', 'Warm Season Crops', 'Perennial Options', 'Water Requirements'],
+          rows: [
+            ['Temperate', 'Clover, Ryegrass, Oats', 'Corn, Sorghum, Pearl millet', 'Alfalfa, Timothy', 'Moderate'],
+            ['Tropical', 'Winter wheat, Barley', 'Napier grass, Stylo, Brachiaria', 'Leucaena, Gliricidia', 'High'],
+            ['Arid/Semi-arid', 'Wheat, Barley', 'Cactus pads, Atriplex', 'Prosopis, Acacia', 'Low'],
+            ['Mediterranean', 'Oats, Vetch', 'Sorghum, Cowpea', 'Lucerne, Sulla', 'Moderate'],
+            ['Subtropical', 'Berseem, Oats', 'Maize, Sudan grass', 'Rhodes grass, Siratro', 'Moderate-High'],
+            ['Continental', 'Alfalfa, Clover', 'Corn, Soybeans', 'Bromegrass, Festuca', 'Variable']
+          ]
+        }
+      ],
+      content: [
+        'Fodder plants form the foundation of global livestock agriculture, providing essential nutrition for billions of animals that feed humanity. Leguminous fodder crops like alfalfa and clover possess the unique ability to fix atmospheric nitrogen through symbiotic relationships with rhizobia bacteria, enriching soils while producing high-protein feed for ruminant animals.',
+        'Grass-based fodder systems support extensive grazing operations worldwide, with species like timothy, bermuda grass, and brome grass providing digestible energy and fiber essential for ruminant health. These perennial grasses develop extensive root systems that prevent soil erosion, sequester carbon, and maintain ecosystem stability in agricultural landscapes.',
+        'Corn silage represents one of the most energy-dense fodder crops, with entire corn plants harvested and fermented to preserve nutrients through anaerobic fermentation. This process increases digestibility while allowing year-round feed availability, supporting intensive dairy and beef operations that require consistent high-energy nutrition.',
+        'Tree fodder systems, particularly common in tropical and arid regions, utilize species like leucaena, gliricidia, and various acacia species that provide protein-rich leaves and pods while offering shade, windbreaks, and soil improvement. These agroforestry approaches integrate animal nutrition with environmental conservation and climate resilience.',
+        'Modern fodder crop breeding focuses on developing varieties with improved nutritional quality, disease resistance, and climate adaptation. Innovations include brown midrib corn with enhanced digestibility, drought-tolerant sorghum varieties, and multi-cut annual legumes that maximize protein production per unit area.',
+        'Sustainable fodder production increasingly emphasizes diverse crop rotations, reduced tillage systems, and integrated pest management to maintain soil health while maximizing nutritional output. These practices ensure long-term productivity while supporting biodiversity and reducing environmental impacts of livestock agriculture.'
       ]
     }
   ];
