@@ -43,6 +43,7 @@ import Disclosure from "@/pages/disclosure";
 import FAQ from "@/pages/faq";
 import PlantDatabase from "@/pages/plant-database";
 import Community from "@/pages/community";
+import CarePlans from "@/pages/care-plans";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 import Footer from "@/components/Footer";
 
@@ -125,6 +126,7 @@ function Router() {
       <Route path="/faq" component={FAQ} />
       <Route path="/plant-database" component={PlantDatabase} />
       <Route path="/community" component={Community} />
+      <Route path="/care-plans" component={CarePlans} />
       
       {/* Admin login should be public - accessible before logging in */}
       <Route path="/admin-login">
