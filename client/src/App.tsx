@@ -45,6 +45,7 @@ import PlantDatabase from "@/pages/plant-database";
 import Community from "@/pages/community";
 import CarePlans from "@/pages/care-plans";
 import Privacy from "@/pages/privacy";
+import Terms from "@/pages/terms";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 import Footer from "@/components/Footer";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
@@ -126,6 +127,7 @@ function Router() {
       <Route path="/tools" component={Tools} />
       <Route path="/disclosure" component={Disclosure} />
       <Route path="/privacy" component={Privacy} />
+      <Route path="/terms" component={Terms} />
       <Route path="/faq" component={FAQ} />
       <Route path="/plant-database" component={PlantDatabase} />
       <Route path="/community" component={Community} />
