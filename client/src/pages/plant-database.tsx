@@ -9,6 +9,11 @@ import ClassificationTreeImage from '@assets/generated_images/Figure_1_Plant_cla
 import PhotosynthesisImage from '@assets/generated_images/Figure_2_Photosynthesis_process_77187dd0.png';
 import PlantCellImage from '@assets/generated_images/Figure_3_Plant_cell_056ba9a3.png';
 import RootAnatomyImage from '@assets/generated_images/Figure_4_Root_anatomy_e1520e9a.png';
+import PlantGeneticsImage from '@assets/generated_images/Figure_5_Plant_genetics_b7425d0c.png';
+import PlantPathologyImage from '@assets/generated_images/Figure_6_Plant_pathology_41a5c986.png';
+import PlantEvolutionImage from '@assets/generated_images/Figure_7_Plant_evolution_b661011e.png';
+import PlantEcologyImage from '@assets/generated_images/Figure_8_Plant_ecology_fdcd7049.png';
+import PlantBiotechnologyImage from '@assets/generated_images/Figure_9_Plant_biotechnology_7b4082bb.png';
 
 interface DatabaseSection {
   id: string;
@@ -106,6 +111,7 @@ export default function PlantDatabase() {
       title: 'Plant Genetics',
       icon: Dna,
       description: 'The hereditary mechanisms that control plant traits and evolution',
+      image: PlantGeneticsImage,
       content: [
         'DNA structure in plants follows the same double helix model as other organisms, but plant genomes often contain significantly more repetitive sequences and polyploid chromosome sets. Many crop plants are polyploid, meaning they have multiple complete sets of chromosomes, which can enhance genetic diversity and hybrid vigor.',
         'Gene expression in plants is highly regulated by environmental factors, allowing remarkable phenotypic plasticity. Epigenetic modifications, including DNA methylation and histone modifications, enable plants to adapt their gene expression patterns in response to changing conditions without altering the underlying DNA sequence.',
@@ -119,6 +125,7 @@ export default function PlantDatabase() {
       title: 'Plant Pathology',
       icon: FlaskConical,
       description: 'The study of plant diseases and their management strategies',
+      image: PlantPathologyImage,
       content: [
         'Fungal diseases represent the largest category of plant pathogens, affecting virtually all plant species. Common mechanisms include direct tissue invasion through natural openings or wounds, enzyme production that breaks down cell walls, and toxin release that disrupts normal cellular functions. Understanding fungal life cycles is essential for developing effective control strategies.',
         'Bacterial plant pathogens typically enter through natural openings like stomata or wounds, then multiply in intercellular spaces or vascular systems. Many bacterial diseases are characterized by water-soaked lesions, wilting, or systemic infections that can rapidly spread through plant populations under favorable environmental conditions.',
@@ -176,6 +183,7 @@ export default function PlantDatabase() {
       title: 'Plant Evolution',
       icon: Sprout,
       description: 'The evolutionary history and diversification of plant life',
+      image: PlantEvolutionImage,
       content: [
         'Plant evolution began with the transition from aquatic algae to terrestrial plants approximately 500 million years ago. This major evolutionary event required the development of specialized structures for water conservation, structural support, and reproduction in terrestrial environments.',
         'The evolution of vascular tissues marked a crucial advancement that enabled plants to grow larger and colonize diverse terrestrial habitats. Xylem and phloem tissues provided efficient transport systems for water, minerals, and organic compounds throughout the plant body.',
@@ -189,6 +197,7 @@ export default function PlantDatabase() {
       title: 'Plant Ecology',
       icon: Zap,
       description: 'Interactions between plants and their environment',
+      image: PlantEcologyImage,
       content: [
         'Plant community dynamics involve complex interactions between species competing for light, water, nutrients, and space. Succession patterns show how plant communities change over time, with pioneer species preparing habitats for later successional species in predictable sequences.',
         'Nutrient cycling in ecosystems depends heavily on plant processes including uptake, storage, and decomposition. Plants play crucial roles in carbon, nitrogen, and phosphorus cycles, influencing global biogeochemical processes and climate regulation.',
@@ -202,6 +211,7 @@ export default function PlantDatabase() {
       title: 'Plant Biotechnology',
       icon: BookOpen,
       description: 'Modern techniques for plant improvement and research',
+      image: PlantBiotechnologyImage,
       content: [
         'Tissue culture techniques enable the propagation of plants from small tissue samples under sterile laboratory conditions. This technology allows rapid multiplication of disease-free plants, preservation of rare species, and production of secondary metabolites for pharmaceutical applications.',
         'Genetic transformation methods allow scientists to introduce new genes into plants to confer beneficial traits such as disease resistance, improved nutritional content, or enhanced stress tolerance. Common techniques include Agrobacterium-mediated transformation and particle bombardment.',
@@ -362,13 +372,13 @@ export default function PlantDatabase() {
                                   {table.title}
                                 </h4>
                                 <div className="overflow-x-auto">
-                                  <table className="min-w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                                  <table className="min-w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs">
                                     <thead className="bg-green-50 dark:bg-green-900/30">
                                       <tr>
                                         {table.headers.map((header, headerIndex) => (
                                           <th
                                             key={headerIndex}
-                                            className="px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white border-b border-gray-300 dark:border-gray-600"
+                                            className="px-2 py-1.5 text-left text-xs font-medium text-gray-900 dark:text-white border-b border-gray-300 dark:border-gray-600 break-words max-w-xs"
                                             data-testid={`table-header-${section.id}-${tableIndex}-${headerIndex}`}
                                           >
                                             {header}
@@ -385,7 +395,7 @@ export default function PlantDatabase() {
                                           {row.map((cell, cellIndex) => (
                                             <td
                                               key={cellIndex}
-                                              className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600"
+                                              className="px-2 py-1.5 text-xs text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600 break-words max-w-xs leading-tight"
                                               data-testid={`table-cell-${section.id}-${tableIndex}-${rowIndex}-${cellIndex}`}
                                             >
                                               {cell}
