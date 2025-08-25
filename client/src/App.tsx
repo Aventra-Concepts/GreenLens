@@ -47,6 +47,7 @@ import CarePlans from "@/pages/care-plans";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import About from "@/pages/about";
+import RefundPolicy from "@/pages/refund-policy";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 import Footer from "@/components/Footer";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
@@ -130,6 +131,7 @@ function Router() {
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
       <Route path="/about" component={About} />
+      <Route path="/refund-policy" component={RefundPolicy} />
       <Route path="/faq" component={FAQ} />
       <Route path="/plant-database" component={PlantDatabase} />
       <Route path="/community" component={Community} />

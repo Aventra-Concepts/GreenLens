@@ -15,6 +15,7 @@ export default function Footer() {
   const termsQR = useQRCode(`${baseUrl}/terms`);
   const aboutQR = useQRCode(`${baseUrl}/about`);
   const privacyQR = useQRCode(`${baseUrl}/privacy`);
+  const refundQR = useQRCode(`${baseUrl}/refund-policy`);
   
   const toggleQR = (page: string) => {
     setShowQR(showQR === page ? null : page);
@@ -245,6 +246,33 @@ export default function Footer() {
                       <div className="absolute bottom-full left-0 mb-2 bg-white p-2 rounded-lg shadow-lg border z-50">
                         <img src={termsQR} alt="Terms of Service QR Code" className="w-16 h-16" />
                         <p className="text-xs text-gray-600 mt-1 text-center">Terms of Service</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => navigateWithMessage("/refund-policy")}
+                    className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                    data-testid="link-refund-policy"
+                  >
+                    Refund Policy
+                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => toggleQR('refund')}
+                      className="text-gray-400 hover:text-white transition-colors"
+                      data-testid="qr-refund-toggle"
+                      title="Show QR Code"
+                    >
+                      <QrCode className="w-3 h-3" />
+                    </button>
+                    {showQR === 'refund' && refundQR && (
+                      <div className="absolute bottom-full left-0 mb-2 bg-white p-2 rounded-lg shadow-lg border z-50">
+                        <img src={refundQR} alt="Refund Policy QR Code" className="w-16 h-16" />
+                        <p className="text-xs text-gray-600 mt-1 text-center">Refund Policy</p>
                       </div>
                     )}
                   </div>
