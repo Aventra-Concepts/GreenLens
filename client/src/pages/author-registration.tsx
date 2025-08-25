@@ -10,6 +10,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
@@ -21,7 +22,22 @@ import { ArrowLeft, CheckCircle, Clock, XCircle, Upload, FileText, User, Briefca
 interface AuthorProfile {
   id?: string;
   userId?: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
   displayName?: string;
+  age?: number;
+  gender?: string;
+  phone?: string;
+  doorNumber?: string;
+  buildingName?: string;
+  street?: string;
+  colony?: string;
+  area?: string;
+  city?: string;
+  pincode?: string;
+  state?: string;
+  country?: string;
   bio?: string;
   expertise?: string;
   experience?: string;
@@ -42,7 +58,28 @@ interface AuthorProfile {
 
 // Author registration form schema
 const authorRegistrationSchema = z.object({
+  // Personal Information
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  middleName: z.string().optional(),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
   displayName: z.string().min(2, "Display name must be at least 2 characters"),
+  age: z.number().min(18, "Must be at least 18 years old").max(120, "Please enter a valid age"),
+  gender: z.enum(["male", "female", "other", "prefer_not_to_say"], {
+    errorMap: () => ({ message: "Please select your gender" })
+  }),
+  phone: z.string().min(10, "Please enter a valid phone number"),
+  
+  // Address Information
+  doorNumber: z.string().min(1, "Door/House number is required"),
+  buildingName: z.string().optional(),
+  street: z.string().min(1, "Street is required"),
+  colony: z.string().optional(),
+  area: z.string().min(1, "Area is required"),
+  city: z.string().min(1, "City is required"),
+  pincode: z.string().min(5, "Please enter a valid pincode/zip code"),
+  state: z.string().min(1, "State is required"),
+  country: z.string().min(1, "Country is required"),
+  
   bio: z.string().optional(),
   expertise: z.string().min(1, "Please specify your areas of expertise"),
   experience: z.string().min(50, "Please provide at least 50 characters describing your experience"),
@@ -82,7 +119,22 @@ export default function AuthorRegistration() {
   const form = useForm<AuthorRegistrationForm>({
     resolver: zodResolver(authorRegistrationSchema),
     defaultValues: {
+      firstName: "",
+      middleName: "",
+      lastName: "",
       displayName: "",
+      age: undefined,
+      gender: undefined,
+      phone: "",
+      doorNumber: "",
+      buildingName: "",
+      street: "",
+      colony: "",
+      area: "",
+      city: "",
+      pincode: "",
+      state: "",
+      country: "",
       bio: "",
       expertise: "",
       experience: "",
@@ -366,12 +418,69 @@ export default function AuthorRegistration() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               
-              {/* Step 1: Basic Information */}
+              {/* Step 1: Personal Information */}
               {currentStep === 1 && (
                 <div className="space-y-6">
                   <div className="flex items-center gap-2 mb-4">
                     <User className="h-5 w-5 text-green-600" />
-                    <h3 className="text-lg font-semibold">Basic Information</h3>
+                    <h3 className="text-lg font-semibold">Personal Information</h3>
+                  </div>
+
+                  {/* Name Fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="First name" 
+                              {...field} 
+                              data-testid="input-first-name"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="middleName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Middle Name</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Middle name (optional)" 
+                              {...field} 
+                              data-testid="input-middle-name"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Last name" 
+                              {...field} 
+                              data-testid="input-last-name"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
 
                   <FormField
@@ -387,10 +496,251 @@ export default function AuthorRegistration() {
                             data-testid="input-display-name"
                           />
                         </FormControl>
+                        <FormDescription>
+                          This is how your name will appear on your published books
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
+                  {/* Age, Gender, Phone */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="age"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Age *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              placeholder="Age" 
+                              {...field}
+                              onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                              data-testid="input-age"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="gender"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Gender *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger data-testid="select-gender">
+                                <SelectValue placeholder="Select gender" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="male">Male</SelectItem>
+                              <SelectItem value="female">Female</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                              <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Phone number" 
+                              {...field} 
+                              data-testid="input-phone"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Address Section */}
+                  <div className="mt-6">
+                    <h4 className="text-md font-semibold text-gray-900 mb-4">Address Information</h4>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <FormField
+                        control={form.control}
+                        name="doorNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Door/House Number *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="Door/House number" 
+                                {...field} 
+                                data-testid="input-door-number"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="buildingName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Building Name</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="Building name (optional)" 
+                                {...field} 
+                                data-testid="input-building-name"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="street"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Street *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Street address" 
+                              {...field} 
+                              data-testid="input-street"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <FormField
+                        control={form.control}
+                        name="colony"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Colony</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="Colony (optional)" 
+                                {...field} 
+                                data-testid="input-colony"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="area"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Area *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="Area" 
+                                {...field} 
+                                data-testid="input-area"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                      <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>City *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="City" 
+                                {...field} 
+                                data-testid="input-city"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="pincode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Pincode/Zip Code *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="Pincode/Zip code" 
+                                {...field} 
+                                data-testid="input-pincode"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="state"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>State *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="State" 
+                                {...field} 
+                                data-testid="input-state"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem className="mt-4">
+                          <FormLabel>Country *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Country" 
+                              {...field} 
+                              data-testid="input-country"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
                   <FormField
                     control={form.control}
