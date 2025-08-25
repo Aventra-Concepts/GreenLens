@@ -63,7 +63,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/author-registration" className="inline-block bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded transition-colors text-xs font-medium" data-testid="link-author-registration">
+                <Link href="/author-registration" className="inline-block bg-green-100 hover:bg-green-200 text-green-800 px-2 py-1 rounded transition-colors text-xs font-bold" data-testid="link-author-registration">
                   📝 Author Registration
                 </Link>
               </li>
