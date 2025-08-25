@@ -1,8 +1,14 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Microscope, Leaf, Dna, Zap, ArrowLeft, Search, BookOpen, FlaskConical, Sprout, TreePine } from 'lucide-react';
+import { ChevronDown, ChevronUp, Microscope, Leaf, Dna, Zap, ArrowLeft, Search, BookOpen, FlaskConical, Sprout, TreePine, Layers } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+
+// Import generated images
+import PlantCellImage from '@assets/generated_images/Plant_cell_structure_diagram_1a666e09.png';
+import PhotosynthesisImage from '@assets/generated_images/Photosynthesis_process_diagram_98665ae6.png';
+import ClassificationTreeImage from '@assets/generated_images/Plant_classification_tree_b308df90.png';
+import RootAnatomyImage from '@assets/generated_images/Root_anatomy_diagram_9c5f037d.png';
 
 interface DatabaseSection {
   id: string;
@@ -10,6 +16,12 @@ interface DatabaseSection {
   icon: any;
   description: string;
   content: string[];
+  image?: string;
+  tables?: Array<{
+    title: string;
+    headers: string[];
+    rows: string[][];
+  }>;
 }
 
 export default function PlantDatabase() {
@@ -28,12 +40,61 @@ export default function PlantDatabase() {
 
   const databaseSections: DatabaseSection[] = [
     {
+      id: 'plant-classification',
+      title: 'Plant Kingdom Classification',
+      icon: Layers,
+      description: 'Taxonomic organization and evolutionary relationships of plant groups',
+      image: ClassificationTreeImage,
+      tables: [
+        {
+          title: 'Major Plant Groups and Characteristics',
+          headers: ['Group', 'Common Name', 'Vascular System', 'Reproduction', 'Approximate Species'],
+          rows: [
+            ['Bryophyta', 'Mosses', 'None', 'Spores', '12,000'],
+            ['Marchantiophyta', 'Liverworts', 'None', 'Spores', '9,000'],
+            ['Anthocerotophyta', 'Hornworts', 'None', 'Spores', '300'],
+            ['Pteridophyta', 'Ferns', 'Xylem & Phloem', 'Spores', '12,000'],
+            ['Coniferophyta', 'Conifers', 'Xylem & Phloem', 'Seeds (naked)', '630'],
+            ['Cycadophyta', 'Cycads', 'Xylem & Phloem', 'Seeds (naked)', '300'],
+            ['Ginkgophyta', 'Ginkgo', 'Xylem & Phloem', 'Seeds (naked)', '1'],
+            ['Magnoliophyta', 'Flowering Plants', 'Xylem & Phloem', 'Seeds (enclosed)', '300,000+']
+          ]
+        }
+      ],
+      content: [
+        'The plant kingdom (Plantae) represents one of the major domains of life, encompassing over 400,000 described species. Modern classification systems organize plants based on evolutionary relationships, morphological characteristics, and molecular evidence.',
+        'Bryophytes represent the earliest land plants, including mosses (Bryophyta), liverworts (Marchantiophyta), and hornworts (Anthocerotophyta). These non-vascular plants lack true roots, stems, and leaves, relying on simple structures for water and nutrient transport.',
+        'Pteridophytes include ferns, horsetails, and club mosses, representing the first vascular plants. They possess specialized tissues (xylem and phloem) for transport but reproduce via spores rather than seeds. This group includes approximately 12,000 species worldwide.',
+        'Gymnosperms are seed-bearing plants with naked seeds not enclosed in fruits. Major groups include conifers (Coniferophyta), cycads (Cycadophyta), ginkgo (Ginkgophyta), and gnetophytes (Gnetophyta). These plants dominated Earth before flowering plants evolved.',
+        'Angiosperms or flowering plants represent the most diverse and successful plant group with over 300,000 species. They are characterized by flowers, fruits, and seeds enclosed within carpels. This group is divided into monocotyledons and dicotyledons based on seed structure and other characteristics.'
+      ]
+    },
+    {
       id: 'plant-physiology',
       title: 'Plant Physiology',
       icon: Leaf,
       description: 'Understanding how plants function at the cellular and molecular level',
+      image: PhotosynthesisImage,
+      tables: [
+        {
+          title: 'Essential Plant Nutrients',
+          headers: ['Element', 'Symbol', 'Type', 'Primary Function'],
+          rows: [
+            ['Nitrogen', 'N', 'Macronutrient', 'Protein synthesis, chlorophyll'],
+            ['Phosphorus', 'P', 'Macronutrient', 'Energy transfer, DNA/RNA'],
+            ['Potassium', 'K', 'Macronutrient', 'Water regulation, enzyme activation'],
+            ['Calcium', 'Ca', 'Macronutrient', 'Cell wall structure, signaling'],
+            ['Magnesium', 'Mg', 'Macronutrient', 'Chlorophyll center, enzyme cofactor'],
+            ['Sulfur', 'S', 'Macronutrient', 'Protein structure, amino acids'],
+            ['Iron', 'Fe', 'Micronutrient', 'Electron transport, chlorophyll synthesis'],
+            ['Manganese', 'Mn', 'Micronutrient', 'Photosystem II, enzyme activation'],
+            ['Zinc', 'Zn', 'Micronutrient', 'Enzyme function, growth regulators'],
+            ['Copper', 'Cu', 'Micronutrient', 'Electron transport, lignin synthesis']
+          ]
+        }
+      ],
       content: [
-        'Photosynthesis is the fundamental process by which plants convert light energy into chemical energy. This complex biochemical pathway occurs in chloroplasts, where chlorophyll molecules capture photons and initiate a series of reactions that ultimately produce glucose and oxygen from carbon dioxide and water.',
+        'Photosynthesis is the fundamental process by which plants convert light energy into chemical energy. This complex biochemical pathway occurs in chloroplasts, where chlorophyll molecules capture photons and initiate a series of reactions that ultimately produce glucose and oxygen from carbon dioxide and water. The process consists of two main stages: light-dependent reactions in the thylakoids and light-independent reactions (Calvin cycle) in the stroma.',
         'Plant respiration operates continuously in all living plant cells, breaking down stored carbohydrates to release energy for cellular activities. Unlike photosynthesis, respiration occurs in mitochondria and consumes oxygen while producing carbon dioxide, making it essential for plant survival during dark periods.',
         'Water transport in plants follows a sophisticated system called the transpiration-cohesion theory. Water molecules move from roots to leaves through xylem vessels, driven by transpiration at leaf surfaces and the cohesive properties of water molecules that create a continuous column.',
         'Nutrient uptake involves both passive and active transport mechanisms across root cell membranes. Essential macronutrients like nitrogen, phosphorus, and potassium are absorbed through specific transport proteins, while micronutrients are often chelated by root exudates to enhance availability.',
@@ -71,8 +132,9 @@ export default function PlantDatabase() {
       title: 'Molecular Biology',
       icon: Microscope,
       description: 'Cellular and molecular mechanisms underlying plant life processes',
+      image: PlantCellImage,
       content: [
-        'Cell wall composition and structure provide plants with structural support and protection while allowing controlled growth and expansion. Primary cell walls consist mainly of cellulose microfibrils embedded in a matrix of hemicelluloses and pectins, while secondary walls may contain lignin for additional strength and water resistance.',
+        'Cell wall composition and structure provide plants with structural support and protection while allowing controlled growth and expansion. Primary cell walls consist mainly of cellulose microfibrils embedded in a matrix of hemicelluloses and pectins, while secondary walls may contain lignin for additional strength and water resistance. Plant cells are distinguished from animal cells by their rigid cell walls, large central vacuoles, and chloroplasts.',
         'Protein synthesis in plants follows the central dogma of molecular biology but includes unique features such as chloroplast and mitochondrial protein synthesis systems. Many plant proteins are post-translationally modified and targeted to specific cellular compartments through signal sequences.',
         'Signal transduction pathways allow plants to perceive and respond to environmental stimuli including light, gravity, touch, and chemical signals. These complex cascades often involve phosphorylation events, second messengers, and transcriptional regulation to coordinate appropriate physiological responses.',
         'Membrane transport systems regulate the movement of water, ions, and molecules across cellular membranes. Aquaporins facilitate water transport, ion channels control electrical gradients, and various pumps and transporters maintain cellular homeostasis while enabling selective uptake and exclusion of substances.',
@@ -84,6 +146,23 @@ export default function PlantDatabase() {
       title: 'Plant Anatomy',
       icon: TreePine,
       description: 'The structural organization of plant tissues and organs',
+      image: RootAnatomyImage,
+      tables: [
+        {
+          title: 'Plant Tissue Types and Functions',
+          headers: ['Tissue Type', 'Location', 'Function', 'Cell Characteristics'],
+          rows: [
+            ['Epidermis', 'Outer surface', 'Protection, gas exchange', 'Flat, waxy cuticle'],
+            ['Parenchyma', 'Throughout plant', 'Storage, photosynthesis', 'Thin walls, large vacuoles'],
+            ['Collenchyma', 'Young stems, leaves', 'Flexible support', 'Thickened corners'],
+            ['Sclerenchyma', 'Mature stems, seeds', 'Rigid support', 'Thick, lignified walls'],
+            ['Xylem', 'Vascular bundles', 'Water transport', 'Dead at maturity, hollow'],
+            ['Phloem', 'Vascular bundles', 'Sugar transport', 'Living, sieve plates'],
+            ['Meristem', 'Growing points', 'Cell division', 'Small, dense cytoplasm'],
+            ['Cambium', 'Between xylem/phloem', 'Secondary growth', 'Actively dividing']
+          ]
+        }
+      ],
       content: [
         'Root anatomy reflects functional specialization for absorption and anchorage. The epidermis and root hairs maximize surface area for nutrient and water uptake, while the cortex provides storage and transport functions. The central vascular cylinder contains xylem and phloem tissues organized in patterns that vary among plant families.',
         'Stem structure supports the plant body and facilitates transport between roots and leaves. Vascular bundles contain xylem for water transport and phloem for sugar transport, while supporting tissues like collenchyma and sclerenchyma provide mechanical strength. Cambial activity enables secondary growth in woody plants.',
@@ -250,15 +329,74 @@ export default function PlantDatabase() {
                     {isOpen && (
                       <div className="px-6 pb-6">
                         <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                          <div className="space-y-4">
-                            {section.content.map((paragraph, index) => (
-                              <p
-                                key={index}
-                                className="text-gray-700 dark:text-gray-300 leading-relaxed"
-                                data-testid={`text-content-${section.id}-${index}`}
-                              >
-                                {paragraph}
-                              </p>
+                          <div className="space-y-6">
+                            {/* Display image if available */}
+                            {section.image && (
+                              <div className="text-center">
+                                <img
+                                  src={section.image}
+                                  alt={`${section.title} diagram`}
+                                  className="max-w-full h-auto rounded-lg shadow-lg mx-auto"
+                                  data-testid={`image-${section.id}`}
+                                />
+                              </div>
+                            )}
+                            
+                            {/* Display content paragraphs */}
+                            <div className="space-y-4">
+                              {section.content.map((paragraph, index) => (
+                                <p
+                                  key={index}
+                                  className="text-gray-700 dark:text-gray-300 leading-relaxed"
+                                  data-testid={`text-content-${section.id}-${index}`}
+                                >
+                                  {paragraph}
+                                </p>
+                              ))}
+                            </div>
+                            
+                            {/* Display tables if available */}
+                            {section.tables && section.tables.map((table, tableIndex) => (
+                              <div key={tableIndex} className="mt-6">
+                                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                                  {table.title}
+                                </h4>
+                                <div className="overflow-x-auto">
+                                  <table className="min-w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                                    <thead className="bg-green-50 dark:bg-green-900/30">
+                                      <tr>
+                                        {table.headers.map((header, headerIndex) => (
+                                          <th
+                                            key={headerIndex}
+                                            className="px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white border-b border-gray-300 dark:border-gray-600"
+                                            data-testid={`table-header-${section.id}-${tableIndex}-${headerIndex}`}
+                                          >
+                                            {header}
+                                          </th>
+                                        ))}
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {table.rows.map((row, rowIndex) => (
+                                        <tr
+                                          key={rowIndex}
+                                          className={rowIndex % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-700'}
+                                        >
+                                          {row.map((cell, cellIndex) => (
+                                            <td
+                                              key={cellIndex}
+                                              className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600"
+                                              data-testid={`table-cell-${section.id}-${tableIndex}-${rowIndex}-${cellIndex}`}
+                                            >
+                                              {cell}
+                                            </td>
+                                          ))}
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
                             ))}
                           </div>
                         </div>
