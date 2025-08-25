@@ -62,6 +62,11 @@ export default function Footer() {
                   API Access
                 </Link>
               </li>
+              <li>
+                <Link href="/author-registration" className="inline-block bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded transition-colors text-xs font-medium" data-testid="link-author-registration">
+                  📝 Author Registration
+                </Link>
+              </li>
             </ul>
           </div>
           
@@ -114,11 +119,6 @@ export default function Footer() {
               <li>
                 <Link href="/contact" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-contact">
                   Contact
-                </Link>
-              </li>
-              <li>
-                <Link href="/author-registration" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-author-registration">
-                  Author Registration
                 </Link>
               </li>
               <li>
