@@ -158,7 +158,7 @@ export default function HeroSection() {
           <div className="max-w-4xl mx-auto">
             <div className="space-y-5 sm:space-y-7">
               <div className="space-y-3 sm:space-y-5">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-gray-900 dark:text-white leading-tight text-center px-2">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-gray-900 dark:text-white leading-tight text-center px-2">
                   <div className="text-center">Identify Plants Accurately</div>
                   <div className="text-center">Powered by <span className="text-green-600">GreenLens AI Precision</span></div>
                 </h1>
