@@ -1,7 +1,10 @@
 import { Link } from "wouter";
 import { Facebook, Instagram, Twitter, Leaf } from "lucide-react";
+import { useFooterNavigation } from "@/hooks/useFooterNavigation";
 
 export default function Footer() {
+  const { navigateWithMessage } = useFooterNavigation();
+  
   return (
     <footer className="bg-slate-800 text-white mr-6 ml-6 sm:mr-8 sm:ml-8 lg:mr-52 lg:ml-56 xl:mr-64 xl:ml-72 rounded-2xl mb-6">
       <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-4">
@@ -48,24 +51,40 @@ export default function Footer() {
             <h3 className="font-semibold text-white mb-2 text-sm">Product</h3>
             <ul className="space-y-1">
               <li>
-                <Link href="/" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-identification">
+                <button 
+                  onClick={() => navigateWithMessage("/")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-identification"
+                >
                   Identification
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/disease-diagnosis" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-disease-diagnosis">
+                <button 
+                  onClick={() => navigateWithMessage("/disease-diagnosis")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-disease-diagnosis"
+                >
                   Disease Diagnosis
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/api-access" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-api-access">
+                <button 
+                  onClick={() => navigateWithMessage("/api-access")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-api-access"
+                >
                   API Access
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/author-registration" className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md transition-colors text-xs font-extrabold text-center shadow-sm hover:shadow-md" data-testid="link-author-registration">
+                <button 
+                  onClick={() => navigateWithMessage("/author-registration")}
+                  className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md transition-colors text-xs font-extrabold text-center shadow-sm hover:shadow-md cursor-pointer" 
+                  data-testid="link-author-registration"
+                >
                   📝 Author Registration
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
@@ -75,34 +94,58 @@ export default function Footer() {
             <h3 className="font-semibold text-white mb-2 text-sm">Resources</h3>
             <ul className="space-y-1">
               <li>
-                <Link href="/blog" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-blog">
+                <button 
+                  onClick={() => navigateWithMessage("/blog")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-blog"
+                >
                   Blog
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/reviews" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-reviews">
+                <button 
+                  onClick={() => navigateWithMessage("/reviews")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-reviews"
+                >
                   Reviews
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/plant-database" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-plant-database">
+                <button 
+                  onClick={() => navigateWithMessage("/plant-database")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-plant-database"
+                >
                   Plant Database
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/faq" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-faq">
+                <button 
+                  onClick={() => navigateWithMessage("/faq")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-faq"
+                >
                   FAQ
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/help-center" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-help-center">
+                <button 
+                  onClick={() => navigateWithMessage("/help-center")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-help-center"
+                >
                   Help Center
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/community" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-community">
+                <button 
+                  onClick={() => navigateWithMessage("/community")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-community"
+                >
                   Community
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
@@ -112,24 +155,40 @@ export default function Footer() {
             <h3 className="font-semibold text-white mb-2 text-sm">Company</h3>
             <ul className="space-y-1">
               <li>
-                <Link href="/about" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-about-us">
+                <button 
+                  onClick={() => navigateWithMessage("/about")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-about-us"
+                >
                   About Us
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-contact">
+                <button 
+                  onClick={() => navigateWithMessage("/contact")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-contact"
+                >
                   Contact
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-privacy-policy">
+                <button 
+                  onClick={() => navigateWithMessage("/privacy")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-privacy-policy"
+                >
                   Privacy Policy
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/terms" className="text-gray-300 hover:text-white transition-colors text-xs" data-testid="link-terms-of-service">
+                <button 
+                  onClick={() => navigateWithMessage("/terms")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-terms-of-service"
+                >
                   Terms of Service
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
@@ -141,17 +200,21 @@ export default function Footer() {
               As an Amazon Associate, we earn from qualifying purchases. No extra cost to you.
             </p>
             <div className="mb-2">
-              <Link href="/affiliate-disclosure" className="text-blue-400 hover:text-blue-300 transition-colors text-xs underline" data-testid="link-affiliate-disclosure">
+              <button 
+                onClick={() => navigateWithMessage("/affiliate-disclosure")}
+                className="text-blue-400 hover:text-blue-300 transition-colors text-xs underline cursor-pointer" 
+                data-testid="link-affiliate-disclosure"
+              >
                 Affiliate Disclosure
-              </Link>
+              </button>
             </div>
-            <Link 
-              href="/amazon-affiliate-register" 
-              className="inline-block bg-orange-500 hover:bg-orange-600 text-white text-xs px-2 py-1 rounded transition-colors font-medium"
+            <button 
+              onClick={() => navigateWithMessage("/amazon-affiliate-register")}
+              className="inline-block bg-orange-500 hover:bg-orange-600 text-white text-xs px-2 py-1 rounded transition-colors font-medium cursor-pointer"
               data-testid="button-amazon-affiliate-register"
             >
               🛍️ Amazon Affiliate Register
-            </Link>
+            </button>
           </div>
         </div>
         
