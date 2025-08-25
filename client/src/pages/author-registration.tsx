@@ -23,7 +23,6 @@ interface AuthorProfile {
   userId?: string;
   displayName?: string;
   bio?: string;
-  websiteUrl?: string;
   expertise?: string;
   experience?: string;
   applicationStatus?: 'pending' | 'approved' | 'rejected' | 'under_review' | 'suspended';
@@ -45,7 +44,6 @@ interface AuthorProfile {
 const authorRegistrationSchema = z.object({
   displayName: z.string().min(2, "Display name must be at least 2 characters"),
   bio: z.string().optional(),
-  websiteUrl: z.string().url().optional().or(z.literal("")),
   expertise: z.string().min(1, "Please specify your areas of expertise"),
   experience: z.string().min(50, "Please provide at least 50 characters describing your experience"),
   hasPublishingExperience: z.boolean(),
@@ -86,7 +84,6 @@ export default function AuthorRegistration() {
     defaultValues: {
       displayName: "",
       bio: "",
-      websiteUrl: "",
       expertise: "",
       experience: "",
       hasPublishingExperience: false,
@@ -417,26 +414,6 @@ export default function AuthorRegistration() {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="websiteUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Website URL</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="https://your-website.com" 
-                            {...field} 
-                            data-testid="input-website"
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Optional: Link to your personal website or blog
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
               )}
 
