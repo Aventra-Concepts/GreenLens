@@ -153,6 +153,7 @@ export default function Terms() {
                       <li>• E-book marketplace</li>
                       <li>• Expert consultations</li>
                       <li>• Garden monitoring tools</li>
+                      <li>• My Garden</li>
                       <li>• Community forums</li>
                     </ul>
                   </div>
