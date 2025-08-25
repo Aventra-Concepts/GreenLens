@@ -495,6 +495,113 @@ export const insertUserGardenStatsSchema = createInsertSchema(userGardenStats).o
   updatedAt: true,
 });
 
+// Community Posts Table
+export const communityPosts = pgTable("community_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: varchar("title").notNull(),
+  content: text("content").notNull(),
+  category: varchar("category", { 
+    enum: ["experience", "plant_barter", "green_revolution", "decoration", "general", "tips", "questions"] 
+  }).notNull(),
+  tags: jsonb("tags").default("[]"), // Array of tags
+  imageUrl: varchar("image_url"),
+  location: varchar("location"), // User's location for bartering
+  telegramId: varchar("telegram_id"), // Contact info for bartering
+  emailContact: varchar("email_contact"), // Secondary email if different from user email
+  isBarterPost: boolean("is_barter_post").default(false),
+  barterType: varchar("barter_type", { enum: ["offering", "seeking", "exchange"] }),
+  plantSpecies: varchar("plant_species"), // For barter posts
+  isActive: boolean("is_active").default(true),
+  isPinned: boolean("is_pinned").default(false),
+  isModerated: boolean("is_moderated").default(true),
+  viewCount: integer("view_count").default(0),
+  likeCount: integer("like_count").default(0),
+  commentCount: integer("comment_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Community Comments Table
+export const communityComments = pgTable("community_comments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  postId: varchar("post_id").notNull().references(() => communityPosts.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  parentId: varchar("parent_id"), // For threaded comments
+  likeCount: integer("like_count").default(0),
+  isActive: boolean("is_active").default(true),
+  isModerated: boolean("is_moderated").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Community Post Likes Table
+export const communityPostLikes = pgTable("community_post_likes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  postId: varchar("post_id").notNull().references(() => communityPosts.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Community Comment Likes Table
+export const communityCommentLikes = pgTable("community_comment_likes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  commentId: varchar("comment_id").notNull().references(() => communityComments.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Type exports for Community
+export type CommunityPost = typeof communityPosts.$inferSelect;
+export type InsertCommunityPost = typeof communityPosts.$inferInsert;
+
+export type CommunityComment = typeof communityComments.$inferSelect;
+export type InsertCommunityComment = typeof communityComments.$inferInsert;
+
+export type CommunityPostLike = typeof communityPostLikes.$inferSelect;
+export type InsertCommunityPostLike = typeof communityPostLikes.$inferInsert;
+
+export type CommunityCommentLike = typeof communityCommentLikes.$inferSelect;
+export type InsertCommunityCommentLike = typeof communityCommentLikes.$inferInsert;
+
+// Zod schemas for Community
+export const insertCommunityPostSchema = createInsertSchema(communityPosts).omit({
+  id: true,
+  userId: true,
+  viewCount: true,
+  likeCount: true,
+  commentCount: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  // Custom validation - no phone numbers allowed
+  content: z.string().min(10).max(5000).refine(
+    (val) => !/((\+\d{1,3}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4})|(\+\d{1,3}[\s.-]?\d{4,14})/g.test(val),
+    "Phone numbers are not allowed. Please use Telegram ID or email only."
+  ),
+  telegramId: z.string().optional().refine(
+    (val) => !val || val.startsWith('@') || val.match(/^[a-zA-Z0-9_]{5,32}$/),
+    "Invalid Telegram ID format"
+  ),
+});
+
+export const insertCommunityCommentSchema = createInsertSchema(communityComments).omit({
+  id: true,
+  userId: true,
+  likeCount: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  content: z.string().min(1).max(1000).refine(
+    (val) => !/((\+\d{1,3}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4})|(\+\d{1,3}[\s.-]?\d{4,14})/g.test(val),
+    "Phone numbers are not allowed. Please use Telegram ID or email only."
+  ),
+});
+
+export type InsertCommunityPostType = z.infer<typeof insertCommunityPostSchema>;
+export type InsertCommunityCommentType = z.infer<typeof insertCommunityCommentSchema>;
+
 // Login schema
 export const loginUserSchema = z.object({
   email: z.string().email(),

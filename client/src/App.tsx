@@ -42,6 +42,7 @@ import Tools from "@/pages/tools";
 import Disclosure from "@/pages/disclosure";
 import FAQ from "@/pages/faq";
 import PlantDatabase from "@/pages/plant-database";
+import Community from "@/pages/community";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 import Footer from "@/components/Footer";
 
@@ -123,6 +124,7 @@ function Router() {
       <Route path="/disclosure" component={Disclosure} />
       <Route path="/faq" component={FAQ} />
       <Route path="/plant-database" component={PlantDatabase} />
+      <Route path="/community" component={Community} />
       
       {/* Admin login should be public - accessible before logging in */}
       <Route path="/admin-login">

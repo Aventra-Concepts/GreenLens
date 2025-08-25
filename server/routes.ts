@@ -34,6 +34,7 @@ import { socialMediaService } from "./services/socialMediaService";
 import { usOptimizationService } from "./services/usOptimizationService";
 import gardenContentRoutes from "./routes/gardenContentRoutes";
 import gardenMonitoringRoutes from "./routes/gardenMonitoringRoutes";
+import { registerCommunityRoutes } from "./routes/community";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -156,6 +157,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register garden monitoring premium routes
   app.use('/api/garden-monitoring', gardenMonitoringRoutes);
+  
+  // Register community routes
+  registerCommunityRoutes(app);
   
   // Register garden subscription routes
   app.use('/api/garden/subscription', gardenSubscriptionRoutes);
