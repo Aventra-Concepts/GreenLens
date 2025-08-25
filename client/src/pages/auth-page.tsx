@@ -9,24 +9,50 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Eye, EyeOff, Mail, Lock, User, MapPin, AlertCircle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2, Eye, EyeOff, Mail, Lock, User, MapPin, AlertCircle, Calendar, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
 import { SocialLoginButtons } from "@/components/SocialLoginButtons";
 
-// Registration form schema
+// COPPA age verification helper
+const calculateAge = (dateOfBirth: Date): number => {
+  const today = new Date();
+  let age = today.getFullYear() - dateOfBirth.getFullYear();
+  const monthDiff = today.getMonth() - dateOfBirth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())) {
+    age--;
+  }
+  return age;
+};
+
+// Registration form schema with COPPA compliance
 const registerSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
   location: z.string().min(3, "Location must be at least 3 characters"),
+  dateOfBirth: z.string().min(1, "Date of birth is required"),
   password: z.string().min(8, "Password must be at least 8 characters")
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Password must contain uppercase, lowercase, and number"),
   confirmPassword: z.string(),
+  privacyPolicyAccepted: z.boolean().refine(val => val === true, {
+    message: "You must accept the Privacy Policy to continue"
+  }),
+  ageVerification: z.boolean().refine(val => val === true, {
+    message: "You must confirm you are 13 or older to use this service"
+  }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
+}).refine((data) => {
+  const birthDate = new Date(data.dateOfBirth);
+  const age = calculateAge(birthDate);
+  return age >= 13;
+}, {
+  message: "You must be at least 13 years old to use GreenLens. This is required by COPPA (Children's Online Privacy Protection Act).",
+  path: ["dateOfBirth"],
 });
 
 // Login form schema
@@ -67,8 +93,11 @@ export default function AuthPage() {
       lastName: "",
       email: "",
       location: "",
+      dateOfBirth: "",
       password: "",
       confirmPassword: "",
+      privacyPolicyAccepted: false,
+      ageVerification: false,
     },
   });
 
@@ -89,12 +118,27 @@ export default function AuthPage() {
 
   const onRegister = async (data: RegisterForm) => {
     try {
+      // Verify age compliance before registration
+      const birthDate = new Date(data.dateOfBirth);
+      const age = calculateAge(birthDate);
+      
+      if (age < 13) {
+        toast({
+          title: "Age Verification Failed",
+          description: "You must be at least 13 years old to create an account. This requirement is mandated by COPPA for your privacy protection.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await registerMutation.mutateAsync({
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         location: data.location,
+        dateOfBirth: data.dateOfBirth,
         password: data.password,
+        ageVerified: true,
       });
       toast({
         title: "Registration Successful",
@@ -394,6 +438,33 @@ export default function AuthPage() {
                           )}
                         />
 
+                        {/* COPPA Age Verification Field */}
+                        <FormField
+                          control={registerForm.control}
+                          name="dateOfBirth"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-gray-400" />
+                                Date of Birth
+                                <span className="text-xs text-red-600">(COPPA Compliance - Must be 13+)</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="date"
+                                  max={new Date(new Date().setFullYear(new Date().getFullYear() - 13)).toISOString().split('T')[0]}
+                                  data-testid="register-date-of-birth"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                We require this to comply with COPPA (Children's Online Privacy Protection Act). Users must be 13 or older.
+                              </p>
+                            </FormItem>
+                          )}
+                        />
+
                         <FormField
                           control={registerForm.control}
                           name="password"
@@ -456,6 +527,65 @@ export default function AuthPage() {
                                 </div>
                               </FormControl>
                               <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Privacy Policy Agreement */}
+                        <FormField
+                          control={registerForm.control}
+                          name="privacyPolicyAccepted"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  data-testid="register-privacy-policy"
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel className="text-sm font-normal cursor-pointer">
+                                  I agree to the{" "}
+                                  <button
+                                    type="button"
+                                    className="text-green-600 hover:text-green-700 underline"
+                                    onClick={() => window.open('/privacy', '_blank')}
+                                    data-testid="privacy-policy-link"
+                                  >
+                                    Privacy Policy
+                                  </button>
+                                  {" "}and understand how my personal information will be used.
+                                </FormLabel>
+                                <FormMessage />
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* COPPA Age Verification Checkbox */}
+                        <FormField
+                          control={registerForm.control}
+                          name="ageVerification"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  data-testid="register-age-verification"
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel className="text-sm font-normal cursor-pointer flex items-center gap-2">
+                                  <ShieldCheck className="h-4 w-4 text-green-600" />
+                                  I confirm that I am 13 years of age or older
+                                </FormLabel>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  This confirmation is required by COPPA (Children's Online Privacy Protection Act) to protect minors' privacy online.
+                                </p>
+                                <FormMessage />
+                              </div>
                             </FormItem>
                           )}
                         />

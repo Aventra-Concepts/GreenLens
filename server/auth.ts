@@ -103,11 +103,33 @@ export function setupAuth(app: Express) {
   // Registration endpoint with comprehensive error handling
   app.post("/api/register", authLimiter, async (req, res, next) => {
     try {
-      const { email, firstName, lastName, location, password, country } = req.body;
+      const { email, firstName, lastName, location, password, country, dateOfBirth, ageVerified } = req.body;
       
-      // Validate required fields
+      // Validate required fields including COPPA compliance
       if (!email || !firstName || !lastName || !password) {
         return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      // COPPA Age Verification
+      if (!dateOfBirth || !ageVerified) {
+        return res.status(400).json({ 
+          message: "Age verification is required. You must be 13 or older to create an account." 
+        });
+      }
+
+      // Verify age compliance (additional server-side check)
+      const birthDate = new Date(dateOfBirth);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      
+      if (age < 13) {
+        return res.status(400).json({ 
+          message: "You must be at least 13 years old to create an account. This is required by COPPA for your protection." 
+        });
       }
 
       // Enhanced email validation
@@ -130,7 +152,7 @@ export function setupAuth(app: Express) {
       // Hash password and create user with safe defaults
       const hashedPassword = await hashPassword(password);
       
-      // Create user data with all required fields and safe defaults
+      // Create user data with all required fields including COPPA compliance
       const userData = {
         email: email.toLowerCase().trim(),
         firstName: firstName.trim(),
@@ -139,14 +161,34 @@ export function setupAuth(app: Express) {
         password: hashedPassword,
         profileImageUrl: null,
         country: country?.trim() || null,
+        dateOfBirth: birthDate.toISOString().split('T')[0], // Store as date string
+        ageVerified: true, // Confirmed during registration
+        gmail: null,
+        facebookId: null,
+        githubId: null,
+        twitterId: null,
+        provider: 'local',
+        isActive: true,
+        isAdmin: false,
         isSuperAdmin: false,
         isAuthor: false,
         authorVerified: false,
+        emailVerified: false,
         twoFactorEnabled: false,
         failedLoginAttempts: 0,
         lockedUntil: null,
         preferredLanguage: 'en',
         timezone: 'UTC',
+        preferredCurrency: 'USD',
+        region: 'US',
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        gardenMonitoringSubscriptionId: null,
+        gardenMonitoringActive: false,
+        gardenMonitoringExpiresAt: null,
+        subscriptionStatus: 'none',
+        subscriptionPlan: 'Free Plan',
+        subscriptionPlanId: 'free',
       };
 
       const user = await storage.createUser(userData);

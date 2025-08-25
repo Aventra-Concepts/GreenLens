@@ -47,6 +47,7 @@ import CarePlans from "@/pages/care-plans";
 import Privacy from "@/pages/privacy";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 import Footer from "@/components/Footer";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
 // E-book Category Pages
 import GardeningBasicsPage from "@/pages/categories/gardening-basics";
@@ -171,6 +172,7 @@ function App() {
               <Router />
             </main>
             <Footer />
+            <CookieConsentBanner />
             <PerformanceMetrics />
           </div>
         </AuthProvider>

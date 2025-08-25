@@ -74,6 +74,9 @@ export const users = pgTable("users", {
   subscriptionStatus: varchar("subscription_status").default('none'), // 'active', 'inactive', 'trialing', 'none'
   subscriptionPlan: varchar("subscription_plan").default('Free Plan'),
   subscriptionPlanId: varchar("subscription_plan_id").default('free'),
+  // COPPA compliance - Age verification
+  dateOfBirth: date("date_of_birth"), // For age verification (COPPA compliance)
+  ageVerified: boolean("age_verified").default(false), // Confirmed 13+ years old
 });
 
 export type UpsertUser = typeof users.$inferInsert;
