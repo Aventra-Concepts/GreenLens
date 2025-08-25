@@ -14,6 +14,10 @@ import PlantPathologyImage from '@assets/generated_images/Figure_6_Plant_patholo
 import PlantEvolutionImage from '@assets/generated_images/Figure_7_Plant_evolution_b661011e.png';
 import PlantEcologyImage from '@assets/generated_images/Figure_8_Plant_ecology_fdcd7049.png';
 import PlantBiotechnologyImage from '@assets/generated_images/Figure_9_Plant_biotechnology_7b4082bb.png';
+import RegionalFloweringImage from '@assets/generated_images/Figure_10_Regional_flowering_plants_eec73aa6.png';
+import RegionalFruitingImage from '@assets/generated_images/Figure_11_Regional_fruiting_plants_5bb63955.png';
+import RegionalVegetativeImage from '@assets/generated_images/Figure_12_Regional_vegetative_plants_e53fa2eb.png';
+import DecorativePlantsImage from '@assets/generated_images/Figure_13_Decorative_plants_c9b3a735.png';
 
 interface DatabaseSection {
   id: string;
@@ -218,6 +222,118 @@ export default function PlantDatabase() {
         'Marker-assisted breeding uses DNA markers linked to desirable traits to accelerate the plant breeding process. This approach increases breeding efficiency by allowing early selection of plants with desired characteristics before they reach reproductive maturity.',
         'Genomic sequencing and analysis provide detailed information about plant genomes, enabling identification of genes responsible for important traits and understanding of evolutionary relationships. This information guides both basic research and applied breeding programs.',
         'Plant biotechnology applications include production of pharmaceuticals in plants, development of biofuels from plant biomass, and creation of plants with enhanced environmental remediation capabilities. These applications demonstrate the potential for plants to address global challenges.'
+      ]
+    },
+    {
+      id: 'regional-flowering',
+      title: 'Regional Flowering Plants',
+      icon: Sprout,
+      description: 'Flowering plant species distribution and adaptation across global regions',
+      image: RegionalFloweringImage,
+      tables: [
+        {
+          title: 'Flowering Plants by Climate Regions',
+          headers: ['Region', 'Climate Type', 'Common Flowers', 'Bloom Season', 'Adaptation Features'],
+          rows: [
+            ['Tropical', 'Hot, humid', 'Hibiscus, Orchids, Bird of Paradise', 'Year-round', 'Large leaves, bright colors'],
+            ['Temperate', 'Moderate seasons', 'Roses, Tulips, Daffodils', 'Spring-Summer', 'Seasonal dormancy'],
+            ['Mediterranean', 'Dry summers', 'Lavender, Oleander, Poppy', 'Spring', 'Drought tolerance'],
+            ['Desert', 'Arid, hot', 'Desert Marigold, Prickly Pear', 'Spring', 'Water storage, waxy coating'],
+            ['Alpine', 'Cold, windy', 'Edelweiss, Alpine Forget-me-not', 'Short summer', 'Low growth, deep roots'],
+            ['Arctic Tundra', 'Very cold', 'Arctic Poppy, Purple Saxifrage', 'Brief summer', 'Cushion growth form']
+          ]
+        }
+      ],
+      content: [
+        'Tropical regions support the greatest diversity of flowering plants, with over 170,000 species found in rainforests alone. These plants exhibit remarkable adaptations including large, colorful blooms to attract pollinators in dense forest understories, and many produce flowers directly on tree trunks (cauliflory) for better pollinator access.',
+        'Temperate flowering plants have evolved sophisticated seasonal timing mechanisms, with many species requiring vernalization (cold treatment) to trigger flowering. Spring ephemerals like trout lilies and bloodroot complete their entire flowering cycle before tree leaves emerge, maximizing light capture.',
+        'Mediterranean climate regions harbor unique flowering plant communities adapted to hot, dry summers and mild, wet winters. Many species like lavender and rosemary produce aromatic oils that deter herbivores and reduce water loss while attracting specialized pollinators.',
+        'Desert flowering plants employ diverse water conservation strategies, with many species like desert lupines timing their reproduction to coincide with rare rainfall events. Some cacti produce massive floral displays that can be seen from great distances to attract pollinators in sparse environments.',
+        'High-altitude flowering plants face extreme conditions including intense UV radiation, temperature fluctuations, and short growing seasons. Alpine species often produce disproportionately large flowers relative to their plant size to maximize reproductive success during brief flowering windows.'
+      ]
+    },
+    {
+      id: 'regional-fruiting',
+      title: 'Regional Fruiting Plants',
+      icon: TreePine,
+      description: 'Fruit-bearing plants and their regional cultivation patterns worldwide',
+      image: RegionalFruitingImage,
+      tables: [
+        {
+          title: 'Major Fruit Crops by Geographic Region',
+          headers: ['Region', 'Primary Fruits', 'Growing Season', 'Soil Preference', 'Water Requirements'],
+          rows: [
+            ['Southeast Asia', 'Mango, Durian, Rambutan', 'Year-round', 'Well-drained loam', 'High humidity'],
+            ['Mediterranean', 'Citrus, Grapes, Figs', 'Spring-Fall', 'Sandy loam', 'Moderate, winter rain'],
+            ['North America', 'Apples, Berries, Stone fruits', 'Spring-Fall', 'Various', 'Regular watering'],
+            ['South America', 'Avocado, Papaya, Passion fruit', 'Variable', 'Rich, organic', 'Consistent moisture'],
+            ['Africa', 'Baobab, Marula, Date palm', 'Seasonal', 'Sandy, alkaline', 'Drought tolerant'],
+            ['Australia', 'Macadamia, Finger lime, Kakadu plum', 'Variable', 'Acidic to neutral', 'Low to moderate']
+          ]
+        }
+      ],
+      content: [
+        'Tropical fruit plants have evolved diverse strategies for seed dispersal, with many producing large, fleshy fruits consumed by mammals and birds. Fruits like durian and jackfruit can weigh several kilograms and contain multiple large seeds adapted for dispersal by large animals in forest ecosystems.',
+        'Mediterranean fruit crops are typically adapted to dry summers through deep root systems and waxy fruit coatings that reduce water loss. Citrus fruits contain high levels of citric acid and essential oils that provide natural preservation and protection against pathogens during long ripening periods.',
+        'Temperate fruit trees require specific chilling hours (temperatures below 45°F) during winter dormancy to break bud and flower properly. This adaptation ensures that flowering occurs after the threat of killing frosts has passed, maximizing reproductive success.',
+        'Desert fruiting plants like prickly pear cacti produce fruits with high sugar content and thick, waxy skins to attract animal dispersers while minimizing water loss. Many desert fruits ripen during cooler months when animals have greater water needs and travel wider areas.',
+        'Cold-climate fruiting plants often produce berries rich in antioxidants and natural antifreeze compounds that allow fruits to remain edible even after freezing. Species like cloudberries and lingonberries have evolved to fruit during the brief Arctic summer when migrating animals are present.'
+      ]
+    },
+    {
+      id: 'regional-vegetative',
+      title: 'Regional Vegetative Plants',
+      icon: Leaf,
+      description: 'Leafy vegetables and crops adapted to different climatic regions',
+      image: RegionalVegetativeImage,
+      tables: [
+        {
+          title: 'Vegetative Crops by Climate Zone',
+          headers: ['Climate Zone', 'Leafy Vegetables', 'Growing Season', 'Temperature Range', 'Special Requirements'],
+          rows: [
+            ['Cool Season', 'Spinach, Kale, Lettuce', 'Fall-Spring', '50-70°F', 'Short days for some'],
+            ['Warm Season', 'Amaranth, Chard, Collards', 'Summer', '70-85°F', 'Heat tolerance'],
+            ['Tropical', 'Water spinach, Moringa, Taro', 'Year-round', '75-95°F', 'High humidity'],
+            ['Mediterranean', 'Arugula, Radicchio, Endive', 'Fall-Spring', '55-75°F', 'Cool, moist winters'],
+            ['Desert', 'Purslane, Desert sage, Epazote', 'Cool season', '60-80°F', 'Low water needs'],
+            ['Temperate', 'Cabbage, Brussels sprouts, Leeks', 'Fall-Spring', '45-75°F', 'Frost tolerance']
+          ]
+        }
+      ],
+      content: [
+        'Cool-season leafy vegetables have evolved efficient photosynthesis at lower temperatures and often accumulate sugars as natural antifreeze compounds. Plants like spinach and kale actually become sweeter after frost exposure as starch converts to sugar for cellular protection.',
+        'Tropical leafy vegetables typically grow rapidly in high humidity and heat, with many species like amaranth and water spinach capable of regenerative harvest where leaves can be continuously cut while the plant continues growing. These plants often have succulent stems for water storage.',
+        'Mediterranean region vegetables are adapted to grow during mild, wet winters and survive dry summers through deep taproots or underground storage organs. Many species like radicchio develop bitter compounds that concentrate during stress, providing natural pest protection.',
+        'Desert-adapted leafy plants employ CAM photosynthesis, opening stomata at night to collect CO2 while minimizing water loss during hot days. Species like purslane store water in thick, fleshy leaves and can survive extended drought periods while remaining edible.',
+        'Cold-climate vegetative plants often require vernalization for proper development and can withstand temperatures well below freezing. Brussels sprouts and kale can survive temperatures down to 20°F while maintaining nutritional quality and palatability.'
+      ]
+    },
+    {
+      id: 'decorative-plants',
+      title: 'Decorative Indoor and Outdoor Plants',
+      icon: FlaskConical,
+      description: 'Ornamental plants for landscaping and interior decoration by regional preferences',
+      image: DecorativePlantsImage,
+      tables: [
+        {
+          title: 'Popular Decorative Plants by Region',
+          headers: ['Region', 'Indoor Plants', 'Outdoor Plants', 'Maintenance Level', 'Key Features'],
+          rows: [
+            ['North America', 'Pothos, Snake plant, Monstera', 'Maple, Oak, Azalea', 'Low-Medium', 'Seasonal color'],
+            ['Europe', 'Ficus, Peace lily, Ivy', 'Rose, Lavender, Boxwood', 'Medium', 'Formal gardens'],
+            ['Asia', 'Bamboo, Bonsai, Orchids', 'Cherry blossom, Camellia', 'Medium-High', 'Zen aesthetics'],
+            ['Australia', 'Eucalyptus, Kangaroo vine', 'Bottlebrush, Grevillea', 'Low', 'Drought tolerant'],
+            ['Tropical', 'Bromeliad, Anthurium, Palms', 'Hibiscus, Plumeria, Bougainvillea', 'Medium', 'Bright colors'],
+            ['Mediterranean', 'Olive bonsai, Succulents', 'Rosemary, Sage, Cypress', 'Low', 'Aromatic foliage']
+          ]
+        }
+      ],
+      content: [
+        'Indoor decorative plants serve both aesthetic and functional purposes, with many species improving air quality by removing volatile organic compounds. Popular houseplants like snake plants and pothos are particularly effective at filtering formaldehyde and benzene from indoor air while requiring minimal maintenance.',
+        'Regional preferences for outdoor ornamental plants often reflect cultural traditions and local climate adaptations. Japanese gardens emphasize asymmetrical balance with plants like bamboo and ornamental maples, while English gardens favor structured designs with roses, lavender, and boxwood hedges.',
+        'Succulent plants have gained worldwide popularity for both indoor and outdoor decoration due to their low water requirements and architectural forms. Species like echeveria and jade plants store water in thick leaves and can survive extended periods without irrigation while maintaining attractive appearances.',
+        'Native plant gardening movements encourage the use of indigenous decorative species that support local wildlife and require fewer inputs. Native plants are pre-adapted to local soil and climate conditions, making them more sustainable choices for ornamental landscaping.',
+        'Seasonal decorative plant rotation allows gardeners to maintain year-round visual interest by replacing summer annuals with cold-tolerant species. This practice maximizes garden aesthetics while working with natural plant life cycles and regional growing seasons.'
       ]
     }
   ];
