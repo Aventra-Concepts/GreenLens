@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import Layout from "@/components/Layout";
+import { Layout } from "@/components/Layout";
 import { ArrowLeft, Scale, Shield, Globe, BookOpen, Leaf, Users, CreditCard, AlertTriangle, FileText, UserCheck, Eye, Calendar } from "lucide-react";
 
 export default function Terms() {

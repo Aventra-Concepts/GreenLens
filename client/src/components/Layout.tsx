@@ -11,7 +11,7 @@ interface LayoutProps {
   className?: string;
 }
 
-export function Layout({ 
+function Layout({ 
   children, 
   showImageBanner = false, 
   showSidebarAds = false, 
@@ -134,3 +134,6 @@ export function Layout({
     </div>
   );
 }
+
+export { Layout };
+export default Layout;
