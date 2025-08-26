@@ -265,14 +265,80 @@ export function Chatbot() {
 
   if (!isOpen) {
     return (
-      <Button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 z-[9999] rounded-full w-16 h-16 bg-green-600 hover:bg-green-700 shadow-xl transition-all duration-300 hover:scale-105 animate-bounce"
-        data-testid="button-open-chatbot"
-        style={{ zIndex: 9999 }}
-      >
-        <MessageCircle className="h-7 w-7" />
-      </Button>
+      <div className="fixed bottom-6 left-6 z-[9999] flex flex-col items-center" style={{ zIndex: 9999 }}>
+        {/* Chat with me tooltip */}
+        <div className="mb-2 bg-white px-3 py-2 rounded-lg shadow-lg border border-gray-200 animate-pulse">
+          <p className="text-sm font-medium text-gray-700">Chat with me</p>
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full">
+            <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-white"></div>
+          </div>
+        </div>
+        
+        {/* Chatbot button with plant theme */}
+        <div className="relative">
+          <Button
+            onClick={() => setIsOpen(true)}
+            className="rounded-full w-16 h-16 bg-gradient-to-br from-green-200 to-green-300 hover:from-green-300 hover:to-green-400 shadow-xl transition-all duration-500 hover:shadow-2xl flex items-center justify-center relative overflow-hidden border-2 border-green-400"
+            data-testid="button-open-chatbot"
+            style={{ 
+              zIndex: 9999,
+              animation: 'pulse-scale 2s ease-in-out infinite'
+            }}
+          >
+            {/* Large Plant icon */}
+            <div className="flex items-center justify-center">
+              <svg 
+                width="40" 
+                height="40" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                className="text-green-800"
+              >
+                <path 
+                  d="M12 22C12 22 20 18 20 10C20 8.9 19.1 8 18 8C16.9 8 16 8.9 16 10C16 8.9 15.1 8 14 8H10C8.9 8 8 8.9 8 10C8 8.9 7.1 8 6 8C4.9 8 4 8.9 4 10C4 18 12 22 12 22Z" 
+                  fill="currentColor" 
+                  opacity="0.4"
+                />
+                <path 
+                  d="M12 2L12 10M12 10C10 8 8 9 8 12M12 10C14 8 16 9 16 12" 
+                  stroke="currentColor" 
+                  strokeWidth="2.5" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+                <circle 
+                  cx="12" 
+                  cy="19" 
+                  r="2.5" 
+                  fill="currentColor"
+                />
+                <path 
+                  d="M10 12C10 12 9 13 8 13C7 13 6 12 6 11M14 12C14 12 15 13 16 13C17 13 18 12 18 11" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </svg>
+            </div>
+            
+            {/* Animated background circles */}
+            <div className="absolute inset-0 rounded-full bg-white opacity-0 hover:opacity-20 transition-opacity duration-300"></div>
+          </Button>
+        </div>
+        
+        <style>{`
+          @keyframes pulse-scale {
+            0%, 100% {
+              transform: scale(1);
+            }
+            50% {
+              transform: scale(1.05);
+            }
+          }
+        `}</style>
+      </div>
     );
   }
 
