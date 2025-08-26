@@ -9,7 +9,7 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import { User as SelectUser } from "@shared/schema";
+import { User } from "@shared/schema";
 import connectPg from "connect-pg-simple";
 import { authLimiter, validateEmail, validatePassword } from "./middleware/security";
 
@@ -228,7 +228,7 @@ export function setupAuth(app: Express) {
 
   // Login endpoint
   app.post("/api/login", authLimiter, (req, res, next) => {
-    passport.authenticate("local", (err: any, user: SelectUser | false, info: any) => {
+    passport.authenticate("local", (err: any, user: User | false, info: any) => {
       if (err) {
         return res.status(500).json({ message: "Login failed" });
       }

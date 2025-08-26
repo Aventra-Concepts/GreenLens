@@ -44,13 +44,13 @@ export const users = pgTable("users", {
   provider: varchar("provider").default('local'), // 'local', 'google', 'facebook', 'github', 'twitter'
   profileImageUrl: varchar("profile_image_url"),
   country: varchar("country"),
-  isAdmin: boolean("is_admin").default(false),
-  isSuperAdmin: boolean("is_super_admin").default(false), // Enhanced admin levels
-  isActive: boolean("is_active").default(true),
-  isAuthor: boolean("is_author").default(false),
-  authorVerified: boolean("author_verified").default(false),
-  emailVerified: boolean("email_verified").default(false),
-  twoFactorEnabled: boolean("two_factor_enabled").default(false),
+  isAdmin: boolean("is_admin").default(false).notNull(),
+  isSuperAdmin: boolean("is_super_admin").default(false).notNull(), // Enhanced admin levels
+  isActive: boolean("is_active").default(true).notNull(),
+  isAuthor: boolean("is_author").default(false).notNull(),
+  authorVerified: boolean("author_verified").default(false).notNull(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
   lastLoginAt: timestamp("last_login_at"),
   failedLoginAttempts: integer("failed_login_attempts").default(0),
   lockedUntil: timestamp("locked_until"),
@@ -68,7 +68,7 @@ export const users = pgTable("users", {
   stripeSubscriptionId: varchar("stripe_subscription_id"),
   // Garden Monitoring Premium Add-on
   gardenMonitoringSubscriptionId: varchar("garden_monitoring_subscription_id"),
-  gardenMonitoringActive: boolean("garden_monitoring_active").default(false),
+  gardenMonitoringActive: boolean("garden_monitoring_active").default(false).notNull(),
   gardenMonitoringExpiresAt: timestamp("garden_monitoring_expires_at"),
   // General subscription fields for plan management
   subscriptionStatus: varchar("subscription_status").default('none'), // 'active', 'inactive', 'trialing', 'none'
@@ -76,7 +76,7 @@ export const users = pgTable("users", {
   subscriptionPlanId: varchar("subscription_plan_id").default('free'),
   // COPPA compliance - Age verification
   dateOfBirth: date("date_of_birth"), // For age verification (COPPA compliance)
-  ageVerified: boolean("age_verified").default(false), // Confirmed 13+ years old
+  ageVerified: boolean("age_verified").default(false).notNull(), // Confirmed 13+ years old
 });
 
 export type UpsertUser = typeof users.$inferInsert;
