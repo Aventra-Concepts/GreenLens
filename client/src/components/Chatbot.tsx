@@ -274,92 +274,173 @@ export function Chatbot() {
           </div>
         </div>
         
-        {/* Adorable Duck Chatbot Button */}
+        {/* Modern Designer Chatbot Button */}
         <div className="relative group">
           <Button
             onClick={() => setIsOpen(true)}
-            className="rounded-full w-16 h-16 bg-gradient-to-br from-yellow-200 via-orange-200 to-yellow-300 hover:from-yellow-300 hover:via-orange-300 hover:to-yellow-400 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center relative overflow-hidden border-2 border-orange-300 hover:border-orange-400"
+            className="rounded-2xl w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center relative overflow-hidden border-3 border-white"
             data-testid="button-open-chatbot"
             style={{ 
               zIndex: 9999,
-              animation: 'duck-bob 1.5s ease-in-out infinite'
+              animation: 'float-bounce 3s ease-in-out infinite'
             }}
           >
-            {/* Animated Duck Design */}
+            {/* Modern Chat Robot Design */}
             <div className="flex items-center justify-center relative">
               <svg 
-                width="40" 
-                height="40" 
-                viewBox="0 0 40 40" 
+                width="42" 
+                height="42" 
+                viewBox="0 0 48 48" 
                 fill="none" 
-                className="text-orange-600"
+                className="text-white drop-shadow-lg"
                 style={{
-                  animation: 'duck-talk 2s ease-in-out infinite'
+                  animation: 'chat-pulse 2.5s ease-in-out infinite'
                 }}
               >
-                {/* Duck body */}
-                <ellipse 
-                  cx="20" 
-                  cy="26" 
+                {/* Robot body/head - rounded rectangle */}
+                <rect 
+                  x="12" 
+                  y="16" 
+                  width="24" 
+                  height="20" 
                   rx="12" 
-                  ry="8" 
+                  ry="10" 
                   fill="currentColor"
+                  stroke="none"
                 />
                 
-                {/* Duck head */}
+                {/* Robot antenna */}
                 <circle 
-                  cx="20" 
-                  cy="15" 
-                  r="8" 
-                  fill="currentColor"
-                />
-                
-                {/* Duck bill/beak - animated */}
-                <path 
-                  d="M12 15 Q8 15 6 17 Q8 19 12 17" 
-                  fill="#ff8c00"
-                  className="duck-bill"
-                />
-                
-                {/* Duck eye */}
-                <circle 
-                  cx="22" 
-                  cy="12" 
+                  cx="24" 
+                  cy="8" 
                   r="2" 
-                  fill="white"
+                  fill="#fbbf24"
+                  className="antenna-glow"
+                />
+                <line 
+                  x1="24" 
+                  y1="10" 
+                  x2="24" 
+                  y2="16" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round"
+                />
+                
+                {/* Robot eyes - animated */}
+                <circle 
+                  cx="19" 
+                  cy="22" 
+                  r="2.5" 
+                  fill="#fbbf24"
+                  className="robot-eye-left"
                 />
                 <circle 
-                  cx="23" 
-                  cy="11.5" 
-                  r="1" 
-                  fill="black"
-                />
-                
-                {/* Wing detail */}
-                <ellipse 
-                  cx="26" 
+                  cx="29" 
                   cy="22" 
-                  rx="4" 
-                  ry="6" 
-                  fill="currentColor" 
-                  opacity="0.7"
+                  r="2.5" 
+                  fill="#fbbf24"
+                  className="robot-eye-right"
                 />
                 
-                {/* Water ripples */}
-                <ellipse 
-                  cx="20" 
-                  cy="34" 
-                  rx="15" 
-                  ry="3" 
-                  fill="currentColor" 
-                  opacity="0.2"
+                {/* Eye pupils */}
+                <circle 
+                  cx="19.5" 
+                  cy="22" 
+                  r="1" 
+                  fill="#1f2937"
+                />
+                <circle 
+                  cx="29.5" 
+                  cy="22" 
+                  r="1" 
+                  fill="#1f2937"
+                />
+                
+                {/* Robot mouth - animated */}
+                <rect 
+                  x="20" 
+                  y="28" 
+                  width="8" 
+                  height="3" 
+                  rx="1.5" 
+                  fill="#fbbf24"
+                  className="robot-mouth"
+                />
+                
+                {/* Side antennas/ears */}
+                <circle 
+                  cx="8" 
+                  cy="20" 
+                  r="1.5" 
+                  fill="#fbbf24"
+                />
+                <circle 
+                  cx="40" 
+                  cy="20" 
+                  r="1.5" 
+                  fill="#fbbf24"
+                />
+                <line 
+                  x1="10" 
+                  y1="20" 
+                  x2="12" 
+                  y2="22" 
+                  stroke="currentColor" 
+                  strokeWidth="1.5"
+                />
+                <line 
+                  x1="38" 
+                  y1="20" 
+                  x2="36" 
+                  y2="22" 
+                  stroke="currentColor" 
+                  strokeWidth="1.5"
+                />
+                
+                {/* Decorative elements */}
+                <rect 
+                  x="16" 
+                  y="32" 
+                  width="2" 
+                  height="1" 
+                  fill="#fbbf24" 
+                  opacity="0.8"
+                />
+                <rect 
+                  x="20" 
+                  y="32" 
+                  width="2" 
+                  height="1" 
+                  fill="#fbbf24" 
+                  opacity="0.8"
+                />
+                <rect 
+                  x="26" 
+                  y="32" 
+                  width="2" 
+                  height="1" 
+                  fill="#fbbf24" 
+                  opacity="0.8"
+                />
+                <rect 
+                  x="30" 
+                  y="32" 
+                  width="2" 
+                  height="1" 
+                  fill="#fbbf24" 
+                  opacity="0.8"
                 />
               </svg>
               
-              {/* Speech bubble effect */}
-              <div className="absolute -top-2 -right-2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 animate-bounce transition-opacity duration-300">
-                <div className="absolute top-0.5 left-0.5 w-2 h-2 bg-blue-400 rounded-full"></div>
+              {/* Floating message indicator */}
+              <div className="absolute -top-2 -right-2 w-4 h-4 bg-gradient-to-r from-green-400 to-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute inset-0.5 bg-white rounded-full animate-ping"></div>
+                <div className="absolute inset-1 bg-green-400 rounded-full"></div>
               </div>
+              
+              {/* Hover glow effect */}
+              <div className="absolute inset-0 rounded-2xl bg-white opacity-0 group-hover:opacity-20 transition-all duration-300 blur-sm scale-110"></div>
             </div>
           </Button>
         </div>
