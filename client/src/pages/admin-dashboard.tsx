@@ -313,6 +313,57 @@ export default function AdminDashboard() {
               </Card>
             </div>
 
+            {/* Admin Quick Actions */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+              <Card className="cursor-pointer hover:shadow-md transition-shadow border-green-200" onClick={() => setLocation('/admin/garden')}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Leaf className="h-5 w-5 text-green-600" />
+                    Garden Dashboard Admin
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-3">Monitor user gardens and plant identifications</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Total Users: {totalUsers}</span>
+                    <ArrowRight className="h-4 w-4 text-gray-400" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('content')}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-purple-600" />
+                    Blog Management
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-3">Create and manage blog posts</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Published: {publishedBlogs}</span>
+                    <ArrowRight className="h-4 w-4 text-gray-400" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('consultations')}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5 text-blue-600" />
+                    Consultations
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-3">Manage expert consultations</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Pending: {consultations?.filter(c => c.status === 'pending').length || 0}</span>
+                    <ArrowRight className="h-4 w-4 text-gray-400" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
             {/* Recent Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
@@ -898,7 +949,23 @@ export default function AdminDashboard() {
               <p className="text-gray-600 dark:text-gray-300">Utilities and maintenance tools</p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setLocation('/admin/garden')}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Leaf className="h-5 w-5 text-green-600" />
+                    Garden Dashboard Admin
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-3">Monitor user gardens and plant identifications</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Total Users: {totalUsers}</span>
+                    <ArrowRight className="h-4 w-4 text-gray-400" />
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle>Database Tools</CardTitle>
@@ -916,22 +983,6 @@ export default function AdminDashboard() {
                     <Zap className="w-4 h-4 mr-2" />
                     Optimize Tables
                   </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setLocation('/admin/garden')}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Leaf className="h-5 w-5 text-green-600" />
-                    Garden Dashboard Admin
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600 mb-3">Monitor user gardens and plant identifications</p>
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Total Users: {totalUsers}</span>
-                    <ArrowRight className="h-4 w-4 text-gray-400" />
-                  </div>
                 </CardContent>
               </Card>
 
