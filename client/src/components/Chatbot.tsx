@@ -265,7 +265,7 @@ export function Chatbot() {
 
   if (!isOpen) {
     return (
-      <div className="fixed bottom-6 left-6 z-[9999] flex flex-col items-center" style={{ zIndex: 9999 }}>
+      <div className="fixed bottom-6 left-6 z-[9998] flex flex-col items-center" style={{ zIndex: 9998 }}>
         {/* Chat with me tooltip */}
         <div className="mb-2 bg-white px-3 py-2 rounded-lg shadow-lg border border-gray-200 animate-pulse">
           <p className="text-sm font-medium text-gray-700">Chat with me</p>
@@ -460,7 +460,7 @@ export function Chatbot() {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 z-[9999] w-96 h-[500px] bg-white border border-gray-200 rounded-lg shadow-xl flex flex-col" data-testid="chatbot-window" style={{ zIndex: 9999 }}>
+    <div className="fixed bottom-6 left-6 z-[9998] w-96 h-[500px] bg-white border border-gray-200 rounded-lg shadow-xl flex flex-col" data-testid="chatbot-window" style={{ zIndex: 9998 }}>
       {/* Header */}
       <div className="bg-green-600 text-white p-4 rounded-t-lg flex justify-between items-center">
         <div>

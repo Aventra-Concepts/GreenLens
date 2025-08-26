@@ -168,70 +168,65 @@ export function CookieConsentBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 z-[9999] max-w-md animate-in slide-in-from-left-5 duration-500" style={{ zIndex: 9999 }}>
-      <Card className="bg-white border-2 border-green-300 shadow-2xl">
-        <div className="p-6">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Cookie className="h-5 w-5 text-green-600" />
-              <h3 className="font-semibold text-gray-900">Cookie Settings</h3>
+    <div className="fixed bottom-4 right-4 z-[9999] max-w-xs animate-in slide-in-from-right-5 duration-500" style={{ zIndex: 9999 }}>
+      <Card className="bg-white border-2 border-green-300 shadow-lg">
+        <div className="p-3">
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex items-center gap-1">
+              <Cookie className="h-4 w-4 text-green-600" />
+              <h3 className="font-semibold text-sm text-gray-900">Cookies</h3>
             </div>
             <Button
               onClick={() => setIsVisible(false)}
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 -mt-1"
+              className="h-6 w-6 p-0 -mt-1"
               data-testid="button-close-cookies"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3 w-3" />
             </Button>
           </div>
           
           {!showSettings ? (
             <>
-              <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                We use cookies to improve your experience, analyze site usage, and assist with marketing. 
-                Essential cookies are required for basic functionality.
+              <p className="text-xs text-gray-600 mb-3 leading-relaxed">
+                We use cookies to improve your experience. Essential cookies are required.
               </p>
               
-              <div className="flex flex-col gap-2">
-                <div className="flex gap-2">
+              <div className="flex flex-col gap-1">
+                <div className="flex gap-1">
                   <Button
                     onClick={acceptAll}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-xs py-1 h-7"
                     data-testid="button-accept-all-cookies"
                   >
-                    Accept All
+                    Accept
                   </Button>
                   <Button
-                    onClick={() => setShowSettings(true)}
+                    onClick={acceptEssential}
                     variant="outline"
-                    className="flex-1 border-green-300 text-green-700 hover:bg-green-50"
-                    data-testid="button-customize-cookies"
+                    className="flex-1 border-gray-300 hover:bg-gray-50 text-xs py-1 h-7"
+                    data-testid="button-essential-only-cookies"
                   >
-                    <Settings className="h-4 w-4 mr-1" />
-                    Customize
+                    Essential
                   </Button>
                 </div>
                 
                 <Button
-                  onClick={acceptEssential}
-                  variant="outline"
-                  className="w-full text-gray-600 hover:bg-gray-50"
-                  data-testid="button-essential-only-cookies"
+                  onClick={() => setShowSettings(true)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs text-green-600 hover:text-green-700 h-6"
+                  data-testid="button-customize-cookies"
                 >
-                  Essential Only
+                  <Settings className="h-3 w-3 mr-1" />
+                  Customize
                 </Button>
               </div>
               
-              <div className="flex items-center gap-1 mt-3 text-xs text-gray-500">
-                <Shield className="h-3 w-3" />
-                <span>
-                  GDPR, CCPA & GPC Compliant • 
-                  <a href="/privacy" className="underline hover:text-green-600 ml-1">
-                    Privacy Policy
-                  </a>
-                </span>
+              <div className="flex items-center justify-center gap-1 mt-2 text-xs text-gray-400">
+                <Shield className="h-2 w-2" />
+                <span>GDPR Compliant</span>
               </div>
             </>
           ) : (
