@@ -296,10 +296,10 @@ export default function Identify() {
             </h1>
             <div className="space-y-2 text-center">
               <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300">
-                Upload up to 3 photos for instant plant identification across all US growing zones.
+                Upload up to 3 photos for instant plant identification across and regions worldwide.
               </p>
               <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                Get personalized care plans and expert disease diagnosis designed for American gardens.
+                Get personalized care plans and expert disease diagnosis designed for world over Gardens.
               </p>
             </div>
           </div>
