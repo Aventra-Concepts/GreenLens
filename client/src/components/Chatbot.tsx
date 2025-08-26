@@ -285,11 +285,11 @@ export function Chatbot() {
               animation: 'pulse-scale 2s ease-in-out infinite'
             }}
           >
-            {/* Large Plant icon */}
+            {/* Extra Large Plant icon */}
             <div className="flex items-center justify-center">
               <svg 
-                width="40" 
-                height="40" 
+                width="200" 
+                height="200" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 className="text-green-800"
