@@ -82,7 +82,7 @@ router.get('/api/recent-predictions', isAuthenticated, async (req: any, res) => 
     // Get recent plant identifications from the community (anonymized)
     const recentPredictions = await db
       .select({
-        plantName: plantResults.primaryCommonName,
+        plantName: plantResults.commonName,
         scientificName: plantResults.species,
         confidence: plantResults.confidence,
         createdAt: plantResults.createdAt,
@@ -129,6 +129,136 @@ router.post('/api/share-milestone', isAuthenticated, async (req: any, res) => {
   } catch (error) {
     console.error('Share milestone error:', error);
     res.status(500).json({ error: 'Failed to share milestone' });
+  }
+});
+
+// Admin garden endpoints - accessible without user login
+router.get('/api/admin/garden-users', async (req: any, res) => {
+  try {
+    // Get all users with their garden statistics
+    const gardenUsers = await db
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        email: users.email,
+        profileImageUrl: users.profileImageUrl,
+        createdAt: users.createdAt,
+        subscriptionStatus: sql<string>`COALESCE(${users.subscriptionStatus}, 'free')`,
+        totalPlants: sql<number>`COALESCE((SELECT COUNT(*) FROM ${plantResults} WHERE ${plantResults.userId} = ${users.id}), 0)`,
+        totalIdentifications: sql<number>`COALESCE((SELECT COUNT(*) FROM ${plantResults} WHERE ${plantResults.userId} = ${users.id}), 0)`,
+        lastActive: users.updatedAt,
+        gardenLevel: sql<number>`COALESCE((SELECT FLOOR(COUNT(*)/10) + 1 FROM ${plantResults} WHERE ${plantResults.userId} = ${users.id}), 1)`,
+        experiencePoints: sql<number>`COALESCE((SELECT COUNT(*) * 50 FROM ${plantResults} WHERE ${plantResults.userId} = ${users.id}), 0)`
+      })
+      .from(users)
+      .orderBy(desc(users.createdAt))
+      .limit(100);
+
+    res.json(gardenUsers);
+  } catch (error) {
+    console.error('Admin garden users error:', error);
+    res.status(500).json({ error: 'Failed to fetch garden users' });
+  }
+});
+
+router.get('/api/admin/garden-user-data/:userId', async (req: any, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Get user info
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId));
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Get user's plants
+    const plants = await db
+      .select()
+      .from(plantResults)
+      .where(eq(plantResults.userId, userId))
+      .orderBy(desc(plantResults.createdAt))
+      .limit(20);
+
+    // Calculate statistics
+    const totalPlants = plants.length;
+    const averageConfidence = plants.length > 0 
+      ? plants.reduce((sum, plant) => sum + parseFloat(plant.confidence || '0'), 0) / plants.length 
+      : 0;
+
+    const userGardenData = {
+      user: {
+        ...user,
+        gardenLevel: Math.floor(totalPlants / 10) + 1,
+        experiencePoints: totalPlants * 50
+      },
+      totalPlants,
+      healthPredictions: {
+        overallHealth: averageConfidence > 80 ? 'Excellent' : averageConfidence > 60 ? 'Good' : 'Needs Attention',
+        diseaseRisk: totalPlants > 10 ? 'Low' : totalPlants > 5 ? 'Medium' : 'High'
+      },
+      achievements: {
+        level: Math.floor(totalPlants / 10) + 1,
+        progress: (totalPlants % 10) * 10,
+        badges: Math.floor(totalPlants / 5),
+        goals: Math.floor(totalPlants / 3),
+        points: totalPlants * 50
+      },
+      plants: plants.map(plant => ({
+        id: plant.id,
+        species: plant.species || 'Unknown',
+        primaryCommonName: plant.commonName || 'Unknown Plant',
+        confidence: plant.confidence || '85',
+        createdAt: plant.createdAt,
+        userId: plant.userId
+      }))
+    };
+
+    res.json(userGardenData);
+  } catch (error) {
+    console.error('Admin garden user data error:', error);
+    res.status(500).json({ error: 'Failed to fetch user garden data' });
+  }
+});
+
+router.get('/api/admin/garden-analytics', async (req: any, res) => {
+  try {
+    // Get overall garden analytics
+    const [totalUsersResult] = await db
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(users);
+
+    const [totalPlantsResult] = await db
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(plantResults);
+
+    const [premiumUsersResult] = await db
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(users)
+      .where(eq(users.subscriptionStatus, 'active'));
+
+    // Calculate monthly growth (placeholder calculation)
+    const currentMonth = new Date().getMonth();
+    const [monthlyGrowthResult] = await db
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(users)
+      .where(sql`EXTRACT(MONTH FROM ${users.createdAt}) = ${currentMonth}`);
+
+    const analytics = {
+      totalUsers: totalUsersResult?.count || 0,
+      totalPlants: totalPlantsResult?.count || 0,
+      premiumUsers: premiumUsersResult?.count || 0,
+      monthlyGrowth: `${Math.round((monthlyGrowthResult?.count || 0) / (totalUsersResult?.count || 1) * 100)}%`
+    };
+
+    res.json(analytics);
+  } catch (error) {
+    console.error('Admin garden analytics error:', error);
+    res.status(500).json({ error: 'Failed to fetch garden analytics' });
   }
 });
 

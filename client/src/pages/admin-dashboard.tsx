@@ -15,7 +15,7 @@ import {
   BarChart3, FileText, LogOut, Database, Server, Activity, Globe, Image, BookOpen,
   TrendingUp, UserCheck, AlertTriangle, CheckCircle, XCircle, Plus, Edit, Trash2,
   Search, Filter, Download, Upload, Eye, ToggleLeft, ToggleRight, Monitor,
-  PieChart, LineChart, UserPlus, Zap, Layers, Lock
+  PieChart, LineChart, UserPlus, Zap, Layers, Lock, ArrowRight, Leaf, Share2
 } from "lucide-react";
 
 interface ConsultationRequest {
@@ -916,6 +916,22 @@ export default function AdminDashboard() {
                     <Zap className="w-4 h-4 mr-2" />
                     Optimize Tables
                   </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setLocation('/admin/garden')}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Leaf className="h-5 w-5 text-green-600" />
+                    Garden Dashboard Admin
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-3">Monitor user gardens and plant identifications</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Total Users: {totalUsers}</span>
+                    <ArrowRight className="h-4 w-4 text-gray-400" />
+                  </div>
                 </CardContent>
               </Card>
 

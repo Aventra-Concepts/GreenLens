@@ -51,6 +51,7 @@ import RefundPolicy from "@/pages/refund-policy";
 import SoilTestingCenters from "@/pages/soil-testing-centers";
 import Disclaimer from "@/pages/disclaimer";
 import Contact from "@/pages/contact";
+import AdminGarden from "@/pages/admin-garden";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 import Footer from "@/components/Footer";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
@@ -152,6 +153,7 @@ function Router() {
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/blog" component={AdminBlogManager} />
       <Route path="/admin/social-media" component={AdminSocialMedia} />
+      <Route path="/admin/garden" component={AdminGarden} />
       
       {/* Protected routes that require authentication */}
       {user && (
