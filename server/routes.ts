@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
+import path from "path";
 import { storage } from "./storage";
 import { setupAuth, requireAuth, requireAdmin } from "./auth";
 import passport from "passport";
@@ -1810,6 +1811,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error updating tool image:', error);
       res.status(500).json({ error: 'Failed to update tool image' });
     }
+  });
+
+  // Serve premium documentation files
+  app.get('/premium_features_documentation.md', (req, res) => {
+    const filePath = path.join(process.cwd(), 'premium_features_documentation.md');
+    res.sendFile(filePath);
+  });
+  
+  app.get('/premium_features_summary.html', (req, res) => {
+    const filePath = path.join(process.cwd(), 'premium_features_summary.html');
+    res.sendFile(filePath);
   });
 
   const httpServer = createServer(app);

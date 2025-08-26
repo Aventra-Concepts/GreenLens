@@ -87,19 +87,19 @@ export default function AdminDashboard() {
   }, [setLocation]);
 
   // Fetch consultation requests - always call this hook
-  const { data: consultations, isLoading: isLoadingConsultations } = useQuery({
+  const { data: consultations = [], isLoading: isLoadingConsultations } = useQuery({
     queryKey: ['/api/admin/consultation-requests'],
     enabled: isAuthenticated,
   });
 
   // Fetch users data
-  const { data: users, isLoading: isLoadingUsers } = useQuery({
+  const { data: users = [], isLoading: isLoadingUsers } = useQuery({
     queryKey: ['/api/admin/users'],
     enabled: isAuthenticated,
   });
 
   // Fetch blog posts
-  const { data: blogPosts, isLoading: isLoadingBlogs } = useQuery({
+  const { data: blogPosts = [], isLoading: isLoadingBlogs } = useQuery({
     queryKey: ['/api/admin/blog-posts'],
     enabled: isAuthenticated,
   });
@@ -165,16 +165,16 @@ export default function AdminDashboard() {
     );
   }
 
-  const filteredConsultations = consultations?.filter((consultation: ConsultationRequest) => 
+  const filteredConsultations = (consultations || []).filter((consultation: ConsultationRequest) => 
     selectedStatus === "all" || consultation.status === selectedStatus
-  ) || [];
+  );
 
   // Calculate stats
-  const totalUsers = users?.length || 0;
-  const activeUsers = users?.filter((u: AdminUser) => u.isActive).length || 0;
-  const totalRevenue = consultations?.reduce((sum, c) => sum + (c.amount || 0), 0) || 0;
-  const totalBlogs = blogPosts?.length || 0;
-  const publishedBlogs = blogPosts?.filter((b: BlogPost) => b.status === 'published').length || 0;
+  const totalUsers = (users || []).length;
+  const activeUsers = (users || []).filter((u: AdminUser) => u.isActive).length;
+  const totalRevenue = (consultations || []).reduce((sum: number, c: ConsultationRequest) => sum + (c.amount || 0), 0);
+  const totalBlogs = (blogPosts || []).length;
+  const publishedBlogs = (blogPosts || []).filter((b: BlogPost) => b.status === 'published').length;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -278,8 +278,8 @@ export default function AdminDashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Consultations</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{consultations?.length || 0}</p>
-                      <p className="text-xs text-yellow-600">{consultations?.filter(c => c.status === 'pending').length || 0} pending</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{(consultations || []).length}</p>
+                      <p className="text-xs text-yellow-600">{(consultations || []).filter((c: ConsultationRequest) => c.status === 'pending').length} pending</p>
                     </div>
                     <MessageSquare className="w-8 h-8 text-yellow-500" />
                   </div>
@@ -357,7 +357,7 @@ export default function AdminDashboard() {
                 <CardContent>
                   <p className="text-sm text-gray-600 mb-3">Manage expert consultations</p>
                   <div className="flex items-center justify-between text-sm">
-                    <span>Pending: {consultations?.filter(c => c.status === 'pending').length || 0}</span>
+                    <span>Pending: {(consultations || []).filter((c: ConsultationRequest) => c.status === 'pending').length}</span>
                     <ArrowRight className="h-4 w-4 text-gray-400" />
                   </div>
                 </CardContent>
@@ -403,39 +403,56 @@ export default function AdminDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Monitor className="w-5 h-5" />
-                    System Status
+                    <FileText className="w-5 h-5" />
+                    Premium Documentation
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">API Services</span>
-                      <Badge className="bg-green-100 text-green-800">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Online
-                      </Badge>
+                      <div>
+                        <p className="text-sm font-medium">My Garden Premium Features</p>
+                        <p className="text-xs text-gray-500">Complete feature documentation</p>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => window.open('/premium_features_documentation.md', '_blank')}
+                        className="flex items-center gap-1"
+                      >
+                        <Download className="w-3 h-3" />
+                        MD
+                      </Button>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Database</span>
-                      <Badge className="bg-green-100 text-green-800">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Connected
-                      </Badge>
+                      <div>
+                        <p className="text-sm font-medium">Premium Features Guide</p>
+                        <p className="text-xs text-gray-500">Formatted HTML documentation</p>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => window.open('/premium_features_summary.html', '_blank')}
+                        className="flex items-center gap-1"
+                      >
+                        <Download className="w-3 h-3" />
+                        HTML
+                      </Button>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">AI Services</span>
-                      <Badge className="bg-green-100 text-green-800">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Active
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Storage</span>
-                      <Badge className="bg-yellow-100 text-yellow-800">
-                        <AlertTriangle className="w-3 h-3 mr-1" />
-                        95% Full
-                      </Badge>
+                      <div>
+                        <p className="text-sm font-medium">Dashboard Interface Preview</p>
+                        <p className="text-xs text-gray-500">Premium dashboard mockup</p>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => window.open('/attached_assets/generated_images/Premium_Garden_Dashboard_Interface_ca5c6759.png', '_blank')}
+                        className="flex items-center gap-1"
+                      >
+                        <Download className="w-3 h-3" />
+                        PNG
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -472,10 +489,10 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   {isLoadingUsers ? (
                     <div className="text-center py-8">Loading users...</div>
-                  ) : users?.length === 0 ? (
+                  ) : (users || []).length === 0 ? (
                     <div className="text-center py-8 text-gray-500">No users found</div>
                   ) : (
-                    users?.slice(0, 10)?.map((user: AdminUser) => (
+                    (users || []).slice(0, 10).map((user: AdminUser) => (
                       <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex items-center space-x-4">
                           <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">

@@ -53,6 +53,7 @@ import Disclaimer from "@/pages/disclaimer";
 import Contact from "@/pages/contact";
 import AdminGarden from "@/pages/admin-garden";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
+import { Chatbot } from "@/components/Chatbot";
 import Footer from "@/components/Footer";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
@@ -187,6 +188,7 @@ function App() {
             </main>
             <Footer />
             <CookieConsentBanner />
+            <Chatbot />
             <PerformanceMetrics />
           </div>
         </AuthProvider>
