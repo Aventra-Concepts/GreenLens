@@ -133,6 +133,62 @@ router.post('/api/share-milestone', isAuthenticated, async (req: any, res) => {
 });
 
 // Admin garden endpoints - accessible without user login
+router.get('/api/admin/garden-users/:filterType', async (req: any, res) => {
+  try {
+    const { filterType } = req.params;
+    
+    // Base query setup
+    const baseQuery = db
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        email: users.email,
+        profileImageUrl: users.profileImageUrl,
+        createdAt: users.createdAt,
+        subscriptionStatus: sql<string>`COALESCE(${users.subscriptionStatus}, 'free')`,
+        totalPlants: sql<number>`COALESCE((SELECT COUNT(*) FROM ${plantResults} WHERE ${plantResults.userId} = ${users.id}), 0)`,
+        totalIdentifications: sql<number>`COALESCE((SELECT COUNT(*) FROM ${plantResults} WHERE ${plantResults.userId} = ${users.id}), 0)`,
+        lastActive: users.updatedAt,
+        gardenLevel: sql<number>`COALESCE((SELECT FLOOR(COUNT(*)/10) + 1 FROM ${plantResults} WHERE ${plantResults.userId} = ${users.id}), 1)`,
+        experiencePoints: sql<number>`COALESCE((SELECT COUNT(*) * 50 FROM ${plantResults} WHERE ${plantResults.userId} = ${users.id}), 0)`
+      })
+      .from(users);
+    
+    let gardenUsers;
+    
+    // Apply filtering based on type
+    if (filterType === 'active') {
+      gardenUsers = await baseQuery
+        .where(eq(users.subscriptionStatus, 'active'))
+        .orderBy(desc(users.createdAt))
+        .limit(100);
+    } else if (filterType === 'premium') {
+      gardenUsers = await baseQuery
+        .where(sql`${users.subscriptionStatus} IN ('active', 'trialing')`)
+        .orderBy(desc(users.createdAt))
+        .limit(100);
+    } else if (filterType === 'free') {
+      gardenUsers = await baseQuery
+        .where(sql`${users.subscriptionStatus} IS NULL OR ${users.subscriptionStatus} = 'free' OR ${users.subscriptionStatus} = 'none'`)
+        .orderBy(desc(users.createdAt))
+        .limit(100);
+    } else {
+      // Default: all users
+      gardenUsers = await baseQuery
+        .orderBy(desc(users.createdAt))
+        .limit(100);
+    }
+
+    console.log(`Admin garden users (${filterType}):`, gardenUsers.length, 'users found');
+    res.json(gardenUsers);
+  } catch (error) {
+    console.error('Admin garden users error:', error);
+    res.status(500).json({ error: 'Failed to fetch garden users' });
+  }
+});
+
+// Main endpoint (no path params)
 router.get('/api/admin/garden-users', async (req: any, res) => {
   try {
     // Get all users with their garden statistics
@@ -155,6 +211,7 @@ router.get('/api/admin/garden-users', async (req: any, res) => {
       .orderBy(desc(users.createdAt))
       .limit(100);
 
+    console.log('Admin garden users (all):', gardenUsers.length, 'users found');
     res.json(gardenUsers);
   } catch (error) {
     console.error('Admin garden users error:', error);

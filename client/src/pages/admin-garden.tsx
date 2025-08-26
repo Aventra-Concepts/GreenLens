@@ -90,7 +90,8 @@ export default function AdminGardenPage() {
 
   // Fetch all garden users for admin overview
   const { data: gardenUsers = [], isLoading: usersLoading } = useQuery<AdminGardenUser[]>({
-    queryKey: ['/api/admin/garden-users', searchTerm, filterBy],
+    queryKey: ['/api/admin/garden-users', filterBy],
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Fetch specific user's garden data
@@ -127,11 +128,14 @@ export default function AdminGardenPage() {
                          user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    if (filterBy === 'active') return matchesSearch && user.subscriptionStatus === 'active';
-    if (filterBy === 'premium') return matchesSearch && (user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing');
-    if (filterBy === 'free') return matchesSearch && (!user.subscriptionStatus || user.subscriptionStatus === 'none');
-    return matchesSearch;
+    return matchesSearch; // Server-side filtering handles user type filtering
   });
+
+  // Debug logging
+  console.log('Garden users fetched:', gardenUsers.length);
+  console.log('Filtered users:', filteredUsers.length);
+  console.log('Filter by:', filterBy);
+  console.log('Search term:', searchTerm);
 
   if (usersLoading || analyticsLoading) {
     return (
@@ -263,7 +267,17 @@ export default function AdminGardenPage() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
+              <div className="p-3 bg-gray-50 border-b text-sm text-gray-600">
+                Showing {filteredUsers.length} users {filterBy !== 'all' ? `(${filterBy})` : ''}
+              </div>
               <div className="max-h-96 overflow-y-auto">
+                {filteredUsers.length === 0 ? (
+                  <div className="p-6 text-center text-gray-500">
+                    <Users className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                    <p>No users found</p>
+                    <p className="text-sm">Try changing your filter or search term</p>
+                  </div>
+                ) : null}
                 {(filteredUsers as AdminGardenUser[]).map((user: AdminGardenUser) => (
                   <div
                     key={user.id}
@@ -289,6 +303,16 @@ export default function AdminGardenPage() {
                           {user.subscriptionStatus === 'active' && (
                             <Badge className="text-xs bg-green-100 text-green-800">
                               Premium
+                            </Badge>
+                          )}
+                          {user.subscriptionStatus === 'trialing' && (
+                            <Badge className="text-xs bg-blue-100 text-blue-800">
+                              Trial
+                            </Badge>
+                          )}
+                          {(!user.subscriptionStatus || user.subscriptionStatus === 'free') && (
+                            <Badge variant="outline" className="text-xs">
+                              Free
                             </Badge>
                           )}
                         </div>
