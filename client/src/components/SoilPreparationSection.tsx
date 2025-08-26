@@ -23,15 +23,15 @@ export function SoilPreparationSection() {
       borderColor: "border-green-200",
       tasks: [
         {
-          title: "Soil Temperature Check",
-          description: "Ensure soil temperature is consistently above 50°F (10°C)",
+          title: "Ground Temperature Assessment",
+          description: "Verify earth warmth maintains steady levels above 50°F (10°C)",
           timing: "Early March - April",
           difficulty: "Beginner",
           tools: ["Soil thermometer"]
         },
         {
-          title: "Remove Winter Debris",
-          description: "Clear fallen leaves, dead plant material, and winter mulch",
+          title: "Clear Seasonal Remnants",
+          description: "Eliminate accumulated foliage, expired vegetation, and cold-season coverings",
           timing: "Late March - Early April",
           difficulty: "Beginner",
           tools: ["Rake", "Garden gloves", "Compost bin"]
@@ -161,11 +161,11 @@ export function SoilPreparationSection() {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
         <div className="text-center mb-8 sm:mb-10 lg:mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 leading-tight">
-            Seasonal Soil Preparation Guide
+            Year-Round Garden Foundation Strategies
           </h2>
           <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-2 leading-relaxed">
-            Optimize your soil health throughout the year with our comprehensive seasonal preparation guide. 
-            Healthy soil is the foundation of a thriving garden.
+            Master the art of soil enhancement through every season with our detailed cultivation preparation methodology. 
+            Rich, vibrant soil forms the cornerstone of flourishing plant communities.
           </p>
         </div>
 

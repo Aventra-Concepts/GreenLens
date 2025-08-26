@@ -41,10 +41,10 @@ export default function About() {
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Our Mission</h2>
               </div>
               <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed max-w-4xl mx-auto px-2 sm:px-0">
-                At GreenLens, we believe everyone deserves to connect with nature and successfully grow plants. 
-                Our mission is to democratize plant knowledge through cutting-edge AI technology, making plant 
-                identification, care, and education accessible to plant enthusiasts worldwide, from beginners 
-                taking their first steps in gardening to experts seeking advanced insights.
+                GreenLens exists to bridge the gap between botanical science and everyday gardening success. 
+                We harness the power of artificial intelligence to transform how people understand and nurture plants. 
+                Our vision is to create a world where every plant lover can achieve gardening success, whether they're 
+                cultivating their first houseplant or managing extensive botanical collections.
               </p>
             </div>
           </div>
@@ -54,8 +54,8 @@ export default function About() {
             <div className="text-center mb-6 sm:mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">What We Do</h2>
               <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto px-2 sm:px-0">
-                GreenLens combines artificial intelligence, botanical expertise, and community knowledge 
-                to create the most comprehensive plant identification and care platform available today.
+                We unite advanced machine learning algorithms with professional botanical knowledge and 
+                global gardening wisdom to deliver unparalleled plant care intelligence and identification accuracy.
               </p>
             </div>
 
@@ -69,8 +69,8 @@ export default function About() {
                   <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white leading-tight">AI Plant Identification</h3>
                 </div>
                 <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                  Advanced computer vision and machine learning algorithms analyze plant photos to provide 
-                  accurate species identification with detailed botanical information and care recommendations.
+                  Our proprietary neural networks examine plant imagery using multi-layered analysis to deliver 
+                  precise species recognition coupled with comprehensive botanical profiles and tailored cultivation guidance.
                 </p>
               </div>
 

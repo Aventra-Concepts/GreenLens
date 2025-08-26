@@ -182,11 +182,11 @@ export function SoilTestingSection() {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
         <div className="text-center mb-8 sm:mb-10 lg:mb-12">
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 leading-tight">
-            Complete Soil Testing Guide
+            Advanced Ground Analysis Systems
           </h2>
           <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-2 leading-relaxed">
-            Understand your soil's health with comprehensive testing. Get the insights you need to 
-            create the perfect growing environment for your plants.
+            Unlock your soil's nutritional mysteries through our expert-recommended analytical approaches. 
+            Understanding substrate composition empowers optimal cultivation success.
           </p>
         </div>
 

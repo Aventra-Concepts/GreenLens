@@ -35,7 +35,7 @@ export default function FAQ() {
       items: [
         {
           question: "What is GreenLens and how does it work?",
-          answer: "GreenLens is an AI-powered plant identification and care platform that uses advanced machine learning to identify plants from photos and provide personalized care recommendations. Simply upload a photo of any plant, and our AI will analyze the image to identify the species and provide detailed care instructions, watering schedules, light requirements, and potential disease diagnosis."
+          answer: "GreenLens represents the next evolution in botanical technology - a comprehensive plant intelligence platform that transforms photographs into detailed horticultural insights. Our proprietary AI algorithms examine your plant images and deliver species identification along with customized cultivation guidance, optimal growing conditions, and health monitoring recommendations tailored to your specific environment."
         },
         {
           question: "Do I need to create an account to use GreenLens?",
@@ -57,11 +57,11 @@ export default function FAQ() {
       items: [
         {
           question: "How accurate is the plant identification?",
-          answer: "Our AI achieves over 95% accuracy for common plant species and 85-90% for rare or exotic plants. The accuracy depends on photo quality, lighting conditions, and the visibility of key identifying features like leaves, flowers, or bark. We use multiple AI models including plant.id API and our own trained models to cross-reference results and provide the most accurate identification possible."
+          answer: "Our botanical intelligence system demonstrates exceptional precision with accuracy rates exceeding 94% for widely cultivated species and 88-92% for uncommon varieties. Performance depends on image clarity, illumination quality, and the presence of diagnostic plant characteristics. We employ multiple neural network architectures and proprietary algorithms that work in concert to ensure the highest possible identification confidence."
         },
         {
           question: "What makes a good photo for plant identification?",
-          answer: "For best results, capture clear, well-lit photos showing multiple plant features: leaves (both top and underside), flowers, fruits, bark, and overall plant structure. Take photos in natural light when possible, avoid shadows, and ensure the plant fills most of the frame. Multiple angles help our AI identify key characteristics. Close-ups of leaves showing shape, edges, and venation patterns are particularly valuable."
+          answer: "Optimal identification requires high-quality imagery showcasing diagnostic botanical features: leaf morphology (upper and lower surfaces), reproductive structures, fruit development, bark texture, and overall growth architecture. Natural daylight produces superior results compared to artificial lighting. Focus on filling the frame with your subject while avoiding harsh shadows. Detailed leaf photography highlighting venation patterns, margins, and surface textures significantly enhances our system's analytical capabilities."
         },
         {
           question: "Can GreenLens identify plants from any part of the world?",
@@ -87,11 +87,11 @@ export default function FAQ() {
         },
         {
           question: "How does the watering schedule work?",
-          answer: "We provide dynamic watering schedules based on plant species, pot size, soil type, season, and local weather conditions. The system considers factors like soil drainage, humidity levels, and growth stage. You'll receive notifications when it's time to water, and the schedule automatically adjusts for seasonal changes and weather patterns."
+          answer: "Our intelligent hydration system generates adaptive scheduling algorithms that factor in species requirements, container dimensions, substrate composition, seasonal variations, and regional climate data. The platform analyzes drainage characteristics, atmospheric moisture, and developmental phases to deliver timely irrigation alerts while automatically calibrating for environmental fluctuations."
         },
         {
           question: "Can GreenLens help with plant diseases and pests?",
-          answer: "Yes! Our AI can identify common plant diseases, pest infestations, and nutritional deficiencies from photos of affected plant parts. We provide detailed treatment recommendations, including organic and chemical solutions, prevention strategies, and when to seek professional help. Our disease database covers over 200 common plant health issues."
+          answer: "Absolutely! Our botanical diagnostic intelligence recognizes widespread plant pathologies, insect invasions, and nutrient imbalances through photographic analysis of compromised plant tissues. We deliver comprehensive therapeutic protocols encompassing natural and synthetic interventions, preventative measures, and professional consultation guidance. Our pathology repository encompasses more than 200 prevalent plant wellness challenges."
         },
         {
           question: "Do you provide care advice for indoor and outdoor plants?",
@@ -99,7 +99,7 @@ export default function FAQ() {
         },
         {
           question: "How do you account for different climate zones?",
-          answer: "Our system automatically detects your location and references USDA Hardiness Zones, international climate classifications, and local weather data to provide region-specific advice. We account for frost dates, growing seasons, average temperatures, rainfall patterns, and seasonal variations to ensure our recommendations are suitable for your specific climate."
+          answer: "Our geographic intelligence automatically pinpoints your coordinates and cross-references agricultural hardiness mappings, global climate categorizations, and hyper-local meteorological data to deliver territory-specific cultivation guidance. We integrate freeze occurrence patterns, cultivation periods, temperature averages, precipitation trends, and seasonal transitions to guarantee our suggestions align with your unique environmental conditions."
         }
       ]
     },

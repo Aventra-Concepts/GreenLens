@@ -159,12 +159,12 @@ export default function HeroSection() {
             <div className="space-y-5 sm:space-y-7">
               <div className="space-y-3 sm:space-y-5">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-gray-900 dark:text-white leading-tight text-center px-2">
-                  <div className="text-center">Identify Plants Accurately</div>
-                  <div className="text-center">Powered by <span className="text-green-600">GreenLens AI Precision</span></div>
+                  <div className="text-center">Discover Your Plant's Identity</div>
+                  <div className="text-center">Through <span className="text-green-600">GreenLens Intelligence</span></div>
                 </h1>
                 <div className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-300 leading-relaxed text-center px-4">
-                  <div>Upload up to 3 photos for instant plant identification across all US growing zones.</div>
-                  <div>Get personalized care plans and expert disease diagnosis designed for American gardens.</div>
+                  <div>Share up to 3 plant photographs for immediate botanical recognition and species analysis.</div>
+                  <div>Receive customized cultivation strategies and professional plant health assessments.</div>
                 </div>
               </div>
               

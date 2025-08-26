@@ -65,14 +65,14 @@ export function FeatureShowcase() {
   const features = [
     {
       icon: <Gift className="h-6 w-6" />,
-      title: "Free Tier Plan",
-      description: "Get started with 3 free plant identifications, valid for 7 days",
+      title: "Complimentary Access Plan",
+      description: "Begin your botanical journey with 3 complimentary plant analyses, active for one week",
       details: [
-        "3 free plant identifications",
-        "7-day validity period", 
-        "Full AI-powered species identification",
-        "Basic care recommendations",
-        "No credit card required"
+        "3 complimentary botanical identifications",
+        "One-week access window", 
+        "Complete AI-driven species recognition",
+        "Essential cultivation guidance",
+        "Zero payment information needed"
       ],
       category: "free"
     },
@@ -91,27 +91,27 @@ export function FeatureShowcase() {
     },
     {
       icon: <Heart className="h-6 w-6" />,
-      title: "Plant Health Monitoring",
-      description: "Regular health check-ups for your plants",
+      title: "Botanical Wellness Surveillance",
+      description: "Continuous vitality assessment for optimal plant health",
       details: [
-        "Disease detection and diagnosis",
-        "Health status tracking",
-        "Treatment recommendations",
-        "Progress monitoring",
-        "Expert AI advice"
+        "Pathogen identification and analysis",
+        "Wellness trajectory monitoring",
+        "Therapeutic intervention strategies",
+        "Recovery progress evaluation",
+        "Professional botanical consultation"
       ],
       category: "health"
     },
     {
       icon: <Camera className="h-6 w-6" />,
-      title: "Advanced Image Analysis",
-      description: "AI-powered image quality assessment and suggestions",
+      title: "Intelligent Visual Processing",
+      description: "Smart image optimization and photographic guidance system",
       details: [
-        "Image quality verification",
-        "Photography tips",
-        "Multiple angle analysis",
-        "Lighting recommendations",
-        "95%+ accuracy rate"
+        "Visual quality enhancement assessment",
+        "Professional photography coaching",
+        "Multi-perspective analytical processing",
+        "Illumination optimization guidance",
+        "Superior accuracy achievement"
       ],
       category: "identification"
     },
