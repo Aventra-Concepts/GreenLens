@@ -167,67 +167,68 @@ export function CookieConsentBanner() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4" data-testid="cookie-consent-banner">
-      <Card className="mx-auto max-w-4xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl">
-        <div className="p-6">
+    <div className="fixed bottom-4 right-4 z-50 max-w-sm" data-testid="cookie-consent-banner">
+      <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="p-4">
           {!showSettings ? (
-            // Main consent banner
-            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
-              <div className="flex-shrink-0">
-                <Cookie className="w-8 h-8 text-green-600" />
-              </div>
-              
-              <div className="flex-1 space-y-2">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Cookie & Privacy Settings
+            // Main consent banner - compact version
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Cookie className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                  Cookie Settings
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  We use cookies to enhance your experience, provide personalized content, and analyze site usage. 
-                  You can manage your preferences or learn more in our{' '}
-                  <button
-                    type="button"
-                    className="text-green-600 hover:text-green-700 underline"
-                    onClick={() => window.open('/privacy', '_blank')}
-                    data-testid="privacy-policy-link"
-                  >
-                    Privacy Policy
-                  </button>.
-                </p>
-                {navigator.globalPrivacyControl && (
-                  <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-                    <Shield className="w-4 h-4" />
-                    <span>Global Privacy Control detected - respecting your privacy preferences</span>
-                  </div>
-                )}
               </div>
               
-              <div className="flex flex-col lg:flex-row gap-2">
+              <p className="text-xs text-gray-600 dark:text-gray-300">
+                We use cookies to enhance your experience. See our{' '}
+                <button
+                  type="button"
+                  className="text-green-600 hover:text-green-700 underline"
+                  onClick={() => window.open('/privacy', '_blank')}
+                  data-testid="privacy-policy-link"
+                >
+                  Privacy Policy
+                </button>.
+              </p>
+              
+              {navigator.globalPrivacyControl && (
+                <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                  <Shield className="w-3 h-3" />
+                  <span>GPC detected</span>
+                </div>
+              )}
+              
+              <div className="flex flex-col gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowSettings(true)}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1 h-8"
                   data-testid="cookie-settings-button"
                 >
-                  <Settings className="w-4 h-4" />
-                  Manage Preferences
+                  <Settings className="w-3 h-3" />
+                  Manage
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={acceptEssential}
-                  data-testid="accept-essential-button"
-                >
-                  Essential Only
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={acceptAll}
-                  className="bg-green-600 hover:bg-green-700"
-                  data-testid="accept-all-button"
-                >
-                  Accept All
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={acceptEssential}
+                    className="flex-1 h-8 text-xs"
+                    data-testid="accept-essential-button"
+                  >
+                    Essential
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={acceptAll}
+                    className="flex-1 h-8 bg-green-600 hover:bg-green-700 text-xs"
+                    data-testid="accept-all-button"
+                  >
+                    Accept All
+                  </Button>
+                </div>
               </div>
             </div>
           ) : (
