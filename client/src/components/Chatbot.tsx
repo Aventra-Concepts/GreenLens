@@ -26,35 +26,35 @@ const faqs: FAQ[] = [
     question: 'How do I identify a plant?',
     answer: 'Upload a clear photo of your plant using our AI identification tool. Make sure the image shows the leaves, flowers, or distinctive features clearly. Our AI will analyze the image and provide species identification with care recommendations.',
     category: 'identification',
-    keywords: ['identify', 'plant', 'photo', 'upload', 'species', 'recognize']
+    keywords: ['identify', 'plant', 'photo', 'upload', 'species', 'recognize', 'name', 'what', 'this', 'identification']
   },
   {
     id: '2',
     question: 'What are the premium features?',
     answer: 'Premium users get unlimited plant identifications, advanced AI health predictions, disease diagnosis, personalized care plans, expert consultations, achievement system, social features, and priority support. You can upgrade from your account settings.',
     category: 'premium',
-    keywords: ['premium', 'upgrade', 'features', 'unlimited', 'advanced', 'subscription']
+    keywords: ['premium', 'upgrade', 'features', 'unlimited', 'advanced', 'subscription', 'paid', 'pro', 'benefits']
   },
   {
     id: '3',
     question: 'How accurate is the plant identification?',
     answer: 'Our AI plant identification system has over 95% accuracy for common plants and 85% for rare species. Premium users get access to our most advanced AI models with even higher accuracy rates.',
     category: 'accuracy',
-    keywords: ['accuracy', 'correct', 'reliable', 'percentage', 'how good']
+    keywords: ['accuracy', 'correct', 'reliable', 'percentage', 'how good', 'precise', 'right', 'wrong']
   },
   {
     id: '4',
     question: 'Can I get help with plant diseases?',
     answer: 'Yes! Upload photos of affected plant parts and our AI will diagnose common diseases, pests, and nutrient deficiencies. Premium users get detailed treatment plans and access to expert botanist consultations.',
     category: 'health',
-    keywords: ['disease', 'sick', 'pest', 'problem', 'dying', 'health', 'diagnosis']
+    keywords: ['disease', 'sick', 'pest', 'problem', 'dying', 'health', 'diagnosis', 'bug', 'insect', 'yellow', 'brown', 'spots', 'wilting']
   },
   {
     id: '5',
     question: 'How do I care for my plants?',
     answer: 'After identifying your plant, you will receive personalized care instructions including watering schedules, light requirements, soil needs, and seasonal care tips. Premium users get smart reminders and weather-integrated care plans.',
     category: 'care',
-    keywords: ['care', 'watering', 'light', 'soil', 'fertilizer', 'maintenance', 'how to']
+    keywords: ['care', 'watering', 'light', 'soil', 'fertilizer', 'maintenance', 'how to', 'water', 'sun', 'sunlight', 'grow', 'growing']
   },
   {
     id: '6',
@@ -68,21 +68,21 @@ const faqs: FAQ[] = [
     question: 'How much does premium cost?',
     answer: 'Premium plans start at $9.99/month or $89.99/year (save 25%). Family plans for up to 5 accounts are $149.99/year. All plans include a free trial period.',
     category: 'pricing',
-    keywords: ['cost', 'price', 'subscription', 'monthly', 'yearly', 'family', 'trial']
+    keywords: ['cost', 'price', 'subscription', 'monthly', 'yearly', 'family', 'trial', 'pricing', 'money', 'fee', 'payment', 'much', 'expensive', 'cheap']
   },
   {
     id: '8',
     question: 'Can I cancel my subscription?',
     answer: 'Yes, you can cancel your premium subscription anytime from your account settings. There are no cancellation fees, and you will retain premium access until the end of your billing period.',
     category: 'billing',
-    keywords: ['cancel', 'subscription', 'billing', 'refund', 'stop', 'end']
+    keywords: ['cancel', 'subscription', 'billing', 'refund', 'stop', 'end', 'unsubscribe', 'quit', 'leave', 'terminate']
   },
   {
     id: '9',
     question: 'What plants can you identify?',
     answer: 'We can identify over 17,000 plant species including houseplants, garden plants, trees, flowers, succulents, herbs, vegetables, and weeds. Our database covers plants from around the world.',
     category: 'database',
-    keywords: ['species', 'types', 'database', 'flowers', 'trees', 'houseplants', 'vegetables']
+    keywords: ['species', 'types', 'database', 'flowers', 'trees', 'houseplants', 'vegetables', 'plants', 'many', 'how many', 'which', 'kinds', 'varieties']
   },
   {
     id: '10',
@@ -139,37 +139,92 @@ export function Chatbot() {
   }, [isOpen]);
 
   const findBestAnswer = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
+    const lowerMessage = userMessage.toLowerCase().trim();
     
-    // Find FAQ with matching keywords
-    const matchedFAQ = faqs.find(faq => 
-      faq.keywords.some(keyword => lowerMessage.includes(keyword))
-    );
+    // Calculate relevance scores for each FAQ
+    const scoredFAQs = faqs.map(faq => {
+      let score = 0;
+      
+      // Check if question directly matches
+      if (lowerMessage.includes(faq.question.toLowerCase()) || 
+          faq.question.toLowerCase().includes(lowerMessage)) {
+        score += 10;
+      }
+      
+      // Count keyword matches with different weights
+      const keywordMatches = faq.keywords.filter(keyword => 
+        lowerMessage.includes(keyword.toLowerCase())
+      );
+      score += keywordMatches.length * 2;
+      
+      // Bonus for exact keyword match at start
+      const firstWord = lowerMessage.split(' ')[0];
+      if (faq.keywords.some(keyword => keyword.toLowerCase() === firstWord)) {
+        score += 3;
+      }
+      
+      // Bonus for multiple word matches
+      const messageWords = lowerMessage.split(' ').filter(word => word.length > 2);
+      const matchingWords = messageWords.filter(word => 
+        faq.keywords.some(keyword => keyword.toLowerCase().includes(word)) ||
+        faq.question.toLowerCase().includes(word)
+      );
+      score += matchingWords.length;
+      
+      return { faq, score };
+    });
     
-    if (matchedFAQ) {
-      return matchedFAQ.answer;
+    // Find the best match
+    const bestMatch = scoredFAQs
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)[0];
+    
+    if (bestMatch && bestMatch.score >= 2) {
+      return bestMatch.faq.answer;
     }
     
-    // Fallback responses for common queries
-    if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-      return 'Hello! I am here to help with all your plant care questions. You can ask me about plant identification, care tips, premium features, or any gardening questions.';
+    // Enhanced fallback responses for common queries
+    if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+      return 'Hello! I am your GreenLens assistant. I can help you identify plants, provide care advice, explain premium features, diagnose plant problems, and answer gardening questions. What would you like to know?';
     }
     
-    if (lowerMessage.includes('help')) {
-      return 'I can help you with: Plant identification, Disease diagnosis, Care recommendations, Premium features, Account questions, and General plant care. What specific topic interests you?';
+    if (lowerMessage.includes('help') || lowerMessage.includes('what can you do')) {
+      return 'I can assist with: 🌱 Plant identification from photos, 🏥 Disease and pest diagnosis, 💡 Personalized care recommendations, ⭐ Premium feature information, 📞 Account and billing questions, 🌿 General gardening advice. What interests you most?';
     }
     
-    if (lowerMessage.includes('thank')) {
-      return 'You are welcome! I am always here to help with your gardening questions. Is there anything else you would like to know?';
+    if (lowerMessage.includes('thank') || lowerMessage.includes('thanks')) {
+      return 'You are very welcome! I am here whenever you need plant care guidance. Feel free to ask about any gardening topics or plant concerns you might have.';
     }
     
-    if (lowerMessage.includes('contact') || lowerMessage.includes('support')) {
+    if (lowerMessage.includes('contact') || lowerMessage.includes('support') || lowerMessage.includes('email')) {
       setShowContact(true);
-      return 'Here are our contact details for additional support. Our team is ready to help you with any questions not covered here.';
+      return 'I will show you our contact information. Our support team is ready to help with any questions beyond what I can answer here.';
     }
     
-    // Default response with suggestions
-    return 'I am not sure about that specific question, but I can help you with plant identification, care tips, premium features, and general gardening advice. Try asking about: "How to identify plants", "Premium features", "Plant care", or "Contact support".';
+    // Handle specific question patterns
+    if (lowerMessage.includes('how') && (lowerMessage.includes('work') || lowerMessage.includes('use'))) {
+      return 'GreenLens works by analyzing photos of your plants using advanced AI. Simply upload a clear image, and our system identifies the species and provides tailored care recommendations. Would you like to know about our identification process or premium features?';
+    }
+    
+    if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('money') || lowerMessage.includes('fee')) {
+      return 'Our premium plans start at $9.99/month or $89.99/year (25% savings). Premium includes unlimited identifications, advanced health analysis, disease diagnosis, expert consultations, and priority support. There is also a free tier with basic features.';
+    }
+    
+    if (lowerMessage.includes('free') && !lowerMessage.includes('trial')) {
+      return 'Yes! GreenLens offers free plant identification with limited monthly uses. Free users can identify plants, get basic care tips, and access our plant database. Premium users get unlimited access plus advanced features like health predictions and expert consultations.';
+    }
+    
+    // Default response with personalized suggestions
+    const suggestedQuestions = [
+      'How do I identify a plant?',
+      'What premium features are available?',
+      'How do I care for my plants?',
+      'Can you diagnose plant diseases?',
+      'How accurate is plant identification?'
+    ];
+    const randomSuggestion = suggestedQuestions[Math.floor(Math.random() * suggestedQuestions.length)];
+    
+    return `I am not quite sure about that specific question. I specialize in plant identification, care guidance, and GreenLens features. You might want to ask: "${randomSuggestion}" or try rephrasing your question with keywords like "identify", "care", "premium", or "help".`;
   };
 
   const handleSendMessage = async () => {
