@@ -28,7 +28,7 @@ export function CookieConsentBanner() {
     // Add delay to ensure proper rendering on all pages
     const timer = setTimeout(() => {
       const consent = localStorage.getItem('greenlens-cookie-consent');
-      const gpcEnabled = navigator.globalPrivacyControl;
+      const gpcEnabled = (navigator as any).globalPrivacyControl;
       
       if (!consent) {
         // Honor Global Privacy Control (GPC) signals
@@ -64,7 +64,7 @@ export function CookieConsentBanner() {
         setPreferences(consentData.preferences);
         applyCookieSettings(consentData.preferences);
       }
-    }, 2000); // 2 second delay to ensure page loads properly
+    }, 1000); // 1 second delay to ensure page loads properly
     
     return () => clearTimeout(timer);
   }, [toast]);
@@ -106,7 +106,7 @@ export function CookieConsentBanner() {
       preferences: prefs,
       timestamp: new Date().toISOString(),
       version: '1.0',
-      gpcDetected: !!navigator.globalPrivacyControl,
+      gpcDetected: !!(navigator as any).globalPrivacyControl,
     };
     
     localStorage.setItem('greenlens-cookie-consent', JSON.stringify(consentData));

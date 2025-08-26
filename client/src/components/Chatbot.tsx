@@ -113,7 +113,7 @@ export function Chatbot() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShouldShow(true);
-    }, 5000); // Show after 5 seconds (after cookie banner appears)
+    }, 3000); // Show after 3 seconds (after cookie banner appears)
     
     return () => clearTimeout(timer);
   }, []);
@@ -274,57 +274,100 @@ export function Chatbot() {
           </div>
         </div>
         
-        {/* Chatbot button with plant theme - Much Larger */}
-        <div className="relative">
+        {/* Elegant Chatbot button with refined plant design */}
+        <div className="relative group">
           <Button
             onClick={() => setIsOpen(true)}
-            className="rounded-full w-32 h-32 bg-gradient-to-br from-green-200 to-green-300 hover:from-green-300 hover:to-green-400 shadow-xl transition-all duration-500 hover:shadow-2xl flex items-center justify-center relative overflow-hidden border-2 border-green-400"
+            className="rounded-full w-16 h-16 bg-gradient-to-br from-lime-200 via-green-200 to-emerald-200 hover:from-lime-300 hover:via-green-300 hover:to-emerald-300 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center relative overflow-hidden border-3 border-green-300 hover:border-green-400"
             data-testid="button-open-chatbot"
             style={{ 
               zIndex: 9999,
               animation: 'pulse-scale 2s ease-in-out infinite'
             }}
           >
-            {/* Massive Plant icon - 5x larger */}
-            <div className="flex items-center justify-center w-full h-full">
+            {/* Elegant Plant Design */}
+            <div className="flex items-center justify-center relative">
+              {/* Main plant stem and leaves */}
               <svg 
-                width="120" 
-                height="120" 
-                viewBox="0 0 24 24" 
+                width="38" 
+                height="38" 
+                viewBox="0 0 32 32" 
                 fill="none" 
-                className="text-green-800"
+                className="text-green-700 drop-shadow-sm"
               >
+                {/* Pot/Base */}
                 <path 
-                  d="M12 22C12 22 20 18 20 10C20 8.9 19.1 8 18 8C16.9 8 16 8.9 16 10C16 8.9 15.1 8 14 8H10C8.9 8 8 8.9 8 10C8 8.9 7.1 8 6 8C4.9 8 4 8.9 4 10C4 18 12 22 12 22Z" 
+                  d="M10 26 L22 26 L21 28 L11 28 Z" 
                   fill="currentColor" 
-                  opacity="0.4"
+                  opacity="0.6"
+                />
+                
+                {/* Main stem */}
+                <path 
+                  d="M16 26 L16 12" 
+                  stroke="currentColor" 
+                  strokeWidth="3" 
+                  strokeLinecap="round"
+                />
+                
+                {/* Large decorative leaves */}
+                <path 
+                  d="M16 16 Q12 14 10 16 Q12 18 16 16" 
+                  fill="currentColor" 
+                  opacity="0.8"
                 />
                 <path 
-                  d="M12 2L12 10M12 10C10 8 8 9 8 12M12 10C14 8 16 9 16 12" 
-                  stroke="currentColor" 
-                  strokeWidth="2.5" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round"
-                  fill="none"
+                  d="M16 16 Q20 14 22 16 Q20 18 16 16" 
+                  fill="currentColor" 
+                  opacity="0.8"
                 />
+                
+                {/* Upper leaves */}
+                <path 
+                  d="M16 14 Q13 12 11 14 Q13 16 16 14" 
+                  fill="currentColor" 
+                  opacity="0.7"
+                />
+                <path 
+                  d="M16 14 Q19 12 21 14 Q19 16 16 14" 
+                  fill="currentColor" 
+                  opacity="0.7"
+                />
+                
+                {/* Top flourish */}
+                <path 
+                  d="M16 12 Q14 10 12 12 Q14 14 16 12" 
+                  fill="currentColor" 
+                  opacity="0.9"
+                />
+                <path 
+                  d="M16 12 Q18 10 20 12 Q18 14 16 12" 
+                  fill="currentColor" 
+                  opacity="0.9"
+                />
+                
+                {/* Center flower/bud */}
                 <circle 
-                  cx="12" 
-                  cy="19" 
-                  r="2.5" 
+                  cx="16" 
+                  cy="10" 
+                  r="2" 
                   fill="currentColor"
                 />
-                <path 
-                  d="M10 12C10 12 9 13 8 13C7 13 6 12 6 11M14 12C14 12 15 13 16 13C17 13 18 12 18 11" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round"
-                  fill="none"
+                <circle 
+                  cx="16" 
+                  cy="10" 
+                  r="1" 
+                  fill="white" 
+                  opacity="0.8"
                 />
               </svg>
+              
+              {/* Subtle sparkle effect */}
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-300 rounded-full opacity-0 group-hover:opacity-100 animate-ping transition-opacity duration-300"></div>
             </div>
             
-            {/* Animated background circles */}
-            <div className="absolute inset-0 rounded-full bg-white opacity-0 hover:opacity-20 transition-opacity duration-300"></div>
+            {/* Hover glow effect */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-green-200 to-lime-200 opacity-0 group-hover:opacity-30 transition-opacity duration-300 blur-sm"></div>
           </Button>
         </div>
         
