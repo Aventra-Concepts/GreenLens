@@ -164,7 +164,7 @@ export function CookieConsentBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-[9999] max-w-md" style={{ zIndex: 9999 }}>
+    <div className="fixed bottom-4 left-4 z-[9999] max-w-md animate-in slide-in-from-left-5 duration-500" style={{ zIndex: 9999 }}>
       <Card className="bg-white border-2 border-green-300 shadow-2xl">
         <div className="p-6">
           <div className="flex items-start justify-between mb-4">

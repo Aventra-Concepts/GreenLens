@@ -274,100 +274,93 @@ export function Chatbot() {
           </div>
         </div>
         
-        {/* Elegant Chatbot button with refined plant design */}
+        {/* Adorable Duck Chatbot Button */}
         <div className="relative group">
           <Button
             onClick={() => setIsOpen(true)}
-            className="rounded-full w-16 h-16 bg-gradient-to-br from-lime-200 via-green-200 to-emerald-200 hover:from-lime-300 hover:via-green-300 hover:to-emerald-300 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center relative overflow-hidden border-3 border-green-300 hover:border-green-400"
+            className="rounded-full w-16 h-16 bg-gradient-to-br from-yellow-200 via-orange-200 to-yellow-300 hover:from-yellow-300 hover:via-orange-300 hover:to-yellow-400 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center relative overflow-hidden border-2 border-orange-300 hover:border-orange-400"
             data-testid="button-open-chatbot"
             style={{ 
               zIndex: 9999,
-              animation: 'pulse-scale 2s ease-in-out infinite'
+              animation: 'duck-bob 1.5s ease-in-out infinite'
             }}
           >
-            {/* Elegant Plant Design */}
+            {/* Animated Duck Design */}
             <div className="flex items-center justify-center relative">
-              {/* Main plant stem and leaves */}
               <svg 
-                width="38" 
-                height="38" 
-                viewBox="0 0 32 32" 
+                width="40" 
+                height="40" 
+                viewBox="0 0 40 40" 
                 fill="none" 
-                className="text-green-700 drop-shadow-sm"
+                className="text-orange-600"
+                style={{
+                  animation: 'duck-talk 2s ease-in-out infinite'
+                }}
               >
-                {/* Pot/Base */}
-                <path 
-                  d="M10 26 L22 26 L21 28 L11 28 Z" 
-                  fill="currentColor" 
-                  opacity="0.6"
-                />
-                
-                {/* Main stem */}
-                <path 
-                  d="M16 26 L16 12" 
-                  stroke="currentColor" 
-                  strokeWidth="3" 
-                  strokeLinecap="round"
-                />
-                
-                {/* Large decorative leaves */}
-                <path 
-                  d="M16 16 Q12 14 10 16 Q12 18 16 16" 
-                  fill="currentColor" 
-                  opacity="0.8"
-                />
-                <path 
-                  d="M16 16 Q20 14 22 16 Q20 18 16 16" 
-                  fill="currentColor" 
-                  opacity="0.8"
-                />
-                
-                {/* Upper leaves */}
-                <path 
-                  d="M16 14 Q13 12 11 14 Q13 16 16 14" 
-                  fill="currentColor" 
-                  opacity="0.7"
-                />
-                <path 
-                  d="M16 14 Q19 12 21 14 Q19 16 16 14" 
-                  fill="currentColor" 
-                  opacity="0.7"
-                />
-                
-                {/* Top flourish */}
-                <path 
-                  d="M16 12 Q14 10 12 12 Q14 14 16 12" 
-                  fill="currentColor" 
-                  opacity="0.9"
-                />
-                <path 
-                  d="M16 12 Q18 10 20 12 Q18 14 16 12" 
-                  fill="currentColor" 
-                  opacity="0.9"
-                />
-                
-                {/* Center flower/bud */}
-                <circle 
-                  cx="16" 
-                  cy="10" 
-                  r="2" 
+                {/* Duck body */}
+                <ellipse 
+                  cx="20" 
+                  cy="26" 
+                  rx="12" 
+                  ry="8" 
                   fill="currentColor"
                 />
+                
+                {/* Duck head */}
                 <circle 
-                  cx="16" 
-                  cy="10" 
+                  cx="20" 
+                  cy="15" 
+                  r="8" 
+                  fill="currentColor"
+                />
+                
+                {/* Duck bill/beak - animated */}
+                <path 
+                  d="M12 15 Q8 15 6 17 Q8 19 12 17" 
+                  fill="#ff8c00"
+                  className="duck-bill"
+                />
+                
+                {/* Duck eye */}
+                <circle 
+                  cx="22" 
+                  cy="12" 
+                  r="2" 
+                  fill="white"
+                />
+                <circle 
+                  cx="23" 
+                  cy="11.5" 
                   r="1" 
-                  fill="white" 
-                  opacity="0.8"
+                  fill="black"
+                />
+                
+                {/* Wing detail */}
+                <ellipse 
+                  cx="26" 
+                  cy="22" 
+                  rx="4" 
+                  ry="6" 
+                  fill="currentColor" 
+                  opacity="0.7"
+                />
+                
+                {/* Water ripples */}
+                <ellipse 
+                  cx="20" 
+                  cy="34" 
+                  rx="15" 
+                  ry="3" 
+                  fill="currentColor" 
+                  opacity="0.2"
                 />
               </svg>
               
-              {/* Subtle sparkle effect */}
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-300 rounded-full opacity-0 group-hover:opacity-100 animate-ping transition-opacity duration-300"></div>
+              {/* Speech bubble effect */}
+              <div className="absolute -top-2 -right-2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 animate-bounce transition-opacity duration-300">
+                <div className="absolute top-0.5 left-0.5 w-2 h-2 bg-blue-400 rounded-full"></div>
+              </div>
             </div>
-            
-            {/* Hover glow effect */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-green-200 to-lime-200 opacity-0 group-hover:opacity-30 transition-opacity duration-300 blur-sm"></div>
           </Button>
         </div>
         
