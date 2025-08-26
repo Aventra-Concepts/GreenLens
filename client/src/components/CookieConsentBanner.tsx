@@ -30,6 +30,9 @@ export function CookieConsentBanner() {
       const consent = localStorage.getItem('greenlens-cookie-consent');
       const gpcEnabled = (navigator as any).globalPrivacyControl;
       
+      // For development/demo - always show banner (remove this line in production)
+      localStorage.removeItem('greenlens-cookie-consent');
+      
       if (!consent) {
         // Honor Global Privacy Control (GPC) signals
         if (gpcEnabled) {
@@ -58,6 +61,7 @@ export function CookieConsentBanner() {
           return;
         }
         
+        // Show cookie consent banner for first-time users
         setIsVisible(true);
       } else {
         const consentData = JSON.parse(consent);
