@@ -225,7 +225,19 @@ router.get('/api/admin/garden-user-data/:userId', async (req: any, res) => {
     
     // Get user info
     const [user] = await db
-      .select()
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        email: users.email,
+        profileImageUrl: users.profileImageUrl,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+        subscriptionStatus: users.subscriptionStatus,
+        preferredCurrency: users.preferredCurrency,
+        timezone: users.timezone,
+        region: users.region
+      })
       .from(users)
       .where(eq(users.id, userId));
     
