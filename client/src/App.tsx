@@ -49,6 +49,7 @@ import Terms from "@/pages/terms";
 import About from "@/pages/about";
 import RefundPolicy from "@/pages/refund-policy";
 import SoilTestingCenters from "@/pages/soil-testing-centers";
+import Disclaimer from "@/pages/disclaimer";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 import Footer from "@/components/Footer";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
@@ -134,6 +135,7 @@ function Router() {
       <Route path="/about" component={About} />
       <Route path="/refund-policy" component={RefundPolicy} />
       <Route path="/soil-testing-centers" component={SoilTestingCenters} />
+      <Route path="/disclaimer" component={Disclaimer} />
       <Route path="/faq" component={FAQ} />
       <Route path="/plant-database" component={PlantDatabase} />
       <Route path="/community" component={Community} />

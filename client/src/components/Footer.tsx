@@ -287,6 +287,15 @@ export default function Footer() {
                   </div>
                 </div>
               </li>
+              <li>
+                <button 
+                  onClick={() => navigateWithMessage("/disclaimer")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-disclaimer"
+                >
+                  Disclaimer
+                </button>
+              </li>
             </ul>
           </div>
           
