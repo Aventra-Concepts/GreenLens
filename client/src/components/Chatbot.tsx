@@ -102,11 +102,21 @@ const quickActions = [
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [shouldShow, setShouldShow] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showContact, setShowContact] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Show chatbot after cookie consent is handled
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShouldShow(true);
+    }, 5000); // Show after 5 seconds (after cookie banner appears)
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -250,20 +260,24 @@ export function Chatbot() {
     </Card>
   );
 
+  // Don't show until timer completes
+  if (!shouldShow) return null;
+
   if (!isOpen) {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 left-4 z-50 rounded-full w-14 h-14 bg-green-600 hover:bg-green-700 shadow-lg"
+        className="fixed bottom-6 left-6 z-[9999] rounded-full w-16 h-16 bg-green-600 hover:bg-green-700 shadow-xl transition-all duration-300 hover:scale-105 animate-bounce"
         data-testid="button-open-chatbot"
+        style={{ zIndex: 9999 }}
       >
-        <MessageCircle className="h-6 w-6" />
+        <MessageCircle className="h-7 w-7" />
       </Button>
     );
   }
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 w-96 h-[500px] bg-white border border-gray-200 rounded-lg shadow-xl flex flex-col" data-testid="chatbot-window">
+    <div className="fixed bottom-6 left-6 z-[9999] w-96 h-[500px] bg-white border border-gray-200 rounded-lg shadow-xl flex flex-col" data-testid="chatbot-window" style={{ zIndex: 9999 }}>
       {/* Header */}
       <div className="bg-green-600 text-white p-4 rounded-t-lg flex justify-between items-center">
         <div>

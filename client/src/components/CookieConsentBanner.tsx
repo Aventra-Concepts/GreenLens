@@ -25,43 +25,48 @@ export function CookieConsentBanner() {
 
   // Check if user has already made a choice
   useEffect(() => {
-    const consent = localStorage.getItem('greenlens-cookie-consent');
-    const gpcEnabled = navigator.globalPrivacyControl;
-    
-    if (!consent) {
-      // Honor Global Privacy Control (GPC) signals
-      if (gpcEnabled) {
-        // GPC signal detected - automatically opt-out of non-essential cookies
-        const gpcPreferences = {
-          essential: true,
-          analytics: false,
-          marketing: false,
-          personalization: false,
-        };
-        
-        localStorage.setItem('greenlens-cookie-consent', JSON.stringify({
-          preferences: gpcPreferences,
-          timestamp: new Date().toISOString(),
-          gpcDetected: true,
-        }));
-        
-        setPreferences(gpcPreferences);
-        applyCookieSettings(gpcPreferences);
-        
-        toast({
-          title: 'Privacy Settings Applied',
-          description: 'Global Privacy Control detected - automatically opted out of non-essential cookies.',
-        });
-        
-        return;
-      }
+    // Add delay to ensure proper rendering on all pages
+    const timer = setTimeout(() => {
+      const consent = localStorage.getItem('greenlens-cookie-consent');
+      const gpcEnabled = navigator.globalPrivacyControl;
       
-      setIsVisible(true);
-    } else {
-      const consentData = JSON.parse(consent);
-      setPreferences(consentData.preferences);
-      applyCookieSettings(consentData.preferences);
-    }
+      if (!consent) {
+        // Honor Global Privacy Control (GPC) signals
+        if (gpcEnabled) {
+          // GPC signal detected - automatically opt-out of non-essential cookies
+          const gpcPreferences = {
+            essential: true,
+            analytics: false,
+            marketing: false,
+            personalization: false,
+          };
+          
+          localStorage.setItem('greenlens-cookie-consent', JSON.stringify({
+            preferences: gpcPreferences,
+            timestamp: new Date().toISOString(),
+            gpcDetected: true,
+          }));
+          
+          setPreferences(gpcPreferences);
+          applyCookieSettings(gpcPreferences);
+          
+          toast({
+            title: 'Privacy Settings Applied',
+            description: 'Global Privacy Control detected - automatically opted out of non-essential cookies.',
+          });
+          
+          return;
+        }
+        
+        setIsVisible(true);
+      } else {
+        const consentData = JSON.parse(consent);
+        setPreferences(consentData.preferences);
+        applyCookieSettings(consentData.preferences);
+      }
+    }, 2000); // 2 second delay to ensure page loads properly
+    
+    return () => clearTimeout(timer);
   }, [toast]);
 
   const applyCookieSettings = (prefs: CookiePreferences) => {
@@ -144,243 +149,160 @@ export function CookieConsentBanner() {
 
   const saveCustomPreferences = () => {
     saveConsent(preferences);
+    
     toast({
-      title: 'Cookie Preferences Saved',
-      description: 'Your custom cookie preferences have been applied.',
+      title: 'Custom Preferences Saved',
+      description: 'Your cookie preferences have been updated.',
     });
   };
 
-  const resetConsent = () => {
-    localStorage.removeItem('greenlens-cookie-consent');
-    setIsVisible(true);
-    setShowSettings(false);
-    setPreferences({
-      essential: true,
-      analytics: false,
-      marketing: false,
-      personalization: false,
-    });
+  const updatePreference = (key: keyof CookiePreferences, value: boolean) => {
+    if (key === 'essential') return; // Essential cookies cannot be disabled
+    setPreferences(prev => ({ ...prev, [key]: value }));
   };
 
-  if (!isVisible) {
-    return null;
-  }
+  if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 max-w-sm" data-testid="cookie-consent-banner">
-      <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
-        <div className="p-4">
+    <div className="fixed bottom-4 right-4 z-[9999] max-w-md" style={{ zIndex: 9999 }}>
+      <Card className="bg-white border-2 border-green-300 shadow-2xl">
+        <div className="p-6">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Cookie className="h-5 w-5 text-green-600" />
+              <h3 className="font-semibold text-gray-900">Cookie Settings</h3>
+            </div>
+            <Button
+              onClick={() => setIsVisible(false)}
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 -mt-1"
+              data-testid="button-close-cookies"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          
           {!showSettings ? (
-            // Main consent banner - compact version
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Cookie className="w-5 h-5 text-green-600 flex-shrink-0" />
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                  Cookie Settings
-                </h3>
-              </div>
-              
-              <p className="text-xs text-gray-600 dark:text-gray-300">
-                We use cookies to enhance your experience. See our{' '}
-                <button
-                  type="button"
-                  className="text-green-600 hover:text-green-700 underline"
-                  onClick={() => window.open('/privacy', '_blank')}
-                  data-testid="privacy-policy-link"
-                >
-                  Privacy Policy
-                </button>.
+            <>
+              <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                We use cookies to improve your experience, analyze site usage, and assist with marketing. 
+                Essential cookies are required for basic functionality.
               </p>
               
-              {navigator.globalPrivacyControl && (
-                <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
-                  <Shield className="w-3 h-3" />
-                  <span>GPC detected</span>
-                </div>
-              )}
-              
               <div className="flex flex-col gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowSettings(true)}
-                  className="flex items-center gap-1 h-8"
-                  data-testid="cookie-settings-button"
-                >
-                  <Settings className="w-3 h-3" />
-                  Manage
-                </Button>
                 <div className="flex gap-2">
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={acceptEssential}
-                    className="flex-1 h-8 text-xs"
-                    data-testid="accept-essential-button"
-                  >
-                    Essential
-                  </Button>
-                  <Button
-                    size="sm"
                     onClick={acceptAll}
-                    className="flex-1 h-8 bg-green-600 hover:bg-green-700 text-xs"
-                    data-testid="accept-all-button"
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                    data-testid="button-accept-all-cookies"
                   >
                     Accept All
                   </Button>
+                  <Button
+                    onClick={() => setShowSettings(true)}
+                    variant="outline"
+                    className="flex-1 border-green-300 text-green-700 hover:bg-green-50"
+                    data-testid="button-customize-cookies"
+                  >
+                    <Settings className="h-4 w-4 mr-1" />
+                    Customize
+                  </Button>
                 </div>
-              </div>
-            </div>
-          ) : (
-            // Detailed settings panel
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Cookie Preferences
-                </h3>
+                
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowSettings(false)}
-                  data-testid="close-settings-button"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                {/* Essential Cookies */}
-                <div className="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <Checkbox
-                    checked={preferences.essential}
-                    disabled={true}
-                    className="mt-1"
-                    data-testid="essential-cookies-checkbox"
-                  />
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 dark:text-white">
-                      Essential Cookies <span className="text-xs text-gray-500">(Always Active)</span>
-                    </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Required for basic site functionality, authentication, and security. Cannot be disabled.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Analytics Cookies */}
-                <div className="flex items-start space-x-3 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
-                  <Checkbox
-                    checked={preferences.analytics}
-                    onCheckedChange={(checked) => 
-                      setPreferences(prev => ({ ...prev, analytics: !!checked }))
-                    }
-                    className="mt-1"
-                    data-testid="analytics-cookies-checkbox"
-                  />
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 dark:text-white">Analytics Cookies</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Help us understand how visitors interact with our website to improve user experience.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Marketing Cookies */}
-                <div className="flex items-start space-x-3 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
-                  <Checkbox
-                    checked={preferences.marketing}
-                    onCheckedChange={(checked) => 
-                      setPreferences(prev => ({ ...prev, marketing: !!checked }))
-                    }
-                    className="mt-1"
-                    data-testid="marketing-cookies-checkbox"
-                  />
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 dark:text-white">Marketing Cookies</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Used to deliver personalized advertisements and measure advertising campaign effectiveness.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Personalization Cookies */}
-                <div className="flex items-start space-x-3 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
-                  <Checkbox
-                    checked={preferences.personalization}
-                    onCheckedChange={(checked) => 
-                      setPreferences(prev => ({ ...prev, personalization: !!checked }))
-                    }
-                    className="mt-1"
-                    data-testid="personalization-cookies-checkbox"
-                  />
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 dark:text-white">Personalization Cookies</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Enable personalized plant recommendations and remember your preferences.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col lg:flex-row gap-2 pt-4 border-t border-gray-200 dark:border-gray-600">
-                <Button
-                  variant="outline"
-                  size="sm"
                   onClick={acceptEssential}
-                  data-testid="accept-essential-settings-button"
+                  variant="outline"
+                  className="w-full text-gray-600 hover:bg-gray-50"
+                  data-testid="button-essential-only-cookies"
                 >
                   Essential Only
                 </Button>
+              </div>
+              
+              <div className="flex items-center gap-1 mt-3 text-xs text-gray-500">
+                <Shield className="h-3 w-3" />
+                <span>
+                  GDPR, CCPA & GPC Compliant • 
+                  <a href="/privacy" className="underline hover:text-green-600 ml-1">
+                    Privacy Policy
+                  </a>
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="space-y-4 mb-4">
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <div className="font-medium text-sm">Essential Cookies</div>
+                    <div className="text-xs text-gray-500">Required for basic site functionality</div>
+                  </div>
+                  <Checkbox 
+                    checked={preferences.essential} 
+                    disabled={true}
+                    data-testid="checkbox-essential-cookies"
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <div className="font-medium text-sm">Analytics Cookies</div>
+                    <div className="text-xs text-gray-500">Help us understand site usage</div>
+                  </div>
+                  <Checkbox
+                    checked={preferences.analytics}
+                    onCheckedChange={(checked) => updatePreference('analytics', !!checked)}
+                    data-testid="checkbox-analytics-cookies"
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <div className="font-medium text-sm">Marketing Cookies</div>
+                    <div className="text-xs text-gray-500">Show relevant ads and content</div>
+                  </div>
+                  <Checkbox
+                    checked={preferences.marketing}
+                    onCheckedChange={(checked) => updatePreference('marketing', !!checked)}
+                    data-testid="checkbox-marketing-cookies"
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <div className="font-medium text-sm">Personalization</div>
+                    <div className="text-xs text-gray-500">Customize your experience</div>
+                  </div>
+                  <Checkbox
+                    checked={preferences.personalization}
+                    onCheckedChange={(checked) => updatePreference('personalization', !!checked)}
+                    data-testid="checkbox-personalization-cookies"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-2">
                 <Button
-                  size="sm"
                   onClick={saveCustomPreferences}
-                  className="bg-green-600 hover:bg-green-700"
-                  data-testid="save-preferences-button"
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  data-testid="button-save-preferences"
                 >
                   Save Preferences
                 </Button>
                 <Button
-                  size="sm"
-                  onClick={acceptAll}
+                  onClick={() => setShowSettings(false)}
                   variant="outline"
-                  data-testid="accept-all-settings-button"
+                  className="flex-1"
+                  data-testid="button-back-to-main"
                 >
-                  Accept All
+                  Back
                 </Button>
               </div>
-            </div>
+            </>
           )}
         </div>
       </Card>
     </div>
   );
-}
-
-// Hook for other components to access cookie consent status
-export function useCookieConsent() {
-  const [consent, setConsent] = useState<any>(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('greenlens-cookie-consent');
-    if (stored) {
-      setConsent(JSON.parse(stored));
-    }
-  }, []);
-
-  const hasConsent = (type: keyof CookiePreferences): boolean => {
-    return consent?.preferences?.[type] || false;
-  };
-
-  const resetConsent = () => {
-    localStorage.removeItem('greenlens-cookie-consent');
-    setConsent(null);
-    window.location.reload();
-  };
-
-  return {
-    consent,
-    hasConsent,
-    resetConsent,
-    hasGivenConsent: !!consent,
-  };
 }
