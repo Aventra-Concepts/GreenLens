@@ -274,22 +274,22 @@ export function Chatbot() {
           </div>
         </div>
         
-        {/* Chatbot button with plant theme */}
+        {/* Chatbot button with plant theme - Much Larger */}
         <div className="relative">
           <Button
             onClick={() => setIsOpen(true)}
-            className="rounded-full w-16 h-16 bg-gradient-to-br from-green-200 to-green-300 hover:from-green-300 hover:to-green-400 shadow-xl transition-all duration-500 hover:shadow-2xl flex items-center justify-center relative overflow-hidden border-2 border-green-400"
+            className="rounded-full w-32 h-32 bg-gradient-to-br from-green-200 to-green-300 hover:from-green-300 hover:to-green-400 shadow-xl transition-all duration-500 hover:shadow-2xl flex items-center justify-center relative overflow-hidden border-2 border-green-400"
             data-testid="button-open-chatbot"
             style={{ 
               zIndex: 9999,
               animation: 'pulse-scale 2s ease-in-out infinite'
             }}
           >
-            {/* Extra Large Plant icon */}
-            <div className="flex items-center justify-center">
+            {/* Massive Plant icon - 5x larger */}
+            <div className="flex items-center justify-center w-full h-full">
               <svg 
-                width="200" 
-                height="200" 
+                width="120" 
+                height="120" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 className="text-green-800"
