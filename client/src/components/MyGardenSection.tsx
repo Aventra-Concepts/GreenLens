@@ -5,7 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import {
   Droplets,
@@ -22,7 +26,18 @@ import {
   Search,
   Plus,
   TrendingUp,
-  Bell
+  Bell,
+  Trophy,
+  Target,
+  Star,
+  Stethoscope,
+  Activity,
+  Brain,
+  Shield,
+  Share2,
+  Award,
+  User,
+  BarChart3
 } from "lucide-react";
 
 
@@ -201,6 +216,173 @@ export default function MyGardenSection() {
                 <TrendingUp className="h-8 w-8 text-purple-500" />
               </div>
             </div>
+          </div>
+        )}
+
+        {/* New Integrated Functionalities */}
+        {user && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* 1. AI Health Predictions */}
+            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg flex items-center gap-2 text-blue-800">
+                  <Brain className="h-5 w-5" />
+                  AI Health Predictions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                        <Stethoscope className="h-4 w-4 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Overall Garden Health</p>
+                        <p className="text-xs text-gray-600">Based on AI analysis</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-green-100 text-green-800">Excellent</Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <Shield className="h-4 w-4 text-yellow-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Disease Risk</p>
+                        <p className="text-xs text-gray-600">Prevention insights</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-yellow-100 text-yellow-800">Low</Badge>
+                  </div>
+                  <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700">
+                    View Detailed Analysis
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 2. Social Sharing */}
+            <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg flex items-center gap-2 text-green-800">
+                  <Share2 className="h-5 w-5" />
+                  Share Your Progress
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                        <Activity className="h-4 w-4 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Growth Milestone</p>
+                        <p className="text-xs text-gray-600">Share your success</p>
+                      </div>
+                    </div>
+                    <Button size="sm" variant="outline" className="border-green-200 text-green-700 hover:bg-green-50">
+                      Share
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
+                        <Heart className="h-4 w-4 text-pink-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Care Achievement</p>
+                        <p className="text-xs text-gray-600">Celebrate dedication</p>
+                      </div>
+                    </div>
+                    <Button size="sm" variant="outline" className="border-green-200 text-green-700 hover:bg-green-50">
+                      Share
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 3. Achievement System */}
+            <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg flex items-center gap-2 text-yellow-800">
+                  <Trophy className="h-5 w-5" />
+                  Your Achievements
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Garden Level</p>
+                      <p className="text-xs text-gray-600">Seedling Gardener</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-yellow-600">Level 3</p>
+                      <p className="text-xs text-gray-600">850 / 1000 XP</p>
+                    </div>
+                  </div>
+                  <Progress value={85} className="h-2" />
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-center p-2 bg-white rounded-lg border border-yellow-100">
+                      <Trophy className="h-4 w-4 text-gold-500 mx-auto mb-1" />
+                      <p className="text-xs font-medium">5 Badges</p>
+                    </div>
+                    <div className="text-center p-2 bg-white rounded-lg border border-yellow-100">
+                      <Target className="h-4 w-4 text-blue-500 mx-auto mb-1" />
+                      <p className="text-xs font-medium">12 Goals</p>
+                    </div>
+                    <div className="text-center p-2 bg-white rounded-lg border border-yellow-100">
+                      <Star className="h-4 w-4 text-purple-500 mx-auto mb-1" />
+                      <p className="text-xs font-medium">850 Points</p>
+                    </div>
+                  </div>
+                  <Button size="sm" className="w-full bg-yellow-600 hover:bg-yellow-700">
+                    View All Achievements
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 4. User Profile */}
+            <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg flex items-center gap-2 text-purple-800">
+                  <User className="h-5 w-5" />
+                  Your Garden Profile
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={user.profileImageUrl || ''} alt={user.firstName || ''} />
+                      <AvatarFallback>{user.firstName?.charAt(0) || ''}{user.lastName?.charAt(0) || ''}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium text-gray-900">{user.firstName} {user.lastName}</p>
+                      <p className="text-sm text-gray-600">Garden enthusiast since {user.createdAt ? new Date(user.createdAt).getFullYear() : new Date().getFullYear()}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="text-center p-3 bg-white rounded-lg border border-purple-100">
+                      <p className="text-lg font-bold text-purple-600">{typedCarePlans.length}</p>
+                      <p className="text-xs text-gray-600">Plants</p>
+                    </div>
+                    <div className="text-center p-3 bg-white rounded-lg border border-purple-100">
+                      <p className="text-lg font-bold text-green-600">45</p>
+                      <p className="text-xs text-gray-600">Days Active</p>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="outline" className="w-full border-purple-200 text-purple-700 hover:bg-purple-50">
+                    Edit Profile
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 

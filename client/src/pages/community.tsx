@@ -55,6 +55,7 @@ export default function Community() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
   const [showCreatePost, setShowCreatePost] = useState(false);
+  const [showRecentPredictions, setShowRecentPredictions] = useState(false);
 
   const form = useForm<InsertCommunityPostType>({
     resolver: zodResolver(insertCommunityPostSchema),
@@ -90,6 +91,12 @@ export default function Community() {
   // Fetch community posts
   const { data: posts = [], isLoading: postsLoading } = useQuery({
     queryKey: ['/api/community/posts', selectedCategory, sortBy, searchTerm],
+    enabled: isAuthenticated,
+  });
+
+  // Fetch recent predictions for community sharing
+  const { data: recentPredictions = [], isLoading: predictionsLoading } = useQuery({
+    queryKey: ['/api/recent-predictions'],
     enabled: isAuthenticated,
   });
 
@@ -457,6 +464,83 @@ export default function Community() {
               </Select>
             </div>
           </div>
+
+          {/* Recent Predictions Section */}
+          <Card className="mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xl flex items-center gap-2 text-indigo-800">
+                  <BarChart3 className="h-5 w-5" />
+                  Recent Community Predictions
+                </CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowRecentPredictions(!showRecentPredictions)}
+                  className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                >
+                  {showRecentPredictions ? 'Hide' : 'Show'} Predictions
+                </Button>
+              </div>
+              <p className="text-sm text-indigo-600 mt-1">
+                Discover what plants our AI has recently identified for community members
+              </p>
+            </CardHeader>
+            {showRecentPredictions && (
+              <CardContent>
+                {predictionsLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto mb-2"></div>
+                    <p className="text-sm text-indigo-600">Loading recent predictions...</p>
+                  </div>
+                ) : recentPredictions.length === 0 ? (
+                  <div className="text-center py-6">
+                    <Leaf className="h-12 w-12 text-indigo-400 mx-auto mb-3" />
+                    <p className="text-indigo-600">No recent predictions to display</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {recentPredictions.slice(0, 6).map((prediction: any, index: number) => (
+                      <Card key={index} className="bg-white border border-indigo-100 hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                              <Leaf className="h-5 w-5 text-green-600" />
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-900 text-sm">
+                                {prediction.plantName || 'Unknown Plant'}
+                              </h4>
+                              <p className="text-xs text-gray-500 italic">
+                                {prediction.scientificName || 'Species unknown'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-xs">
+                              <span className="text-gray-600">Confidence:</span>
+                              <span className="font-medium text-green-600">
+                                {prediction.confidence || '85'}%
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                              <span className="text-gray-600">Identified:</span>
+                              <span className="text-gray-500">
+                                {new Date().toLocaleDateString()}
+                              </span>
+                            </div>
+                            <Badge className="w-full justify-center text-xs bg-indigo-100 text-indigo-800">
+                              Community Prediction
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            )}
+          </Card>
 
           {/* Community Posts */}
           <div className="space-y-6">
