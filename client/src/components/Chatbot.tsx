@@ -3,6 +3,7 @@ import { MessageCircle, X, Send, Phone, Mail, MapPin, Clock, ExternalLink } from
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import chatbotIcon from '@assets/chatbot_variant_1_1756279130191.png';
 
 interface ChatMessage {
   id: string;
@@ -321,183 +322,42 @@ export function Chatbot() {
   if (!isOpen) {
     return (
       <div className="fixed bottom-6 left-6 z-[9998] flex flex-col items-center" style={{ zIndex: 9998 }}>
-        {/* Chat with me tooltip */}
-        <div className="mb-2 bg-white px-3 py-2 rounded-lg shadow-lg border border-gray-200 animate-pulse">
-          <p className="text-sm font-medium text-gray-700">Chat with me</p>
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full">
-            <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-white"></div>
+        {/* Custom Chatbot Button with Your Icon */}
+        <div className="relative group cursor-pointer" onClick={() => setIsOpen(true)} data-testid="button-open-chatbot">
+          {/* Custom Chatbot Icon - No Background */}
+          <div className="w-20 h-20 hover:scale-110 transition-all duration-300 ease-in-out" 
+               style={{ 
+                 animation: 'float-bounce 3s ease-in-out infinite',
+                 filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.2))'
+               }}>
+            <img 
+              src={chatbotIcon} 
+              alt="GreenLens Chatbot" 
+              className="w-full h-full object-contain"
+              style={{
+                filter: 'drop-shadow(0 0 10px rgba(64, 224, 208, 0.4))'
+              }}
+            />
           </div>
-        </div>
-        
-        {/* Modern Designer Chatbot Button */}
-        <div className="relative group">
-          <Button
-            onClick={() => setIsOpen(true)}
-            className="rounded-2xl w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center relative overflow-hidden border-3 border-white"
-            data-testid="button-open-chatbot"
-            style={{ 
-              zIndex: 9999,
-              animation: 'float-bounce 3s ease-in-out infinite'
-            }}
-          >
-            {/* Modern Chat Robot Design */}
-            <div className="flex items-center justify-center relative">
-              <svg 
-                width="42" 
-                height="42" 
-                viewBox="0 0 48 48" 
-                fill="none" 
-                className="text-white drop-shadow-lg"
-                style={{
-                  animation: 'chat-pulse 2.5s ease-in-out infinite'
-                }}
-              >
-                {/* Robot body/head - rounded rectangle */}
-                <rect 
-                  x="12" 
-                  y="16" 
-                  width="24" 
-                  height="20" 
-                  rx="12" 
-                  ry="10" 
-                  fill="currentColor"
-                  stroke="none"
-                />
-                
-                {/* Robot antenna */}
-                <circle 
-                  cx="24" 
-                  cy="8" 
-                  r="2" 
-                  fill="#fbbf24"
-                  className="antenna-glow"
-                />
-                <line 
-                  x1="24" 
-                  y1="10" 
-                  x2="24" 
-                  y2="16" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round"
-                />
-                
-                {/* Robot eyes - animated */}
-                <circle 
-                  cx="19" 
-                  cy="22" 
-                  r="2.5" 
-                  fill="#fbbf24"
-                  className="robot-eye-left"
-                />
-                <circle 
-                  cx="29" 
-                  cy="22" 
-                  r="2.5" 
-                  fill="#fbbf24"
-                  className="robot-eye-right"
-                />
-                
-                {/* Eye pupils */}
-                <circle 
-                  cx="19.5" 
-                  cy="22" 
-                  r="1" 
-                  fill="#1f2937"
-                />
-                <circle 
-                  cx="29.5" 
-                  cy="22" 
-                  r="1" 
-                  fill="#1f2937"
-                />
-                
-                {/* Robot mouth - animated */}
-                <rect 
-                  x="20" 
-                  y="28" 
-                  width="8" 
-                  height="3" 
-                  rx="1.5" 
-                  fill="#fbbf24"
-                  className="robot-mouth"
-                />
-                
-                {/* Side antennas/ears */}
-                <circle 
-                  cx="8" 
-                  cy="20" 
-                  r="1.5" 
-                  fill="#fbbf24"
-                />
-                <circle 
-                  cx="40" 
-                  cy="20" 
-                  r="1.5" 
-                  fill="#fbbf24"
-                />
-                <line 
-                  x1="10" 
-                  y1="20" 
-                  x2="12" 
-                  y2="22" 
-                  stroke="currentColor" 
-                  strokeWidth="1.5"
-                />
-                <line 
-                  x1="38" 
-                  y1="20" 
-                  x2="36" 
-                  y2="22" 
-                  stroke="currentColor" 
-                  strokeWidth="1.5"
-                />
-                
-                {/* Decorative elements */}
-                <rect 
-                  x="16" 
-                  y="32" 
-                  width="2" 
-                  height="1" 
-                  fill="#fbbf24" 
-                  opacity="0.8"
-                />
-                <rect 
-                  x="20" 
-                  y="32" 
-                  width="2" 
-                  height="1" 
-                  fill="#fbbf24" 
-                  opacity="0.8"
-                />
-                <rect 
-                  x="26" 
-                  y="32" 
-                  width="2" 
-                  height="1" 
-                  fill="#fbbf24" 
-                  opacity="0.8"
-                />
-                <rect 
-                  x="30" 
-                  y="32" 
-                  width="2" 
-                  height="1" 
-                  fill="#fbbf24" 
-                  opacity="0.8"
-                />
-              </svg>
-              
-              {/* Floating message indicator */}
-              <div className="absolute -top-2 -right-2 w-4 h-4 bg-gradient-to-r from-green-400 to-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute inset-0.5 bg-white rounded-full animate-ping"></div>
-                <div className="absolute inset-1 bg-green-400 rounded-full"></div>
-              </div>
-              
-              {/* Hover glow effect */}
-              <div className="absolute inset-0 rounded-2xl bg-white opacity-0 group-hover:opacity-20 transition-all duration-300 blur-sm scale-110"></div>
-            </div>
-          </Button>
+          
+          {/* Artistic "Chat with me" Text Below Icon */}
+          <div className="mt-2 text-center">
+            <p className="text-sm font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent"
+               style={{ 
+                 fontFamily: '"Dancing Script", "Brush Script MT", cursive',
+                 fontSize: '16px',
+                 textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                 letterSpacing: '0.5px'
+               }}>
+              Chat with me
+            </p>
+          </div>
+          
+          {/* Floating message indicator */}
+          <div className="absolute -top-2 -right-2 w-4 h-4 bg-gradient-to-r from-green-400 to-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute inset-0.5 bg-white rounded-full animate-ping"></div>
+            <div className="absolute inset-1 bg-green-400 rounded-full"></div>
+          </div>
         </div>
         
         <style>{`
