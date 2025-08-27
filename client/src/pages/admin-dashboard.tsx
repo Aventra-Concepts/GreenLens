@@ -516,7 +516,7 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Admin Navigation Tabs */}
-          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-9 bg-white dark:bg-gray-800 p-1 h-auto">
+          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-10 bg-white dark:bg-gray-800 p-1 h-auto">
             <TabsTrigger value="overview" className="flex items-center gap-1 px-2 py-2 text-xs">
               <BarChart3 className="w-3 h-3" />
               <span className="hidden sm:inline">Overview</span>
@@ -552,6 +552,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="tools" className="flex items-center gap-1 px-2 py-2 text-xs">
               <Zap className="w-3 h-3" />
               <span className="hidden sm:inline">Tools</span>
+            </TabsTrigger>
+            <TabsTrigger value="affiliate" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-orange-100 to-yellow-100 border-2 border-orange-300">
+              <DollarSign className="w-3 h-3 text-orange-600" />
+              <span className="hidden sm:inline font-semibold text-orange-700">Affiliate</span>
             </TabsTrigger>
           </TabsList>
 
@@ -618,7 +622,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Admin Quick Actions */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
               <Card className="cursor-pointer hover:shadow-md transition-shadow border-green-200" onClick={() => setLocation('/admin/garden')}>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
@@ -647,6 +651,22 @@ export default function AdminDashboard() {
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-semibold text-purple-600">24 E-Books • $3,247 Revenue</span>
                     <ArrowRight className="h-4 w-4 text-purple-400" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:shadow-md transition-shadow border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50" onClick={() => setActiveTab('affiliate')}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-orange-600" />
+                    Amazon Affiliate Dashboard
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-3">Monitor affiliate earnings from Garden Tools marketplace</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-semibold text-orange-600">$1,247.83 • 2,847 clicks</span>
+                    <ArrowRight className="h-4 w-4 text-orange-400" />
                   </div>
                 </CardContent>
               </Card>
@@ -1474,6 +1494,409 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Amazon Affiliate Dashboard */}
+          <TabsContent value="affiliate" className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Amazon Affiliate Dashboard</h2>
+              <p className="text-gray-600 dark:text-gray-300">Comprehensive Amazon affiliate earnings and Garden Tools marketplace analytics</p>
+            </div>
+
+            {/* Affiliate Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Clicks</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">2,847</p>
+                      <p className="text-xs text-green-600">+18% this month</p>
+                    </div>
+                    <TrendingUp className="w-8 h-8 text-blue-500" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Conversions</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">142</p>
+                      <p className="text-xs text-yellow-600">5.0% conversion rate</p>
+                    </div>
+                    <CheckCircle className="w-8 h-8 text-green-500" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Affiliate Earnings</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">$1,247.83</p>
+                      <p className="text-xs text-green-600">+24% this month</p>
+                    </div>
+                    <DollarSign className="w-8 h-8 text-green-500" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Product Views</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">8,934</p>
+                      <p className="text-xs text-blue-600">Garden Tools marketplace</p>
+                    </div>
+                    <Eye className="w-8 h-8 text-purple-500" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Regional Performance */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Globe className="h-5 w-5 text-blue-600" />
+                    Regional Performance
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">United States (Amazon.com)</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">1,847 clicks • 89 conversions</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-green-600">$892.45</p>
+                        <p className="text-xs text-gray-500">4.8% rate</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">India (Amazon.in)</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">642 clicks • 34 conversions</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-green-600">$247.38</p>
+                        <p className="text-xs text-gray-500">5.3% rate</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">United Kingdom (Amazon.co.uk)</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">358 clicks • 19 conversions</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-green-600">$108.00</p>
+                        <p className="text-xs text-gray-500">5.3% rate</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <PieChart className="h-5 w-5 text-purple-600" />
+                    Top Product Categories
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">Hand Tools</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Pruners, trowels, cultivators</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-purple-600">$487.22</p>
+                        <p className="text-xs text-gray-500">39% of earnings</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">Watering & Irrigation</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Hoses, sprinklers, timers</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-green-600">$324.18</p>
+                        <p className="text-xs text-gray-500">26% of earnings</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">Soil & Fertilizers</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Compost, nutrients, soil mixes</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-orange-600">$298.43</p>
+                        <p className="text-xs text-gray-500">24% of earnings</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">Protective Gear</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Gloves, kneepads, aprons</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-blue-600">$138.00</p>
+                        <p className="text-xs text-gray-500">11% of earnings</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Activity & Garden Tools Integration */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-green-600" />
+                    Recent Activity
+                  </CardTitle>
+                  <Button variant="outline" size="sm" className="text-xs">
+                    <Download className="w-3 h-3 mr-1" />
+                    Export
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 max-h-80 overflow-y-auto">
+                    <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">Premium Pruning Shears</p>
+                        <p className="text-xs text-gray-500">Amazon.com • 2 hours ago</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-green-600">+$12.45</p>
+                        <p className="text-xs text-gray-500">Commission</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">Soil pH Test Kit</p>
+                        <p className="text-xs text-gray-500">Amazon.in • 4 hours ago</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-green-600">+$8.22</p>
+                        <p className="text-xs text-gray-500">Commission</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">Organic Fertilizer Set</p>
+                        <p className="text-xs text-gray-500">Amazon.co.uk • 6 hours ago</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-green-600">+$15.67</p>
+                        <p className="text-xs text-gray-500">Commission</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">Garden Hose 50ft</p>
+                        <p className="text-xs text-gray-500">Amazon.com • 8 hours ago</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-green-600">+$9.33</p>
+                        <p className="text-xs text-gray-500">Commission</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">Gardening Gloves Set</p>
+                        <p className="text-xs text-gray-500">Amazon.in • 12 hours ago</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-green-600">+$6.89</p>
+                        <p className="text-xs text-gray-500">Commission</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Leaf className="h-5 w-5 text-green-600" />
+                    Garden Tools Marketplace Link
+                  </CardTitle>
+                  <Button variant="outline" size="sm" onClick={() => setLocation("/tools")}>
+                    <Eye className="w-3 h-3 mr-1" />
+                    View Marketplace
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                      <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">Integration Status</h4>
+                      <p className="text-sm text-green-700 dark:text-green-300 mb-2">✅ Garden Tools marketplace is fully integrated with Amazon affiliate system</p>
+                      <p className="text-xs text-green-600 dark:text-green-400">All product clicks are tracked and commissions are calculated automatically</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded">
+                        <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Marketplace Traffic</p>
+                        <p className="text-lg font-bold text-blue-600">8,934 views</p>
+                        <p className="text-xs text-blue-500">This month</p>
+                      </div>
+                      <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded">
+                        <p className="text-sm font-medium text-purple-800 dark:text-purple-200">Click-through Rate</p>
+                        <p className="text-lg font-bold text-purple-600">31.8%</p>
+                        <p className="text-xs text-purple-500">Above average</p>
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-4">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Quick Actions</h4>
+                      <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" className="text-xs">
+                          <Settings className="w-3 h-3 mr-1" />
+                          Configure APIs
+                        </Button>
+                        <Button variant="outline" size="sm" className="text-xs">
+                          <BarChart3 className="w-3 h-3 mr-1" />
+                          Analytics
+                        </Button>
+                        <Button variant="outline" size="sm" className="text-xs">
+                          <Upload className="w-3 h-3 mr-1" />
+                          Sync Data
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Earnings Breakdown Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <LineChart className="h-5 w-5 text-orange-600" />
+                  Detailed Earnings Breakdown
+                </CardTitle>
+                <CardDescription>
+                  Complete affiliate earnings data with product details and commission rates
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 dark:bg-gray-700">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Product
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Region
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Clicks
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Conversions
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Commission Rate
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Earnings
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+                      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-4 py-4">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">Professional Pruning Shears</p>
+                            <p className="text-xs text-gray-500">Hand Tools Category</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <Badge variant="outline">US</Badge>
+                        </td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">847</td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">42</td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">8.5%</td>
+                        <td className="px-4 py-4 text-sm font-bold text-green-600">$247.83</td>
+                      </tr>
+                      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-4 py-4">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">Expandable Garden Hose</p>
+                            <p className="text-xs text-gray-500">Watering & Irrigation</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <Badge variant="outline">US</Badge>
+                        </td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">634</td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">28</td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">7.2%</td>
+                        <td className="px-4 py-4 text-sm font-bold text-green-600">$189.45</td>
+                      </tr>
+                      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-4 py-4">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">Organic Fertilizer Mix</p>
+                            <p className="text-xs text-gray-500">Soil & Fertilizers</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <Badge variant="outline">IN</Badge>
+                        </td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">523</td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">31</td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">6.8%</td>
+                        <td className="px-4 py-4 text-sm font-bold text-green-600">$156.22</td>
+                      </tr>
+                      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-4 py-4">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">Garden Tool Set Premium</p>
+                            <p className="text-xs text-gray-500">Hand Tools Category</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <Badge variant="outline">UK</Badge>
+                        </td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">412</td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">18</td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">9.1%</td>
+                        <td className="px-4 py-4 text-sm font-bold text-green-600">$134.67</td>
+                      </tr>
+                      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-4 py-4">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">Protective Gardening Gloves</p>
+                            <p className="text-xs text-gray-500">Protective Gear</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <Badge variant="outline">US</Badge>
+                        </td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">378</td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">23</td>
+                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">5.9%</td>
+                        <td className="px-4 py-4 text-sm font-bold text-green-600">$97.34</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
