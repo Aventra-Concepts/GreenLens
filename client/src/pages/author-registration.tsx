@@ -254,11 +254,17 @@ export default function AuthorRegistration() {
 
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="mb-8">
+        <div className="mb-8 flex gap-4">
           <Link href="/ebook-marketplace">
             <Button variant="ghost" size="sm" data-testid="button-back-marketplace">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Marketplace
+            </Button>
+          </Link>
+          <Link href="/">
+            <Button variant="ghost" size="sm" data-testid="button-back-home">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Go to Home
             </Button>
           </Link>
         </div>

@@ -75,7 +75,6 @@ export const users = pgTable("users", {
   subscriptionPlan: varchar("subscription_plan").default('Free Plan'),
   subscriptionPlanId: varchar("subscription_plan_id").default('free'),
   // COPPA compliance - Age verification
-  dateOfBirth: date("date_of_birth"), // For age verification (COPPA compliance)
   ageVerified: boolean("age_verified").default(false).notNull(), // Confirmed 13+ years old
 });
 
