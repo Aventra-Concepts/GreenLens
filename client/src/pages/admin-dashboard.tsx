@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -581,6 +582,9 @@ export default function AdminDashboard() {
 
   // Author Management Row Component
   const AuthorManagementRow = ({ author }: { author: AdminAuthor }) => {
+    const [showRejectionDialog, setShowRejectionDialog] = useState(false);
+    const [rejectionReason, setRejectionReason] = useState("");
+    
     const updateAuthorStatusMutation = useMutation({
       mutationFn: async ({ id, applicationStatus, adminNotes, isVerified, canPublish }: { 
         id: string; 
@@ -613,14 +617,25 @@ export default function AdminDashboard() {
       },
     });
 
-    const handleStatusChange = (status: string) => {
+    const handleStatusChange = (status: string, reason?: string) => {
       updateAuthorStatusMutation.mutate({ 
         id: author.id, 
         applicationStatus: status,
         isVerified: status === 'approved',
         canPublish: status === 'approved',
-        adminNotes: status === 'rejected' ? 'Application rejected by admin' : undefined
+        adminNotes: status === 'rejected' ? (reason || 'Application rejected by admin') : undefined
       });
+    };
+
+    const handleRejectClick = () => {
+      setShowRejectionDialog(true);
+    };
+
+    const handleConfirmReject = () => {
+      const reason = rejectionReason.trim() || 'Application rejected by admin';
+      handleStatusChange('rejected', reason);
+      setShowRejectionDialog(false);
+      setRejectionReason('');
     };
 
     const getStatusColor = (status: string) => {
@@ -634,146 +649,193 @@ export default function AdminDashboard() {
     };
 
     return (
-      <tr className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
-        <td className="p-3">
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {author.display_name}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {author.user_first_name} {author.user_last_name}
-            </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              {author.user_location || 'No location'}
-            </p>
-          </div>
-        </td>
-        <td className="p-3">
-          <div className="space-y-1">
-            <p className="text-sm text-gray-900 dark:text-white">
-              {author.email}
-            </p>
-            {author.phone && (
+      <>
+        <tr className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+          <td className="p-3">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {author.display_name}
+              </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {author.phone}
+                {author.user_first_name} {author.user_last_name}
               </p>
-            )}
-            {author.website_url && (
-              <p className="text-xs text-blue-600 dark:text-blue-400">
-                {author.website_url}
+              <p className="text-xs text-gray-400 dark:text-gray-500">
+                {author.user_location || 'No location'}
               </p>
-            )}
-          </div>
-        </td>
-        <td className="p-3">
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(author.application_status)}`}>
-            {author.application_status}
-          </span>
-        </td>
-        <td className="p-3">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              {author.is_verified ? (
-                <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                  <CheckCircle className="w-3 h-3 mr-1" />
-                  Verified
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-300">
-                  <XCircle className="w-3 h-3 mr-1" />
-                  Unverified
-                </Badge>
+            </div>
+          </td>
+          <td className="p-3">
+            <div className="space-y-1">
+              <p className="text-sm text-gray-900 dark:text-white">
+                {author.email}
+              </p>
+              {author.phone && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {author.phone}
+                </p>
+              )}
+              {author.website_url && (
+                <p className="text-xs text-blue-600 dark:text-blue-400">
+                  {author.website_url}
+                </p>
               )}
             </div>
-            <div className="flex items-center gap-2">
-              {author.can_publish ? (
-                <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
-                  <Edit className="w-3 h-3 mr-1" />
-                  Can Publish
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-300">
-                  <Lock className="w-3 h-3 mr-1" />
-                  No Publish
-                </Badge>
+          </td>
+          <td className="p-3">
+            <div className="space-y-1">
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(author.application_status)}`}>
+                {author.application_status}
+              </span>
+              {author.application_status === 'rejected' && author.admin_notes && (
+                <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                  Reason: {author.admin_notes}
+                </p>
               )}
             </div>
-          </div>
-        </td>
-        <td className="p-3">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            {author.created_at && isValid(new Date(author.created_at)) ? format(new Date(author.created_at), 'MMM dd, yyyy') : 'N/A'}
-          </p>
-          {author.reviewed_at && (
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              Reviewed: {isValid(new Date(author.reviewed_at)) ? format(new Date(author.reviewed_at), 'MMM dd') : 'Invalid date'}
+          </td>
+          <td className="p-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                {author.is_verified ? (
+                  <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Verified
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-300">
+                    <XCircle className="w-3 h-3 mr-1" />
+                    Unverified
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {author.can_publish ? (
+                  <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
+                    <Edit className="w-3 h-3 mr-1" />
+                    Can Publish
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-300">
+                    <Lock className="w-3 h-3 mr-1" />
+                    No Publish
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </td>
+          <td className="p-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {author.created_at && isValid(new Date(author.created_at)) ? format(new Date(author.created_at), 'MMM dd, yyyy') : 'N/A'}
             </p>
-          )}
-        </td>
-        <td className="p-3">
-          <div className="flex flex-col gap-1">
+            {author.reviewed_at && (
+              <p className="text-xs text-gray-400 dark:text-gray-500">
+                Reviewed: {isValid(new Date(author.reviewed_at)) ? format(new Date(author.reviewed_at), 'MMM dd') : 'Invalid date'}
+              </p>
+            )}
+          </td>
+          <td className="p-3">
+            <div className="flex flex-col gap-1">
 
-            {author.application_status === 'pending' && (
-              <>
+              {author.application_status === 'pending' && (
+                <>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs text-green-600"
+                    onClick={() => handleStatusChange('approved')}
+                    data-testid={`button-approve-author-${author.id}`}
+                  >
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Approve
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs text-red-600"
+                    onClick={handleRejectClick}
+                    data-testid={`button-reject-author-${author.id}`}
+                  >
+                    <XCircle className="w-3 h-3 mr-1" />
+                    Reject
+                  </Button>
+                </>
+              )}
+              {author.application_status === 'approved' && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-xs text-red-600"
+                  onClick={handleRejectClick}
+                  data-testid={`button-revoke-author-${author.id}`}
+                >
+                  <XCircle className="w-3 h-3 mr-1" />
+                  Revoke
+                </Button>
+              )}
+              {author.application_status === 'rejected' && (
                 <Button
                   size="sm"
                   variant="outline"
                   className="text-xs text-green-600"
                   onClick={() => handleStatusChange('approved')}
-                  data-testid={`button-approve-author-${author.id}`}
+                  data-testid={`button-approve-rejected-author-${author.id}`}
                 >
                   <CheckCircle className="w-3 h-3 mr-1" />
                   Approve
                 </Button>
+              )}
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs"
+                onClick={() => setViewingAuthor(author)}
+                data-testid={`button-view-author-${author.id}`}
+              >
+                <Eye className="w-3 h-3 mr-1" />
+                View
+              </Button>
+            </div>
+          </td>
+        </tr>
+        
+        {/* Rejection Reason Dialog */}
+        <Dialog open={showRejectionDialog} onOpenChange={setShowRejectionDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Reject Author Application</DialogTitle>
+              <DialogDescription>
+                Please provide a reason for rejecting {author.display_name}'s application. This will help the author understand why their application was not accepted.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <Textarea
+                placeholder="Enter rejection reason (e.g., incomplete documentation, insufficient experience, etc.)"
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows={4}
+                data-testid="input-rejection-reason"
+              />
+              <div className="flex justify-end gap-2">
                 <Button
-                  size="sm"
                   variant="outline"
-                  className="text-xs text-red-600"
-                  onClick={() => handleStatusChange('rejected')}
-                  data-testid={`button-reject-author-${author.id}`}
+                  onClick={() => setShowRejectionDialog(false)}
+                  data-testid="button-cancel-rejection"
                 >
-                  <XCircle className="w-3 h-3 mr-1" />
-                  Reject
+                  Cancel
                 </Button>
-              </>
-            )}
-            {author.application_status === 'approved' && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-xs text-red-600"
-                onClick={() => handleStatusChange('rejected')}
-                data-testid={`button-revoke-author-${author.id}`}
-              >
-                <XCircle className="w-3 h-3 mr-1" />
-                Revoke
-              </Button>
-            )}
-            {author.application_status === 'rejected' && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-xs text-green-600"
-                onClick={() => handleStatusChange('approved')}
-                data-testid={`button-approve-rejected-author-${author.id}`}
-              >
-                <CheckCircle className="w-3 h-3 mr-1" />
-                Approve
-              </Button>
-            )}
-            <Button
-              size="sm"
-              variant="outline"
-              className="text-xs"
-              onClick={() => setViewingAuthor(author)}
-              data-testid={`button-view-author-${author.id}`}
-            >
-              <Eye className="w-3 h-3 mr-1" />
-              View
-            </Button>
-          </div>
-        </td>
-      </tr>
+                <Button
+                  variant="destructive"
+                  onClick={handleConfirmReject}
+                  data-testid="button-confirm-rejection"
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Reject Application
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   };
 
