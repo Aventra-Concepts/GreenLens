@@ -125,6 +125,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register e-book marketplace routes
   app.use('/api/ebooks', ebookRoutes);
   
+  // Admin E-books Management Route
+  app.get('/api/admin/ebooks', requireAuth, requireAdmin, async (req: any, res) => {
+    try {
+      const ebooks = await storage.getAllEbooksForAdmin();
+      res.json(ebooks);
+    } catch (error) {
+      console.error('Get admin ebooks error:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch e-books for admin' });
+    }
+  });
+
+  // Admin E-book Status Update Route
+  app.put('/api/admin/ebooks/:id/status', requireAuth, requireAdmin, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { status, rejectionReason, platformCommissionRate } = req.body;
+      
+      const validStatuses = ['draft', 'submitted', 'under_review', 'published', 'rejected', 'suspended', 'returned_for_revision'];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ success: false, message: 'Invalid status' });
+      }
+
+      const updatedEbook = await storage.updateEbookStatus(id, status, rejectionReason, platformCommissionRate);
+      res.json({ success: true, ebook: updatedEbook });
+    } catch (error) {
+      console.error('Update ebook status error:', error);
+      res.status(500).json({ success: false, message: 'Failed to update e-book status' });
+    }
+  });
+  
   // Register separate ebook categories route - connected to database
   app.get('/api/ebook-categories', async (req, res) => {
     try {

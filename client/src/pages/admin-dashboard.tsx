@@ -57,6 +57,33 @@ interface BlogPost {
   createdAt: string;
 }
 
+interface AdminEbook {
+  id: string;
+  title: string;
+  authorId: string;
+  authorName: string;
+  authorEmail: string;
+  authorFirstName: string;
+  authorLastName: string;
+  authorLocation: string;
+  authorCountry: string;
+  category: string;
+  basePrice: string;
+  currency: string;
+  royaltyRate: string;
+  platformCommissionRate: string;
+  status: string;
+  publicationDate: string | null;
+  lastRevisionDate: string | null;
+  downloadCount: number;
+  ratingAverage: number;
+  totalRevenue: string;
+  totalSales: number;
+  actualAmount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'pending': return 'bg-yellow-100 text-yellow-800';
@@ -65,6 +92,19 @@ const getStatusColor = (status: string) => {
     case 'expert_assigned': return 'bg-purple-100 text-purple-800';
     case 'completed': return 'bg-gray-100 text-gray-800';
     case 'cancelled': return 'bg-red-100 text-red-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+};
+
+const getEbookStatusColor = (status: string) => {
+  switch (status) {
+    case 'draft': return 'bg-gray-100 text-gray-800';
+    case 'submitted': return 'bg-blue-100 text-blue-800';
+    case 'under_review': return 'bg-yellow-100 text-yellow-800';
+    case 'published': return 'bg-green-100 text-green-800';
+    case 'rejected': return 'bg-red-100 text-red-800';
+    case 'suspended': return 'bg-orange-100 text-orange-800';
+    case 'returned_for_revision': return 'bg-purple-100 text-purple-800';
     default: return 'bg-gray-100 text-gray-800';
   }
 };
@@ -101,6 +141,12 @@ export default function AdminDashboard() {
   // Fetch blog posts
   const { data: blogPosts = [], isLoading: isLoadingBlogs } = useQuery({
     queryKey: ['/api/admin/blog-posts'],
+    enabled: isAuthenticated,
+  });
+
+  // Fetch e-books for admin
+  const { data: adminEbooks = [], isLoading: isLoadingEbooks, refetch: refetchEbooks } = useQuery({
+    queryKey: ['/api/admin/ebooks'],
     enabled: isAuthenticated,
   });
 
@@ -175,6 +221,260 @@ export default function AdminDashboard() {
   const totalRevenue = (consultations || []).reduce((sum: number, c: ConsultationRequest) => sum + (c.amount || 0), 0);
   const totalBlogs = (blogPosts || []).length;
   const publishedBlogs = (blogPosts || []).filter((b: BlogPost) => b.status === 'published').length;
+
+  // E-books Management Table Component
+  const EbooksManagementTable = () => {
+    const updateStatusMutation = useMutation({
+      mutationFn: async ({ id, status, rejectionReason, platformCommissionRate }: { 
+        id: string; 
+        status: string; 
+        rejectionReason?: string; 
+        platformCommissionRate?: number; 
+      }) => {
+        const response = await apiRequest("PUT", `/api/admin/ebooks/${id}/status`, {
+          status,
+          rejectionReason,
+          platformCommissionRate,
+        });
+        return response.json();
+      },
+      onSuccess: () => {
+        refetchEbooks();
+        toast({
+          title: "E-book Status Updated",
+          description: "The e-book status has been updated successfully.",
+        });
+      },
+      onError: (error: Error) => {
+        toast({
+          title: "Update Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+
+    const handleStatusChange = (ebookId: string, newStatus: string) => {
+      let rejectionReason = '';
+      let platformCommissionRate = undefined;
+      
+      if (newStatus === 'rejected') {
+        rejectionReason = prompt('Please provide a reason for rejection:') || '';
+        if (!rejectionReason) return;
+      }
+      
+      if (newStatus === 'published') {
+        const commissionInput = prompt('Set platform commission rate (0-1, e.g., 0.3 for 30%):');
+        if (commissionInput !== null) {
+          const commission = parseFloat(commissionInput);
+          if (isNaN(commission) || commission < 0 || commission > 1) {
+            toast({
+              title: "Invalid Commission Rate",
+              description: "Please enter a valid commission rate between 0 and 1.",
+              variant: "destructive",
+            });
+            return;
+          }
+          platformCommissionRate = commission;
+        }
+      }
+      
+      updateStatusMutation.mutate({ 
+        id: ebookId, 
+        status: newStatus, 
+        rejectionReason, 
+        platformCommissionRate 
+      });
+    };
+
+    if (isLoadingEbooks) {
+      return <div className="flex justify-center p-8">
+        <div className="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full" />
+      </div>;
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    E-book Details
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Author Info
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Pricing & Revenue
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Performance
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+                {adminEbooks.map((ebook: AdminEbook) => (
+                  <tr key={ebook.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <td className="px-4 py-4">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-xs" title={ebook.title}>
+                          {ebook.title}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{ebook.category}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
+                          Submitted: {new Date(ebook.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {ebook.authorFirstName} {ebook.authorLastName}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{ebook.authorEmail}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
+                          {ebook.authorLocation}, {ebook.authorCountry}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {ebook.currency} {ebook.basePrice}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Commission: {(parseFloat(ebook.platformCommissionRate) * 100).toFixed(1)}%
+                        </p>
+                        <p className="text-xs text-green-600 dark:text-green-400 font-medium">
+                          Revenue: {ebook.currency} {ebook.actualAmount.toFixed(2)}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {ebook.downloadCount} downloads
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                          <Star className="w-3 h-3 text-yellow-500 fill-current" />
+                          {ebook.ratingAverage.toFixed(1)} rating
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getEbookStatusColor(ebook.status)}`}>
+                        {ebook.status.replace('_', ' ')}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-col gap-1">
+                        {ebook.status === 'submitted' && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-xs"
+                              onClick={() => handleStatusChange(ebook.id, 'under_review')}
+                              data-testid={`button-review-${ebook.id}`}
+                            >
+                              Review
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-xs text-green-600"
+                              onClick={() => handleStatusChange(ebook.id, 'published')}
+                              data-testid={`button-approve-${ebook.id}`}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-xs text-red-600"
+                              onClick={() => handleStatusChange(ebook.id, 'rejected')}
+                              data-testid={`button-reject-${ebook.id}`}
+                            >
+                              Reject
+                            </Button>
+                          </>
+                        )}
+                        {ebook.status === 'under_review' && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-xs text-green-600"
+                              onClick={() => handleStatusChange(ebook.id, 'published')}
+                              data-testid={`button-publish-${ebook.id}`}
+                            >
+                              Publish
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-xs text-orange-600"
+                              onClick={() => handleStatusChange(ebook.id, 'returned_for_revision')}
+                              data-testid={`button-return-${ebook.id}`}
+                            >
+                              Return
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-xs text-red-600"
+                              onClick={() => handleStatusChange(ebook.id, 'rejected')}
+                              data-testid={`button-reject-review-${ebook.id}`}
+                            >
+                              Reject
+                            </Button>
+                          </>
+                        )}
+                        {ebook.status === 'published' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-xs text-orange-600"
+                            onClick={() => handleStatusChange(ebook.id, 'suspended')}
+                            data-testid={`button-suspend-${ebook.id}`}
+                          >
+                            Suspend
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-xs"
+                          data-testid={`button-view-${ebook.id}`}
+                        >
+                          <Eye className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        {adminEbooks.length === 0 && (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>No e-book submissions found</p>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -548,90 +848,19 @@ export default function AdminDashboard() {
               </Card>
             </div>
 
-            {/* E-books Management Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-purple-600" />
-                    Popular E-Books
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {[
-                      { title: "Complete Guide to Indoor Plants", downloads: 547, rating: 4.9, price: "$12.99" },
-                      { title: "Succulent Care Mastery", downloads: 423, rating: 4.8, price: "$9.99" },
-                      { title: "Herb Gardening for Beginners", downloads: 389, rating: 4.7, price: "$8.99" },
-                      { title: "Plant Disease Identification", downloads: 312, rating: 4.6, price: "$15.99" }
-                    ].map((book, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                        <div className="flex-1">
-                          <p className="font-medium text-sm">{book.title}</p>
-                          <div className="flex items-center gap-4 text-xs text-gray-500 mt-1">
-                            <span>{book.downloads} downloads</span>
-                            <span className="flex items-center gap-1">
-                              <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                              {book.rating}
-                            </span>
-                            <span className="font-semibold text-green-600">{book.price}</span>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            <Edit className="w-3 h-3" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Eye className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
-                    Sales Analytics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">This Month's Sales</span>
-                      <span className="font-semibold text-green-600">$847.50</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Last Month</span>
-                      <span className="font-medium">$721.30</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-full">
-                      <div className="h-2 bg-gradient-to-r from-green-400 to-blue-500 rounded-full" style={{width: "68%"}}></div>
-                    </div>
-                    <div className="text-xs text-gray-500">68% of monthly target achieved</div>
-                    
-                    <div className="mt-4 space-y-2">
-                      <div className="text-sm font-medium">Top Categories</div>
-                      {[
-                        { category: "Plant Care Guides", percentage: 45, color: "bg-green-500" },
-                        { category: "Disease Management", percentage: 28, color: "bg-blue-500" },
-                        { category: "Gardening Basics", percentage: 18, color: "bg-purple-500" },
-                        { category: "Advanced Techniques", percentage: 9, color: "bg-orange-500" }
-                      ].map((cat, index) => (
-                        <div key={index} className="flex items-center gap-3">
-                          <div className="w-3 h-3 rounded-full" style={{backgroundColor: cat.color.replace('bg-', '').replace('-500', '')}}></div>
-                          <span className="text-xs flex-1">{cat.category}</span>
-                          <span className="text-xs font-medium">{cat.percentage}%</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            {/* E-books Management Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-purple-600" />
+                  All Submitted E-Books
+                </CardTitle>
+                <p className="text-sm text-gray-600">Manage e-book submissions from registered authors</p>
+              </CardHeader>
+              <CardContent>
+                <EbooksManagementTable />
+              </CardContent>
+            </Card>
 
             {/* Quick Actions for E-books */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

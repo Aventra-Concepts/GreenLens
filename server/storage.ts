@@ -1388,6 +1388,71 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  // Admin E-book Management Methods
+  async getAllEbooksForAdmin(): Promise<any[]> {
+    return await db
+      .select({
+        id: ebooks.id,
+        title: ebooks.title,
+        authorId: ebooks.authorId,
+        authorName: ebooks.authorName,
+        category: ebooks.category,
+        basePrice: ebooks.basePrice,
+        currency: ebooks.currency,
+        royaltyRate: ebooks.royaltyRate,
+        platformCommissionRate: ebooks.platformCommissionRate,
+        status: ebooks.status,
+        publicationDate: ebooks.publicationDate,
+        lastRevisionDate: ebooks.lastRevisionDate,
+        downloadCount: ebooks.downloadCount,
+        ratingAverage: ebooks.ratingAverage,
+        totalRevenue: ebooks.totalRevenue,
+        createdAt: ebooks.createdAt,
+        updatedAt: ebooks.updatedAt,
+        // Author details
+        authorEmail: users.email,
+        authorFirstName: users.firstName,
+        authorLastName: users.lastName,
+        authorLocation: users.location,
+        authorCountry: users.country,
+        // Sales data
+        totalSales: sql<number>`COALESCE(${ebooks.downloadCount}, 0)`,
+        actualAmount: sql<number>`COALESCE(${ebooks.totalRevenue}, 0)`
+      })
+      .from(ebooks)
+      .leftJoin(users, eq(ebooks.authorId, users.id))
+      .orderBy(desc(ebooks.createdAt));
+  }
+
+  async updateEbookStatus(id: string, status: string, rejectionReason?: string, platformCommissionRate?: number): Promise<Ebook> {
+    const updates: any = { 
+      status, 
+      updatedAt: new Date(),
+      adminReviewedAt: new Date()
+    };
+    
+    if (rejectionReason) {
+      updates.rejectionReason = rejectionReason;
+    }
+    
+    if (platformCommissionRate !== undefined) {
+      updates.platformCommissionRate = platformCommissionRate.toString();
+      // Recalculate royalty rate
+      updates.royaltyRate = (1 - platformCommissionRate).toString();
+    }
+    
+    if (status === 'published') {
+      updates.publicationDate = new Date();
+    }
+
+    const [result] = await db
+      .update(ebooks)
+      .set(updates)
+      .where(eq(ebooks.id, id))
+      .returning();
+    return result;
+  }
+
   // E-book Purchase operations
   async createEbookPurchase(purchase: InsertEbookPurchase): Promise<EbookPurchase> {
     const [result] = await db
