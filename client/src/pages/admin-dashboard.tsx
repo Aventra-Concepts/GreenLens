@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { 
   Calendar, Clock, User, Mail, Phone, MessageSquare, DollarSign, Settings, Users, Shield, 
   BarChart3, FileText, LogOut, Database, Server, Activity, Globe, Image, BookOpen,
@@ -655,11 +655,11 @@ export default function AdminDashboard() {
         </td>
         <td className="p-3">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            {format(new Date(author.createdAt), 'MMM dd, yyyy')}
+            {author.createdAt && isValid(new Date(author.createdAt)) ? format(new Date(author.createdAt), 'MMM dd, yyyy') : 'N/A'}
           </p>
           {author.reviewedAt && (
             <p className="text-xs text-gray-400 dark:text-gray-500">
-              Reviewed: {format(new Date(author.reviewedAt), 'MMM dd')}
+              Reviewed: {isValid(new Date(author.reviewedAt)) ? format(new Date(author.reviewedAt), 'MMM dd') : 'Invalid date'}
             </p>
           )}
         </td>
