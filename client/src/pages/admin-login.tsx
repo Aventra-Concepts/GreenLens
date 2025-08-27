@@ -42,7 +42,10 @@ export default function AdminLogin() {
           description: "Welcome to the admin dashboard",
         });
         
-        setLocation("/admin-dashboard");
+        // Small delay to ensure session is set properly
+        setTimeout(() => {
+          setLocation("/admin-dashboard");
+        }, 100);
       } else {
         toast({
           title: "Invalid Credentials",
