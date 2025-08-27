@@ -294,12 +294,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { applicationStatus, adminNotes, isVerified, canPublish } = req.body;
       
       const updatedAuthor = await storage.updateAuthorStatus(id, {
-        applicationStatus,
-        adminNotes,
-        isVerified,
-        canPublish,
-        reviewedBy: req.session?.adminUser?.id || 'admin-system',
-        reviewedAt: new Date()
+        application_status: applicationStatus,
+        admin_notes: adminNotes,
+        is_verified: isVerified,
+        can_publish: canPublish,
+        reviewed_at: new Date()
       });
       
       if (updatedAuthor && applicationStatus === 'approved') {
