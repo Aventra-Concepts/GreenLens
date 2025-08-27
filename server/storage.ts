@@ -1453,6 +1453,43 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  // Publisher Dashboard Methods
+  async getPublisherStats(userId: string): Promise<any> {
+    const authorEbooks = await db
+      .select()
+      .from(ebooks)
+      .where(eq(ebooks.authorId, userId));
+
+    const totalEbooks = authorEbooks.length;
+    const publishedEbooks = authorEbooks.filter(e => e.status === 'published').length;
+    const totalDownloads = authorEbooks.reduce((sum, e) => sum + (e.downloadCount || 0), 0);
+    const totalRevenue = authorEbooks.reduce((sum, e) => sum + parseFloat(e.totalRevenue || '0'), 0);
+    const averageRating = authorEbooks.length > 0 
+      ? authorEbooks.reduce((sum, e) => sum + (e.ratingAverage || 0), 0) / authorEbooks.length 
+      : 0;
+    const pendingReviews = authorEbooks.filter(e => 
+      ['submitted', 'under_review', 'returned_for_revision'].includes(e.status)
+    ).length;
+
+    return {
+      totalEbooks,
+      publishedEbooks,
+      totalDownloads,
+      totalRevenue,
+      averageRating,
+      pendingReviews
+    };
+  }
+
+  async updateEbook(id: string, updates: any): Promise<Ebook> {
+    const [result] = await db
+      .update(ebooks)
+      .set(updates)
+      .where(eq(ebooks.id, id))
+      .returning();
+    return result;
+  }
+
   // E-book Purchase operations
   async createEbookPurchase(purchase: InsertEbookPurchase): Promise<EbookPurchase> {
     const [result] = await db

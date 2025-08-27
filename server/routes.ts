@@ -154,6 +154,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ success: false, message: 'Failed to update e-book status' });
     }
   });
+
+  // Publisher Dashboard Routes
+  app.get('/api/publisher/ebooks', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const ebooks = await storage.getEbooksByAuthor(userId);
+      res.json(ebooks);
+    } catch (error) {
+      console.error('Get publisher ebooks error:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch publisher e-books' });
+    }
+  });
+
+  app.get('/api/publisher/stats', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const stats = await storage.getPublisherStats(userId);
+      res.json(stats);
+    } catch (error) {
+      console.error('Get publisher stats error:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch publisher stats' });
+    }
+  });
+
+  app.put('/api/publisher/ebooks/:id/action', requireAuth, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { action } = req.body;
+      const userId = req.user.id;
+      
+      // Verify the ebook belongs to the publisher
+      const ebook = await storage.getEbook(id);
+      if (!ebook || ebook.authorId !== userId) {
+        return res.status(404).json({ success: false, message: 'E-book not found or access denied' });
+      }
+
+      let newStatus = ebook.status;
+      const updates: any = { updatedAt: new Date() };
+
+      switch (action) {
+        case 'submit':
+          if (ebook.status === 'draft') {
+            newStatus = 'submitted';
+            updates.submittedAt = new Date();
+          }
+          break;
+        case 'resubmit':
+          if (ebook.status === 'returned_for_revision') {
+            newStatus = 'submitted';
+            updates.submittedAt = new Date();
+            updates.rejectionReason = null;
+          }
+          break;
+        default:
+          return res.status(400).json({ success: false, message: 'Invalid action' });
+      }
+
+      updates.status = newStatus;
+      const updatedEbook = await storage.updateEbook(id, updates);
+      res.json({ success: true, ebook: updatedEbook });
+    } catch (error) {
+      console.error('Publisher ebook action error:', error);
+      res.status(500).json({ success: false, message: 'Failed to update e-book' });
+    }
+  });
   
   // Register separate ebook categories route - connected to database
   app.get('/api/ebook-categories', async (req, res) => {

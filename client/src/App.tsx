@@ -33,6 +33,7 @@ import EbookDetail from "@/pages/ebook-detail";
 import AuthorRegistration from "@/pages/author-registration";
 import StudentVerification from "@/pages/student-verification-new";
 import StudentDashboard from "@/pages/student-dashboard";
+import PublisherDashboard from "@/pages/publisher-dashboard";
 import MyGarden from "@/pages/my-garden";
 import GardenMonitoring from "@/pages/garden-monitoring";
 import PlantCareDashboard from "@/pages/PlantCareDashboard";
@@ -126,6 +127,7 @@ function Router() {
       <Route path="/categories/permaculture" component={PermaculturePage} />
       
       <Route path="/author-upload" component={AuthorUpload} />
+      <Route path="/publisher-dashboard" component={PublisherDashboard} />
       <Route path="/student-registration" component={StudentRegistration} />
       <Route path="/author-registration" component={AuthorRegistration} />
       <Route path="/student-verification" component={StudentVerification} />
