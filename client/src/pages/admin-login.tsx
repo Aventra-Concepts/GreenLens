@@ -37,15 +37,33 @@ export default function AdminLogin() {
         // Set admin session in sessionStorage for frontend checks
         sessionStorage.setItem("adminAuthenticated", "true");
         
-        toast({
-          title: "Login Successful",
-          description: "Welcome to the admin dashboard",
+        // Verify the session was properly established by making a check call
+        const checkResponse = await fetch('/api/admin/check', {
+          credentials: 'include',
         });
         
-        // Small delay to ensure session is set properly
-        setTimeout(() => {
-          setLocation("/admin-dashboard");
-        }, 100);
+        if (checkResponse.ok) {
+          const checkData = await checkResponse.json();
+          if (checkData.isAdmin) {
+            toast({
+              title: "Login Successful",
+              description: "Welcome to the admin dashboard",
+            });
+            
+            // Session verified, redirect to dashboard
+            setTimeout(() => {
+              setLocation("/admin-dashboard");
+            }, 100);
+            return;
+          }
+        }
+        
+        // If session verification failed, show error
+        toast({
+          title: "Session Error",
+          description: "Login succeeded but session verification failed. Please try again.",
+          variant: "destructive",
+        });
       } else {
         toast({
           title: "Invalid Credentials",

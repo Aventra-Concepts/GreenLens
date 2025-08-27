@@ -146,26 +146,26 @@ export default function AdminDashboard() {
 
   // Check admin authentication
   useEffect(() => {
-    // For now, let's bypass auth check to test the buttons functionality
-    // We'll fix the auth session issue separately
-    setIsAuthenticated(true);
-    sessionStorage.setItem("adminAuthenticated", "true");
-    
-    // Commented out for debugging - we know auth is the issue
-    /*
     const checkAuth = async () => {
       try {
-        // Always check server session first to ensure validity
-        const response = await fetch('/api/admin/check', {
-          credentials: 'include'
-        });
+        // Check if we have session storage first
+        const hasStoredAuth = sessionStorage.getItem("adminAuthenticated");
         
-        if (response.ok) {
-          const data = await response.json();
-          if (data.isAdmin) {
-            setIsAuthenticated(true);
-            sessionStorage.setItem("adminAuthenticated", "true");
-            return;
+        if (hasStoredAuth) {
+          // Verify with server that session is still valid
+          const response = await fetch('/api/admin/check', {
+            credentials: 'include',
+            headers: {
+              'Cache-Control': 'no-cache'
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.isAdmin) {
+              setIsAuthenticated(true);
+              return;
+            }
           }
         }
         
@@ -180,7 +180,6 @@ export default function AdminDashboard() {
     };
     
     checkAuth();
-    */
   }, [setLocation]);
 
   // Fetch consultation requests - always call this hook
@@ -210,7 +209,7 @@ export default function AdminDashboard() {
   // Fetch authors for admin
   const { data: adminAuthors = [], isLoading: isLoadingAuthors, refetch: refetchAuthors, error: authorsError } = useQuery<AdminAuthor[]>({
     queryKey: ['/api/admin/authors'],
-    enabled: true, // Temporarily disable auth check to test buttons
+    enabled: isAuthenticated,
     retry: false,
   });
 
@@ -675,9 +674,7 @@ export default function AdminDashboard() {
         </td>
         <td className="p-3">
           <div className="flex flex-col gap-1">
-            <div className="text-xs text-blue-600 mb-1">
-              Status: {author.applicationStatus} | Debug: {author.applicationStatus === 'pending' ? 'SHOW BUTTONS' : 'HIDE BUTTONS'}
-            </div>
+
             {author.applicationStatus === 'pending' && (
               <>
                 <Button
