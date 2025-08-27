@@ -749,16 +749,16 @@ export default function AdminDashboard() {
                 Revoke
               </Button>
             )}
-            {author.applicationStatus === 'rejected' && (
+            {author.application_status === 'rejected' && (
               <Button
                 size="sm"
                 variant="outline"
                 className="text-xs text-green-600"
                 onClick={() => handleStatusChange('approved')}
-                data-testid={`button-reinstate-author-${author.id}`}
+                data-testid={`button-approve-rejected-author-${author.id}`}
               >
                 <CheckCircle className="w-3 h-3 mr-1" />
-                Reinstate
+                Approve
               </Button>
             )}
             <Button
