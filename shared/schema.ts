@@ -1485,96 +1485,53 @@ export const insertStudentUserSchema = createInsertSchema(studentUsers).omit({
 });
 export type InsertStudentUser = z.infer<typeof insertStudentUserSchema>;
 
-// E-books Schema
+// E-books Schema - Matching actual database structure
 export const ebooks = pgTable("ebooks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: varchar("title").notNull(),
   subtitle: varchar("subtitle"),
-  description: text("description").notNull(),
-  shortDescription: varchar("short_description", { length: 500 }),
+  description: text("description"),
   authorId: varchar("author_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  authorName: varchar("author_name", { length: 255 }).notNull(), // Store at time of upload
-  
-  // Book Details
-  isbn: varchar("isbn").unique(),
-  isbn13: varchar("isbn13").unique(),
-  category: varchar("category").notNull(),
-  subcategory: varchar("subcategory"),
-  language: varchar("language").default('en'),
+  categoryId: varchar("category_id"),
+  coverImageUrl: varchar("cover_image_url"),
+  previewFileUrl: varchar("preview_file_url"),
+  fullFileUrl: varchar("full_file_url").notNull(),
+  fileSize: integer("file_size"),
+  fileFormat: varchar("file_format"),
+  language: varchar("language"),
   pageCount: integer("page_count"),
-  wordCount: integer("word_count"),
-  publicationDate: timestamp("publication_date"),
-  originalPublicationDate: timestamp("original_publication_date"),
-  edition: varchar("edition").default('1'),
-  publisher: varchar("publisher"),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency"),
   tags: text("tags").array(),
-  keywords: text("keywords").array(), // For search optimization
-  
-  // Pricing - Enhanced for KDP-style royalties
-  basePrice: decimal("base_price", { precision: 10, scale: 2 }).notNull(),
-  minimumPrice: decimal("minimum_price", { precision: 10, scale: 2 }),
-  maximumPrice: decimal("maximum_price", { precision: 10, scale: 2 }),
-  currency: varchar("currency", { length: 3 }).default('USD'),
-  royaltyRate: decimal("royalty_rate", { precision: 5, scale: 4 }).default('0.7000'), // 70% default
-  platformCommissionRate: decimal("platform_commission_rate", { precision: 5, scale: 4 }).default('0.3000'), // 30% platform fee
-  
-  // Files and Media
-  coverImageUrl: varchar("cover_image_url").notNull(),
-  thumbnailUrl: varchar("thumbnail_url"),
-  previewFileUrl: varchar("preview_file_url"), // Preview pages (first 10% or specific pages)
-  fullFileUrl: varchar("full_file_url").notNull(), // Complete e-book file
-  manuscriptUrl: varchar("manuscript_url"), // Original manuscript for review
-  fileSize: integer("file_size"), // In bytes
-  fileFormat: varchar("file_format").notNull(), // pdf, epub, mobi, etc.
-  previewPageCount: integer("preview_page_count").default(10),
-  
-  // Publishing Compliance
-  copyrightStatus: varchar("copyright_status").notNull(), // original, licensed, public_domain
-  publishingRights: boolean("publishing_rights").default(false),
-  contentRating: varchar("content_rating"), // all_ages, teen, adult
-  
-  // Status & Verification - Enhanced KDP-style workflow
-  status: varchar("status").default('draft'), // draft, submitted, under_review, published, rejected, suspended
-  submissionNotes: text("submission_notes"), // Author's notes to reviewers
+  isbn: varchar("isbn"),
+  publishDate: date("publish_date"),
+  isPublished: boolean("is_published"),
+  adminApproved: boolean("admin_approved"),
   adminNotes: text("admin_notes"),
-  rejectionReason: text("rejection_reason"),
-  approvedBy: varchar("approved_by").references(() => users.id),
+  approvedBy: varchar("approved_by"),
   approvedAt: timestamp("approved_at"),
-  submittedAt: timestamp("submitted_at"),
-  publishedAt: timestamp("published_at"),
-  lastModifiedAt: timestamp("last_modified_at"),
-  
-  // Sales and Performance Analytics
-  totalSales: integer("total_sales").default(0),
-  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).default('0'),
-  authorEarnings: decimal("author_earnings", { precision: 12, scale: 2 }).default('0'),
-  platformEarnings: decimal("platform_earnings", { precision: 12, scale: 2 }).default('0'),
-  downloadCount: integer("download_count").default(0),
-  viewCount: integer("view_count").default(0),
-  wishlistCount: integer("wishlist_count").default(0),
+  downloadCount: integer("download_count"),
   ratingAverage: decimal("rating_average", { precision: 3, scale: 2 }),
-  ratingCount: integer("rating_count").default(0),
-  
-  isActive: boolean("is_active").default(true),
-  isFeatured: boolean("is_featured").default(false),
-  isExclusive: boolean("is_exclusive").default(false), // Platform exclusive
-  isBestseller: boolean("is_bestseller").default(false),
-  
-  // Author Rights and Legal
-  hasExclusiveRights: boolean("has_exclusive_rights").default(true),
-  copyrightYear: integer("copyright_year"),
-  copyrightHolder: varchar("copyright_holder"),
-  licenseType: varchar("license_type").default('standard'), // standard, creative_commons, public_domain
-  termsAcceptedAt: timestamp("terms_accepted_at"),
-  
-  // Geographic Restrictions for E-book Availability 
-  allowedCountries: jsonb("allowed_countries").default("[]"), // Array of allowed country codes
-  restrictedCountries: jsonb("restricted_countries").default("[]"), // Array of restricted country codes  
-  globalAccess: boolean("global_access").default(true), // E-books default to global access
-  regionRestrictions: jsonb("region_restrictions").default("{}"), // Custom region-based rules
-  
+  ratingCount: integer("rating_count"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  authorName: varchar("author_name"),
+  status: varchar("status"),
+  isActive: boolean("is_active"),
+  isFeatured: boolean("is_featured"),
+  category: varchar("category"),
+  subcategory: varchar("subcategory"),
+  basePrice: decimal("base_price", { precision: 10, scale: 2 }),
+  copyrightStatus: varchar("copyright_status"),
+  publishingRights: boolean("publishing_rights"),
+  contentRating: varchar("content_rating"),
+  publicationDate: timestamp("publication_date"),
+  rating: decimal("rating", { precision: 3, scale: 2 }),
+  reviewCount: integer("review_count"),
+  allowedCountries: jsonb("allowed_countries"),
+  restrictedCountries: jsonb("restricted_countries"),
+  globalAccess: boolean("global_access"),
+  regionRestrictions: jsonb("region_restrictions"),
 });
 
 export type Ebook = typeof ebooks.$inferSelect;

@@ -192,29 +192,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const ebookFilePath = `/uploads/ebooks/${ebookFileName}`;
       const coverImagePath = `/uploads/covers/${coverFileName}`;
 
-      // Create e-book submission record
+      // Create e-book submission record - matching actual database structure
       const ebookData = {
         title: metadata.title,
         description: metadata.description,
         authorId: userId,
         authorName: metadata.authorName || `${req.user.firstName} ${req.user.lastName}`,
         category: metadata.category,
-        basePrice: parseFloat(metadata.price),
+        price: parseFloat(metadata.price), // Using 'price' column not 'basePrice'
         currency: metadata.currency || 'USD',
-        language: metadata.language || 'English',
+        language: metadata.language || 'en',
         pageCount: metadata.pages || null,
-        isbn: metadata.isbn || null,
-        tags: metadata.tags || [],
         coverImageUrl: coverImagePath,
         fullFileUrl: ebookFilePath,
         fileFormat: path.extname(ebookFile.originalname).toLowerCase().replace('.', ''),
-        fileSize: ebookFile.size,
+        fileSize: parseInt(ebookFile.size),
+        tags: metadata.tags || [],
         status: 'submitted',
-        copyrightStatus: 'original',
-        publishingRights: true,
-        previewText: metadata.previewText || null,
-        authorBio: metadata.authorBio || null,
-        publicationDate: metadata.publishDate ? new Date(metadata.publishDate) : new Date(),
+        isActive: true,
+        isPublished: false,
+        adminApproved: false,
+        globalAccess: true,
       };
 
       const newEbook = await storage.createEbook(ebookData);

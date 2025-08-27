@@ -286,12 +286,12 @@ export default function EbookUpload() {
           <div className="mb-8">
             <Button
               variant="ghost"
-              onClick={() => setLocation('/admin-dashboard')}
+              onClick={() => setLocation('/author-dashboard')}
               className="mb-4 flex items-center gap-2"
               data-testid="button-back-dashboard"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Dashboard
+              Back to Author Dashboard
             </Button>
             
             <div className="text-center">
