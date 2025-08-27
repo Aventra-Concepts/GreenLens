@@ -1894,12 +1894,31 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAuthorStatus(id: string, updates: any): Promise<AuthorProfile> {
-    const [result] = await db
-      .update(authorProfiles)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(authorProfiles.id, id))
-      .returning();
-    return result;
+    // Use raw SQL since Drizzle ORM field mapping is causing issues
+    const query = `
+      UPDATE author_profiles 
+      SET 
+        application_status = $1,
+        admin_notes = $2, 
+        is_verified = $3,
+        can_publish = $4,
+        reviewed_at = $5,
+        updated_at = NOW()
+      WHERE id = $6
+      RETURNING *
+    `;
+    
+    const values = [
+      updates.application_status,
+      updates.admin_notes,
+      updates.is_verified,
+      updates.can_publish,
+      updates.reviewed_at,
+      id
+    ];
+    
+    const result = await db.execute(sql.raw(query, values));
+    return result.rows[0] as AuthorProfile;
   }
 
   async getAllEbooksForAdmin(): Promise<any[]> {
