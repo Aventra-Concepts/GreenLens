@@ -340,14 +340,13 @@ export function Chatbot() {
             />
           </div>
           
-          {/* Artistic "Chat with me" Text Below Icon */}
+          {/* Elegant "Chat with me" Text Below Icon */}
           <div className="mt-2 text-center">
-            <p className="text-sm font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent"
+            <p className="text-sm font-semibold text-green-700 hover:text-green-800 transition-colors duration-200"
                style={{ 
-                 fontFamily: '"Dancing Script", "Brush Script MT", cursive',
-                 fontSize: '16px',
-                 textShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                 letterSpacing: '0.5px'
+                 fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+                 fontSize: '14px',
+                 letterSpacing: '0.025em'
                }}>
               Chat with me
             </p>
