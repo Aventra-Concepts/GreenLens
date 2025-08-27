@@ -144,101 +144,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   // Admin login endpoint
-  app.post("/api/admin/login", async (req, res) => {
-    try {
-      const { username, password } = req.body;
+  app.post("/api/admin/login", (req, res) => {
+    const { username, password } = req.body;
+    
+    // Check admin credentials
+    if (username === "admin" && password === "greenlens2024") {
+      // Create admin session
+      req.session.adminAuthenticated = true;
+      req.session.adminUser = {
+        id: "admin-system",
+        email: "admin@greenlens.com",
+        firstName: "System",
+        lastName: "Administrator",
+        isAdmin: true
+      };
       
-      // Check admin credentials (in production, this should be more secure)
-      if (username === "admin" && password === "greenlens2024") {
-        // Create or find admin user
-        let adminUser;
-        try {
-          adminUser = await storage.getUserByEmail("admin@greenlens.com");
-        } catch (error) {
-          // Admin user doesn't exist, create it
-          const bcrypt = require('bcrypt');
-          const newUser = {
-            email: "admin@greenlens.com",
-            password: await bcrypt.hash("greenlens2024", 10),
-            firstName: "System",
-            lastName: "Administrator",
-            location: "Global",
-            gmail: null,
-            facebookId: null,
-            githubId: null,
-            twitterId: null,
-            isAdmin: true,
-            isActive: true,
-            isAuthor: false,
-            authorVerified: false,
-            phone: null,
-            timezone: null,
-            preferredCurrency: "USD",
-            region: "US",
-            subscriptionStatus: null,
-            subscriptionPlanId: null,
-            subscriptionStartDate: null,
-            subscriptionEndDate: null,
-            freeTierUsed: 0,
-            freeTierLimit: 10,
-            freeTierStartedAt: null,
-            lastLoginDate: null,
-            totalSessions: 0,
-            profileImageUrl: null,
-            bio: null,
-            website: null,
-            socialLinks: null,
-            language: "en",
-            notifications: true,
-            emailUpdates: true,
-            marketingEmails: false,
-            twoFactorEnabled: false,
-            twoFactorSecret: null,
-            lastPasswordChange: null,
-            accountCreationSource: "admin",
-            provider: "local",
-            country: "US",
-            isSuperAdmin: true,
-            failedLoginAttempts: 0,
-            lastFailedLoginAt: null,
-            accountLockedUntil: null,
-            passwordResetToken: null,
-            passwordResetExpiry: null,
-            emailVerificationToken: null,
-            emailVerified: true
-          };
-          adminUser = await storage.createUser(newUser);
-        }
-        
-        // Ensure admin user has admin privileges
-        if (!adminUser?.isAdmin) {
-          adminUser = await storage.updateUserAdminStatus(adminUser!.id, true);
-        }
-        
-        // Create session manually
-        (req.session as any).passport = { user: adminUser };
-        req.logIn(adminUser!, (err) => {
-          if (err) {
-            return res.status(500).json({ success: false, message: "Session creation failed" });
-          }
-          res.json({ 
-            success: true, 
-            message: "Admin login successful",
-            user: {
-              id: adminUser!.id,
-              email: adminUser!.email,
-              isAdmin: adminUser!.isAdmin,
-              firstName: adminUser!.firstName,
-              lastName: adminUser!.lastName
-            }
-          });
-        });
-      } else {
-        res.status(401).json({ success: false, message: "Invalid admin credentials" });
-      }
-    } catch (error) {
-      console.error("Admin login error:", error);
-      res.status(500).json({ success: false, message: "Login failed" });
+      res.json({ 
+        success: true, 
+        message: "Admin login successful",
+        user: req.session.adminUser
+      });
+    } else {
+      res.status(401).json({ success: false, message: "Invalid admin credentials" });
+    }
+  });
+
+  // Admin session check endpoint
+  app.get("/api/admin/check", (req, res) => {
+    if (req.session.adminAuthenticated && req.session.adminUser) {
+      res.json({ 
+        isAdmin: true, 
+        user: req.session.adminUser 
+      });
+    } else {
+      res.status(401).json({ isAdmin: false });
     }
   });
 
@@ -279,7 +218,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid metadata format" });
       }
 
-      const userId = req.user.id;
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User authentication required" });
+      }
       
       // Create unique file paths for object storage
       const timestamp = Date.now();

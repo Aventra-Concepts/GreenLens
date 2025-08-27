@@ -144,12 +144,38 @@ export default function AdminDashboard() {
 
   // Check admin authentication
   useEffect(() => {
-    const adminAuth = sessionStorage.getItem("adminAuthenticated");
-    if (adminAuth === "true") {
-      setIsAuthenticated(true);
-    } else {
-      setLocation("/admin-login");
-    }
+    const checkAuth = async () => {
+      try {
+        // Check for session storage first
+        const adminAuth = sessionStorage.getItem("adminAuthenticated");
+        if (adminAuth === "true") {
+          setIsAuthenticated(true);
+          return;
+        }
+        
+        // Also check server session
+        const response = await fetch('/api/admin/check', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.isAdmin) {
+            setIsAuthenticated(true);
+            sessionStorage.setItem("adminAuthenticated", "true");
+            return;
+          }
+        }
+        
+        // If no valid session, redirect to login
+        setLocation("/admin-login");
+      } catch (error) {
+        console.log("Auth check failed, redirecting to login");
+        setLocation("/admin-login");
+      }
+    };
+    
+    checkAuth();
   }, [setLocation]);
 
   // Fetch consultation requests - always call this hook
