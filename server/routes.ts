@@ -303,7 +303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (updatedAuthor && applicationStatus === 'approved') {
         // Update user's author flags when approved
-        await storage.updateUser(updatedAuthor.userId, {
+        await storage.updateUser(updatedAuthor.user_id, {
           isAuthor: true,
           authorVerified: true
         });

@@ -1894,15 +1894,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAuthorStatus(id: string, updates: any): Promise<AuthorProfile> {
-    // Use template literal with Neon's sql template tag
+    // Use template literal with Neon's sql template tag - all fields must be defined
     const result = await db.execute(sql`
       UPDATE author_profiles 
       SET 
-        application_status = ${updates.application_status},
-        admin_notes = ${updates.admin_notes}, 
-        is_verified = ${updates.is_verified},
-        can_publish = ${updates.can_publish},
-        reviewed_at = ${updates.reviewed_at},
+        application_status = ${updates.application_status || null},
+        admin_notes = ${updates.admin_notes || null}, 
+        is_verified = ${updates.is_verified || false},
+        can_publish = ${updates.can_publish || false},
+        reviewed_at = ${updates.reviewed_at || new Date()},
         updated_at = NOW()
       WHERE id = ${id}
       RETURNING *
