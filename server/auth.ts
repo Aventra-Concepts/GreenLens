@@ -298,9 +298,16 @@ export function isAuthenticated(req: any, res: any, next: any) {
 
 // Admin authentication middleware
 export function requireAdmin(req: any, res: any, next: any) {
+  // Check session-based admin authentication first
+  if (req.session?.adminAuthenticated && req.session?.adminUser?.isAdmin) {
+    return next();
+  }
+  
+  // Fallback to passport-based authentication
   if (req.isAuthenticated() && req.user && req.user.isAdmin) {
     return next();
   }
+  
   return res.status(403).json({ message: "Admin access required" });
 }
 

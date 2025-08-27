@@ -4,6 +4,7 @@ import { storage } from "../storage";
 import { insertConsultationRequestSchema } from "@shared/schema";
 import { EmailService } from "../services/emailService";
 import { requireAuth } from "../auth";
+import { requireAdmin } from "../middleware/auth";
 
 const router = Router();
 
@@ -262,6 +263,20 @@ router.put('/admin/consultation-requests/:id/status', requireAuth, async (req, r
     res.status(500).json({
       success: false,
       message: 'Internal server error',
+    });
+  }
+});
+
+// Admin endpoint to get all consultation requests
+router.get('/admin/consultation-requests', requireAdmin, async (req, res) => {
+  try {
+    const consultationRequests = await storage.getConsultationRequests();
+    res.json(consultationRequests);
+  } catch (error) {
+    console.error('Error fetching admin consultation requests:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch consultation requests',
     });
   }
 });

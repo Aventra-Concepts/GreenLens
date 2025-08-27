@@ -3,7 +3,8 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import { storage } from "./storage";
-import { setupAuth, requireAuth, requireAdmin } from "./auth";
+import { setupAuth, requireAuth } from "./auth";
+import { requireAdmin } from "./middleware/auth";
 import passport from "passport";
 import { z } from "zod";
 import { insertUserSchema, loginUserSchema } from "@shared/schema";
@@ -277,7 +278,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/ebooks', ebookRoutes);
   
   // Admin Author Management Routes
-  app.get('/api/admin/authors', requireAuth, requireAdmin, async (req: any, res) => {
+  app.get('/api/admin/authors', requireAdmin, async (req: any, res) => {
     try {
       const authors = await storage.getAllAuthorsForAdmin();
       res.json(authors);
@@ -287,7 +288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/admin/authors/:id/status', requireAuth, requireAdmin, async (req: any, res) => {
+  app.put('/api/admin/authors/:id/status', requireAdmin, async (req: any, res) => {
     try {
       const { id } = req.params;
       const { applicationStatus, adminNotes, isVerified, canPublish } = req.body;
@@ -317,7 +318,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Admin E-books Management Route
-  app.get('/api/admin/ebooks', requireAuth, requireAdmin, async (req: any, res) => {
+  app.get('/api/admin/ebooks', requireAdmin, async (req: any, res) => {
     try {
       const ebooks = await storage.getAllEbooksForAdmin();
       res.json(ebooks);
@@ -328,7 +329,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin E-book Status Update Route
-  app.put('/api/admin/ebooks/:id/status', requireAuth, requireAdmin, async (req: any, res) => {
+  app.put('/api/admin/ebooks/:id/status', requireAdmin, async (req: any, res) => {
     try {
       const { id } = req.params;
       const { status, rejectionReason, platformCommissionRate } = req.body;

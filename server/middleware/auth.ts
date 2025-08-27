@@ -9,6 +9,17 @@ declare global {
       isAdmin: boolean;
       isActive: boolean;
     }
+    
+    interface Request {
+      session?: {
+        adminAuthenticated?: boolean;
+        adminUser?: {
+          id: string;
+          username: string;
+          isAdmin: boolean;
+        };
+      };
+    }
   }
 }
 
@@ -20,12 +31,19 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
   next();
 };
 
-// Middleware to check if user is admin
+// Middleware to check if user is admin (supports both passport and session-based auth)
 export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user?.isAdmin) {
-    return res.status(403).json({ error: 'Admin access required' });
+  // Check session-based admin authentication first
+  if (req.session?.adminAuthenticated && req.session?.adminUser?.isAdmin) {
+    return next();
   }
-  next();
+  
+  // Fallback to passport-based authentication
+  if (req.user?.isAdmin) {
+    return next();
+  }
+  
+  return res.status(403).json({ message: 'Admin access required' });
 };
 
 // Middleware to check if user account is active
