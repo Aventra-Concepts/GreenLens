@@ -143,6 +143,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   );
 
+  // Admin login endpoint
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      // Check admin credentials (in production, this should be more secure)
+      if (username === "admin" && password === "greenlens2024") {
+        // Create or find admin user
+        let adminUser;
+        try {
+          adminUser = await storage.getUserByEmail("admin@greenlens.com");
+        } catch (error) {
+          // Admin user doesn't exist, create it
+          const bcrypt = require('bcrypt');
+          const newUser = {
+            email: "admin@greenlens.com",
+            password: await bcrypt.hash("greenlens2024", 10),
+            firstName: "System",
+            lastName: "Administrator",
+            location: "Global",
+            gmail: null,
+            facebookId: null,
+            githubId: null,
+            twitterId: null,
+            isAdmin: true,
+            isActive: true,
+            isAuthor: false,
+            authorVerified: false,
+            phone: null,
+            timezone: null,
+            preferredCurrency: "USD",
+            region: "US",
+            subscriptionStatus: null,
+            subscriptionPlanId: null,
+            subscriptionStartDate: null,
+            subscriptionEndDate: null,
+            freeTierUsed: 0,
+            freeTierLimit: 10,
+            freeTierStartedAt: null,
+            lastLoginDate: null,
+            totalSessions: 0,
+            profileImageUrl: null,
+            bio: null,
+            website: null,
+            socialLinks: null,
+            language: "en",
+            notifications: true,
+            emailUpdates: true,
+            marketingEmails: false,
+            twoFactorEnabled: false,
+            twoFactorSecret: null,
+            lastPasswordChange: null,
+            accountCreationSource: "admin",
+            provider: "local",
+            country: "US",
+            isSuperAdmin: true,
+            failedLoginAttempts: 0,
+            lastFailedLoginAt: null,
+            accountLockedUntil: null,
+            passwordResetToken: null,
+            passwordResetExpiry: null,
+            emailVerificationToken: null,
+            emailVerified: true
+          };
+          adminUser = await storage.createUser(newUser);
+        }
+        
+        // Ensure admin user has admin privileges
+        if (!adminUser?.isAdmin) {
+          adminUser = await storage.updateUserAdminStatus(adminUser!.id, true);
+        }
+        
+        // Create session manually
+        (req.session as any).passport = { user: adminUser };
+        req.logIn(adminUser!, (err) => {
+          if (err) {
+            return res.status(500).json({ success: false, message: "Session creation failed" });
+          }
+          res.json({ 
+            success: true, 
+            message: "Admin login successful",
+            user: {
+              id: adminUser!.id,
+              email: adminUser!.email,
+              isAdmin: adminUser!.isAdmin,
+              firstName: adminUser!.firstName,
+              lastName: adminUser!.lastName
+            }
+          });
+        });
+      } else {
+        res.status(401).json({ success: false, message: "Invalid admin credentials" });
+      }
+    } catch (error) {
+      console.error("Admin login error:", error);
+      res.status(500).json({ success: false, message: "Login failed" });
+    }
+  });
+
   // SEO Routes - Serve sitemap and robots.txt
   app.get('/sitemap.xml', (req, res) => {
     res.sendFile('sitemap.xml', { root: 'public' });
@@ -199,14 +298,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         authorId: userId,
         authorName: metadata.authorName || `${req.user.firstName} ${req.user.lastName}`,
         category: metadata.category,
-        price: parseFloat(metadata.price), // Using 'price' column not 'basePrice'
+        price: metadata.price.toString(), // Using 'price' column not 'basePrice'
         currency: metadata.currency || 'USD',
         language: metadata.language || 'en',
         pageCount: metadata.pages || null,
         coverImageUrl: coverImagePath,
         fullFileUrl: ebookFilePath,
         fileFormat: path.extname(ebookFile.originalname).toLowerCase().replace('.', ''),
-        fileSize: parseInt(ebookFile.size),
+        fileSize: ebookFile.size,
         tags: metadata.tags || [],
         status: 'submitted',
         isActive: true,

@@ -19,9 +19,22 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      // Simple admin credentials check (in production, this should be more secure)
-      if (credentials.username === "admin" && credentials.password === "greenlens2024") {
-        // Set admin session
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: credentials.username,
+          password: credentials.password,
+        }),
+        credentials: 'include', // Important for session cookies
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Set admin session in sessionStorage for frontend checks
         sessionStorage.setItem("adminAuthenticated", "true");
         
         toast({
@@ -33,11 +46,12 @@ export default function AdminLogin() {
       } else {
         toast({
           title: "Invalid Credentials",
-          description: "Please check your username and password",
+          description: data.message || "Please check your username and password",
           variant: "destructive",
         });
       }
     } catch (error) {
+      console.error('Admin login error:', error);
       toast({
         title: "Login Failed",
         description: "An error occurred during login",
