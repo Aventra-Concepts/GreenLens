@@ -168,36 +168,36 @@ export function CookieConsentBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 z-[9999] max-w-xs sm:max-w-sm animate-in slide-in-from-left-5 duration-500" style={{ zIndex: 9999, animation: 'gentle-pulse 2s ease-in-out infinite' }}>
+    <div className="fixed bottom-4 left-4 z-[9999] max-w-[280px] animate-in slide-in-from-left-5 duration-500" style={{ zIndex: 9999, animation: 'gentle-pulse 2s ease-in-out infinite' }}>
       <Card className="bg-white border-2 border-green-400 shadow-xl ring-2 ring-green-200">
-        <div className="p-3">
-          <div className="flex items-start justify-between mb-2">
-            <div className="flex items-center gap-1">
-              <Cookie className="h-4 w-4 text-green-600" />
-              <h3 className="font-semibold text-sm text-gray-900">Cookies</h3>
+        <div className="p-2">
+          <div className="flex items-start justify-between mb-1">
+            <div className="flex items-center gap-0.5">
+              <Cookie className="h-3 w-3 text-green-600" />
+              <h3 className="font-semibold text-xs text-gray-900">Cookies</h3>
             </div>
             <Button
               onClick={() => setIsVisible(false)}
               variant="ghost"
               size="sm"
-              className="h-6 w-6 p-0 -mt-1"
+              className="h-5 w-5 p-0 -mt-0.5"
               data-testid="button-close-cookies"
             >
-              <X className="h-3 w-3" />
+              <X className="h-2.5 w-2.5" />
             </Button>
           </div>
           
           {!showSettings ? (
             <>
-              <p className="text-xs text-gray-600 mb-3 leading-relaxed">
+              <p className="text-[10px] text-gray-600 mb-2 leading-tight">
                 We use cookies to improve your experience. Essential cookies are required.
               </p>
               
-              <div className="flex flex-col gap-1">
-                <div className="flex gap-1">
+              <div className="flex flex-col gap-0.5">
+                <div className="flex gap-0.5">
                   <Button
                     onClick={acceptAll}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-xs py-1 h-7"
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-[10px] py-0.5 h-6"
                     data-testid="button-accept-all-cookies"
                   >
                     Accept
@@ -205,7 +205,7 @@ export function CookieConsentBanner() {
                   <Button
                     onClick={acceptEssential}
                     variant="outline"
-                    className="flex-1 border-gray-300 hover:bg-gray-50 text-xs py-1 h-7"
+                    className="flex-1 border-gray-300 hover:bg-gray-50 text-[10px] py-0.5 h-6"
                     data-testid="button-essential-only-cookies"
                   >
                     Essential
@@ -216,75 +216,79 @@ export function CookieConsentBanner() {
                   onClick={() => setShowSettings(true)}
                   variant="ghost"
                   size="sm"
-                  className="text-xs text-green-600 hover:text-green-700 h-6"
+                  className="text-[10px] text-green-600 hover:text-green-700 h-5"
                   data-testid="button-customize-cookies"
                 >
-                  <Settings className="h-3 w-3 mr-1" />
+                  <Settings className="h-2.5 w-2.5 mr-0.5" />
                   Customize
                 </Button>
               </div>
               
-              <div className="flex items-center justify-center gap-1 mt-2 text-xs text-gray-400">
-                <Shield className="h-2 w-2" />
+              <div className="flex items-center justify-center gap-0.5 mt-1 text-[9px] text-gray-400">
+                <Shield className="h-1.5 w-1.5" />
                 <span>GDPR Compliant</span>
               </div>
             </>
           ) : (
             <>
-              <div className="space-y-4 mb-4">
-                <div className="flex items-center justify-between py-2">
+              <div className="space-y-2 mb-2">
+                <div className="flex items-center justify-between py-1">
                   <div>
-                    <div className="font-medium text-sm">Essential Cookies</div>
-                    <div className="text-xs text-gray-500">Required for basic site functionality</div>
+                    <div className="font-medium text-[10px]">Essential Cookies</div>
+                    <div className="text-[9px] text-gray-500">Required for basic site functionality</div>
                   </div>
                   <Checkbox 
                     checked={preferences.essential} 
                     disabled={true}
+                    className="h-3 w-3"
                     data-testid="checkbox-essential-cookies"
                   />
                 </div>
                 
-                <div className="flex items-center justify-between py-2">
+                <div className="flex items-center justify-between py-1">
                   <div>
-                    <div className="font-medium text-sm">Analytics Cookies</div>
-                    <div className="text-xs text-gray-500">Help us understand site usage</div>
+                    <div className="font-medium text-[10px]">Analytics Cookies</div>
+                    <div className="text-[9px] text-gray-500">Help us understand site usage</div>
                   </div>
                   <Checkbox
                     checked={preferences.analytics}
                     onCheckedChange={(checked) => updatePreference('analytics', !!checked)}
+                    className="h-3 w-3"
                     data-testid="checkbox-analytics-cookies"
                   />
                 </div>
                 
-                <div className="flex items-center justify-between py-2">
+                <div className="flex items-center justify-between py-1">
                   <div>
-                    <div className="font-medium text-sm">Marketing Cookies</div>
-                    <div className="text-xs text-gray-500">Show relevant ads and content</div>
+                    <div className="font-medium text-[10px]">Marketing Cookies</div>
+                    <div className="text-[9px] text-gray-500">Show relevant ads and content</div>
                   </div>
                   <Checkbox
                     checked={preferences.marketing}
                     onCheckedChange={(checked) => updatePreference('marketing', !!checked)}
+                    className="h-3 w-3"
                     data-testid="checkbox-marketing-cookies"
                   />
                 </div>
                 
-                <div className="flex items-center justify-between py-2">
+                <div className="flex items-center justify-between py-1">
                   <div>
-                    <div className="font-medium text-sm">Personalization</div>
-                    <div className="text-xs text-gray-500">Customize your experience</div>
+                    <div className="font-medium text-[10px]">Personalization</div>
+                    <div className="text-[9px] text-gray-500">Customize your experience</div>
                   </div>
                   <Checkbox
                     checked={preferences.personalization}
                     onCheckedChange={(checked) => updatePreference('personalization', !!checked)}
+                    className="h-3 w-3"
                     data-testid="checkbox-personalization-cookies"
                   />
                 </div>
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex gap-0.5">
                 <Button
                   onClick={saveCustomPreferences}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-[10px] py-0.5 h-6"
                   data-testid="button-save-preferences"
                 >
                   Save Preferences
@@ -292,7 +296,7 @@ export function CookieConsentBanner() {
                 <Button
                   onClick={() => setShowSettings(false)}
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 text-[10px] py-0.5 h-6"
                   data-testid="button-back-to-main"
                 >
                   Back
