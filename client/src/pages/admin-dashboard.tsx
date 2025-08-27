@@ -713,6 +713,9 @@ export default function AdminDashboard() {
         <td className="p-3">
           <div className="flex flex-col gap-1">
 
+            <div className="text-xs text-blue-600 mb-1">
+              Debug: Status={author.applicationStatus} | Pending={author.applicationStatus === 'pending' ? 'YES' : 'NO'}
+            </div>
             {author.applicationStatus === 'pending' && (
               <>
                 <Button
