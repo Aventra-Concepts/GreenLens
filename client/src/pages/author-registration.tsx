@@ -349,7 +349,8 @@ export default function AuthorRegistration() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <Layout>
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Navigation */}
       <div className="mb-8">
         <Link href="/">
@@ -1139,5 +1140,6 @@ export default function AuthorRegistration() {
         </CardContent>
       </Card>
     </div>
+    </Layout>
   );
 }
