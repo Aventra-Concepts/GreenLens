@@ -27,11 +27,11 @@ export function CookieConsentBanner() {
   useEffect(() => {
     // Add delay to ensure proper rendering on all pages
     const timer = setTimeout(() => {
-      const consent = localStorage.getItem('greenlens-cookie-consent');
-      const gpcEnabled = (navigator as any).globalPrivacyControl;
-      
       // For development/demo - always show banner (remove this line in production)
       localStorage.removeItem('greenlens-cookie-consent');
+      
+      const consent = localStorage.getItem('greenlens-cookie-consent');
+      const gpcEnabled = (navigator as any).globalPrivacyControl;
       
       if (!consent) {
         // Honor Global Privacy Control (GPC) signals
@@ -168,8 +168,8 @@ export function CookieConsentBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-[9999] max-w-xs animate-in slide-in-from-right-5 duration-500" style={{ zIndex: 9999 }}>
-      <Card className="bg-white border-2 border-green-300 shadow-lg">
+    <div className="fixed bottom-4 right-4 z-[9999] max-w-xs sm:max-w-sm animate-in slide-in-from-right-5 duration-500" style={{ zIndex: 9999, animation: 'gentle-pulse 2s ease-in-out infinite' }}>
+      <Card className="bg-white border-2 border-green-400 shadow-xl ring-2 ring-green-200">
         <div className="p-3">
           <div className="flex items-start justify-between mb-2">
             <div className="flex items-center gap-1">
