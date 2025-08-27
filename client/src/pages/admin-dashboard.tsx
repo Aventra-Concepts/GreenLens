@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { format, isValid } from "date-fns";
@@ -141,6 +142,7 @@ export default function AdminDashboard() {
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [viewingAuthor, setViewingAuthor] = useState<AdminAuthor | null>(null);
 
   // Check admin authentication
   useEffect(() => {
@@ -597,7 +599,7 @@ export default function AdminDashboard() {
               {author.user_first_name} {author.user_last_name}
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500">
-              {author.country}
+              {author.user_location || 'No location'}
             </p>
           </div>
         </td>
@@ -611,9 +613,9 @@ export default function AdminDashboard() {
                 {author.phone}
               </p>
             )}
-            {author.website && (
+            {author.websiteUrl && (
               <p className="text-xs text-blue-600 dark:text-blue-400">
-                {author.website}
+                {author.websiteUrl}
               </p>
             )}
           </div>
@@ -717,6 +719,7 @@ export default function AdminDashboard() {
               size="sm"
               variant="outline"
               className="text-xs"
+              onClick={() => setViewingAuthor(author)}
               data-testid={`button-view-author-${author.id}`}
             >
               <Eye className="w-3 h-3 mr-1" />
@@ -2284,6 +2287,87 @@ export default function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Author Details Modal */}
+      <Dialog open={!!viewingAuthor} onOpenChange={() => setViewingAuthor(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Author Details</DialogTitle>
+            <DialogDescription>
+              Complete information for {viewingAuthor?.displayName}
+            </DialogDescription>
+          </DialogHeader>
+          {viewingAuthor && (
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">Personal Information</h4>
+                  <div className="space-y-2 text-sm">
+                    <p><span className="font-medium">Display Name:</span> {viewingAuthor.displayName}</p>
+                    <p><span className="font-medium">Full Name:</span> {viewingAuthor.user_first_name} {viewingAuthor.user_last_name}</p>
+                    <p><span className="font-medium">Email:</span> {viewingAuthor.email}</p>
+                    {viewingAuthor.phone && <p><span className="font-medium">Phone:</span> {viewingAuthor.phone}</p>}
+                    <p><span className="font-medium">Location:</span> {viewingAuthor.user_location || 'Not specified'}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">Professional Details</h4>
+                  <div className="space-y-2 text-sm">
+                    <p><span className="font-medium">Bio:</span> {viewingAuthor.bio || 'No bio provided'}</p>
+                    <p><span className="font-medium">Experience:</span> {viewingAuthor.experienceYears || 0} years</p>
+                    <p><span className="font-medium">Expertise:</span> {viewingAuthor.expertise || 'Not specified'}</p>
+                    <p><span className="font-medium">Genres:</span> {viewingAuthor.genres || 'Not specified'}</p>
+                    {viewingAuthor.websiteUrl && <p><span className="font-medium">Website:</span> <a href={viewingAuthor.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{viewingAuthor.websiteUrl}</a></p>}
+                    {viewingAuthor.linkedinUrl && <p><span className="font-medium">LinkedIn:</span> <a href={viewingAuthor.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{viewingAuthor.linkedinUrl}</a></p>}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">Application Status</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Status:</span>
+                      <Badge variant="outline" className={`${
+                        viewingAuthor.applicationStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        viewingAuthor.applicationStatus === 'approved' ? 'bg-green-100 text-green-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {viewingAuthor.applicationStatus}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Verified:</span>
+                      <Badge variant="outline" className={viewingAuthor.isVerified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                        {viewingAuthor.isVerified ? 'Yes' : 'No'}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Can Publish:</span>
+                      <Badge variant="outline" className={viewingAuthor.canPublish ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}>
+                        {viewingAuthor.canPublish ? 'Yes' : 'No'}
+                      </Badge>
+                    </div>
+                    <p><span className="font-medium">Applied:</span> {viewingAuthor.createdAt && isValid(new Date(viewingAuthor.createdAt)) ? format(new Date(viewingAuthor.createdAt), 'MMM dd, yyyy') : 'N/A'}</p>
+                    {viewingAuthor.reviewedAt && (
+                      <p><span className="font-medium">Reviewed:</span> {isValid(new Date(viewingAuthor.reviewedAt)) ? format(new Date(viewingAuthor.reviewedAt), 'MMM dd, yyyy') : 'Invalid date'}</p>
+                    )}
+                  </div>
+                </div>
+                
+                {viewingAuthor.adminNotes && (
+                  <div>
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Admin Notes</h4>
+                    <p className="text-sm bg-gray-50 dark:bg-gray-800 p-3 rounded-md">{viewingAuthor.adminNotes}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
