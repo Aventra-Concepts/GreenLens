@@ -1453,8 +1453,8 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  // Publisher Dashboard Methods
-  async getPublisherStats(userId: string): Promise<any> {
+  // Author Dashboard Methods
+  async getAuthorStats(userId: string): Promise<any> {
     const authorEbooks = await db
       .select()
       .from(ebooks)

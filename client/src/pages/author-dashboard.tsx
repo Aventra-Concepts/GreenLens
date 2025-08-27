@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -96,27 +97,53 @@ const getStatusIcon = (status: string) => {
   }
 };
 
-export default function PublisherDashboard() {
+export default function AuthorDashboard() {
+  const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Fetch publisher's e-books
-  const { data: publisherEbooks = [], isLoading: isLoadingEbooks, refetch: refetchEbooks } = useQuery<PublisherEbook[]>({
-    queryKey: ['/api/publisher/ebooks'],
+  // Check if user is authenticated and is an author
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to access the author dashboard",
+        variant: "destructive",
+      });
+      setLocation("/login");
+      return;
+    }
+
+    if (!user?.isAuthor || !user?.authorVerified) {
+      toast({
+        title: "Author Access Required",
+        description: "You need to be a verified author to access this dashboard. Please register as an author first.",
+        variant: "destructive",
+      });
+      setLocation("/author-registration");
+      return;
+    }
+  }, [isAuthenticated, user, setLocation, toast]);
+
+  // Fetch author's e-books - only if authenticated and is author
+  const { data: authorEbooks = [], isLoading: isLoadingEbooks, refetch: refetchEbooks } = useQuery<PublisherEbook[]>({
+    queryKey: ['/api/author/ebooks'],
+    enabled: isAuthenticated && user?.isAuthor && user?.authorVerified,
     retry: false,
   });
 
-  // Fetch publisher stats
-  const { data: publisherStats, isLoading: isLoadingStats } = useQuery<PublisherStats>({
-    queryKey: ['/api/publisher/stats'],
+  // Fetch author stats - only if authenticated and is author
+  const { data: authorStats, isLoading: isLoadingStats } = useQuery<PublisherStats>({
+    queryKey: ['/api/author/stats'],
+    enabled: isAuthenticated && user?.isAuthor && user?.authorVerified,
     retry: false,
   });
 
   // Filter e-books based on search and status
-  const filteredEbooks = publisherEbooks.filter(ebook => {
+  const filteredEbooks = authorEbooks.filter(ebook => {
     const matchesSearch = ebook.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          ebook.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "all" || ebook.status === statusFilter;
@@ -126,7 +153,7 @@ export default function PublisherDashboard() {
   // Status update mutation
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, action }: { id: string; action: string }) => {
-      const response = await apiRequest("PUT", `/api/publisher/ebooks/${id}/action`, { action });
+      const response = await apiRequest("PUT", `/api/author/ebooks/${id}/action`, { action });
       return response.json();
     },
     onSuccess: () => {
@@ -149,6 +176,19 @@ export default function PublisherDashboard() {
     updateStatusMutation.mutate({ id: ebookId, action });
   };
 
+  // Don't render if not authenticated or not an author
+  if (!isAuthenticated || !user?.isAuthor || !user?.authorVerified) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full" />
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   if (isLoadingEbooks || isLoadingStats) {
     return (
       <Layout>
@@ -170,7 +210,7 @@ export default function PublisherDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  Publisher Dashboard
+                  Author's Dashboard
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-2">
                   Manage your e-books, track performance, and grow your audience
@@ -196,7 +236,7 @@ export default function PublisherDashboard() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total E-books</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {publisherStats?.totalEbooks || 0}
+                      {authorStats?.totalEbooks || 0}
                     </p>
                   </div>
                 </div>
@@ -210,7 +250,7 @@ export default function PublisherDashboard() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Published</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {publisherStats?.publishedEbooks || 0}
+                      {authorStats?.publishedEbooks || 0}
                     </p>
                   </div>
                 </div>
@@ -224,7 +264,7 @@ export default function PublisherDashboard() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Downloads</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {publisherStats?.totalDownloads || 0}
+                      {authorStats?.totalDownloads || 0}
                     </p>
                   </div>
                 </div>
@@ -238,7 +278,7 @@ export default function PublisherDashboard() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Revenue</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      ${publisherStats?.totalRevenue || 0}
+                      ${authorStats?.totalRevenue || 0}
                     </p>
                   </div>
                 </div>
@@ -252,7 +292,7 @@ export default function PublisherDashboard() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Rating</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {publisherStats?.averageRating?.toFixed(1) || '0.0'}
+                      {authorStats?.averageRating?.toFixed(1) || '0.0'}
                     </p>
                   </div>
                 </div>
@@ -266,7 +306,7 @@ export default function PublisherDashboard() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Pending</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {publisherStats?.pendingReviews || 0}
+                      {authorStats?.pendingReviews || 0}
                     </p>
                   </div>
                 </div>

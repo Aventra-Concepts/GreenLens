@@ -64,9 +64,7 @@ function Layout({
             <a href="/expert-onboarding" className="bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition-colors font-medium" data-testid="link-expert-register">
               Experts Register
             </a>
-            <a href="/publisher-dashboard" className="bg-blue-600 text-white px-3 py-1 rounded-full hover:bg-blue-700 transition-colors font-medium" data-testid="link-publisher-dashboard">
-              Publisher Dashboard
-            </a>
+
           </nav>
         </div>
       </div>

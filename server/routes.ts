@@ -155,36 +155,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Publisher Dashboard Routes
-  app.get('/api/publisher/ebooks', requireAuth, async (req: any, res) => {
+  // Author Dashboard Routes - Requires author authentication
+  app.get('/api/author/ebooks', requireAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
+      
+      // Check if user is an author
+      if (!req.user.isAuthor || !req.user.authorVerified) {
+        return res.status(403).json({ success: false, message: 'Author access required' });
+      }
+      
       const ebooks = await storage.getEbooksByAuthor(userId);
       res.json(ebooks);
     } catch (error) {
-      console.error('Get publisher ebooks error:', error);
-      res.status(500).json({ success: false, message: 'Failed to fetch publisher e-books' });
+      console.error('Get author ebooks error:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch author e-books' });
     }
   });
 
-  app.get('/api/publisher/stats', requireAuth, async (req: any, res) => {
+  app.get('/api/author/stats', requireAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
-      const stats = await storage.getPublisherStats(userId);
+      
+      // Check if user is an author
+      if (!req.user.isAuthor || !req.user.authorVerified) {
+        return res.status(403).json({ success: false, message: 'Author access required' });
+      }
+      
+      const stats = await storage.getAuthorStats(userId);
       res.json(stats);
     } catch (error) {
-      console.error('Get publisher stats error:', error);
-      res.status(500).json({ success: false, message: 'Failed to fetch publisher stats' });
+      console.error('Get author stats error:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch author stats' });
     }
   });
 
-  app.put('/api/publisher/ebooks/:id/action', requireAuth, async (req: any, res) => {
+  app.put('/api/author/ebooks/:id/action', requireAuth, async (req: any, res) => {
     try {
       const { id } = req.params;
       const { action } = req.body;
       const userId = req.user.id;
       
-      // Verify the ebook belongs to the publisher
+      // Check if user is an author
+      if (!req.user.isAuthor || !req.user.authorVerified) {
+        return res.status(403).json({ success: false, message: 'Author access required' });
+      }
+      
+      // Verify the ebook belongs to the author
       const ebook = await storage.getEbook(id);
       if (!ebook || ebook.authorId !== userId) {
         return res.status(404).json({ success: false, message: 'E-book not found or access denied' });
@@ -215,7 +232,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedEbook = await storage.updateEbook(id, updates);
       res.json({ success: true, ebook: updatedEbook });
     } catch (error) {
-      console.error('Publisher ebook action error:', error);
+      console.error('Author ebook action error:', error);
       res.status(500).json({ success: false, message: 'Failed to update e-book' });
     }
   });
