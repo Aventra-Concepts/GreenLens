@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
+import { Layout } from "@/components/Layout";
 import { ArrowLeft, CheckCircle, Clock, XCircle, Upload, FileText, User, Briefcase, CreditCard, Home } from "lucide-react";
 
 // Author profile interface
@@ -201,7 +202,8 @@ export default function AuthorRegistration() {
   // If user not logged in
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <Layout>
+        <div className="container mx-auto px-4 py-8 max-w-2xl">
         <Card>
           <CardHeader>
             <CardTitle>Author Registration</CardTitle>
@@ -221,13 +223,15 @@ export default function AuthorRegistration() {
           </CardContent>
         </Card>
       </div>
+      </Layout>
     );
   }
 
   // If already has author profile, show status
   if (isLoadingProfile) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <Layout>
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
           <div className="h-4 bg-gray-200 rounded w-2/3 mb-8"></div>
@@ -237,6 +241,7 @@ export default function AuthorRegistration() {
           </div>
         </div>
       </div>
+      </Layout>
     );
   }
 
