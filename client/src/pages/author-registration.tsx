@@ -57,20 +57,17 @@ interface AuthorProfile {
   paypalEmail?: string;
 }
 
-// Author registration form schema
-const authorRegistrationSchema = z.object({
-  // Personal Information
+// Step-by-step validation schemas
+const step1Schema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   middleName: z.string().optional(),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   displayName: z.string().min(2, "Display name must be at least 2 characters"),
-  age: z.number().min(18, "Must be at least 18 years old").max(120, "Please enter a valid age"),
+  age: z.coerce.number().min(18, "Must be at least 18 years old").max(120, "Please enter a valid age"),
   gender: z.enum(["male", "female", "other", "prefer_not_to_say"], {
     errorMap: () => ({ message: "Please select your gender" })
   }),
   phone: z.string().min(10, "Please enter a valid phone number"),
-  
-  // Address Information
   doorNumber: z.string().min(1, "Door/House number is required"),
   buildingName: z.string().optional(),
   street: z.string().min(1, "Street is required"),
@@ -80,17 +77,23 @@ const authorRegistrationSchema = z.object({
   pincode: z.string().min(5, "Please enter a valid pincode/zip code"),
   state: z.string().min(1, "State is required"),
   country: z.string().min(1, "Country is required"),
-  
   bio: z.string().optional(),
+});
+
+const step2Schema = z.object({
   expertise: z.string().min(1, "Please specify your areas of expertise"),
   experience: z.string().min(50, "Please provide at least 50 characters describing your experience"),
   hasPublishingExperience: z.boolean(),
   publishingExperienceDetails: z.string().optional(),
+});
+
+const step3Schema = z.object({
   copyrightAgreement: z.boolean().refine(val => val === true, "You must agree to copyright terms"),
   qualityStandardsAgreement: z.boolean().refine(val => val === true, "You must agree to quality standards"),
   exclusivityAgreement: z.boolean().refine(val => val === true, "You must agree to exclusivity terms"),
-  
-  // Bank Details
+});
+
+const step4Schema = z.object({
   bankAccountHolderName: z.string().min(1, "Account holder name is required"),
   bankAccountNumber: z.string().min(8, "Account number must be at least 8 digits"),
   bankName: z.string().min(1, "Bank name is required"),
@@ -98,10 +101,11 @@ const authorRegistrationSchema = z.object({
   ifscCode: z.string().optional(),
   routingNumber: z.string().optional(),
   swiftCode: z.string().optional(),
-  
-  // Alternative Payment
   paypalEmail: z.string().email().optional().or(z.literal("")),
 });
+
+// Complete form schema for final validation
+const authorRegistrationSchema = step1Schema.merge(step2Schema).merge(step3Schema).merge(step4Schema);
 
 type AuthorRegistrationForm = z.infer<typeof authorRegistrationSchema>;
 
@@ -118,13 +122,13 @@ export default function AuthorRegistration() {
   });
 
   const form = useForm<AuthorRegistrationForm>({
-    resolver: zodResolver(authorRegistrationSchema),
+    mode: "onChange",
     defaultValues: {
       firstName: "",
       middleName: "",
       lastName: "",
       displayName: "",
-      age: undefined,
+      age: 0,
       gender: undefined,
       phone: "",
       doorNumber: "",
@@ -183,14 +187,69 @@ export default function AuthorRegistration() {
     },
   });
 
-  const onSubmit = (data: AuthorRegistrationForm) => {
+  const onSubmit = async (data: AuthorRegistrationForm) => {
     console.log('Form submission data:', data);
     console.log('Form errors:', form.formState.errors);
-    submitApplication.mutate(data);
+    
+    // Final validation before submission
+    try {
+      authorRegistrationSchema.parse(data);
+      submitApplication.mutate(data);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        error.errors.forEach((err) => {
+          if (err.path.length > 0) {
+            form.setError(err.path[0] as any, {
+              message: err.message,
+            });
+          }
+        });
+        toast({
+          title: "Validation Error",
+          description: "Please check the form for errors and try again.",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
-  const nextStep = () => {
-    if (currentStep < totalSteps) {
+  const validateCurrentStep = async () => {
+    const formData = form.getValues();
+    try {
+      switch (currentStep) {
+        case 1:
+          step1Schema.parse(formData);
+          return true;
+        case 2:
+          step2Schema.parse(formData);
+          return true;
+        case 3:
+          step3Schema.parse(formData);
+          return true;
+        case 4:
+          step4Schema.parse(formData);
+          return true;
+        default:
+          return true;
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Set form errors for current step
+        error.errors.forEach((err) => {
+          if (err.path.length > 0) {
+            form.setError(err.path[0] as any, {
+              message: err.message,
+            });
+          }
+        });
+      }
+      return false;
+    }
+  };
+
+  const nextStep = async () => {
+    const isValid = await validateCurrentStep();
+    if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -1124,13 +1183,7 @@ export default function AuthorRegistration() {
                   {currentStep < totalSteps ? (
                     <Button
                       type="button"
-onClick={async () => {
-                        // Validate current step before proceeding
-                        const currentStepValid = await form.trigger();
-                        if (currentStepValid) {
-                          nextStep();
-                        }
-                      }}
+                      onClick={nextStep}
                       className="bg-green-600 hover:bg-green-700"
                       data-testid="button-next"
                     >
@@ -1139,14 +1192,9 @@ onClick={async () => {
                   ) : (
                     <Button
                       type="submit"
-                      disabled={submitApplication.isPending || !form.formState.isValid}
+                      disabled={submitApplication.isPending}
                       className="bg-green-600 hover:bg-green-700"
                       data-testid="button-submit"
-                      onClick={() => {
-                        console.log('Submit button clicked');
-                        console.log('Form is valid:', form.formState.isValid);
-                        console.log('Form errors:', form.formState.errors);
-                      }}
                     >
                       {submitApplication.isPending ? "Submitting..." : "Submit Application"}
                     </Button>
