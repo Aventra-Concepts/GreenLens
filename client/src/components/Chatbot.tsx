@@ -340,7 +340,7 @@ export function Chatbot() {
             />
           </div>
           
-          {/* Elegant "Chat with me" Text Below Icon */}
+          {/* Elegant "May I Help You" Text Below Icon */}
           <div className="mt-2 text-center">
             <p className="text-sm font-semibold text-green-700 hover:text-green-800 transition-colors duration-200"
                style={{ 
@@ -348,7 +348,7 @@ export function Chatbot() {
                  fontSize: '14px',
                  letterSpacing: '0.025em'
                }}>
-              Chat with me
+              May I Help You
             </p>
           </div>
           

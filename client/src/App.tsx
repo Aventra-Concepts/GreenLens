@@ -190,7 +190,7 @@ function App() {
               <Router />
             </main>
             {!isAdminPage && <Footer />}
-            <CookieConsentBanner />
+            {!isAdminPage && <CookieConsentBanner />}
             <Chatbot />
             <PerformanceMetrics />
           </div>
