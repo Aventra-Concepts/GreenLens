@@ -56,6 +56,39 @@ const upload = multer({
   },
 });
 
+// Configure multer for e-book uploads
+const ebookUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB max for e-book files
+    files: 2, // E-book file + cover image
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.fieldname === 'ebookFile') {
+      // Allow PDF, EPUB, MOBI for e-book files
+      const allowedTypes = ['application/pdf', 'application/epub+zip', 'application/x-mobipocket-ebook'];
+      const allowedExtensions = ['.pdf', '.epub', '.mobi'];
+      const fileExt = path.extname(file.originalname).toLowerCase();
+      
+      if (allowedTypes.includes(file.mimetype) || allowedExtensions.includes(fileExt)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only PDF, EPUB, and MOBI files are allowed for e-books'));
+      }
+    } else if (file.fieldname === 'coverImage') {
+      // Allow JPEG and PNG for cover images
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only JPEG and PNG images are allowed for covers'));
+      }
+    } else {
+      cb(new Error('Unexpected field'));
+    }
+  },
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   setupAuth(app);
@@ -122,6 +155,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register e-commerce routes
   registerAffiliateRoutes(app);
   
+  // E-book submission endpoint (before modular routes)
+  app.post("/api/ebooks/submit", requireAuth, ebookUpload.fields([
+    { name: 'ebookFile', maxCount: 1 },
+    { name: 'coverImage', maxCount: 1 }
+  ]), async (req: any, res) => {
+    try {
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const metadataStr = req.body.metadata;
+      
+      if (!files.ebookFile || !files.coverImage || !metadataStr) {
+        return res.status(400).json({ 
+          message: "E-book file, cover image, and metadata are required" 
+        });
+      }
+
+      const ebookFile = files.ebookFile[0];
+      const coverFile = files.coverImage[0];
+      let metadata;
+      
+      try {
+        metadata = JSON.parse(metadataStr);
+      } catch (error) {
+        return res.status(400).json({ message: "Invalid metadata format" });
+      }
+
+      const userId = req.user.id;
+      
+      // Create unique file paths for object storage
+      const timestamp = Date.now();
+      const ebookFileName = `${timestamp}_${ebookFile.originalname}`;
+      const coverFileName = `${timestamp}_${coverFile.originalname}`;
+      
+      // For now, we'll store file paths as placeholders
+      // In a real implementation, you'd upload to object storage here
+      const ebookFilePath = `/uploads/ebooks/${ebookFileName}`;
+      const coverImagePath = `/uploads/covers/${coverFileName}`;
+
+      // Create e-book submission record
+      const ebookData = {
+        title: metadata.title,
+        description: metadata.description,
+        authorId: userId,
+        authorName: metadata.authorName || `${req.user.firstName} ${req.user.lastName}`,
+        category: metadata.category,
+        basePrice: parseFloat(metadata.price),
+        currency: metadata.currency || 'USD',
+        language: metadata.language || 'English',
+        pageCount: metadata.pages || null,
+        isbn: metadata.isbn || null,
+        tags: metadata.tags || [],
+        coverImageUrl: coverImagePath,
+        fullFileUrl: ebookFilePath,
+        fileFormat: path.extname(ebookFile.originalname).toLowerCase().replace('.', ''),
+        fileSize: ebookFile.size,
+        status: 'submitted',
+        copyrightStatus: 'original',
+        publishingRights: true,
+        previewText: metadata.previewText || null,
+        authorBio: metadata.authorBio || null,
+        publicationDate: metadata.publishDate ? new Date(metadata.publishDate) : new Date(),
+      };
+
+      const newEbook = await storage.createEbook(ebookData);
+      
+      res.json({ 
+        success: true, 
+        message: "E-book submitted successfully for review",
+        ebookId: newEbook.id
+      });
+
+    } catch (error: any) {
+      console.error("Error submitting e-book:", error);
+      res.status(500).json({ 
+        message: "Failed to submit e-book: " + error.message 
+      });
+    }
+  });
+
   // Register e-book marketplace routes
   app.use('/api/ebooks', ebookRoutes);
   

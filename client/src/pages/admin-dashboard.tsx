@@ -807,7 +807,11 @@ export default function AdminDashboard() {
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">E-Books Management</h2>
                 <p className="text-gray-600 dark:text-gray-300">Manage digital plant care guides and educational content</p>
               </div>
-              <Button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700">
+              <Button 
+                className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700"
+                onClick={() => setLocation('/ebook-upload')}
+                data-testid="button-add-ebook"
+              >
                 <Plus className="w-4 h-4" />
                 Add New E-Book
               </Button>

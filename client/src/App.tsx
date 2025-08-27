@@ -53,6 +53,7 @@ import SoilTestingCenters from "@/pages/soil-testing-centers";
 import Disclaimer from "@/pages/disclaimer";
 import Contact from "@/pages/contact";
 import AdminGarden from "@/pages/admin-garden";
+import EbookUpload from "@/pages/ebook-upload";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 import { Chatbot } from "@/components/Chatbot";
 import Footer from "@/components/Footer";
@@ -127,6 +128,7 @@ function Router() {
       <Route path="/categories/permaculture" component={PermaculturePage} />
       
       <Route path="/author-upload" component={AuthorUpload} />
+      <Route path="/ebook-upload" component={EbookUpload} />
       <Route path="/author-dashboard" component={AuthorDashboard} />
       <Route path="/student-registration" component={StudentRegistration} />
       <Route path="/author-registration" component={AuthorRegistration} />
