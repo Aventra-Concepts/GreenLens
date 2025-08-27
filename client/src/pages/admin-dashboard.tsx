@@ -127,25 +127,25 @@ export default function AdminDashboard() {
   }, [setLocation]);
 
   // Fetch consultation requests - always call this hook
-  const { data: consultations = [], isLoading: isLoadingConsultations } = useQuery({
+  const { data: consultations = [], isLoading: isLoadingConsultations } = useQuery<ConsultationRequest[]>({
     queryKey: ['/api/admin/consultation-requests'],
     enabled: isAuthenticated,
   });
 
   // Fetch users data
-  const { data: users = [], isLoading: isLoadingUsers } = useQuery({
+  const { data: users = [], isLoading: isLoadingUsers } = useQuery<AdminUser[]>({
     queryKey: ['/api/admin/users'],
     enabled: isAuthenticated,
   });
 
   // Fetch blog posts
-  const { data: blogPosts = [], isLoading: isLoadingBlogs } = useQuery({
+  const { data: blogPosts = [], isLoading: isLoadingBlogs } = useQuery<BlogPost[]>({
     queryKey: ['/api/admin/blog-posts'],
     enabled: isAuthenticated,
   });
 
   // Fetch e-books for admin
-  const { data: adminEbooks = [], isLoading: isLoadingEbooks, refetch: refetchEbooks } = useQuery({
+  const { data: adminEbooks = [], isLoading: isLoadingEbooks, refetch: refetchEbooks } = useQuery<AdminEbook[]>({
     queryKey: ['/api/admin/ebooks'],
     enabled: isAuthenticated,
   });

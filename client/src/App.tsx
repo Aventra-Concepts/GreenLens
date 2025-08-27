@@ -151,6 +151,7 @@ function Router() {
       </Route>
       
       {/* Admin routes - accessible with session-based auth */}
+      <Route path="/admin-dashboard" component={AdminDashboard} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/blog" component={AdminBlogManager} />
       <Route path="/admin/social-media" component={AdminSocialMedia} />
