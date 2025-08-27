@@ -60,23 +60,23 @@ interface BlogPost {
 
 interface AdminAuthor {
   id: string;
-  userId: string;
-  displayName: string;
+  user_id: string;
+  display_name: string;
   bio: string;
   email: string;
-  phone: string;
-  website: string;
-  country: string;
-  bankName: string;
-  bankAccountNumber: string;
-  taxIdNumber: string;
-  applicationStatus: string;
-  adminNotes: string;
-  isVerified: boolean;
-  canPublish: boolean;
-  reviewedBy: string;
-  reviewedAt: string;
-  createdAt: string;
+  phone?: string;
+  website_url?: string;
+  social_links?: any;
+  expertise: string[];
+  experience: string;
+  application_status: string;
+  admin_notes: string;
+  is_verified: boolean;
+  can_publish: boolean;
+  reviewed_by: string;
+  reviewed_at: string;
+  created_at: string;
+  updated_at: string;
   user_first_name: string;
   user_last_name: string;
   user_location: string;
@@ -638,7 +638,7 @@ export default function AdminDashboard() {
         <td className="p-3">
           <div className="space-y-1">
             <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {author.displayName}
+              {author.display_name}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {author.user_first_name} {author.user_last_name}
@@ -666,14 +666,14 @@ export default function AdminDashboard() {
           </div>
         </td>
         <td className="p-3">
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(author.applicationStatus)}`}>
-            {author.applicationStatus}
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(author.application_status)}`}>
+            {author.application_status}
           </span>
         </td>
         <td className="p-3">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              {author.isVerified ? (
+              {author.is_verified ? (
                 <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
                   <CheckCircle className="w-3 h-3 mr-1" />
                   Verified
@@ -686,7 +686,7 @@ export default function AdminDashboard() {
               )}
             </div>
             <div className="flex items-center gap-2">
-              {author.canPublish ? (
+              {author.can_publish ? (
                 <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
                   <Edit className="w-3 h-3 mr-1" />
                   Can Publish
@@ -702,21 +702,18 @@ export default function AdminDashboard() {
         </td>
         <td className="p-3">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            {author.createdAt && isValid(new Date(author.createdAt)) ? format(new Date(author.createdAt), 'MMM dd, yyyy') : 'N/A'}
+            {author.created_at && isValid(new Date(author.created_at)) ? format(new Date(author.created_at), 'MMM dd, yyyy') : 'N/A'}
           </p>
-          {author.reviewedAt && (
+          {author.reviewed_at && (
             <p className="text-xs text-gray-400 dark:text-gray-500">
-              Reviewed: {isValid(new Date(author.reviewedAt)) ? format(new Date(author.reviewedAt), 'MMM dd') : 'Invalid date'}
+              Reviewed: {isValid(new Date(author.reviewed_at)) ? format(new Date(author.reviewed_at), 'MMM dd') : 'Invalid date'}
             </p>
           )}
         </td>
         <td className="p-3">
           <div className="flex flex-col gap-1">
 
-            <div className="text-xs text-blue-600 mb-1">
-              Debug: Status={author.applicationStatus} | Pending={author.applicationStatus === 'pending' ? 'YES' : 'NO'}
-            </div>
-            {author.applicationStatus === 'pending' && (
+            {author.application_status === 'pending' && (
               <>
                 <Button
                   size="sm"
@@ -740,7 +737,7 @@ export default function AdminDashboard() {
                 </Button>
               </>
             )}
-            {author.applicationStatus === 'approved' && (
+            {author.application_status === 'approved' && (
               <Button
                 size="sm"
                 variant="outline"
