@@ -298,7 +298,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         adminNotes,
         isVerified,
         canPublish,
-        reviewedBy: req.user.id,
+        reviewedBy: req.session?.adminUser?.id || 'admin-system',
         reviewedAt: new Date()
       });
       
