@@ -234,6 +234,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register e-book marketplace routes
   app.use('/api/ebooks', ebookRoutes);
   
+  // Admin Author Management Routes
+  app.get('/api/admin/authors', requireAuth, requireAdmin, async (req: any, res) => {
+    try {
+      const authors = await storage.getAllAuthorsForAdmin();
+      res.json(authors);
+    } catch (error) {
+      console.error('Error fetching admin authors:', error);
+      res.status(500).json({ message: 'Failed to fetch authors' });
+    }
+  });
+
+  app.put('/api/admin/authors/:id/status', requireAuth, requireAdmin, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { applicationStatus, adminNotes, isVerified, canPublish } = req.body;
+      
+      const updatedAuthor = await storage.updateAuthorStatus(id, {
+        applicationStatus,
+        adminNotes,
+        isVerified,
+        canPublish,
+        reviewedBy: req.user.id,
+        reviewedAt: new Date()
+      });
+      
+      if (updatedAuthor && applicationStatus === 'approved') {
+        // Update user's author flags when approved
+        await storage.updateUser(updatedAuthor.userId, {
+          isAuthor: true,
+          authorVerified: true
+        });
+      }
+      
+      res.json({ success: true, author: updatedAuthor });
+    } catch (error) {
+      console.error('Error updating author status:', error);
+      res.status(500).json({ message: 'Failed to update author status' });
+    }
+  });
+  
   // Admin E-books Management Route
   app.get('/api/admin/ebooks', requireAuth, requireAdmin, async (req: any, res) => {
     try {

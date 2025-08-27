@@ -273,6 +273,12 @@ export interface IStorage {
   updateAuthorProfile(id: string, updates: Partial<AuthorProfile>): Promise<AuthorProfile>;
   getAuthorProfiles(status?: string, limit?: number, offset?: number): Promise<AuthorProfile[]>;
   updateAuthorApplicationStatus(id: string, status: string, adminNotes?: string, reviewedBy?: string): Promise<AuthorProfile>;
+  getAllAuthorsForAdmin(): Promise<any[]>;
+  updateAuthorStatus(id: string, updates: any): Promise<AuthorProfile>;
+  
+  // Admin E-book operations
+  getAllEbooksForAdmin(): Promise<any[]>;
+  addEbookToMarketplace(ebook: any): Promise<void>;
 
   // Garden Monitoring operations
   getGardenPlants(userId: string): Promise<GardenPlant[]>;
@@ -1866,6 +1872,67 @@ export class DatabaseStorage implements IStorage {
       .where(eq(authorProfiles.id, id))
       .returning();
     return result;
+  }
+
+  async getAllAuthorsForAdmin(): Promise<any[]> {
+    const query = `
+      SELECT 
+        ap.*,
+        u.email,
+        u.first_name as user_first_name,
+        u.last_name as user_last_name,
+        u.location as user_location,
+        u.is_author,
+        u.author_verified
+      FROM author_profiles ap
+      LEFT JOIN users u ON ap.user_id = u.id
+      ORDER BY ap.created_at DESC
+    `;
+    
+    const results = await db.execute(sql.raw(query));
+    return results.rows as any[];
+  }
+
+  async updateAuthorStatus(id: string, updates: any): Promise<AuthorProfile> {
+    const [result] = await db
+      .update(authorProfiles)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(authorProfiles.id, id))
+      .returning();
+    return result;
+  }
+
+  async getAllEbooksForAdmin(): Promise<any[]> {
+    const query = `
+      SELECT 
+        e.*,
+        ap.display_name as author_display_name,
+        u.email as author_email,
+        u.first_name as author_first_name,
+        u.last_name as author_last_name,
+        u.location as author_location
+      FROM ebooks e
+      LEFT JOIN author_profiles ap ON e.author_id = ap.user_id
+      LEFT JOIN users u ON ap.user_id = u.id
+      ORDER BY e.created_at DESC
+    `;
+    
+    const results = await db.execute(sql.raw(query));
+    return results.rows as any[];
+  }
+
+  async addEbookToMarketplace(ebook: any): Promise<void> {
+    // Update the ebook to be published and visible in marketplace
+    await db
+      .update(ebooks)
+      .set({ 
+        isPublished: true,
+        isActive: true,
+        adminApproved: true,
+        publicationDate: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(ebooks.id, ebook.id));
   }
 
   // Student Profile Operations for Educational Verification
