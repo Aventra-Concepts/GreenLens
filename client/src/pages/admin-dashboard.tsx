@@ -164,6 +164,8 @@ export default function AdminDashboard() {
             const data = await response.json();
             if (data.isAdmin) {
               setIsAuthenticated(true);
+              // Clear any stale cache when authentication is confirmed
+              queryClient.invalidateQueries();
               return;
             }
           }
@@ -192,6 +194,18 @@ export default function AdminDashboard() {
   const { data: users = [], isLoading: isLoadingUsers } = useQuery<AdminUser[]>({
     queryKey: ['/api/admin/users'],
     enabled: isAuthenticated,
+    queryFn: async () => {
+      const response = await fetch('/api/admin/users', {
+        credentials: 'include',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${await response.text()}`);
+      }
+      return response.json();
+    },
   });
 
   // Fetch blog posts
@@ -204,6 +218,18 @@ export default function AdminDashboard() {
   const { data: adminEbooks = [], isLoading: isLoadingEbooks, refetch: refetchEbooks } = useQuery<AdminEbook[]>({
     queryKey: ['/api/admin/ebooks'],
     enabled: isAuthenticated,
+    queryFn: async () => {
+      const response = await fetch('/api/admin/ebooks', {
+        credentials: 'include',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${await response.text()}`);
+      }
+      return response.json();
+    },
   });
 
   // Fetch authors for admin
@@ -211,6 +237,18 @@ export default function AdminDashboard() {
     queryKey: ['/api/admin/authors'],
     enabled: isAuthenticated,
     retry: false,
+    queryFn: async () => {
+      const response = await fetch('/api/admin/authors', {
+        credentials: 'include',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${await response.text()}`);
+      }
+      return response.json();
+    },
   });
 
 
