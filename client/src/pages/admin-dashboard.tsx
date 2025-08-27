@@ -198,10 +198,13 @@ export default function AdminDashboard() {
   });
 
   // Fetch authors for admin
-  const { data: adminAuthors = [], isLoading: isLoadingAuthors, refetch: refetchAuthors } = useQuery<AdminAuthor[]>({
+  const { data: adminAuthors = [], isLoading: isLoadingAuthors, refetch: refetchAuthors, error: authorsError } = useQuery<AdminAuthor[]>({
     queryKey: ['/api/admin/authors'],
     enabled: isAuthenticated,
+    retry: false,
   });
+
+
 
   // Update consultation status mutation - always call this hook
   const updateStatusMutation = useMutation({
@@ -1146,6 +1149,11 @@ export default function AdminDashboard() {
                   <div className="text-center py-8 text-gray-500">
                     <UserCheck className="w-12 h-12 mx-auto mb-4 opacity-30" />
                     <p>No author applications found</p>
+                    {authorsError && (
+                      <p className="text-red-500 text-sm mt-2">
+                        Error: {authorsError.message}
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
