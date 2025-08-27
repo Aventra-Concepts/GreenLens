@@ -184,6 +184,8 @@ export default function AuthorRegistration() {
   });
 
   const onSubmit = (data: AuthorRegistrationForm) => {
+    console.log('Form submission data:', data);
+    console.log('Form errors:', form.formState.errors);
     submitApplication.mutate(data);
   };
 
@@ -1122,7 +1124,13 @@ export default function AuthorRegistration() {
                   {currentStep < totalSteps ? (
                     <Button
                       type="button"
-                      onClick={nextStep}
+onClick={async () => {
+                        // Validate current step before proceeding
+                        const currentStepValid = await form.trigger();
+                        if (currentStepValid) {
+                          nextStep();
+                        }
+                      }}
                       className="bg-green-600 hover:bg-green-700"
                       data-testid="button-next"
                     >
@@ -1131,9 +1139,14 @@ export default function AuthorRegistration() {
                   ) : (
                     <Button
                       type="submit"
-                      disabled={submitApplication.isPending}
+                      disabled={submitApplication.isPending || !form.formState.isValid}
                       className="bg-green-600 hover:bg-green-700"
                       data-testid="button-submit"
+                      onClick={() => {
+                        console.log('Submit button clicked');
+                        console.log('Form is valid:', form.formState.isValid);
+                        console.log('Form errors:', form.formState.errors);
+                      }}
                     >
                       {submitApplication.isPending ? "Submitting..." : "Submit Application"}
                     </Button>
