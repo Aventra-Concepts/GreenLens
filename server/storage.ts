@@ -1894,30 +1894,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAuthorStatus(id: string, updates: any): Promise<AuthorProfile> {
-    // Use raw SQL since Drizzle ORM field mapping is causing issues
-    const query = `
+    // Use template literal with Neon's sql template tag
+    const result = await db.execute(sql`
       UPDATE author_profiles 
       SET 
-        application_status = $1,
-        admin_notes = $2, 
-        is_verified = $3,
-        can_publish = $4,
-        reviewed_at = $5,
+        application_status = ${updates.application_status},
+        admin_notes = ${updates.admin_notes}, 
+        is_verified = ${updates.is_verified},
+        can_publish = ${updates.can_publish},
+        reviewed_at = ${updates.reviewed_at},
         updated_at = NOW()
-      WHERE id = $6
+      WHERE id = ${id}
       RETURNING *
-    `;
-    
-    const values = [
-      updates.application_status,
-      updates.admin_notes,
-      updates.is_verified,
-      updates.can_publish,
-      updates.reviewed_at,
-      id
-    ];
-    
-    const result = await db.execute(sql.raw(query, values));
+    `);
     return result.rows[0] as AuthorProfile;
   }
 
