@@ -321,11 +321,11 @@ export function Chatbot() {
 
   if (!isOpen) {
     return (
-      <div className="fixed bottom-6 right-6 z-[9998] flex flex-col items-center" style={{ zIndex: 9998 }}>
+      <div className="fixed bottom-2 right-2 sm:bottom-6 sm:right-6 z-[9998] flex flex-col items-center" style={{ zIndex: 9998 }}>
         {/* Custom Chatbot Button with Your Icon */}
         <div className="relative group cursor-pointer" onClick={() => setIsOpen(true)} data-testid="button-open-chatbot">
           {/* Custom Chatbot Icon - No Background */}
-          <div className="w-20 h-20 hover:scale-110 transition-all duration-300 ease-in-out" 
+          <div className="w-16 h-16 sm:w-20 sm:h-20 hover:scale-110 transition-all duration-300 ease-in-out" 
                style={{ 
                  animation: 'float-bounce 3s ease-in-out infinite',
                  filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.2))'
@@ -341,11 +341,11 @@ export function Chatbot() {
           </div>
           
           {/* Elegant "May I Help You" Text Below Icon */}
-          <div className="mt-2 text-center">
-            <p className="text-sm font-semibold text-green-700 hover:text-green-800 transition-colors duration-200"
+          <div className="mt-1 sm:mt-2 text-center">
+            <p className="text-xs sm:text-sm font-semibold text-green-700 hover:text-green-800 transition-colors duration-200"
                style={{ 
                  fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-                 fontSize: '14px',
+                 fontSize: 'clamp(12px, 2.5vw, 14px)',
                  letterSpacing: '0.025em'
                }}>
               May I Help You
@@ -374,12 +374,12 @@ export function Chatbot() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9998] w-96 h-[500px] bg-white border border-gray-200 rounded-lg shadow-xl flex flex-col" data-testid="chatbot-window" style={{ zIndex: 9998 }}>
+    <div className="fixed bottom-2 right-2 z-[9998] w-[90vw] h-[420px] xs:w-80 xs:h-[450px] sm:w-96 sm:h-[500px] sm:bottom-6 sm:right-6 max-w-sm bg-white border border-gray-200 rounded-lg shadow-xl flex flex-col" data-testid="chatbot-window" style={{ zIndex: 9998 }}>
       {/* Header */}
-      <div className="bg-green-600 text-white p-4 rounded-t-lg flex justify-between items-center">
+      <div className="bg-green-600 text-white p-3 sm:p-4 rounded-t-lg flex justify-between items-center">
         <div>
-          <h3 className="font-semibold">GreenLens Assistant</h3>
-          <p className="text-sm opacity-90">Here to help with your plants</p>
+          <h3 className="font-semibold text-sm sm:text-base">GreenLens Assistant</h3>
+          <p className="text-xs sm:text-sm opacity-90">Here to help with your plants</p>
         </div>
         <Button
           onClick={() => setIsOpen(false)}
@@ -393,7 +393,7 @@ export function Chatbot() {
       </div>
 
       {/* Quick Actions */}
-      <div className="p-3 border-b bg-gray-50">
+      <div className="p-2 sm:p-3 border-b bg-gray-50">
         <div className="flex flex-wrap gap-1">
           {quickActions.map((action, index) => (
             <Button
@@ -401,7 +401,7 @@ export function Chatbot() {
               onClick={() => handleQuickAction(action.action)}
               variant="outline"
               size="sm"
-              className="text-xs h-7"
+              className="text-xs h-6 sm:h-7 px-2 sm:px-3"
               data-testid={`button-quick-${action.action}`}
             >
               {action.label}
@@ -411,11 +411,11 @@ export function Chatbot() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2 sm:space-y-3">
         {messages.map((message) => (
           <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div
-              className={`max-w-[80%] p-3 rounded-lg text-sm ${
+              className={`max-w-[85%] sm:max-w-[80%] p-2 sm:p-3 rounded-lg text-xs sm:text-sm ${
                 message.type === 'user'
                   ? 'bg-green-600 text-white'
                   : 'bg-gray-100 text-gray-800'
@@ -432,11 +432,11 @@ export function Chatbot() {
         
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 p-3 rounded-lg text-sm">
+            <div className="bg-gray-100 p-2 sm:p-3 rounded-lg text-xs sm:text-sm">
               <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               </div>
             </div>
           </div>
@@ -445,21 +445,21 @@ export function Chatbot() {
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t">
+      <div className="p-3 sm:p-4 border-t">
         <div className="flex space-x-2">
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Ask me about plants..."
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            className="flex-1"
+            className="flex-1 text-xs sm:text-sm h-8 sm:h-9"
             data-testid="input-chat-message"
           />
-          <Button onClick={handleSendMessage} size="sm" data-testid="button-send-message">
-            <Send className="h-4 w-4" />
+          <Button onClick={handleSendMessage} size="sm" className="h-8 w-8 sm:h-9 sm:w-9 p-0" data-testid="button-send-message">
+            <Send className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </div>
-        <p className="text-xs text-gray-500 mt-2">
+        <p className="text-xs text-gray-500 mt-1 sm:mt-2 hidden sm:block">
           This chatbot provides general information. For complex issues, please contact our support team.
         </p>
       </div>
