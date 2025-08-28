@@ -199,6 +199,15 @@ export default function Footer() {
               </li>
               <li>
                 <button 
+                  onClick={() => navigateWithMessage("/careers")}
+                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
+                  data-testid="link-careers"
+                >
+                  Careers
+                </button>
+              </li>
+              <li>
+                <button 
                   onClick={() => navigateWithMessage("/contact")}
                   className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
                   data-testid="link-contact"
