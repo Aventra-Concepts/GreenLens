@@ -316,23 +316,24 @@ export default function DiseaseDiagnosis() {
             {/* Input Section */}
             <div className="space-y-6">
               {/* Expert Consultation Notice */}
-              <Card className="bg-green-50 border-green-200">
+              <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 border-2">
                 <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-col sm:flex-row gap-4">
                     <div className="flex items-center space-x-3">
                       <div className="flex-shrink-0">
                         <MessageCircle className="h-8 w-8 text-green-600" />
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold text-green-800">Need Expert Help?</h3>
-                        <p className="text-green-700">
-                          Get personalized advice from certified plant specialists for complex issues.
+                        <p className="text-green-700 text-sm">
+                          Get personalized advice from certified plant specialists
                         </p>
                       </div>
                     </div>
-                    <Button asChild variant="outline" className="border-green-300 text-green-700 hover:bg-green-100" data-testid="button-expert-consultation">
+                    <Button asChild className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-200" data-testid="button-expert-consultation">
                       <Link href="/talk-to-expert">
-                        Talk to Expert
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Expert Help
                       </Link>
                     </Button>
                   </div>
@@ -618,17 +619,17 @@ export default function DiseaseDiagnosis() {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex gap-3 pt-4 border-t">
-                      <Button asChild className="flex-1" data-testid="button-go-home">
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+                      <Button asChild variant="outline" className="flex-1" data-testid="button-go-home">
                         <Link href="/">
                           <Home className="h-4 w-4 mr-2" />
-                          Go to Home
+                          Home
                         </Link>
                       </Button>
-                      <Button asChild variant="outline" className="flex-1" data-testid="button-talk-expert">
+                      <Button asChild className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200" data-testid="button-talk-expert">
                         <Link href="/talk-to-expert">
                           <MessageCircle className="h-4 w-4 mr-2" />
-                          Talk to Expert
+                          Expert Help
                         </Link>
                       </Button>
                     </div>
