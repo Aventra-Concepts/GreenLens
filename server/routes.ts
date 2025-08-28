@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
+import fs from "fs/promises";
 import { storage } from "./storage";
 import { setupAuth, requireAuth } from "./auth";
 import { requireAdmin } from "./middleware/auth";
@@ -92,6 +93,35 @@ const ebookUpload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Documentation download routes (no auth required)
+  app.get('/download/documentation.html', async (req, res) => {
+    try {
+      const filePath = path.resolve(process.cwd(), 'GreenLens_Complete_Documentation.html');
+      const fileContent = await fs.readFile(filePath, 'utf8');
+      
+      res.setHeader('Content-Disposition', 'attachment; filename="GreenLens_Complete_Documentation.html"');
+      res.setHeader('Content-Type', 'text/html');
+      res.send(fileContent);
+    } catch (error) {
+      console.error('Error serving HTML documentation:', error);
+      res.status(404).json({ error: 'Documentation file not found' });
+    }
+  });
+
+  app.get('/download/documentation.md', async (req, res) => {
+    try {
+      const filePath = path.resolve(process.cwd(), 'GreenLens_Complete_Documentation.md');
+      const fileContent = await fs.readFile(filePath, 'utf8');
+      
+      res.setHeader('Content-Disposition', 'attachment; filename="GreenLens_Complete_Documentation.md"');
+      res.setHeader('Content-Type', 'text/markdown');
+      res.send(fileContent);
+    } catch (error) {
+      console.error('Error serving Markdown documentation:', error);
+      res.status(404).json({ error: 'Documentation file not found' });
+    }
+  });
+
   // Auth middleware
   setupAuth(app);
 
@@ -2261,43 +2291,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         message: "Failed to fetch diagnosis history."
       });
-    }
-  });
-
-  // Documentation download routes
-  app.get('/download/documentation.html', async (req, res) => {
-    try {
-      const filePath = path.join(process.cwd(), 'GreenLens_Complete_Documentation.html');
-      const exists = await fs.access(filePath).then(() => true).catch(() => false);
-      
-      if (!exists) {
-        return res.status(404).json({ error: 'Documentation file not found' });
-      }
-
-      res.setHeader('Content-Disposition', 'attachment; filename="GreenLens_Complete_Documentation.html"');
-      res.setHeader('Content-Type', 'text/html');
-      res.sendFile(filePath);
-    } catch (error) {
-      console.error('Error serving HTML documentation:', error);
-      res.status(500).json({ error: 'Failed to serve documentation' });
-    }
-  });
-
-  app.get('/download/documentation.md', async (req, res) => {
-    try {
-      const filePath = path.join(process.cwd(), 'GreenLens_Complete_Documentation.md');
-      const exists = await fs.access(filePath).then(() => true).catch(() => false);
-      
-      if (!exists) {
-        return res.status(404).json({ error: 'Documentation file not found' });
-      }
-
-      res.setHeader('Content-Disposition', 'attachment; filename="GreenLens_Complete_Documentation.md"');
-      res.setHeader('Content-Type', 'text/markdown');
-      res.sendFile(filePath);
-    } catch (error) {
-      console.error('Error serving Markdown documentation:', error);
-      res.status(500).json({ error: 'Failed to serve documentation' });
     }
   });
 
