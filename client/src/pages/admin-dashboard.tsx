@@ -1998,6 +1998,45 @@ export default function AdminDashboard() {
                   </Button>
                 </CardContent>
               </Card>
+
+              <Card className="border-blue-200 bg-blue-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-blue-800">
+                    <FileText className="w-5 h-5 text-blue-600" />
+                    Documentation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-sm text-blue-700 mb-3">
+                    Download complete technical documentation
+                  </p>
+                  <div className="space-y-2">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start border-blue-300 hover:bg-blue-100"
+                      onClick={() => window.open('/download/documentation.html', '_blank')}
+                      data-testid="button-download-html-docs"
+                    >
+                      <Globe className="w-4 h-4 mr-2 text-blue-600" />
+                      HTML (PDF Ready)
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start border-blue-300 hover:bg-blue-100"
+                      onClick={() => window.open('/download/documentation.md', '_blank')}
+                      data-testid="button-download-md-docs"
+                    >
+                      <FileText className="w-4 h-4 mr-2 text-blue-600" />
+                      Markdown
+                    </Button>
+                  </div>
+                  <div className="text-xs text-blue-600 mt-2 space-y-1">
+                    <p>• 300+ Pages Complete Guide</p>
+                    <p>• All APIs & Database Schema</p>
+                    <p>• Technical Architecture</p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
