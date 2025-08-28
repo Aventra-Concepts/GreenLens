@@ -73,7 +73,9 @@ import GardenToolsPage from "@/pages/categories/garden-tools";
 import BotanyAndSciencePage from "@/pages/categories/botany-and-science";
 import PermaculturePage from "@/pages/categories/permaculture";
 import DiseaseDiagnosis from '@/pages/disease-diagnosis';
+import CareersPage from '@/pages/careers';
 import DocumentationDownload from '@/pages/documentation-download';
+import AdminHRDashboard from '@/pages/admin-hr-dashboard';
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -152,6 +154,7 @@ function Router() {
       <Route path="/care-plans" component={CarePlans} />
       <Route path="/disease-diagnosis" component={DiseaseDiagnosis} />
       <Route path="/documentation" component={DocumentationDownload} />
+      <Route path="/careers" component={CareersPage} />
       
       {/* Admin login should be public - accessible before logging in */}
       <Route path="/admin-login">
@@ -164,6 +167,7 @@ function Router() {
       <Route path="/admin/blog" component={AdminBlogManager} />
       <Route path="/admin/social-media" component={AdminSocialMedia} />
       <Route path="/admin/garden" component={AdminGarden} />
+      <Route path="/admin/hr" component={AdminHRDashboard} />
       
       {/* Protected routes that require authentication */}
       {user && (

@@ -2101,3 +2101,382 @@ export const publishingSettings = pgTable("publishing_settings", {
 });
 
 export type PublishingSetting = typeof publishingSettings.$inferSelect;
+
+// ============================================================================
+// HR MANAGEMENT SYSTEM - COMPREHENSIVE STAFF AND EMPLOYEE MANAGEMENT
+// ============================================================================
+
+// Staff Roles and Permissions
+export const staffRoles = pgTable("staff_roles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(), // 'Admin', 'HR Manager', 'Developer', 'Content Manager', etc.
+  description: text("description"),
+  permissions: jsonb("permissions").notNull(), // Array of permission strings
+  department: varchar("department"), // 'IT', 'HR', 'Marketing', 'Content', etc.
+  level: integer("level").default(1), // Hierarchy level (1-5)
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Staff Members (Company Employees)
+export const staffMembers = pgTable("staff_members", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  employeeId: varchar("employee_id").unique().notNull(), // Generated employee ID like EMP001
+  userId: varchar("user_id").references(() => users.id), // Links to main users table if they have account
+  email: varchar("email").unique().notNull(),
+  firstName: varchar("first_name").notNull(),
+  lastName: varchar("last_name").notNull(),
+  phone: varchar("phone"),
+  address: text("address"),
+  city: varchar("city"),
+  state: varchar("state"),
+  country: varchar("country"),
+  postalCode: varchar("postal_code"),
+  
+  // Employment Details
+  department: varchar("department").notNull(),
+  position: varchar("position").notNull(),
+  roleId: varchar("role_id").references(() => staffRoles.id),
+  reportingManager: varchar("reporting_manager"), // Self-reference to staff_members.id
+  employmentType: varchar("employment_type").notNull(), // 'full-time', 'part-time', 'contract', 'intern'
+  workLocation: varchar("work_location"), // 'remote', 'office', 'hybrid'
+  
+  // Dates
+  dateOfJoining: date("date_of_joining").notNull(),
+  probationEndDate: date("probation_end_date"),
+  dateOfLeaving: date("date_of_leaving"),
+  
+  // Status
+  status: varchar("status").default('active').notNull(), // 'active', 'inactive', 'terminated', 'resigned'
+  approvalStatus: varchar("approval_status").default('pending').notNull(), // 'pending', 'approved', 'rejected'
+  
+  // Compensation
+  baseSalary: decimal("base_salary", { precision: 12, scale: 2 }),
+  currency: varchar("currency").default('USD'),
+  payFrequency: varchar("pay_frequency"), // 'monthly', 'bi-weekly', 'weekly'
+  
+  // Documents
+  resumeUrl: varchar("resume_url"),
+  profileImageUrl: varchar("profile_image_url"),
+  documentsUploaded: jsonb("documents_uploaded"), // Array of document URLs
+  
+  // System fields
+  createdBy: varchar("created_by").references(() => users.id),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  isActive: boolean("is_active").default(true).notNull(),
+  lastLoginAt: timestamp("last_login_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Job Postings
+export const jobPostings = pgTable("job_postings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: varchar("title").notNull(),
+  department: varchar("department").notNull(),
+  location: varchar("location").notNull(),
+  workType: varchar("work_type").notNull(), // 'remote', 'office', 'hybrid'
+  employmentType: varchar("employment_type").notNull(), // 'full-time', 'part-time', 'contract', 'intern'
+  
+  // Job Details
+  description: text("description").notNull(),
+  requirements: text("requirements").notNull(),
+  responsibilities: text("responsibilities").notNull(),
+  qualifications: text("qualifications"),
+  benefits: text("benefits"),
+  
+  // Compensation
+  salaryMin: decimal("salary_min", { precision: 12, scale: 2 }),
+  salaryMax: decimal("salary_max", { precision: 12, scale: 2 }),
+  currency: varchar("currency").default('USD'),
+  salaryNegotiable: boolean("salary_negotiable").default(false),
+  
+  // Experience
+  experienceMin: integer("experience_min"), // Years
+  experienceMax: integer("experience_max"), // Years
+  
+  // Application Details
+  applicationDeadline: date("application_deadline"),
+  numberOfPositions: integer("number_of_positions").default(1),
+  applicationMethod: varchar("application_method").default('internal'), // 'internal', 'external', 'both'
+  externalApplicationUrl: varchar("external_application_url"),
+  
+  // Status
+  status: varchar("status").default('draft').notNull(), // 'draft', 'published', 'closed', 'filled'
+  priority: varchar("priority").default('medium'), // 'low', 'medium', 'high', 'urgent'
+  
+  // Meta
+  postedBy: varchar("posted_by").references(() => users.id),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  viewCount: integer("view_count").default(0),
+  applicationCount: integer("application_count").default(0),
+  
+  // SEO
+  slug: varchar("slug").unique(),
+  metaDescription: text("meta_description"),
+  tags: jsonb("tags"), // Array of tags for categorization
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  publishedAt: timestamp("published_at"),
+  closedAt: timestamp("closed_at"),
+});
+
+// Job Applications
+export const jobApplications = pgTable("job_applications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobPostingId: varchar("job_posting_id").references(() => jobPostings.id).notNull(),
+  
+  // Applicant Information
+  firstName: varchar("first_name").notNull(),
+  lastName: varchar("last_name").notNull(),
+  email: varchar("email").notNull(),
+  phone: varchar("phone").notNull(),
+  address: text("address"),
+  city: varchar("city"),
+  state: varchar("state"),
+  country: varchar("country"),
+  postalCode: varchar("postal_code"),
+  
+  // Professional Details
+  currentPosition: varchar("current_position"),
+  currentCompany: varchar("current_company"),
+  totalExperience: integer("total_experience"), // Years
+  relevantExperience: integer("relevant_experience"), // Years
+  currentSalary: decimal("current_salary", { precision: 12, scale: 2 }),
+  expectedSalary: decimal("expected_salary", { precision: 12, scale: 2 }),
+  noticePeriod: integer("notice_period"), // Days
+  
+  // Application Details
+  coverLetter: text("cover_letter"),
+  resumeUrl: varchar("resume_url").notNull(),
+  portfolioUrl: varchar("portfolio_url"),
+  linkedinUrl: varchar("linkedin_url"),
+  githubUrl: varchar("github_url"),
+  otherDocuments: jsonb("other_documents"), // Array of document URLs
+  
+  // Skills and Qualifications
+  skills: jsonb("skills"), // Array of skills
+  education: jsonb("education"), // Array of education details
+  certifications: jsonb("certifications"), // Array of certifications
+  languages: jsonb("languages"), // Array of languages with proficiency
+  
+  // Application Status
+  status: varchar("status").default('submitted').notNull(), // 'submitted', 'screening', 'interview', 'technical', 'hr', 'offer', 'hired', 'rejected', 'withdrawn'
+  currentStage: varchar("current_stage").default('application_review'), // Current interview/review stage
+  
+  // Interview Details
+  interviewScheduled: boolean("interview_scheduled").default(false),
+  interviewDate: timestamp("interview_date"),
+  interviewType: varchar("interview_type"), // 'phone', 'video', 'in-person'
+  interviewNotes: text("interview_notes"),
+  
+  // Scoring and Feedback
+  overallRating: integer("overall_rating"), // 1-10 scale
+  technicalRating: integer("technical_rating"), // 1-10 scale
+  culturalFitRating: integer("cultural_fit_rating"), // 1-10 scale
+  communicationRating: integer("communication_rating"), // 1-10 scale
+  
+  // Internal Notes
+  hrNotes: text("hr_notes"),
+  interviewerNotes: text("interviewer_notes"),
+  rejectionReason: text("rejection_reason"),
+  offerDetails: jsonb("offer_details"), // Offer letter details if applicable
+  
+  // System Fields
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  assignedRecruiter: varchar("assigned_recruiter").references(() => users.id),
+  source: varchar("source").default('website'), // 'website', 'referral', 'linkedin', 'job_board'
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  reviewedAt: timestamp("reviewed_at"),
+});
+
+// Employee Records (Detailed HR Records for Staff)
+export const employeeRecords = pgTable("employee_records", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  staffMemberId: varchar("staff_member_id").references(() => staffMembers.id).notNull(),
+  
+  // Personal Details
+  dateOfBirth: date("date_of_birth"),
+  gender: varchar("gender"),
+  maritalStatus: varchar("marital_status"),
+  nationality: varchar("nationality"),
+  emergencyContactName: varchar("emergency_contact_name"),
+  emergencyContactPhone: varchar("emergency_contact_phone"),
+  emergencyContactRelation: varchar("emergency_contact_relation"),
+  
+  // Identification
+  passportNumber: varchar("passport_number"),
+  socialSecurityNumber: varchar("social_security_number"),
+  taxId: varchar("tax_id"),
+  bankAccountNumber: varchar("bank_account_number"),
+  bankName: varchar("bank_name"),
+  bankRoutingNumber: varchar("bank_routing_number"),
+  
+  // Employment History within Company
+  promotionHistory: jsonb("promotion_history"), // Array of promotion records
+  transferHistory: jsonb("transfer_history"), // Array of department/role transfers
+  performanceReviews: jsonb("performance_reviews"), // Array of review records
+  
+  // Leave Management
+  totalAnnualLeave: integer("total_annual_leave").default(20), // Days per year
+  usedAnnualLeave: integer("used_annual_leave").default(0),
+  remainingAnnualLeave: integer("remaining_annual_leave").default(20),
+  totalSickLeave: integer("total_sick_leave").default(10),
+  usedSickLeave: integer("used_sick_leave").default(0),
+  remainingSickLeave: integer("remaining_sick_leave").default(10),
+  
+  // Attendance
+  totalWorkingDays: integer("total_working_days").default(0),
+  presentDays: integer("present_days").default(0),
+  absentDays: integer("absent_days").default(0),
+  lateArrivals: integer("late_arrivals").default(0),
+  overtimeHours: decimal("overtime_hours", { precision: 8, scale: 2 }).default('0'),
+  
+  // Compensation Details
+  currentSalary: decimal("current_salary", { precision: 12, scale: 2 }),
+  lastSalaryReview: date("last_salary_review"),
+  nextSalaryReview: date("next_salary_review"),
+  bonusEligible: boolean("bonus_eligible").default(false),
+  totalEarningsYTD: decimal("total_earnings_ytd", { precision: 12, scale: 2 }).default('0'),
+  
+  // Tax Information
+  taxBracket: varchar("tax_bracket"),
+  taxExemptions: jsonb("tax_exemptions"),
+  w2DocumentUrl: varchar("w2_document_url"),
+  
+  // Benefits
+  healthInsurance: boolean("health_insurance").default(false),
+  dentalInsurance: boolean("dental_insurance").default(false),
+  retirementPlan: boolean("retirement_plan").default(false),
+  stockOptions: boolean("stock_options").default(false),
+  benefitsDetails: jsonb("benefits_details"),
+  
+  // Training and Development
+  trainingRecords: jsonb("training_records"), // Array of training completion
+  skillAssessments: jsonb("skill_assessments"), // Array of skill evaluations
+  certificationProgress: jsonb("certification_progress"),
+  developmentGoals: jsonb("development_goals"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Leave Requests
+export const leaveRequests = pgTable("leave_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  staffMemberId: varchar("staff_member_id").references(() => staffMembers.id).notNull(),
+  leaveType: varchar("leave_type").notNull(), // 'annual', 'sick', 'maternity', 'paternity', 'emergency', 'unpaid'
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  totalDays: integer("total_days").notNull(),
+  reason: text("reason").notNull(),
+  status: varchar("status").default('pending').notNull(), // 'pending', 'approved', 'rejected', 'cancelled'
+  appliedAt: timestamp("applied_at").defaultNow(),
+  reviewedAt: timestamp("reviewed_at"),
+  reviewedBy: varchar("reviewed_by"), // Reference to staff_members.id
+  reviewerComments: text("reviewer_comments"),
+  isEmergency: boolean("is_emergency").default(false),
+  attachmentUrl: varchar("attachment_url"), // Medical certificate, etc.
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Salary Advances
+export const salaryAdvances = pgTable("salary_advances", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  staffMemberId: varchar("staff_member_id").references(() => staffMembers.id).notNull(),
+  requestedAmount: decimal("requested_amount", { precision: 12, scale: 2 }).notNull(),
+  approvedAmount: decimal("approved_amount", { precision: 12, scale: 2 }),
+  reason: text("reason").notNull(),
+  status: varchar("status").default('pending').notNull(), // 'pending', 'approved', 'rejected', 'disbursed', 'repaid'
+  repaymentPeriod: integer("repayment_period"), // Months
+  monthlyDeduction: decimal("monthly_deduction", { precision: 12, scale: 2 }),
+  remainingAmount: decimal("remaining_amount", { precision: 12, scale: 2 }),
+  approvedBy: varchar("approved_by"), // Reference to staff_members.id
+  disbursedAt: timestamp("disbursed_at"),
+  repaidAt: timestamp("repaid_at"),
+  repaymentSchedule: jsonb("repayment_schedule"), // Array of repayment installments
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// HR Management Type Exports
+export type StaffRole = typeof staffRoles.$inferSelect;
+export type StaffMember = typeof staffMembers.$inferSelect;
+export type JobPosting = typeof jobPostings.$inferSelect;
+export type JobApplication = typeof jobApplications.$inferSelect;
+export type EmployeeRecord = typeof employeeRecords.$inferSelect;
+export type LeaveRequest = typeof leaveRequests.$inferSelect;
+export type SalaryAdvance = typeof salaryAdvances.$inferSelect;
+
+// Insert schemas for forms
+export const insertStaffRoleSchema = createInsertSchema(staffRoles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertStaffMemberSchema = createInsertSchema(staffMembers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertJobPostingSchema = createInsertSchema(jobPostings).omit({
+  id: true,
+  slug: true,
+  viewCount: true,
+  applicationCount: true,
+  createdAt: true,
+  updatedAt: true,
+  publishedAt: true,
+  closedAt: true,
+});
+
+export const insertJobApplicationSchema = createInsertSchema(jobApplications).omit({
+  id: true,
+  currentStage: true,
+  interviewScheduled: true,
+  reviewedBy: true,
+  assignedRecruiter: true,
+  createdAt: true,
+  updatedAt: true,
+  reviewedAt: true,
+});
+
+export const insertEmployeeRecordSchema = createInsertSchema(employeeRecords).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertLeaveRequestSchema = createInsertSchema(leaveRequests).omit({
+  id: true,
+  appliedAt: true,
+  reviewedAt: true,
+  reviewedBy: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSalaryAdvanceSchema = createInsertSchema(salaryAdvances).omit({
+  id: true,
+  approvedBy: true,
+  disbursedAt: true,
+  repaidAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Insert type exports
+export type InsertStaffRole = z.infer<typeof insertStaffRoleSchema>;
+export type InsertStaffMember = z.infer<typeof insertStaffMemberSchema>;
+export type InsertJobPosting = z.infer<typeof insertJobPostingSchema>;
+export type InsertJobApplication = z.infer<typeof insertJobApplicationSchema>;
+export type InsertEmployeeRecord = z.infer<typeof insertEmployeeRecordSchema>;
+export type InsertLeaveRequest = z.infer<typeof insertLeaveRequestSchema>;
+export type InsertSalaryAdvance = z.infer<typeof insertSalaryAdvanceSchema>;

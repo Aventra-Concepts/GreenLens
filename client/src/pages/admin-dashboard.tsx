@@ -879,7 +879,7 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Admin Navigation Tabs */}
-          <TabsList className="grid w-full grid-cols-7 lg:grid-cols-11 bg-white dark:bg-gray-800 p-1 h-auto">
+          <TabsList className="grid w-full grid-cols-7 lg:grid-cols-12 bg-white dark:bg-gray-800 p-1 h-auto">
             <TabsTrigger value="overview" className="flex items-center gap-1 px-2 py-2 text-xs">
               <BarChart3 className="w-3 h-3" />
               <span className="hidden sm:inline">Overview</span>
@@ -923,6 +923,14 @@ export default function AdminDashboard() {
             <TabsTrigger value="affiliate" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-orange-100 to-yellow-100 border-2 border-orange-300">
               <DollarSign className="w-3 h-3 text-orange-600" />
               <span className="hidden sm:inline font-semibold text-orange-700">Affiliate</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="hr" 
+              className="flex items-center gap-1 px-2 py-2 text-xs cursor-pointer hover:bg-blue-50" 
+              onClick={() => window.location.href = '/admin/hr'}
+            >
+              <Users className="w-3 h-3 text-blue-600" />
+              <span className="hidden sm:inline text-blue-700">HR</span>
             </TabsTrigger>
           </TabsList>
 
