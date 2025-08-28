@@ -13,6 +13,7 @@ import { plantsCatalogService } from "./services/plantsCatalog";
 import openaiService from "./services/openai";
 import { carePlannerService } from "./services/carePlanner";
 import { pdfService } from "./services/pdf";
+import { diseaseAnalysisService } from "./services/diseaseAnalysisService";
 
 import { plantNamesService } from "./services/plantNames";
 import { pricingService } from "./services/pricing";
@@ -2125,6 +2126,142 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/premium_features_summary.html', (req, res) => {
     const filePath = path.join(process.cwd(), 'premium_features_summary.html');
     res.sendFile(filePath);
+  });
+
+  // Disease Diagnosis API Routes
+  app.post("/api/disease-diagnosis", requireAuth, upload.single('image'), async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { symptoms, plantType, location } = req.body;
+
+      // Check user's diagnosis usage limits
+      const userDiagnoses = await storage.getUserDiseaseUsage(userId);
+      const subscription = await storage.getUserSubscription(userId);
+      
+      // Free users get 3 diagnoses, premium users get unlimited
+      const isLimitReached = !subscription && userDiagnoses >= 3;
+      
+      if (isLimitReached) {
+        return res.status(403).json({
+          success: false,
+          message: "You have reached your free diagnosis limit. Upgrade to premium for unlimited diagnoses.",
+          limitReached: true
+        });
+      }
+
+      // Prepare diagnosis request
+      const diagnosisRequest: any = {
+        symptoms: symptoms?.trim() || undefined,
+        plantType: plantType?.trim() || undefined,
+        location: location?.trim() || undefined,
+      };
+
+      // Add image if provided
+      if (req.file) {
+        diagnosisRequest.imageBuffer = req.file.buffer;
+      }
+
+      // Validate that we have at least one input
+      if (!diagnosisRequest.imageBuffer && !diagnosisRequest.symptoms) {
+        return res.status(400).json({
+          success: false,
+          message: "Please provide either an image or symptom description."
+        });
+      }
+
+      // Perform disease analysis
+      const analysisResult = await diseaseAnalysisService.analyzePlantDisease(diagnosisRequest);
+
+      // Save diagnosis result to database
+      try {
+        await storage.saveDiagnosisResult({
+          userId,
+          imageData: req.file ? req.file.buffer : null,
+          symptoms: symptoms || null,
+          plantType: plantType || null,
+          location: location || null,
+          diagnosis: analysisResult.diagnosis,
+          diseaseIdentified: analysisResult.diseaseIdentified,
+          confidence: analysisResult.confidence,
+          severity: analysisResult.severity,
+          treatmentPlan: analysisResult.treatmentPlan,
+          preventiveMeasures: analysisResult.preventiveMeasures,
+          urgencyLevel: analysisResult.urgencyLevel,
+          needsExpertReview: analysisResult.needsExpertReview,
+        });
+      } catch (storageError) {
+        console.error('Error saving diagnosis result:', storageError);
+        // Continue even if storage fails
+      }
+
+      // Return successful diagnosis
+      res.json({
+        success: true,
+        result: analysisResult,
+        diagnosesUsed: userDiagnoses + 1,
+        diagnosesRemaining: subscription ? -1 : Math.max(0, 2 - userDiagnoses) // -1 means unlimited
+      });
+
+    } catch (error: any) {
+      console.error('Disease diagnosis error:', error);
+      
+      // Handle specific error types
+      if (error.message.includes('quota') || error.message.includes('limit')) {
+        return res.status(429).json({
+          success: false,
+          message: "AI service is temporarily busy. Please try again in a few minutes.",
+          retryAfter: 300 // 5 minutes
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to analyze plant disease. Please try again later."
+      });
+    }
+  });
+
+  // Get user's disease diagnosis usage
+  app.get("/api/disease-diagnosis/usage", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const usageCount = await storage.getUserDiseaseUsage(userId);
+      const subscription = await storage.getUserSubscription(userId);
+      
+      res.json({
+        diagnosesUsed: usageCount,
+        diagnosesRemaining: subscription ? -1 : Math.max(0, 3 - usageCount), // -1 means unlimited
+        isPremium: !!subscription
+      });
+    } catch (error) {
+      console.error('Error fetching disease diagnosis usage:', error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch usage information."
+      });
+    }
+  });
+
+  // Get user's disease diagnosis history
+  app.get("/api/disease-diagnosis/history", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const history = await storage.getUserDiagnosisHistory(userId);
+      
+      res.json({
+        success: true,
+        history: history.map(diagnosis => ({
+          ...diagnosis,
+          imageData: undefined // Don't send image data in history list
+        }))
+      });
+    } catch (error) {
+      console.error('Error fetching disease diagnosis history:', error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch diagnosis history."
+      });
+    }
   });
 
   const httpServer = createServer(app);

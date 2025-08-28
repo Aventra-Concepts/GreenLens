@@ -603,6 +603,110 @@ export const insertCommunityCommentSchema = createInsertSchema(communityComments
 export type InsertCommunityPostType = z.infer<typeof insertCommunityPostSchema>;
 export type InsertCommunityCommentType = z.infer<typeof insertCommunityCommentSchema>;
 
+// Disease Diagnosis Table
+export const diseaseRequests = pgTable("disease_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  requestType: varchar("request_type", { 
+    enum: ["image", "symptoms", "both"] 
+  }).notNull(),
+  imageUrl: varchar("image_url"),
+  symptoms: text("symptoms"),
+  plantType: varchar("plant_type"),
+  location: varchar("location"), // User location for regional disease info
+  
+  // AI Analysis Results
+  diagnosis: text("diagnosis"),
+  diseaseIdentified: varchar("disease_identified"),
+  confidence: decimal("confidence", { precision: 5, scale: 2 }),
+  severity: varchar("severity", { enum: ["low", "medium", "high", "critical"] }),
+  treatmentPlan: text("treatment_plan"),
+  preventiveMeasures: text("preventive_measures"),
+  urgencyLevel: varchar("urgency_level", { enum: ["low", "medium", "high", "emergency"] }).default("medium"),
+  
+  // Analysis metadata
+  analysisStatus: varchar("analysis_status", { 
+    enum: ["pending", "processing", "completed", "failed"] 
+  }).default("pending"),
+  processingTime: integer("processing_time"), // in milliseconds
+  apiProvider: varchar("api_provider").default("openai"), // Track which AI provider used
+  
+  // Expert consultation
+  needsExpertReview: boolean("needs_expert_review").default(false),
+  expertReviewed: boolean("expert_reviewed").default(false),
+  expertNotes: text("expert_notes"),
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  
+  // User feedback
+  userRating: integer("user_rating"), // 1-5 stars
+  userFeedback: text("user_feedback"),
+  treatmentEffective: boolean("treatment_effective"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Usage Tracking for Free Tier Limits
+export const userUsageTracking = pgTable("user_usage_tracking", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
+  
+  // Disease diagnosis usage
+  diseaseRequestsUsed: integer("disease_requests_used").default(0),
+  diseaseRequestsLimit: integer("disease_requests_limit").default(3), // Free tier limit
+  lastDiseaseRequest: timestamp("last_disease_request"),
+  
+  // Plant identification usage (existing feature)
+  plantIdentificationsUsed: integer("plant_identifications_used").default(0),
+  plantIdentificationsLimit: integer("plant_identifications_limit").default(10), // Free tier limit
+  lastPlantIdentification: timestamp("last_plant_identification"),
+  
+  // Monthly reset tracking
+  lastResetDate: date("last_reset_date").defaultNow(),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Type exports for Disease Diagnosis
+export type DiseaseRequest = typeof diseaseRequests.$inferSelect;
+export type InsertDiseaseRequest = typeof diseaseRequests.$inferInsert;
+
+export type UserUsageTracking = typeof userUsageTracking.$inferSelect;
+export type InsertUserUsageTracking = typeof userUsageTracking.$inferInsert;
+
+// Zod schemas for Disease Diagnosis
+export const insertDiseaseRequestSchema = createInsertSchema(diseaseRequests).omit({
+  id: true,
+  userId: true,
+  diagnosis: true,
+  diseaseIdentified: true,
+  confidence: true,
+  severity: true,
+  treatmentPlan: true,
+  preventiveMeasures: true,
+  analysisStatus: true,
+  processingTime: true,
+  apiProvider: true,
+  needsExpertReview: true,
+  expertReviewed: true,
+  expertNotes: true,
+  reviewedBy: true,
+  reviewedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertUserUsageTrackingSchema = createInsertSchema(userUsageTracking).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertDiseaseRequestType = z.infer<typeof insertDiseaseRequestSchema>;
+
 // Login schema
 export const loginUserSchema = z.object({
   email: z.string().email(),
