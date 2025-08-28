@@ -315,6 +315,30 @@ export default function DiseaseDiagnosis() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Input Section */}
             <div className="space-y-6">
+              {/* Expert Consultation Notice */}
+              <Card className="bg-green-50 border-green-200">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0">
+                        <MessageCircle className="h-8 w-8 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-green-800">Need Expert Help?</h3>
+                        <p className="text-green-700">
+                          Get personalized advice from certified plant specialists for complex issues.
+                        </p>
+                      </div>
+                    </div>
+                    <Button asChild variant="outline" className="border-green-300 text-green-700 hover:bg-green-100" data-testid="button-expert-consultation">
+                      <Link href="/talk-to-expert">
+                        Talk to Expert
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Disclaimer */}
               {showDisclaimer && (
                 <Alert className="bg-yellow-50 border-yellow-200">
@@ -602,7 +626,7 @@ export default function DiseaseDiagnosis() {
                         </Link>
                       </Button>
                       <Button asChild variant="outline" className="flex-1" data-testid="button-talk-expert">
-                        <Link href="/consultation">
+                        <Link href="/talk-to-expert">
                           <MessageCircle className="h-4 w-4 mr-2" />
                           Talk to Expert
                         </Link>
