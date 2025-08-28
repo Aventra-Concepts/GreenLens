@@ -73,6 +73,7 @@ import GardenToolsPage from "@/pages/categories/garden-tools";
 import BotanyAndSciencePage from "@/pages/categories/botany-and-science";
 import PermaculturePage from "@/pages/categories/permaculture";
 import DiseaseDiagnosis from '@/pages/disease-diagnosis';
+import DocumentationDownload from '@/pages/documentation-download';
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -150,6 +151,7 @@ function Router() {
       <Route path="/community" component={Community} />
       <Route path="/care-plans" component={CarePlans} />
       <Route path="/disease-diagnosis" component={DiseaseDiagnosis} />
+      <Route path="/documentation" component={DocumentationDownload} />
       
       {/* Admin login should be public - accessible before logging in */}
       <Route path="/admin-login">
