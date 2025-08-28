@@ -26,8 +26,10 @@ import {
   Award,
   FileText,
   Mail,
-  Phone
+  Phone,
+  Home
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 // Job Application Form Schema
 const jobApplicationSchema = z.object({
@@ -98,6 +100,7 @@ interface JobPosting {
 export default function CareersPage() {
   const [selectedJob, setSelectedJob] = useState<JobPosting | null>(null);
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
+  const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
 
   // Fetch published job postings
@@ -191,6 +194,17 @@ export default function CareersPage() {
       <div className="bg-white shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-12">
           <div className="text-center">
+            <div className="mb-6">
+              <Button
+                onClick={() => setLocation("/")}
+                variant="outline"
+                className="inline-flex items-center gap-2 text-green-600 border-green-300 hover:bg-green-50 hover:border-green-400"
+                data-testid="button-go-home"
+              >
+                <Home className="w-4 h-4" />
+                Go to Home
+              </Button>
+            </div>
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               Join Our Team at GreenLens
             </h1>
