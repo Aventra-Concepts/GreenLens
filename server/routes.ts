@@ -2264,6 +2264,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Documentation download routes
+  app.get('/download/documentation.html', async (req, res) => {
+    try {
+      const filePath = path.join(process.cwd(), 'GreenLens_Complete_Documentation.html');
+      const exists = await fs.access(filePath).then(() => true).catch(() => false);
+      
+      if (!exists) {
+        return res.status(404).json({ error: 'Documentation file not found' });
+      }
+
+      res.setHeader('Content-Disposition', 'attachment; filename="GreenLens_Complete_Documentation.html"');
+      res.setHeader('Content-Type', 'text/html');
+      res.sendFile(filePath);
+    } catch (error) {
+      console.error('Error serving HTML documentation:', error);
+      res.status(500).json({ error: 'Failed to serve documentation' });
+    }
+  });
+
+  app.get('/download/documentation.md', async (req, res) => {
+    try {
+      const filePath = path.join(process.cwd(), 'GreenLens_Complete_Documentation.md');
+      const exists = await fs.access(filePath).then(() => true).catch(() => false);
+      
+      if (!exists) {
+        return res.status(404).json({ error: 'Documentation file not found' });
+      }
+
+      res.setHeader('Content-Disposition', 'attachment; filename="GreenLens_Complete_Documentation.md"');
+      res.setHeader('Content-Type', 'text/markdown');
+      res.sendFile(filePath);
+    } catch (error) {
+      console.error('Error serving Markdown documentation:', error);
+      res.status(500).json({ error: 'Failed to serve documentation' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
