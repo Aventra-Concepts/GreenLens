@@ -266,11 +266,11 @@ export default function DiseaseDiagnosis() {
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="flex flex-col items-center justify-center gap-3 mb-4">
               <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                 <Stethoscope className="h-6 w-6 text-green-600" />
               </div>
-              <h1 className="text-3xl font-bold text-gray-900">AI Disease Diagnosis</h1>
+              <h1 className="text-3xl font-bold text-gray-900 text-center">AI Disease Diagnosis</h1>
             </div>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Get instant AI-powered plant disease diagnosis through image analysis and symptom description. 
