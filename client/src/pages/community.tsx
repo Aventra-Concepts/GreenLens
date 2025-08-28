@@ -38,7 +38,8 @@ import {
   Calendar,
   Tag,
   Image as ImageIcon,
-  Send
+  Send,
+  BarChart3
 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -99,6 +100,9 @@ export default function Community() {
     queryKey: ['/api/recent-predictions'],
     enabled: isAuthenticated,
   });
+
+  // Type the predictions data properly
+  const typedPredictions = Array.isArray(recentPredictions) ? recentPredictions : [];
 
   // Create post mutation
   const createPostMutation = useMutation({
@@ -493,14 +497,14 @@ export default function Community() {
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto mb-2"></div>
                     <p className="text-sm text-indigo-600">Loading recent predictions...</p>
                   </div>
-                ) : recentPredictions.length === 0 ? (
+                ) : typedPredictions.length === 0 ? (
                   <div className="text-center py-6">
                     <Leaf className="h-12 w-12 text-indigo-400 mx-auto mb-3" />
                     <p className="text-indigo-600">No recent predictions to display</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {recentPredictions.slice(0, 6).map((prediction: any, index: number) => (
+                    {typedPredictions.slice(0, 6).map((prediction: any, index: number) => (
                       <Card key={index} className="bg-white border border-indigo-100 hover:shadow-md transition-shadow">
                         <CardContent className="p-4">
                           <div className="flex items-center gap-3 mb-3">
