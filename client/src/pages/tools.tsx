@@ -245,14 +245,21 @@ export default function Tools() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="relevance">Relevance</SelectItem>
+                        <SelectItem value="relevance">Best Match</SelectItem>
                         <SelectItem value="rating">Customer Rating</SelectItem>
+                        <SelectItem value="newest">Newest Arrivals</SelectItem>
+                        <SelectItem value="featured">Featured Items</SelectItem>
+                        <SelectItem value="bestsellers">Best Sellers</SelectItem>
                         {productsData?.hasApiAccess && (
                           <>
                             <SelectItem value="price-low">Price: Low to High</SelectItem>
                             <SelectItem value="price-high">Price: High to Low</SelectItem>
+                            <SelectItem value="avg-customer-review">Avg. Customer Review</SelectItem>
+                            <SelectItem value="most-reviewed">Most Reviewed</SelectItem>
                           </>
                         )}
+                        <SelectItem value="name-asc">Name: A to Z</SelectItem>
+                        <SelectItem value="name-desc">Name: Z to A</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
