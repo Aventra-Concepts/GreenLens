@@ -333,15 +333,7 @@ export default function Footer() {
             <p className="text-gray-300 text-xs mb-2 leading-tight">
               As an Amazon Associate, we earn from qualifying purchases. No extra cost to you.
             </p>
-            <div className="mb-2">
-              <button 
-                onClick={() => navigateWithMessage("/affiliate-disclosure")}
-                className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
-                data-testid="link-affiliate-disclosure"
-              >
-                Affiliate Disclosure
-              </button>
-            </div>
+
           </div>
         </div>
         
