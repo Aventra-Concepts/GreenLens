@@ -329,26 +329,19 @@ export default function Footer() {
           
           {/* Amazon Affiliate Column */}
           <div>
-            <h3 className="font-semibold text-white mb-2 text-sm">Amazon Affiliate</h3>
+            <h3 className="font-semibold text-white mb-2 text-sm">Affiliate Disclosure</h3>
             <p className="text-gray-300 text-xs mb-2 leading-tight">
               As an Amazon Associate, we earn from qualifying purchases. No extra cost to you.
             </p>
             <div className="mb-2">
               <button 
                 onClick={() => navigateWithMessage("/affiliate-disclosure")}
-                className="text-blue-400 hover:text-blue-300 transition-colors text-xs underline cursor-pointer" 
+                className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
                 data-testid="link-affiliate-disclosure"
               >
                 Affiliate Disclosure
               </button>
             </div>
-            <button 
-              onClick={() => navigateWithMessage("/amazon-affiliate-register")}
-              className="inline-block bg-orange-500 hover:bg-orange-600 text-white text-xs px-2 py-1 rounded transition-colors font-medium cursor-pointer"
-              data-testid="button-amazon-affiliate-register"
-            >
-              🛍️ Amazon Affiliate Register
-            </button>
           </div>
         </div>
         
