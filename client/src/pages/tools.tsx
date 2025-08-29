@@ -193,9 +193,10 @@ export default function Tools() {
                   size="sm"
                   onClick={() => setShowFilters(!showFilters)}
                   data-testid="button-toggle-filters"
+                  className="text-xs px-3 py-2 flex-shrink-0"
                 >
-                  <Filter className="w-4 h-4 mr-2" />
-                  {showFilters ? 'Hide' : 'Show'} Filters
+                  <Filter className="w-3 h-3 mr-1" />
+                  <span className="truncate">{showFilters ? 'Hide' : 'Show'} Filters</span>
                 </Button>
               </div>
             </CardHeader>
