@@ -147,12 +147,22 @@ export default function AdminGardenPage() {
     return matchesSearch; // Server-side filtering handles user type filtering
   });
 
+  // Calculate dynamic analytics from current user data
+  const totalUsers = gardenUsers.length;
+  const totalPlants = gardenUsers.reduce((sum, user) => {
+    const plants = typeof user.totalPlants === 'number' ? user.totalPlants : parseInt(user.totalPlants?.toString() || '0');
+    return sum + (plants || 0);
+  }, 0);
+  const premiumUsers = gardenUsers.filter(user => 
+    user.subscriptionStatus === 'active' || user.id?.startsWith('demo-premium-')
+  ).length;
+  
   // Debug logging
   console.log('Garden users fetched:', gardenUsers.length);
   console.log('Filtered users:', filteredUsers.length);
   console.log('Filter by:', filterBy);
   console.log('Search term:', searchTerm);
-  console.log('Garden analytics data:', gardenAnalytics);
+  console.log('Dynamic analytics - Total Users:', totalUsers, 'Premium Users:', premiumUsers, 'Total Plants:', totalPlants);
 
   if (usersLoading || analyticsLoading) {
     return (
@@ -200,7 +210,7 @@ export default function AdminGardenPage() {
           </Button>
         </div>
 
-        {/* Analytics Overview */}
+        {/* Analytics Overview - Dynamic Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="pb-3">
@@ -209,7 +219,7 @@ export default function AdminGardenPage() {
             <CardContent>
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-blue-600" />
-                <span className="text-2xl font-bold">{gardenAnalytics?.totalUsers || '0'}</span>
+                <span className="text-2xl font-bold">{gardenUsers.length + (filterBy === 'all' ? 0 : 0)}</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">Active garden users</p>
             </CardContent>
@@ -222,7 +232,7 @@ export default function AdminGardenPage() {
             <CardContent>
               <div className="flex items-center gap-2">
                 <Leaf className="h-5 w-5 text-green-600" />
-                <span className="text-2xl font-bold">{gardenAnalytics?.totalPlants || '0'}</span>
+                <span className="text-2xl font-bold">{totalPlants}</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">Identified plants</p>
             </CardContent>
@@ -235,7 +245,12 @@ export default function AdminGardenPage() {
             <CardContent>
               <div className="flex items-center gap-2">
                 <Trophy className="h-5 w-5 text-yellow-600" />
-                <span className="text-2xl font-bold">{gardenAnalytics?.premiumUsers || '0'}</span>
+                <span className="text-2xl font-bold">
+                  {gardenUsers.filter(user => 
+                    user.subscriptionStatus === 'active' || 
+                    user.id?.startsWith('demo-premium-')
+                  ).length}
+                </span>
               </div>
               <p className="text-xs text-gray-500 mt-1">Active subscriptions</p>
             </CardContent>
@@ -248,7 +263,13 @@ export default function AdminGardenPage() {
             <CardContent>
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-purple-600" />
-                <span className="text-2xl font-bold">{gardenAnalytics?.monthlyGrowth || '0%'}</span>
+                <span className="text-2xl font-bold">
+                  {Math.round((gardenUsers.filter(user => {
+                    const createdAt = new Date(user.createdAt);
+                    const currentMonth = new Date().getMonth();
+                    return createdAt.getMonth() === currentMonth;
+                  }).length / gardenUsers.length) * 100)}%
+                </span>
               </div>
               <p className="text-xs text-gray-500 mt-1">User growth rate</p>
             </CardContent>
