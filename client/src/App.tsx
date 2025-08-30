@@ -38,7 +38,7 @@ import MyGarden from "@/pages/my-garden";
 import GardenMonitoring from "@/pages/garden-monitoring";
 import PlantCareDashboard from "@/pages/PlantCareDashboard";
 import GardenSubscription from "@/pages/GardenSubscription";
-import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
+import GardenSubscriptionSuccess from "@/pages/SubscriptionSuccess";
 import Tools from "@/pages/tools";
 import Disclosure from "@/pages/disclosure";
 import FAQ from "@/pages/faq";
@@ -55,6 +55,8 @@ import Contact from "@/pages/contact";
 import AdminGarden from "@/pages/admin-garden";
 import UserGardenView from "@/pages/user-garden-view";
 import EbookUpload from "@/pages/ebook-upload";
+import SubscriptionCheckout from "@/pages/subscription-checkout";
+import SubscriptionSuccess from "@/pages/subscription-success";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 import { Chatbot } from "@/components/Chatbot";
 import Footer from "@/components/Footer";
@@ -100,7 +102,9 @@ function Router() {
       <Route path="/reviews" component={Reviews} />
       <Route path="/my-garden" component={MyGarden} />
       <Route path="/garden/subscription" component={GardenSubscription} />
-      <Route path="/garden/subscription/success" component={SubscriptionSuccess} />
+      <Route path="/garden/subscription/success" component={GardenSubscriptionSuccess} />
+      <Route path="/subscription/checkout" component={SubscriptionCheckout} />
+      <Route path="/subscription/success" component={SubscriptionSuccess} />
       <Route path="/expert-onboarding" component={ExpertOnboarding} />
       <Route path="/talk-to-expert" component={TalkToExpert} />
       <Route path="/payment/consultation/:id">
@@ -168,6 +172,7 @@ function Router() {
       <Route path="/admin/blog" component={AdminBlogManager} />
       <Route path="/admin/social-media" component={AdminSocialMedia} />
       <Route path="/admin/garden" component={AdminGarden} />
+      <Route path="/admin-garden" component={AdminGarden} />
       <Route path="/admin/user-garden/:userId">
         {(params) => <UserGardenView />}
       </Route>
