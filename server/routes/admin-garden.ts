@@ -163,10 +163,9 @@ export function registerAdminGardenRoutes(app: Express) {
         }
       ];
 
-      // If no database users or requesting premium filter, show demo users
-      if (gardenUsers.length === 0 || filterBy === 'premium') {
-        const premiumUsers = filterBy === 'premium' ? demoPremiumUsers : [];
-        const freeUsers = filterBy === 'free' ? [
+      // Always show demo users for demonstration purposes
+      const premiumUsers = (filterBy === 'premium' || filterBy === 'all') ? demoPremiumUsers : [];
+      const freeUsers = (filterBy === 'free' || filterBy === 'all') ? [
           {
             id: "free-user-1",
             firstName: "John",
@@ -211,11 +210,19 @@ export function registerAdminGardenRoutes(app: Express) {
           }
         ] : [];
         
-        const allDemoUsers = filterBy === 'all' ? [...demoPremiumUsers, ...freeUsers] : [...premiumUsers, ...freeUsers];
+      // Combine users based on filter
+      let allDemoUsers = [...premiumUsers, ...freeUsers];
+
+      // If we have demo users to show, return them first (for premium/free filters)
+      if (allDemoUsers.length > 0 && filterBy !== 'all') {
+        console.log(`Admin garden demo users (${filterBy}): ${allDemoUsers.length} users found`);
         return res.json(allDemoUsers);
       }
 
-      // Format the results from database
+      // For 'all' filter or when no specific demo users, combine database users with demo users
+      let combinedUsers = [...allDemoUsers];
+
+      // Add formatted database users
       const formattedUsers = gardenUsers.map(user => ({
         id: user.id,
         firstName: user.firstName,
@@ -238,7 +245,15 @@ export function registerAdminGardenRoutes(app: Express) {
         achievements: filterBy === 'premium' ? ["Premium Member", "Advanced Gardener"] : ["Getting Started"]
       }));
 
-      res.json(formattedUsers);
+      // Combine demo users with database users for 'all' filter
+      if (filterBy === 'all') {
+        combinedUsers = [...combinedUsers, ...formattedUsers];
+        console.log(`Admin garden combined users (${filterBy}): ${combinedUsers.length} users found`);
+        res.json(combinedUsers);
+      } else {
+        console.log(`Admin garden database users (${filterBy}): ${formattedUsers.length} users found`);
+        res.json(formattedUsers);
+      }
     } catch (error) {
       console.error("Error fetching garden users:", error);
       res.status(500).json({ error: "Failed to fetch garden users" });
