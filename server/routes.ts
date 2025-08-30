@@ -41,6 +41,7 @@ import gardenMonitoringRoutes from "./routes/gardenMonitoringRoutes";
 import { registerCommunityRoutes } from "./routes/community";
 import dashboardFeaturesRoutes from "./routes/dashboard-features";
 import hrRoutes from "./routes/hrRoutes";
+import { registerAdminGardenRoutes } from "./routes/admin-garden";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -506,6 +507,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register HR management routes
   app.use('/api/hr', hrRoutes);
+  
+  // Register admin garden management routes
+  registerAdminGardenRoutes(app);
   
   // Geographic restrictions routes
   app.get('/api/geographic/check-product/:productId', async (req, res) => {

@@ -53,6 +53,7 @@ import SoilTestingCenters from "@/pages/soil-testing-centers";
 import Disclaimer from "@/pages/disclaimer";
 import Contact from "@/pages/contact";
 import AdminGarden from "@/pages/admin-garden";
+import UserGardenView from "@/pages/user-garden-view";
 import EbookUpload from "@/pages/ebook-upload";
 import { PerformanceMetrics } from "@/components/performance/PerformanceMetrics";
 import { Chatbot } from "@/components/Chatbot";
@@ -167,6 +168,9 @@ function Router() {
       <Route path="/admin/blog" component={AdminBlogManager} />
       <Route path="/admin/social-media" component={AdminSocialMedia} />
       <Route path="/admin/garden" component={AdminGarden} />
+      <Route path="/admin/user-garden/:userId">
+        {(params) => <UserGardenView />}
+      </Route>
       <Route path="/admin/hr" component={AdminHRDashboard} />
       
       {/* Protected routes that require authentication */}
