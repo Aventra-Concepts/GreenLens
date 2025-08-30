@@ -163,9 +163,16 @@ export function registerAdminGardenRoutes(app: Express) {
         }
       ];
 
-      // Always show demo users for demonstration purposes
-      const premiumUsers = (filterBy === 'premium' || filterBy === 'all') ? demoPremiumUsers : [];
-      const freeUsers = (filterBy === 'free' || filterBy === 'all') ? [
+      // Demo users should always be available regardless of database content
+      let demoPremiumUsers_filtered = [];
+      let demoFreeUsers_filtered = [];
+      
+      if (filterBy === 'premium' || filterBy === 'all') {
+        demoPremiumUsers_filtered = demoPremiumUsers;
+      }
+      
+      if (filterBy === 'free' || filterBy === 'all') {
+        demoFreeUsers_filtered = [
           {
             id: "free-user-1",
             firstName: "John",
@@ -208,19 +215,17 @@ export function registerAdminGardenRoutes(app: Express) {
             plantsNeedingCare: 0,
             achievements: ["Welcome Gardener"]
           }
-        ] : [];
-        
-      // Combine users based on filter
-      let allDemoUsers = [...premiumUsers, ...freeUsers];
-
-      // If we have demo users to show, return them first (for premium/free filters)
-      if (allDemoUsers.length > 0 && filterBy !== 'all') {
-        console.log(`Admin garden demo users (${filterBy}): ${allDemoUsers.length} users found`);
-        return res.json(allDemoUsers);
+        ];
+      } else {
+        demoFreeUsers_filtered = [];
       }
-
-      // For 'all' filter or when no specific demo users, combine database users with demo users
-      let combinedUsers = [...allDemoUsers];
+      
+      // Always include demo users with "Demo" prefix in names
+      const demoUsers = [...demoPremiumUsers_filtered, ...demoFreeUsers_filtered].map(user => ({
+        ...user,
+        firstName: `Demo ${user.firstName}`,
+        isDemoUser: true
+      }));
 
       // Add formatted database users
       const formattedUsers = gardenUsers.map(user => ({
@@ -245,15 +250,29 @@ export function registerAdminGardenRoutes(app: Express) {
         achievements: filterBy === 'premium' ? ["Premium Member", "Advanced Gardener"] : ["Getting Started"]
       }));
 
-      // Combine demo users with database users for 'all' filter
-      if (filterBy === 'all') {
-        combinedUsers = [...combinedUsers, ...formattedUsers];
-        console.log(`Admin garden combined users (${filterBy}): ${combinedUsers.length} users found`);
-        res.json(combinedUsers);
+      // Combine demo users with database users based on filter
+      let finalUsers = [];
+      
+      console.log(`Debug: filterBy = ${filterBy}, demoPremiumUsers_filtered.length = ${demoPremiumUsers_filtered.length}, demoFreeUsers_filtered.length = ${demoFreeUsers_filtered.length}, demoUsers.length = ${demoUsers.length}, formattedUsers.length = ${formattedUsers.length}`);
+      
+      if (filterBy === 'premium') {
+        // Show only premium demo users and premium database users
+        const premiumDemoUsers = demoUsers.filter(user => user.premium);
+        const premiumDbUsers = formattedUsers.filter(user => user.premium);
+        console.log(`Premium filter: ${premiumDemoUsers.length} demo + ${premiumDbUsers.length} database`);
+        finalUsers = [...premiumDemoUsers, ...premiumDbUsers];
+      } else if (filterBy === 'free') {
+        // Show only free demo users and free database users  
+        const freeDemoUsers = demoUsers.filter(user => !user.premium);
+        const freeDbUsers = formattedUsers.filter(user => !user.premium);
+        finalUsers = [...freeDemoUsers, ...freeDbUsers];
       } else {
-        console.log(`Admin garden database users (${filterBy}): ${formattedUsers.length} users found`);
-        res.json(formattedUsers);
+        // Show all demo users + database users
+        finalUsers = [...demoUsers, ...formattedUsers];
       }
+
+      console.log(`Admin garden users (${filterBy}): ${finalUsers.length} users found (${demoUsers.length} demo + ${formattedUsers.length} database)`);
+      res.json(finalUsers);
     } catch (error) {
       console.error("Error fetching garden users:", error);
       res.status(500).json({ error: "Failed to fetch garden users" });
