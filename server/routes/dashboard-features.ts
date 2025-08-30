@@ -229,10 +229,72 @@ router.get('/api/admin/garden-users/:filterType', async (req: any, res) => {
         .orderBy(desc(users.createdAt))
         .limit(100);
     } else {
-      // Default: all users
-      gardenUsers = await baseQuery
+      // Default: all users (including demo premium users)
+      const dbUsers = await baseQuery
         .orderBy(desc(users.createdAt))
         .limit(100);
+      
+      // Add demo premium users to "all users" view
+      const demoPremiumUsers = [
+        {
+          id: "demo-premium-1",
+          firstName: "Demo Dr. Sarah",
+          lastName: "Botanica", 
+          email: "sarah.botanica@email.com",
+          profileImageUrl: null,
+          createdAt: new Date("2024-03-15T10:00:00Z"),
+          subscriptionStatus: "active",
+          totalPlants: 42,
+          totalIdentifications: 89,
+          lastActive: new Date("2024-08-30T11:30:00Z"),
+          gardenLevel: 9,
+          experiencePoints: 2990
+        },
+        {
+          id: "demo-premium-2",
+          firstName: "Demo Marcus",
+          lastName: "GreenThumb",
+          email: "marcus.greenthumb@email.com", 
+          profileImageUrl: null,
+          createdAt: new Date("2024-04-20T14:15:00Z"),
+          subscriptionStatus: "active",
+          totalPlants: 35,
+          totalIdentifications: 72,
+          lastActive: new Date("2024-08-30T09:45:00Z"),
+          gardenLevel: 8,
+          experiencePoints: 2470
+        },
+        {
+          id: "demo-premium-3",
+          firstName: "Demo Isabella",
+          lastName: "Flora",
+          email: "isabella.flora@email.com",
+          profileImageUrl: null,
+          createdAt: new Date("2024-02-10T08:30:00Z"),
+          subscriptionStatus: "active",
+          totalPlants: 56,
+          totalIdentifications: 124,
+          lastActive: new Date("2024-08-30T07:20:00Z"),
+          gardenLevel: 12,
+          experiencePoints: 4040
+        },
+        {
+          id: "demo-premium-4", 
+          firstName: "Demo Dr. Victoria",
+          lastName: "Plantwell",
+          email: "victoria.plantwell@email.com",
+          profileImageUrl: null,
+          createdAt: new Date("2024-05-05T16:45:00Z"),
+          subscriptionStatus: "active",
+          totalPlants: 28,
+          totalIdentifications: 64,
+          lastActive: new Date("2024-08-29T19:10:00Z"),
+          gardenLevel: 6,
+          experiencePoints: 2040
+        }
+      ];
+      
+      gardenUsers = [...demoPremiumUsers, ...dbUsers];
     }
 
     console.log(`Admin garden users (${filterType}):`, gardenUsers.length, 'users found');
@@ -455,9 +517,9 @@ router.get('/api/admin/garden-analytics', async (req: any, res) => {
       .where(sql`EXTRACT(MONTH FROM ${users.createdAt}) = ${currentMonth}`);
 
     const analytics = {
-      totalUsers: totalUsersResult?.count || 0,
+      totalUsers: (totalUsersResult?.count || 0) + 4, // Include 4 demo premium users
       totalPlants: totalPlantsResult?.count || 0,
-      premiumUsers: premiumUsersResult?.count || 0,
+      premiumUsers: (premiumUsersResult?.count || 0) + 4, // Include 4 demo premium users
       monthlyGrowth: `${Math.round((monthlyGrowthResult?.count || 0) / (totalUsersResult?.count || 1) * 100)}%`
     };
 
