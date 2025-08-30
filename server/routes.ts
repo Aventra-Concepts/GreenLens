@@ -2306,6 +2306,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Register dashboard features routes
+  app.use('/', dashboardFeaturesRoutes);
+
   const httpServer = createServer(app);
   return httpServer;
 }
