@@ -1,6 +1,7 @@
 import { Layout } from "@/components/Layout";
 import MyGardenSection from "@/components/MyGardenSection";
-import { GardeningToolsMarketplace } from "@/components/GardeningToolsMarketplace";
+import { PremiumGardenDashboard } from "@/components/PremiumGardenDashboard";
+import { FreeTierGardenDashboard } from "@/components/FreeTierGardenDashboard";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -15,6 +16,47 @@ export default function MyGardenPage() {
         <div className="animate-spin w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full" />
       </div>
     );
+  }
+
+  // Check if user is authenticated and has premium subscription
+  if (user) {
+    const isPremium = user.subscriptionPlanId === 'premium' || user.subscriptionPlanId === 'pro';
+    
+    if (isPremium) {
+      return (
+        <Layout showImageBanner={false} showSidebarAds={false}>
+          <div className="min-h-screen">
+            {/* Back Button for Premium Users */}
+            <div className="absolute top-4 left-4 z-10">
+              <Link href="/">
+                <Button variant="outline" size="sm" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hover:border-gray-300">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Home
+                </Button>
+              </Link>
+            </div>
+            <PremiumGardenDashboard />
+          </div>
+        </Layout>
+      );
+    } else {
+      return (
+        <Layout showImageBanner={false} showSidebarAds={true}>
+          <div className="min-h-screen">
+            {/* Back Button for Free Users */}
+            <div className="px-4 sm:px-6 lg:px-8 pt-2">
+              <Link href="/">
+                <Button variant="outline" size="sm" className="flex items-center space-x-1 bg-green-50 border-green-200 hover:bg-green-100 hover:border-green-300 text-green-700">
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Back to Home</span>
+                </Button>
+              </Link>
+            </div>
+            <FreeTierGardenDashboard />
+          </div>
+        </Layout>
+      );
+    }
   }
 
   return (
@@ -34,14 +76,7 @@ export default function MyGardenPage() {
         <div className="py-2">
           {user ? (
             <div>
-              {/* Title */}
-              <div className="text-center mb-4">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">My Garden</h1>
-                <p className="text-sm text-gray-600 max-w-2xl mx-auto">
-                  Welcome to your personal garden dashboard. Track your plants, monitor their health, 
-                  and get personalized care recommendations powered by AI technology.
-                </p>
-              </div>
+              {/* This case should not be reached due to the conditional logic above */}
               <MyGardenSection />
             </div>
           ) : (

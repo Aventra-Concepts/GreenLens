@@ -364,10 +364,16 @@ export default function AdminGardenPage() {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => setSelectedUser(user.id)}
-                                  className="text-xs"
+                                  className="text-xs flex items-center gap-1"
                                 >
-                                  <Eye className="h-3 w-3 mr-1" />
-                                  View Garden
+                                  <Eye className="h-3 w-3" />
+                                  <span>View Garden</span>
+                                  {user.subscriptionStatus === 'active' && (
+                                    <Badge className="text-[10px] bg-yellow-400 text-yellow-900 px-1 py-0 h-4">Premium</Badge>
+                                  )}
+                                  {(!user.subscriptionStatus || user.subscriptionStatus === 'free') && (
+                                    <Badge variant="outline" className="text-[10px] px-1 py-0 h-4">Free</Badge>
+                                  )}
                                 </Button>
                               </DialogTrigger>
                               <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -384,10 +390,16 @@ export default function AdminGardenPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => window.open(`/admin/user-garden/${user.id}`, '_blank')}
-                              className="text-xs"
+                              className="text-xs flex items-center gap-1"
                             >
-                              <ExternalLink className="h-3 w-3 mr-1" />
-                              Full View
+                              <ExternalLink className="h-3 w-3" />
+                              <span>Full View</span>
+                              {user.subscriptionStatus === 'active' && (
+                                <Badge className="text-[10px] bg-yellow-400 text-yellow-900 px-1 py-0 h-4">Premium</Badge>
+                              )}
+                              {(!user.subscriptionStatus || user.subscriptionStatus === 'free') && (
+                                <Badge variant="outline" className="text-[10px] px-1 py-0 h-4">Free</Badge>
+                              )}
                             </Button>
                           </div>
                         </TableCell>
