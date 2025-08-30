@@ -1,65 +1,24 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/use-auth';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import {
-  Leaf,
-  Calendar,
-  TrendingUp,
-  Brain,
-  Trophy,
-  Crown,
-  Sparkles,
-  BarChart3,
-  Heart,
-  Award,
-  Target,
-  Star,
-  Zap,
-  Shield,
-  Bell,
-  Settings,
-  Camera,
-  BookOpen,
-  Users,
-  MapPin,
-  Clock,
-  Thermometer,
-  Droplets,
-  Sun,
-  Cloud,
-  Wind,
-  ChevronRight,
-  Plus,
-  Activity,
-  Flower,
-  TreePine,
-  Sprout,
-  Search,
-  Filter,
-  Download,
-  Share,
-  Eye,
-  TrendingDown,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Info,
-  Lock,
-  Unlock
-} from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-import { toast } from "@/hooks/use-toast";
+  Leaf, Heart, Trophy, Zap, TrendingUp, Star, Crown, Sparkles,
+  Settings, Share, Sun, Droplets, Wind, Calendar, Bell, BarChart3,
+  Activity, CheckCircle, AlertTriangle, Brain, Clock, Info,
+  Search, Filter, Sprout, Flower, Award, Users, Plus, BookOpen
+} from 'lucide-react';
 
+// Enhanced PremiumGardenData interface
 interface PremiumGardenData {
   user: {
     id: string;
@@ -69,10 +28,64 @@ interface PremiumGardenData {
     profileImageUrl?: string;
     subscriptionPlan: string;
     subscriptionPlanId: string;
-    location?: string;
+    location: string;
     joinDate: string;
   };
+  weather: {
+    temperature: number;
+    humidity: number;
+    conditions: string;
+    uvIndex: number;
+    windSpeed: number;
+    rainfall: number;
+    forecast: Array<{
+      date: string;
+      temp: number;
+      conditions: string;
+      rainfall: number;
+    }>;
+  };
+  consultations: Array<{
+    id: string;
+    expertName: string;
+    expertTitle: string;
+    topic: string;
+    status: 'scheduled' | 'pending' | 'completed';
+    scheduledDate?: string;
+    duration: number;
+    price: number;
+  }>;
+  tips: Array<{
+    id: string;
+    category: string;
+    title: string;
+    description: string;
+    difficulty: 'beginner' | 'intermediate' | 'advanced';
+    estimatedTime: string;
+  }>;
   analytics: {
+    advancedMetrics: {
+      plantHealthScore: number;
+      growthRate: number;
+      careEfficiency: number;
+      seasonalTrends: Array<{
+        month: string;
+        plantsAdded: number;
+        healthScore: number;
+      }>;
+      speciesDistribution: Array<{
+        family: string;
+        count: number;
+        percentage: number;
+      }>;
+      careReminders: Array<{
+        id: string;
+        plantName: string;
+        action: string;
+        dueDate: string;
+        priority: 'high' | 'medium' | 'low';
+      }>;
+    };
     totalPlants: number;
     healthyPlants: number;
     plantsNeedingCare: number;
@@ -83,14 +96,6 @@ interface PremiumGardenData {
     streakDays: number;
     monthlyGrowth: number;
   };
-  recentActivity: Array<{
-    id: string;
-    type: 'identification' | 'care_plan' | 'diagnosis' | 'achievement';
-    title: string;
-    description: string;
-    timestamp: string;
-    status: 'success' | 'warning' | 'info';
-  }>;
   plants: Array<{
     id: string;
     species: string;
@@ -102,13 +107,14 @@ interface PremiumGardenData {
     careTasks: string[];
     imageUrl?: string;
   }>;
-  weatherData?: {
-    temperature: number;
-    humidity: number;
-    conditions: string;
-    uvIndex: number;
-    recommendation: string;
-  };
+  recentActivity: Array<{
+    id: string;
+    type: 'identification' | 'care_plan' | 'diagnosis' | 'achievement';
+    title: string;
+    description: string;
+    timestamp: string;
+    status: 'success' | 'warning' | 'info';
+  }>;
   aiInsights: Array<{
     type: 'tip' | 'warning' | 'opportunity';
     title: string;
@@ -272,108 +278,65 @@ export function PremiumGardenDashboard() {
           </Card>
         </div>
 
-        {/* Main Dashboard Content */}
-        <Tabs value={selectedView} onValueChange={setSelectedView} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 bg-white dark:bg-gray-800 shadow-lg rounded-xl p-1">
-            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Overview</span>
-            </TabsTrigger>
-            <TabsTrigger value="plants" className="flex items-center gap-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
-              <Flower className="h-4 w-4" />
-              <span className="hidden sm:inline">My Plants</span>
-            </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center gap-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
-              <Brain className="h-4 w-4" />
-              <span className="hidden sm:inline">AI Insights</span>
-            </TabsTrigger>
-            <TabsTrigger value="weather" className="flex items-center gap-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
-              <Sun className="h-4 w-4" />
-              <span className="hidden sm:inline">Weather</span>
-            </TabsTrigger>
-            <TabsTrigger value="achievements" className="flex items-center gap-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
-              <Award className="h-4 w-4" />
-              <span className="hidden sm:inline">Achievements</span>
-            </TabsTrigger>
+        {/* Premium Tabs */}
+        <Tabs value={selectedView} onValueChange={setSelectedView} className="mb-8">
+          <TabsList className="grid w-full grid-cols-5 bg-white/50 backdrop-blur-sm">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="weather">Weather</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="consultations">Experts</TabsTrigger>
+            <TabsTrigger value="tips">Pro Tips</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              {/* Garden Health Overview */}
-              <Card className="xl:col-span-2 shadow-lg border-0 bg-white dark:bg-gray-800">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-xl flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-emerald-600" />
-                    Garden Health Analytics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border border-green-200">
-                      <div className="flex items-center gap-3">
-                        <CheckCircle className="h-8 w-8 text-green-600" />
-                        <div>
-                          <p className="text-2xl font-bold text-green-800">{gardenData.analytics.healthyPlants}</p>
-                          <p className="text-green-600 text-sm font-medium">Healthy Plants</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-gradient-to-br from-yellow-50 to-amber-50 p-4 rounded-xl border border-yellow-200">
-                      <div className="flex items-center gap-3">
-                        <AlertTriangle className="h-8 w-8 text-yellow-600" />
-                        <div>
-                          <p className="text-2xl font-bold text-yellow-800">{gardenData.analytics.plantsNeedingCare}</p>
-                          <p className="text-yellow-600 text-sm font-medium">Need Care</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 rounded-xl border border-purple-200">
-                      <div className="flex items-center gap-3">
-                        <Brain className="h-8 w-8 text-purple-600" />
-                        <div>
-                          <p className="text-2xl font-bold text-purple-800">{gardenData.analytics.plantsDiagnosed}</p>
-                          <p className="text-purple-600 text-sm font-medium">AI Diagnosed</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="font-medium">Overall Garden Health</span>
-                      <span className="text-emerald-600 font-bold">
-                        {Math.round((gardenData.analytics.healthyPlants / gardenData.analytics.totalPlants) * 100)}%
-                      </span>
-                    </div>
-                    <Progress 
-                      value={(gardenData.analytics.healthyPlants / gardenData.analytics.totalPlants) * 100} 
-                      className="h-3 bg-gray-200" 
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Recent Activity */}
-              <Card className="shadow-lg border-0 bg-white dark:bg-gray-800">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-blue-600" />
-                    Recent Activity
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Care Reminders */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bell className="h-5 w-5 text-emerald-600" />
+                    Care Reminders
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {gardenData.recentActivity.map((activity, index) => (
-                      <div key={activity.id || index} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700">
-                        <div className={`w-2 h-2 rounded-full mt-2 ${
-                          activity.status === 'success' ? 'bg-green-500' :
-                          activity.status === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
-                        }`} />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm">{activity.title}</p>
-                          <p className="text-xs text-gray-600 dark:text-gray-300">{activity.description}</p>
-                          <p className="text-xs text-gray-400 mt-1">{activity.timestamp}</p>
+                    {gardenData.analytics.advancedMetrics.careReminders.map((reminder) => (
+                      <div key={reminder.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <h4 className="font-medium">{reminder.plantName}</h4>
+                          <p className="text-sm text-gray-600">{reminder.action}</p>
+                        </div>
+                        <Badge variant={reminder.priority === 'high' ? 'destructive' : reminder.priority === 'medium' ? 'default' : 'secondary'}>
+                          {reminder.priority}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Species Distribution */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-emerald-600" />
+                    Species Distribution
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {gardenData.analytics.advancedMetrics.speciesDistribution.map((species) => (
+                      <div key={species.family} className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{species.family}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-20 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-emerald-500 h-2 rounded-full"
+                              style={{ width: `${species.percentage}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-sm text-gray-600">{species.count}</span>
                         </div>
                       </div>
                     ))}
@@ -383,287 +346,236 @@ export function PremiumGardenDashboard() {
             </div>
           </TabsContent>
 
-          {/* Plants Tab */}
-          <TabsContent value="plants" className="space-y-6">
-            {/* Search and Filter */}
-            <Card className="shadow-lg border-0 bg-white dark:bg-gray-800">
-              <CardContent className="p-4">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1">
-                    <Label htmlFor="plant-search" className="sr-only">Search plants</Label>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="plant-search"
-                        placeholder="Search your plants..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
-                      />
+          {/* Weather Tab */}
+          <TabsContent value="weather" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Current Weather */}
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sun className="h-5 w-5 text-yellow-500" />
+                    Current Weather
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h3 className="text-3xl font-bold">{gardenData.weather.temperature}°F</h3>
+                      <p className="text-gray-600">{gardenData.weather.conditions}</p>
+                      <p className="text-sm text-gray-500">{gardenData.user.location}</p>
+                    </div>
+                    <div className="text-right space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Droplets className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm">{gardenData.weather.humidity}% Humidity</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Wind className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm">{gardenData.weather.windSpeed} mph Wind</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Sun className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm">UV Index: {gardenData.weather.uvIndex}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="sm:w-48">
-                    <Select value={filterStatus} onValueChange={setFilterStatus}>
-                      <SelectTrigger>
-                        <Filter className="h-4 w-4 mr-2" />
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Plants</SelectItem>
-                        <SelectItem value="healthy">Healthy</SelectItem>
-                        <SelectItem value="needs_care">Needs Care</SelectItem>
-                        <SelectItem value="critical">Critical</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  
+                  {/* Garden Recommendations */}
+                  <div className="bg-emerald-50 rounded-lg p-4">
+                    <h4 className="font-semibold text-emerald-800 mb-2">Garden Recommendations</h4>
+                    <p className="text-sm text-emerald-700">
+                      {gardenData.weather.temperature > 75 ? 'Perfect weather for watering outdoor plants early morning.' : 
+                       gardenData.weather.temperature < 60 ? 'Cool weather - consider moving sensitive plants indoors.' :
+                       'Ideal conditions for plant care activities.'}
+                    </p>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            {/* Plants Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {gardenData.plants
-                .filter(plant => 
-                  (filterStatus === 'all' || plant.healthStatus === filterStatus) &&
-                  (searchTerm === '' || plant.commonName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                   plant.species.toLowerCase().includes(searchTerm.toLowerCase()))
-                )
-                .map((plant, index) => (
-                <Card key={plant.id || index} className="overflow-hidden shadow-lg border-0 bg-white dark:bg-gray-800 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                  <div className="aspect-square bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900 flex items-center justify-center">
-                    {plant.imageUrl ? (
-                      <img src={plant.imageUrl} alt={plant.commonName} className="w-full h-full object-cover" />
-                    ) : (
-                      <Sprout className="h-16 w-16 text-green-600" />
-                    )}
+              {/* 3-Day Forecast */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-emerald-600" />
+                    3-Day Forecast
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {gardenData.weather.forecast.map((day, index) => (
+                      <div key={day.date} className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">{index === 0 ? 'Today' : index === 1 ? 'Tomorrow' : new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</p>
+                          <p className="text-sm text-gray-600">{day.conditions}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">{day.temp}°F</p>
+                          {day.rainfall > 0 && (
+                            <p className="text-sm text-blue-600">{day.rainfall}" rain</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <CardContent className="p-4">
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Advanced Metrics */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-emerald-600" />
+                    Performance Metrics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span>Plant Health Score</span>
+                    <div className="flex items-center gap-2">
+                      <Progress value={gardenData.analytics.advancedMetrics.plantHealthScore} className="w-20" />
+                      <span className="font-bold">{gardenData.analytics.advancedMetrics.plantHealthScore}%</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Growth Rate</span>
+                    <span className="font-bold text-green-600">+{gardenData.analytics.advancedMetrics.growthRate}%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Care Efficiency</span>
+                    <div className="flex items-center gap-2">
+                      <Progress value={gardenData.analytics.advancedMetrics.careEfficiency} className="w-20" />
+                      <span className="font-bold">{gardenData.analytics.advancedMetrics.careEfficiency}%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Seasonal Trends */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-emerald-600" />
+                    Seasonal Trends
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {gardenData.analytics.advancedMetrics.seasonalTrends.map((trend) => (
+                      <div key={trend.month} className="flex items-center justify-between">
+                        <span className="font-medium">{trend.month}</span>
+                        <div className="flex items-center gap-4">
+                          <span className="text-sm">+{trend.plantsAdded} plants</span>
+                          <div className="flex items-center gap-1">
+                            <div className="w-12 bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-emerald-500 h-2 rounded-full"
+                                style={{ width: `${trend.healthScore}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-sm">{trend.healthScore}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Consultations Tab */}
+          <TabsContent value="consultations" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {gardenData.consultations.map((consultation) => (
+                <Card key={consultation.id} className="border-l-4 border-l-emerald-500">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">{consultation.expertName}</CardTitle>
+                      <Badge variant={consultation.status === 'scheduled' ? 'default' : consultation.status === 'pending' ? 'secondary' : 'outline'}>
+                        {consultation.status}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-gray-600">{consultation.expertTitle}</p>
+                  </CardHeader>
+                  <CardContent>
                     <div className="space-y-3">
                       <div>
-                        <h3 className="font-semibold text-lg leading-tight">{plant.commonName}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 italic">{plant.species}</p>
+                        <h4 className="font-semibold">Topic: {consultation.topic}</h4>
+                        {consultation.scheduledDate && (
+                          <p className="text-sm text-gray-600">
+                            Scheduled: {new Date(consultation.scheduledDate).toLocaleDateString()} at {new Date(consultation.scheduledDate).toLocaleTimeString()}
+                          </p>
+                        )}
                       </div>
-                      
                       <div className="flex items-center justify-between">
-                        <Badge variant={
-                          plant.healthStatus === 'healthy' ? 'default' :
-                          plant.healthStatus === 'needs_care' ? 'secondary' : 'destructive'
-                        } className={
-                          plant.healthStatus === 'healthy' ? 'bg-green-100 text-green-800 hover:bg-green-200' :
-                          plant.healthStatus === 'needs_care' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' :
-                          'bg-red-100 text-red-800 hover:bg-red-200'
-                        }>
-                          {plant.healthStatus === 'healthy' ? 'Healthy' :
-                           plant.healthStatus === 'needs_care' ? 'Needs Care' : 'Critical'}
-                        </Badge>
-                        <span className="text-sm text-gray-500">{plant.confidence}% ID</span>
+                        <span className="text-sm">Duration: {consultation.duration} minutes</span>
+                        <span className="font-bold text-emerald-600">${consultation.price}</span>
                       </div>
-
-                      <div className="space-y-2 text-xs text-gray-600 dark:text-gray-300">
-                        <div className="flex justify-between">
-                          <span>Last cared:</span>
-                          <span className="font-medium">{plant.lastCared}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Next care:</span>
-                          <span className="font-medium text-emerald-600">{plant.nextCareDate}</span>
-                        </div>
+                      <div className="flex gap-2">
+                        {consultation.status === 'pending' && (
+                          <Button size="sm" className="flex-1">Schedule</Button>
+                        )}
+                        {consultation.status === 'scheduled' && (
+                          <Button size="sm" variant="outline" className="flex-1">Join Session</Button>
+                        )}
+                        <Button size="sm" variant="ghost">View Details</Button>
                       </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              {/* Book New Consultation */}
+              <Card className="border-2 border-dashed border-gray-300">
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <Users className="h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Book Expert Consultation</h3>
+                  <p className="text-sm text-gray-600 text-center mb-4">
+                    Get personalized advice from plant experts
+                  </p>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Schedule Consultation
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
-                      {plant.careTasks.length > 0 && (
-                        <div className="space-y-1">
-                          <p className="text-xs font-medium text-gray-700 dark:text-gray-200">Care Tasks:</p>
-                          <ul className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
-                            {plant.careTasks.slice(0, 2).map((task, taskIndex) => (
-                              <li key={taskIndex} className="flex items-center gap-1">
-                                <div className="w-1 h-1 bg-emerald-500 rounded-full" />
-                                {task}
-                              </li>
-                            ))}
-                            {plant.careTasks.length > 2 && (
-                              <li className="text-emerald-600 font-medium">+{plant.careTasks.length - 2} more</li>
-                            )}
-                          </ul>
-                        </div>
-                      )}
-
-                      <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View Details
+          {/* Tips Tab */}
+          <TabsContent value="tips" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {gardenData.tips.map((tip) => (
+                <Card key={tip.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <Badge variant={tip.category === 'watering' ? 'default' : 'secondary'}>
+                        {tip.category}
+                      </Badge>
+                      <Badge variant={tip.difficulty === 'beginner' ? 'default' : tip.difficulty === 'intermediate' ? 'secondary' : 'outline'}>
+                        {tip.difficulty}
+                      </Badge>
+                    </div>
+                    <CardTitle className="text-lg">{tip.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600 mb-4">{tip.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-emerald-600">⏱️ {tip.estimatedTime}</span>
+                      <Button size="sm" variant="outline">
+                        <BookOpen className="h-4 w-4 mr-2" />
+                        Read More
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
-          </TabsContent>
-
-          {/* AI Insights Tab */}
-          <TabsContent value="insights" className="space-y-6">
-            <div className="space-y-4">
-              {gardenData.aiInsights.map((insight, index) => (
-                <Card key={index} className={`shadow-lg border-0 ${
-                  insight.priority === 'high' ? 'bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-l-red-500' :
-                  insight.priority === 'medium' ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-l-4 border-l-yellow-500' :
-                  'bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-l-blue-500'
-                }`}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className={`p-2 rounded-full ${
-                        insight.type === 'warning' ? 'bg-red-100' :
-                        insight.type === 'tip' ? 'bg-blue-100' : 'bg-green-100'
-                      }`}>
-                        {insight.type === 'warning' ? (
-                          <AlertTriangle className={`h-5 w-5 ${
-                            insight.priority === 'high' ? 'text-red-600' :
-                            insight.priority === 'medium' ? 'text-yellow-600' : 'text-blue-600'
-                          }`} />
-                        ) : insight.type === 'tip' ? (
-                          <Brain className="h-5 w-5 text-blue-600" />
-                        ) : (
-                          <Sparkles className="h-5 w-5 text-green-600" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg mb-2">{insight.title}</h3>
-                        <p className="text-gray-700 dark:text-gray-300">{insight.content}</p>
-                        <div className="flex items-center gap-2 mt-3">
-                          <Badge variant={
-                            insight.priority === 'high' ? 'destructive' :
-                            insight.priority === 'medium' ? 'default' : 'secondary'
-                          }>
-                            {insight.priority} priority
-                          </Badge>
-                          <Badge variant="outline">{insight.type}</Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Weather Tab */}
-          <TabsContent value="weather" className="space-y-6">
-            {gardenData.weatherData ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-sky-50 to-blue-50 dark:from-sky-900 dark:to-blue-900">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-sky-800 dark:text-sky-200">
-                      <Sun className="h-5 w-5" />
-                      Current Weather Conditions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center p-4 bg-white/50 dark:bg-white/10 rounded-xl">
-                        <Thermometer className="h-8 w-8 mx-auto mb-2 text-red-500" />
-                        <p className="text-2xl font-bold">{gardenData.weatherData.temperature}°F</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Temperature</p>
-                      </div>
-                      <div className="text-center p-4 bg-white/50 dark:bg-white/10 rounded-xl">
-                        <Droplets className="h-8 w-8 mx-auto mb-2 text-blue-500" />
-                        <p className="text-2xl font-bold">{gardenData.weatherData.humidity}%</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Humidity</p>
-                      </div>
-                    </div>
-                    <div className="text-center p-4 bg-white/50 dark:bg-white/10 rounded-xl">
-                      <p className="text-lg font-semibold mb-1">{gardenData.weatherData.conditions}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">UV Index: {gardenData.weatherData.uvIndex}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900 dark:to-emerald-900">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-green-800 dark:text-green-200">
-                      <Brain className="h-5 w-5" />
-                      AI Weather Recommendations
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="p-4 bg-white/50 dark:bg-white/10 rounded-xl">
-                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                        {gardenData.weatherData.recommendation}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            ) : (
-              <Card className="shadow-lg border-0">
-                <CardContent className="p-8 text-center">
-                  <Cloud className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-xl font-semibold mb-2">Weather Data Unavailable</h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Unable to fetch weather data for your location. Please check your location settings.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          {/* Achievements Tab */}
-          <TabsContent value="achievements" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="shadow-lg border-0 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900 dark:to-amber-900">
-                <CardHeader className="text-center">
-                  <Trophy className="h-12 w-12 mx-auto mb-2 text-yellow-600" />
-                  <CardTitle className="text-yellow-800 dark:text-yellow-200">Garden Level</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <div className="text-4xl font-bold text-yellow-600 mb-2">{gardenData.analytics.gardenLevel}</div>
-                  <Progress value={75} className="mb-2 bg-yellow-200" />
-                  <p className="text-sm text-yellow-700 dark:text-yellow-300">75% to next level</p>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg border-0 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900 dark:to-indigo-900">
-                <CardHeader className="text-center">
-                  <Star className="h-12 w-12 mx-auto mb-2 text-purple-600" />
-                  <CardTitle className="text-purple-800 dark:text-purple-200">Experience Points</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <div className="text-4xl font-bold text-purple-600 mb-2">{gardenData.analytics.experiencePoints}</div>
-                  <p className="text-sm text-purple-700 dark:text-purple-300">Total XP earned</p>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg border-0 bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900 dark:to-green-900">
-                <CardHeader className="text-center">
-                  <Zap className="h-12 w-12 mx-auto mb-2 text-emerald-600" />
-                  <CardTitle className="text-emerald-800 dark:text-emerald-200">Care Streak</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <div className="text-4xl font-bold text-emerald-600 mb-2">{gardenData.analytics.streakDays}</div>
-                  <p className="text-sm text-emerald-700 dark:text-emerald-300">Days in a row</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card className="shadow-lg border-0">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="h-5 w-5 text-orange-600" />
-                  Achievement Badges
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <div key={i} className="text-center p-3 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
-                      <div className={`w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                        i < 6 ? 'bg-gradient-to-br from-yellow-400 to-orange-500' : 'bg-gray-300 dark:bg-gray-600'
-                      }`}>
-                        <Award className={`h-6 w-6 ${i < 6 ? 'text-white' : 'text-gray-500'}`} />
-                      </div>
-                      <p className="text-xs font-medium">Badge {i + 1}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </div>

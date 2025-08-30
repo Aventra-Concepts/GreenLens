@@ -80,19 +80,6 @@ export class StudentConversionService {
         lastName: student.lastName,
         location: student.universityName || 'Not specified',
         password: 'temp_password_' + Math.random().toString(36), // Generate temporary password
-        profileImageUrl: null,
-        country: student.country,
-        isAdmin: false,
-        isSuperAdmin: false,
-        isActive: true,
-        isAuthor: false,
-        authorVerified: false,
-        emailVerified: student.emailVerified || false,
-        twoFactorEnabled: false,
-        failedLoginAttempts: 0,
-        lockedUntil: null,
-        preferredLanguage: 'en',
-        timezone: 'UTC',
       });
 
       // Update student record to mark as converted

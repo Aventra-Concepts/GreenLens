@@ -403,13 +403,122 @@ router.get('/api/admin/garden-user-data/:userId', async (req: any, res) => {
       
       const demoUser = demoUsers[userId as keyof typeof demoUsers];
       if (demoUser) {
+        // Premium user gets enhanced dashboard with weather, consultations, and advanced analytics
         return res.json({
-          user: demoUser,
+          user: {
+            ...demoUser,
+            subscriptionPlan: 'Premium',
+            subscriptionPlanId: 'premium-monthly',
+            location: 'San Francisco, CA',
+            joinDate: '2024-01-15T00:00:00Z'
+          },
+          weather: {
+            temperature: 72,
+            humidity: 65,
+            conditions: 'Partly Cloudy',
+            uvIndex: 6,
+            windSpeed: 8,
+            rainfall: 0.1,
+            forecast: [
+              { date: '2024-08-31', temp: 75, conditions: 'Sunny', rainfall: 0 },
+              { date: '2024-09-01', temp: 73, conditions: 'Cloudy', rainfall: 0.2 },
+              { date: '2024-09-02', temp: 70, conditions: 'Rain', rainfall: 0.8 }
+            ]
+          },
+          consultations: [
+            {
+              id: 'cons-1',
+              expertName: 'Dr. Sarah Green',
+              expertTitle: 'Plant Disease Specialist',
+              topic: 'Pest Management Strategy',
+              status: 'scheduled',
+              scheduledDate: '2024-09-05T14:00:00Z',
+              duration: 45,
+              price: 89
+            },
+            {
+              id: 'cons-2',
+              expertName: 'Marcus Plant',
+              expertTitle: 'Indoor Garden Expert',
+              topic: 'Light Optimization',
+              status: 'pending',
+              duration: 30,
+              price: 65
+            }
+          ],
+          tips: [
+            {
+              id: 'tip-1',
+              category: 'watering',
+              title: 'Morning Watering Benefits',
+              description: 'Water your plants early morning to reduce evaporation and prevent fungal diseases.',
+              difficulty: 'beginner',
+              estimatedTime: '5 min'
+            },
+            {
+              id: 'tip-2',
+              category: 'soil',
+              title: 'Soil pH Testing',
+              description: 'Test soil pH monthly to ensure optimal nutrient absorption.',
+              difficulty: 'intermediate',
+              estimatedTime: '15 min'
+            },
+            {
+              id: 'tip-3',
+              category: 'pests',
+              title: 'Preventive Pest Control',
+              description: 'Use companion planting to naturally deter common garden pests.',
+              difficulty: 'advanced',
+              estimatedTime: '30 min'
+            }
+          ],
+          analytics: {
+            advancedMetrics: {
+              plantHealthScore: 92,
+              growthRate: 15.3,
+              careEfficiency: 87,
+              seasonalTrends: [
+                { month: 'Jun', plantsAdded: 8, healthScore: 88 },
+                { month: 'Jul', plantsAdded: 12, healthScore: 91 },
+                { month: 'Aug', plantsAdded: 15, healthScore: 94 }
+              ],
+              speciesDistribution: [
+                { family: 'Araceae', count: 12, percentage: 35 },
+                { family: 'Pothos', count: 8, percentage: 24 },
+                { family: 'Ficus', count: 6, percentage: 18 },
+                { family: 'Dracaena', count: 4, percentage: 12 },
+                { family: 'Others', count: 4, percentage: 11 }
+              ],
+              careReminders: [
+                {
+                  id: 'rem-1',
+                  plantName: 'Monstera Deliciosa',
+                  action: 'Water & Fertilize',
+                  dueDate: '2024-09-01',
+                  priority: 'high'
+                },
+                {
+                  id: 'rem-2',
+                  plantName: 'Snake Plant',
+                  action: 'Check for pests',
+                  dueDate: '2024-09-03',
+                  priority: 'medium'
+                }
+              ]
+            },
+            totalPlants: demoUser.totalPlants,
+            healthyPlants: Math.round(demoUser.totalPlants * 0.85),
+            plantsNeedingCare: Math.round(demoUser.totalPlants * 0.15),
+            plantsDiagnosed: Math.round(demoUser.totalPlants * 0.4),
+            achievementScore: demoUser.totalPlants * 50 + demoUser.totalIdentifications * 10,
+            gardenLevel: Math.floor(demoUser.totalPlants / 5) + 1,
+            experiencePoints: demoUser.totalPlants * 50 + demoUser.totalIdentifications * 10,
+            streakDays: 24,
+            monthlyGrowth: 28
+          },
           plants: demoUser.plants,
           plantIdentifications: demoUser.plants,
           totalPlants: demoUser.totalPlants,
-          gardenLevel: Math.floor(demoUser.totalPlants / 5) + 1,
-          experiencePoints: demoUser.totalPlants * 50 + demoUser.totalIdentifications * 10,
           healthPredictions: { overallHealth: 'Excellent', diseaseRisk: 'Low' },
           achievements: { 
             level: Math.floor(demoUser.totalPlants / 5) + 1,
@@ -532,6 +641,196 @@ router.get('/api/admin/garden-analytics', async (req: any, res) => {
   } catch (error) {
     console.error('Admin garden analytics error:', error);
     res.status(500).json({ error: 'Failed to fetch garden analytics' });
+  }
+});
+
+// New endpoint for premium users with enhanced dashboard features
+router.get('/api/premium-garden-dashboard', isAuthenticated, async (req: any, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "User ID not found" });
+    }
+
+    // For now, return demo data for all premium users
+    // In production, this would fetch real user data from database
+    const premiumDashboardData = {
+      user: {
+        id: userId,
+        firstName: "Demo",
+        lastName: "Premium",
+        email: "demo@premium.com",
+        subscriptionPlan: 'Premium',
+        subscriptionPlanId: 'premium-monthly',
+        location: 'San Francisco, CA',
+        joinDate: '2024-01-15T00:00:00Z'
+      },
+      weather: {
+        temperature: 72,
+        humidity: 65,
+        conditions: 'Partly Cloudy',
+        uvIndex: 6,
+        windSpeed: 8,
+        rainfall: 0.1,
+        forecast: [
+          { date: '2024-08-31', temp: 75, conditions: 'Sunny', rainfall: 0 },
+          { date: '2024-09-01', temp: 73, conditions: 'Cloudy', rainfall: 0.2 },
+          { date: '2024-09-02', temp: 70, conditions: 'Rain', rainfall: 0.8 }
+        ]
+      },
+      consultations: [
+        {
+          id: 'cons-1',
+          expertName: 'Dr. Sarah Green',
+          expertTitle: 'Plant Disease Specialist',
+          topic: 'Pest Management Strategy',
+          status: 'scheduled',
+          scheduledDate: '2024-09-05T14:00:00Z',
+          duration: 45,
+          price: 89
+        },
+        {
+          id: 'cons-2',
+          expertName: 'Marcus Plant',
+          expertTitle: 'Indoor Garden Expert',
+          topic: 'Light Optimization',
+          status: 'pending',
+          duration: 30,
+          price: 65
+        }
+      ],
+      tips: [
+        {
+          id: 'tip-1',
+          category: 'watering',
+          title: 'Morning Watering Benefits',
+          description: 'Water your plants early morning to reduce evaporation and prevent fungal diseases.',
+          difficulty: 'beginner',
+          estimatedTime: '5 min'
+        },
+        {
+          id: 'tip-2',
+          category: 'soil',
+          title: 'Soil pH Testing',
+          description: 'Test soil pH monthly to ensure optimal nutrient absorption.',
+          difficulty: 'intermediate',
+          estimatedTime: '15 min'
+        },
+        {
+          id: 'tip-3',
+          category: 'pests',
+          title: 'Preventive Pest Control',
+          description: 'Use companion planting to naturally deter common garden pests.',
+          difficulty: 'advanced',
+          estimatedTime: '30 min'
+        }
+      ],
+      analytics: {
+        advancedMetrics: {
+          plantHealthScore: 92,
+          growthRate: 15.3,
+          careEfficiency: 87,
+          seasonalTrends: [
+            { month: 'Jun', plantsAdded: 8, healthScore: 88 },
+            { month: 'Jul', plantsAdded: 12, healthScore: 91 },
+            { month: 'Aug', plantsAdded: 15, healthScore: 94 }
+          ],
+          speciesDistribution: [
+            { family: 'Araceae', count: 12, percentage: 35 },
+            { family: 'Pothos', count: 8, percentage: 24 },
+            { family: 'Ficus', count: 6, percentage: 18 },
+            { family: 'Dracaena', count: 4, percentage: 12 },
+            { family: 'Others', count: 4, percentage: 11 }
+          ],
+          careReminders: [
+            {
+              id: 'rem-1',
+              plantName: 'Monstera Deliciosa',
+              action: 'Water & Fertilize',
+              dueDate: '2024-09-01',
+              priority: 'high'
+            },
+            {
+              id: 'rem-2',
+              plantName: 'Snake Plant',
+              action: 'Check for pests',
+              dueDate: '2024-09-03',
+              priority: 'medium'
+            }
+          ]
+        },
+        totalPlants: 34,
+        healthyPlants: 29,
+        plantsNeedingCare: 4,
+        plantsDiagnosed: 14,
+        achievementScore: 2240,
+        gardenLevel: 7,
+        experiencePoints: 2240,
+        streakDays: 24,
+        monthlyGrowth: 28
+      },
+      plants: [
+        {
+          id: 'plant-1',
+          species: 'Monstera deliciosa',
+          commonName: 'Swiss Cheese Plant',
+          confidence: 95,
+          healthStatus: 'healthy',
+          lastCared: '2024-08-28',
+          nextCareDate: '2024-09-01',
+          careTasks: ['Water thoroughly', 'Check for pests', 'Prune dead leaves'],
+          imageUrl: ''
+        },
+        {
+          id: 'plant-2',
+          species: 'Sansevieria trifasciata',
+          commonName: 'Snake Plant',
+          confidence: 98,
+          healthStatus: 'needs_care',
+          lastCared: '2024-08-25',
+          nextCareDate: '2024-09-02',
+          careTasks: ['Water sparingly', 'Dust leaves'],
+          imageUrl: ''
+        }
+      ],
+      recentActivity: [
+        {
+          id: 'activity-1',
+          type: 'identification',
+          title: 'New Plant Identified',
+          description: 'Successfully identified Fiddle Leaf Fig',
+          timestamp: '2024-08-30T10:30:00Z',
+          status: 'success'
+        },
+        {
+          id: 'activity-2',
+          type: 'care_plan',
+          title: 'Care Plan Generated',
+          description: 'Custom care plan created for your Monstera',
+          timestamp: '2024-08-29T15:20:00Z',
+          status: 'info'
+        }
+      ],
+      aiInsights: [
+        {
+          type: 'tip',
+          title: 'Optimal Watering Schedule',
+          content: 'Based on your plant collection, consider watering every 3-4 days.',
+          priority: 'medium'
+        },
+        {
+          type: 'warning',
+          title: 'Light Adjustment Needed',
+          content: 'Your Monstera may need more indirect sunlight.',
+          priority: 'high'
+        }
+      ]
+    };
+
+    res.json(premiumDashboardData);
+  } catch (error) {
+    console.error("Error fetching premium garden dashboard data:", error);
+    res.status(500).json({ message: "Failed to load premium dashboard" });
   }
 });
 

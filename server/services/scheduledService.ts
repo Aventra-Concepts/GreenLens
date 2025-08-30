@@ -64,8 +64,8 @@ class ScheduledService {
     try {
       console.log('Running scheduled student conversion check...');
       
-      // Update all student conversion dates first
-      await StudentConversionService.updateAllStudentConversionDates();
+      // Temporarily disabled until database schema is fixed
+      // await StudentConversionService.updateAllStudentConversionDates();
       
       // Run automatic conversion
       const result = await StudentConversionService.runAutomaticConversion();
