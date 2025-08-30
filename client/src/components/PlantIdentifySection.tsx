@@ -92,11 +92,11 @@ export default function PlantIdentifySection() {
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
             AI-Powered Plant Recognition
           </div>
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
             Discover Your Plant's
             <span className="block text-green-600">Identity & Care Needs</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Upload multiple photos from different angles for the most accurate identification. 
             Our advanced AI analyzes your plant and provides personalized care recommendations.
           </p>
