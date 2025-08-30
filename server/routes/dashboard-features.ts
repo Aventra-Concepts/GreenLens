@@ -517,9 +517,9 @@ router.get('/api/admin/garden-analytics', async (req: any, res) => {
       .where(sql`EXTRACT(MONTH FROM ${users.createdAt}) = ${currentMonth}`);
 
     const analytics = {
-      totalUsers: (totalUsersResult?.count || 0) + 4, // Include 4 demo premium users
-      totalPlants: totalPlantsResult?.count || 0,
-      premiumUsers: (premiumUsersResult?.count || 0) + 4, // Include 4 demo premium users
+      totalUsers: ((totalUsersResult?.count || 0) + 4).toString(), // Include 4 demo premium users
+      totalPlants: (totalPlantsResult?.count || 0).toString(),
+      premiumUsers: ((premiumUsersResult?.count || 0) + 4).toString(), // Include 4 demo premium users  
       monthlyGrowth: `${Math.round((monthlyGrowthResult?.count || 0) / (totalUsersResult?.count || 1) * 100)}%`
     };
 

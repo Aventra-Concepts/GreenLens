@@ -115,21 +115,23 @@ export default function AdminGardenPage() {
   });
 
   // Fetch garden analytics
-  const { data: gardenAnalytics, isLoading: analyticsLoading } = useQuery<GardenAnalytics>({
+  const { data: gardenAnalytics, isLoading: analyticsLoading, refetch: refetchAnalytics } = useQuery<GardenAnalytics>({
     queryKey: ['/api/admin/garden-analytics'],
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0 // Don't cache data
   });
 
   const refreshData = useMutation({
     mutationFn: async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Force refetch analytics and users immediately
+      await Promise.all([
+        refetchAnalytics(),
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/garden-users'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/garden-analytics'] })
+      ]);
       return true;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/garden-users'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/garden-analytics'] });
-      if (selectedUser) {
-        queryClient.invalidateQueries({ queryKey: ['/api/admin/garden-user-data', selectedUser] });
-      }
       toast({
         title: "Data Refreshed",
         description: "Garden dashboard data has been updated.",
