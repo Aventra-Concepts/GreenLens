@@ -185,8 +185,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Check admin credentials
     if (username === "admin" && password === "greenlens2024") {
       // Create admin session
-      req.session.adminAuthenticated = true;
-      req.session.adminUser = {
+      (req.session as any).adminAuthenticated = true;
+      (req.session as any).adminUser = {
         id: "admin-system",
         email: "admin@greenlens.com",
         firstName: "System",
@@ -197,7 +197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         success: true, 
         message: "Admin login successful",
-        user: req.session.adminUser
+        user: (req.session as any).adminUser
       });
     } else {
       res.status(401).json({ success: false, message: "Invalid admin credentials" });
@@ -206,10 +206,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Admin session check endpoint
   app.get("/api/admin/check", (req, res) => {
-    if (req.session.adminAuthenticated && req.session.adminUser) {
+    if ((req.session as any).adminAuthenticated && (req.session as any).adminUser) {
       res.json({ 
         isAdmin: true, 
-        user: req.session.adminUser 
+        user: (req.session as any).adminUser 
       });
     } else {
       res.status(401).json({ isAdmin: false });
@@ -337,7 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (updatedAuthor && applicationStatus === 'approved') {
         // Update user's author flags when approved
-        await storage.updateUser(updatedAuthor.user_id, {
+        await storage.updateUser(updatedAuthor.userId, {
           isAuthor: true,
           authorVerified: true
         });
@@ -2314,9 +2314,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.id;
       
-      // Check if user has premium subscription
+      // Check if user has premium subscription or is admin
+      const isAdmin = req.user.id === 'admin-system' || req.user.isAdmin;
       const subscription = await storage.getUserSubscription(userId);
-      if (!subscription) {
+      
+      if (!subscription && !isAdmin) {
         return res.status(403).json({ 
           message: "Premium subscription required",
           premiumRequired: true 
@@ -2324,7 +2326,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get comprehensive premium dashboard data using the service
-      const premiumService = require('./services/premiumFeaturesService');
+      const { PremiumFeaturesService } = require('./services/premiumFeaturesService');
+      const premiumService = new PremiumFeaturesService();
+      
+      // Use demo user for admin testing, or actual user for premium users
+      const targetUserId = isAdmin ? 'demo-premium-test' : userId;
       
       const [
         microclimatezones,
@@ -2333,11 +2339,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         latestAnalytics,
         systemStatus
       ] = await Promise.all([
-        premiumService.getMicroclimatezones(userId),
-        premiumService.getAIInsights(userId),
-        premiumService.getIoTDevices(userId),
-        premiumService.getLatestAnalytics(userId),
-        premiumService.getSystemStatus(userId)
+        premiumService.getMicroclimatezones(targetUserId),
+        premiumService.getAIInsights(targetUserId),
+        premiumService.getIoTDevices(targetUserId),
+        premiumService.getLatestAnalytics(targetUserId),
+        premiumService.getSystemStatus(targetUserId)
       ]);
 
       res.json({

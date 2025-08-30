@@ -149,7 +149,7 @@ export class PremiumFeaturesService {
     }
 
     // Calculate health trend
-    const avgConfidence = recentResults.reduce((sum, result) => sum + parseFloat(result.confidence), 0) / recentResults.length;
+    const avgConfidence = recentResults.reduce((sum, result) => sum + parseFloat(result.confidence || '0'), 0) / recentResults.length;
     const trend = avgConfidence > 80 ? 'improving' : avgConfidence > 60 ? 'stable' : 'declining';
 
     return {
@@ -285,7 +285,7 @@ export class PremiumFeaturesService {
         potassium: 'adequate',
         organicMatter: 12.5 // percentage
       },
-      biodiversityIndex: Math.min(100, userPlants.length * 2.3),
+      biodiversityIndex: Math.min(100, userPlants.length * 2.3).toString(),
       yieldAnalysis: {
         currentYield: userPlants.length * 2.5, // lbs per month (simplified)
         projectedAnnualYield: userPlants.length * 30,
@@ -297,7 +297,7 @@ export class PremiumFeaturesService {
         roi: "180", // percentage as string
         paybackPeriod: "8" // months as string
       },
-      sustainabilityScore: Math.min(100, userPlants.length * 3.2 + 25),
+      sustainabilityScore: Math.min(100, userPlants.length * 3.2 + 25).toString(),
       recommendations: [
         'Consider adding nitrogen-fixing plants like legumes',
         'Install rainwater collection for improved water efficiency',
