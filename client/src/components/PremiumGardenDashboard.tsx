@@ -134,6 +134,11 @@ export function PremiumGardenDashboard() {
     enabled: !!user,
   });
 
+  const { data: premiumFeatures, isLoading: premiumLoading } = useQuery({
+    queryKey: ['/api/premium/dashboard-data'],
+    enabled: !!user,
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-blue-50 dark:from-gray-900 dark:via-green-900/20 dark:to-blue-900/20">
@@ -278,74 +283,160 @@ export function PremiumGardenDashboard() {
           </Card>
         </div>
 
-        {/* Premium Tabs - Enhanced with New Features */}
+        {/* Premium Tabs - Enhanced with Advanced Features */}
         <Tabs value={selectedView} onValueChange={setSelectedView} className="mb-8">
-          <TabsList className="grid w-full grid-cols-7 bg-white/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-5 bg-white/50 backdrop-blur-sm">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="weather">Weather</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="consultations">Experts</TabsTrigger>
-            <TabsTrigger value="tips">Pro Tips</TabsTrigger>
-            <TabsTrigger value="ai-doctor">AI Doctor</TabsTrigger>
-            <TabsTrigger value="automation">Smart Care</TabsTrigger>
+            <TabsTrigger value="microclimate">Microclimate</TabsTrigger>
+            <TabsTrigger value="ai-insights">AI Intelligence</TabsTrigger>
+            <TabsTrigger value="social">Plant Network</TabsTrigger>
+            <TabsTrigger value="iot">Smart Garden</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Care Reminders */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* System Status */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Bell className="h-5 w-5 text-emerald-600" />
-                    Care Reminders
+                    <Activity className="h-5 w-5 text-emerald-600" />
+                    System Status
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {gardenData.analytics.advancedMetrics.careReminders.map((reminder) => (
-                      <div key={reminder.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <h4 className="font-medium">{reminder.plantName}</h4>
-                          <p className="text-sm text-gray-600">{reminder.action}</p>
-                        </div>
-                        <Badge variant={reminder.priority === 'high' ? 'destructive' : reminder.priority === 'medium' ? 'default' : 'secondary'}>
-                          {reminder.priority}
+                  {premiumFeatures?.systemStatus ? (
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Devices Online</span>
+                        <Badge variant="secondary">
+                          {premiumFeatures.systemStatus.devicesOnline}/{premiumFeatures.systemStatus.totalDevices}
                         </Badge>
                       </div>
-                    ))}
-                  </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Data Freshness</span>
+                        <Badge variant={premiumFeatures.systemStatus.dataFreshness === 'real-time' ? 'default' : 'secondary'}>
+                          {premiumFeatures.systemStatus.dataFreshness}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Active Alerts</span>
+                        <Badge variant={premiumFeatures.systemStatus.alertsActive > 0 ? 'destructive' : 'secondary'}>
+                          {premiumFeatures.systemStatus.alertsActive}
+                        </Badge>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">Loading system status...</p>
+                  )}
                 </CardContent>
               </Card>
 
-              {/* Species Distribution */}
+              {/* Latest Analytics */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="h-5 w-5 text-emerald-600" />
-                    Species Distribution
+                    Sustainability Score
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {gardenData.analytics.advancedMetrics.speciesDistribution.map((species) => (
-                      <div key={species.family} className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{species.family}</span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-20 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-emerald-500 h-2 rounded-full"
-                              style={{ width: `${species.percentage}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-sm text-gray-600">{species.count}</span>
+                  {premiumFeatures?.latestAnalytics ? (
+                    <div className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-emerald-600">
+                          {Math.round(premiumFeatures.latestAnalytics.sustainabilityScore)}
+                        </div>
+                        <p className="text-sm text-gray-600">Sustainability Score</p>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Carbon Footprint</span>
+                          <span className="text-green-600">
+                            {premiumFeatures.latestAnalytics.carbonFootprint?.co2Absorbed}kg CO₂
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Biodiversity Index</span>
+                          <span className="text-blue-600">
+                            {Math.round(premiumFeatures.latestAnalytics.biodiversityIndex)}
+                          </span>
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">Loading analytics...</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Quick Actions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Plus className="h-5 w-5 text-emerald-600" />
+                    Quick Actions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <Button className="w-full justify-start" variant="outline" size="sm">
+                      <Sprout className="h-4 w-4 mr-2" />
+                      Add Microclimate Zone
+                    </Button>
+                    <Button className="w-full justify-start" variant="outline" size="sm">
+                      <Brain className="h-4 w-4 mr-2" />
+                      AI Plant Analysis
+                    </Button>
+                    <Button className="w-full justify-start" variant="outline" size="sm">
+                      <Users className="h-4 w-4 mr-2" />
+                      Connect Plants
+                    </Button>
+                    <Button className="w-full justify-start" variant="outline" size="sm">
+                      <Camera className="h-4 w-4 mr-2" />
+                      Share Progress
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
             </div>
+
+            {/* AI Insights */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-emerald-600" />
+                  Latest AI Insights
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {premiumFeatures?.aiInsights ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {premiumFeatures.aiInsights.slice(0, 4).map((insight: any, index: number) => (
+                      <div key={index} className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-semibold text-sm">{insight.title}</h4>
+                          <Badge variant={insight.urgencyLevel === 'high' ? 'destructive' : insight.urgencyLevel === 'medium' ? 'default' : 'secondary'}>
+                            {insight.urgencyLevel}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">{insight.description}</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500">
+                            Confidence: {Math.round(insight.confidence)}%
+                          </span>
+                          <Badge variant="outline" className="text-xs">
+                            {insight.insightType}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">Loading AI insights...</p>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Weather Tab */}
@@ -580,116 +671,348 @@ export function PremiumGardenDashboard() {
             </div>
           </TabsContent>
 
-          {/* AI Plant Doctor Tab - NEW PREMIUM FEATURE */}
-          <TabsContent value="ai-doctor" className="space-y-6">
-            <Card className="border-2 border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-50">
+          {/* Microclimate Zones Tab */}
+          <TabsContent value="microclimate" className="space-y-6">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-emerald-800">
-                  <Brain className="h-6 w-6" />
-                  AI Plant Doctor - Premium Feature
+                <CardTitle className="flex items-center gap-2">
+                  <Sprout className="h-5 w-5 text-emerald-600" />
+                  Microclimate Zones Management
                 </CardTitle>
-                <p className="text-emerald-700">Advanced AI-powered plant health diagnostics and treatment recommendations</p>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-lg">Upload Plant Photo</h3>
-                    <div className="border-2 border-dashed border-emerald-300 rounded-lg p-8 text-center">
-                      <Camera className="h-12 w-12 text-emerald-500 mx-auto mb-4" />
-                      <p className="text-gray-600 mb-4">Drag & drop or click to upload</p>
-                      <Button variant="outline" className="border-emerald-500 text-emerald-700">
-                        Select Photo
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-lg">Recent AI Diagnoses</h3>
-                    <div className="space-y-3">
-                      <div className="bg-white p-4 rounded-lg border">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">Rose Bush</span>
-                          <Badge variant="destructive">Disease Detected</Badge>
+                {premiumFeatures?.microclimatezones ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {premiumFeatures.microclimatezones.map((zone: any) => (
+                      <div key={zone.id} className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                        <h4 className="font-semibold text-lg text-green-800">{zone.name}</h4>
+                        <p className="text-sm text-gray-600 mb-3">{zone.description}</p>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div>
+                            <span className="text-gray-500">Soil Type:</span>
+                            <span className="ml-2 font-medium">{zone.soilType || 'Not set'}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Sunlight:</span>
+                            <span className="ml-2 font-medium">{zone.sunlightHours || 'N/A'} hrs</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Moisture:</span>
+                            <span className="ml-2 font-medium">{zone.moistureLevel || 'Not set'}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Plants:</span>
+                            <span className="ml-2 font-medium">{zone.plantSpecies?.length || 0}</span>
+                          </div>
                         </div>
-                        <p className="text-sm text-gray-600 mt-1">Black Spot Fungus - Treatment needed</p>
                       </div>
-                      <div className="bg-white p-4 rounded-lg border">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">Fiddle Leaf Fig</span>
-                          <Badge variant="default">Healthy</Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">Optimal conditions - Continue current care</p>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Sprout className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500 mb-4">No microclimate zones created yet</p>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Your First Zone
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Smart Care Automation Tab - NEW PREMIUM FEATURE */}
-          <TabsContent value="automation" className="space-y-6">
-            <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50">
+          {/* AI Intelligence Tab */}
+          <TabsContent value="ai-insights" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-emerald-600" />
+                    Predictive Analytics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {premiumFeatures?.aiInsights ? (
+                    <div className="space-y-4">
+                      {premiumFeatures.aiInsights.slice(0, 3).map((insight: any, index: number) => (
+                        <div key={index} className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                          <div className="flex justify-between items-start mb-2">
+                            <h4 className="font-semibold">{insight.title}</h4>
+                            <Badge variant={insight.urgencyLevel === 'critical' ? 'destructive' : 'default'}>
+                              {insight.urgencyLevel}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-2">{insight.description}</p>
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="text-gray-500">Confidence: {Math.round(insight.confidence)}%</span>
+                            <span className="text-gray-500">{insight.insightType}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">Loading AI insights...</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-emerald-600" />
+                    Health Predictions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-green-50 rounded-lg">
+                      <h4 className="font-semibold text-green-800">Overall Garden Health</h4>
+                      <div className="mt-2">
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Predicted Health Score</span>
+                          <span className="font-bold">87%</span>
+                        </div>
+                        <Progress value={87} className="h-2" />
+                      </div>
+                      <p className="text-xs text-green-600 mt-2">Trending upward ↗</p>
+                    </div>
+                    <div className="p-4 bg-yellow-50 rounded-lg">
+                      <h4 className="font-semibold text-yellow-800">Care Recommendations</h4>
+                      <ul className="text-sm text-yellow-700 mt-2 space-y-1">
+                        <li>• Increase watering frequency by 15%</li>
+                        <li>• Monitor for pest activity in Zone 2</li>
+                        <li>• Consider fertilization in 2 weeks</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Plant Social Network Tab */}
+          <TabsContent value="social" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-emerald-600" />
+                    Companion Plant Network
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-400">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-semibold">Tomatoes ↔ Basil</h4>
+                        <Badge variant="default">Beneficial</Badge>
+                      </div>
+                      <p className="text-sm text-gray-600">Basil repels pests and improves tomato flavor</p>
+                      <div className="flex justify-between items-center mt-2 text-xs">
+                        <span className="text-gray-500">Distance: 12-18 inches</span>
+                        <span className="text-yellow-500">★★★★★ Community Verified</span>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-semibold">Roses ↔ Lavender</h4>
+                        <Badge variant="default">Beneficial</Badge>
+                      </div>
+                      <p className="text-sm text-gray-600">Lavender deters aphids and attracts beneficial insects</p>
+                      <div className="flex justify-between items-center mt-2 text-xs">
+                        <span className="text-gray-500">Distance: 2-3 feet</span>
+                        <span className="text-yellow-500">★★★★☆ Community Verified</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Share className="h-5 w-5 text-emerald-600" />
+                    Community Sharing
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <Button className="w-full">
+                      <Camera className="h-4 w-4 mr-2" />
+                      Share Garden Progress
+                    </Button>
+                    <Button variant="outline" className="w-full">
+                      <Users className="h-4 w-4 mr-2" />
+                      Join Plant Exchange
+                    </Button>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-semibold mb-2">Recent Community Activity</h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>Garden photos shared</span>
+                          <span className="font-medium">247</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Tips exchanged</span>
+                          <span className="font-medium">89</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Plant connections made</span>
+                          <span className="font-medium">156</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Smart Garden IoT Tab */}
+          <TabsContent value="iot" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-emerald-600" />
+                    Connected Devices
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {premiumFeatures?.iotDevices ? (
+                    <div className="space-y-3">
+                      {premiumFeatures.iotDevices.map((device: any) => (
+                        <div key={device.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div>
+                            <h4 className="font-medium">{device.deviceName}</h4>
+                            <p className="text-sm text-gray-600">{device.deviceType}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${device.isOnline ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                            <span className="text-xs">{device.isOnline ? 'Online' : 'Offline'}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">No devices connected</p>
+                      <Button size="sm" className="mt-2">Add Device</Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Droplets className="h-5 w-5 text-blue-600" />
+                    Real-time Sensors
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Soil Moisture</span>
+                      <div className="flex items-center gap-2">
+                        <Progress value={78} className="w-16 h-2" />
+                        <span className="text-sm font-medium">78%</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Temperature</span>
+                      <span className="text-sm font-medium">72°F</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Light Level</span>
+                      <div className="flex items-center gap-2">
+                        <Progress value={92} className="w-16 h-2" />
+                        <span className="text-sm font-medium">92%</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">pH Level</span>
+                      <span className="text-sm font-medium">6.8</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="h-5 w-5 text-emerald-600" />
+                    Automation Rules
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
+                      <h4 className="font-medium text-green-800">Auto-Watering</h4>
+                      <p className="text-sm text-green-600">Moisture &lt; 40% → Water 30 seconds</p>
+                      <Badge variant="outline" className="text-xs mt-1">Active</Badge>
+                    </div>
+                    <div className="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                      <h4 className="font-medium text-blue-800">Light Adjustment</h4>
+                      <p className="text-sm text-blue-600">Light &lt; 50% → LED ON</p>
+                      <Badge variant="outline" className="text-xs mt-1">Active</Badge>
+                    </div>
+                    <Button size="sm" variant="outline" className="w-full">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Rule
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Analytics Dashboard */}
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-800">
-                  <Zap className="h-6 w-6" />
-                  Smart Care Automation - Premium Feature
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-emerald-600" />
+                  Garden Analytics Dashboard
                 </CardTitle>
-                <p className="text-blue-700">Automated care schedules and IoT integration for your garden</p>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-lg">Active Automations</h3>
-                    <div className="space-y-3">
-                      <div className="bg-white p-4 rounded-lg border border-green-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                            <span className="font-medium">Auto Watering</span>
-                          </div>
-                          <Badge variant="default">Active</Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">Next: Tomorrow 7:00 AM</p>
+                {premiumFeatures?.latestAnalytics && (
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-green-800">Water Efficiency</h4>
+                      <div className="text-2xl font-bold text-green-600 mt-2">
+                        {premiumFeatures.latestAnalytics.waterUsage?.efficiency || 85}%
                       </div>
-                      <div className="bg-white p-4 rounded-lg border border-orange-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                            <span className="font-medium">Light Schedule</span>
-                          </div>
-                          <Badge variant="secondary">Paused</Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">Summer schedule paused</p>
+                      <p className="text-sm text-green-600">Daily: {premiumFeatures.latestAnalytics.waterUsage?.daily || 0} gal</p>
+                    </div>
+                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-blue-800">Carbon Impact</h4>
+                      <div className="text-2xl font-bold text-blue-600 mt-2">
+                        {premiumFeatures.latestAnalytics.carbonFootprint?.co2Absorbed || 0}kg
                       </div>
+                      <p className="text-sm text-blue-600">CO₂ Absorbed Monthly</p>
+                    </div>
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-purple-800">ROI Analysis</h4>
+                      <div className="text-2xl font-bold text-purple-600 mt-2">
+                        {premiumFeatures.latestAnalytics.costBenefitAnalysis?.roi || 180}%
+                      </div>
+                      <p className="text-sm text-purple-600">Return on Investment</p>
+                    </div>
+                    <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-orange-800">Yield Projection</h4>
+                      <div className="text-2xl font-bold text-orange-600 mt-2">
+                        ${premiumFeatures.latestAnalytics.yieldAnalysis?.marketValue || 0}
+                      </div>
+                      <p className="text-sm text-orange-600">Monthly Market Value</p>
                     </div>
                   </div>
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-lg">Smart Devices</h3>
-                    <div className="space-y-3">
-                      <div className="bg-white p-4 rounded-lg border">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">Smart Irrigation System</span>
-                          <Badge variant="default">Online</Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">Zone 1-3 connected</p>
-                      </div>
-                      <div className="bg-white p-4 rounded-lg border">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">Soil Moisture Sensors</span>
-                          <Badge variant="default">Online</Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">5 sensors active</p>
-                      </div>
-                      <Button className="w-full" variant="outline">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Device
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
+
         </Tabs>
       </div>
     </div>

@@ -2309,6 +2309,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register dashboard features routes
   app.use('/', dashboardFeaturesRoutes);
 
+  // Premium dashboard endpoint - integrates with frontend
+  app.get("/api/premium/dashboard-data", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      
+      // Check if user has premium subscription
+      const subscription = await storage.getUserSubscription(userId);
+      if (!subscription) {
+        return res.status(403).json({ 
+          message: "Premium subscription required",
+          premiumRequired: true 
+        });
+      }
+
+      // Get comprehensive premium dashboard data using the service
+      const premiumService = require('./services/premiumFeaturesService');
+      
+      const [
+        microclimatezones,
+        aiInsights,
+        iotDevices,
+        latestAnalytics,
+        systemStatus
+      ] = await Promise.all([
+        premiumService.getMicroclimatezones(userId),
+        premiumService.getAIInsights(userId),
+        premiumService.getIoTDevices(userId),
+        premiumService.getLatestAnalytics(userId),
+        premiumService.getSystemStatus(userId)
+      ]);
+
+      res.json({
+        microclimatezones,
+        aiInsights,
+        iotDevices,
+        latestAnalytics,
+        systemStatus
+      });
+    } catch (error) {
+      console.error("Error fetching premium dashboard data:", error);
+      res.status(500).json({ message: "Failed to fetch premium dashboard data" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
