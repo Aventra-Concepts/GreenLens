@@ -48,11 +48,18 @@ interface AdminGardenUser {
   profileImageUrl?: string;
   createdAt: string;
   subscriptionStatus?: string;
+  subscriptionPlan?: string;
+  subscriptionPlanId?: string;
   totalPlants: number;
   totalIdentifications: number;
   lastActive: string;
   gardenLevel: number;
   experiencePoints: number;
+  premium?: boolean;
+  plantsThisMonth?: number;
+  healthyPlants?: number;
+  plantsNeedingCare?: number;
+  achievements?: string[];
 }
 
 interface PlantData {
