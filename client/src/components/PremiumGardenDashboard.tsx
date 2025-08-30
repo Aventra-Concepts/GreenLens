@@ -15,7 +15,7 @@ import {
   Leaf, Heart, Trophy, Zap, TrendingUp, Star, Crown, Sparkles,
   Settings, Share, Sun, Droplets, Wind, Calendar, Bell, BarChart3,
   Activity, CheckCircle, AlertTriangle, Brain, Clock, Info,
-  Search, Filter, Sprout, Flower, Award, Users, Plus, BookOpen
+  Search, Filter, Sprout, Flower, Award, Users, Plus, BookOpen, Camera
 } from 'lucide-react';
 
 // Enhanced PremiumGardenData interface
@@ -278,14 +278,16 @@ export function PremiumGardenDashboard() {
           </Card>
         </div>
 
-        {/* Premium Tabs */}
+        {/* Premium Tabs - Enhanced with New Features */}
         <Tabs value={selectedView} onValueChange={setSelectedView} className="mb-8">
-          <TabsList className="grid w-full grid-cols-5 bg-white/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-7 bg-white/50 backdrop-blur-sm">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="weather">Weather</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="consultations">Experts</TabsTrigger>
             <TabsTrigger value="tips">Pro Tips</TabsTrigger>
+            <TabsTrigger value="ai-doctor">AI Doctor</TabsTrigger>
+            <TabsTrigger value="automation">Smart Care</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -576,6 +578,117 @@ export function PremiumGardenDashboard() {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          {/* AI Plant Doctor Tab - NEW PREMIUM FEATURE */}
+          <TabsContent value="ai-doctor" className="space-y-6">
+            <Card className="border-2 border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-emerald-800">
+                  <Brain className="h-6 w-6" />
+                  AI Plant Doctor - Premium Feature
+                </CardTitle>
+                <p className="text-emerald-700">Advanced AI-powered plant health diagnostics and treatment recommendations</p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-lg">Upload Plant Photo</h3>
+                    <div className="border-2 border-dashed border-emerald-300 rounded-lg p-8 text-center">
+                      <Camera className="h-12 w-12 text-emerald-500 mx-auto mb-4" />
+                      <p className="text-gray-600 mb-4">Drag & drop or click to upload</p>
+                      <Button variant="outline" className="border-emerald-500 text-emerald-700">
+                        Select Photo
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-lg">Recent AI Diagnoses</h3>
+                    <div className="space-y-3">
+                      <div className="bg-white p-4 rounded-lg border">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">Rose Bush</span>
+                          <Badge variant="destructive">Disease Detected</Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">Black Spot Fungus - Treatment needed</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg border">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">Fiddle Leaf Fig</span>
+                          <Badge variant="default">Healthy</Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">Optimal conditions - Continue current care</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Smart Care Automation Tab - NEW PREMIUM FEATURE */}
+          <TabsContent value="automation" className="space-y-6">
+            <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-blue-800">
+                  <Zap className="h-6 w-6" />
+                  Smart Care Automation - Premium Feature
+                </CardTitle>
+                <p className="text-blue-700">Automated care schedules and IoT integration for your garden</p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-lg">Active Automations</h3>
+                    <div className="space-y-3">
+                      <div className="bg-white p-4 rounded-lg border border-green-200">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span className="font-medium">Auto Watering</span>
+                          </div>
+                          <Badge variant="default">Active</Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">Next: Tomorrow 7:00 AM</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg border border-orange-200">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                            <span className="font-medium">Light Schedule</span>
+                          </div>
+                          <Badge variant="secondary">Paused</Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">Summer schedule paused</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-lg">Smart Devices</h3>
+                    <div className="space-y-3">
+                      <div className="bg-white p-4 rounded-lg border">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">Smart Irrigation System</span>
+                          <Badge variant="default">Online</Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">Zone 1-3 connected</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg border">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">Soil Moisture Sensors</span>
+                          <Badge variant="default">Online</Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">5 sensors active</p>
+                      </div>
+                      <Button className="w-full" variant="outline">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Device
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
