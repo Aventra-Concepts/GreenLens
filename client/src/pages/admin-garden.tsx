@@ -72,9 +72,9 @@ interface PlantData {
 }
 
 interface GardenAnalytics {
-  totalUsers: number;
-  totalPlants: number;
-  premiumUsers: number;
+  totalUsers: string;
+  totalPlants: string;
+  premiumUsers: string;
   monthlyGrowth: string;
 }
 
@@ -152,6 +152,7 @@ export default function AdminGardenPage() {
   console.log('Filtered users:', filteredUsers.length);
   console.log('Filter by:', filterBy);
   console.log('Search term:', searchTerm);
+  console.log('Garden analytics data:', gardenAnalytics);
 
   if (usersLoading || analyticsLoading) {
     return (
@@ -208,7 +209,7 @@ export default function AdminGardenPage() {
             <CardContent>
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-blue-600" />
-                <span className="text-2xl font-bold">{gardenAnalytics?.totalUsers || 0}</span>
+                <span className="text-2xl font-bold">{gardenAnalytics?.totalUsers || '0'}</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">Active garden users</p>
             </CardContent>
@@ -221,7 +222,7 @@ export default function AdminGardenPage() {
             <CardContent>
               <div className="flex items-center gap-2">
                 <Leaf className="h-5 w-5 text-green-600" />
-                <span className="text-2xl font-bold">{gardenAnalytics?.totalPlants || 0}</span>
+                <span className="text-2xl font-bold">{gardenAnalytics?.totalPlants || '0'}</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">Identified plants</p>
             </CardContent>
@@ -234,7 +235,7 @@ export default function AdminGardenPage() {
             <CardContent>
               <div className="flex items-center gap-2">
                 <Trophy className="h-5 w-5 text-yellow-600" />
-                <span className="text-2xl font-bold">{gardenAnalytics?.premiumUsers || 0}</span>
+                <span className="text-2xl font-bold">{gardenAnalytics?.premiumUsers || '0'}</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">Active subscriptions</p>
             </CardContent>

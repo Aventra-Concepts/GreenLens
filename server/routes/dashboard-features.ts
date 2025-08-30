@@ -516,12 +516,17 @@ router.get('/api/admin/garden-analytics', async (req: any, res) => {
       .from(users)
       .where(sql`EXTRACT(MONTH FROM ${users.createdAt}) = ${currentMonth}`);
 
+    const totalUsersCount = (totalUsersResult?.count || 0) + 4;
+    const premiumUsersCount = (premiumUsersResult?.count || 0) + 4;
+    
     const analytics = {
-      totalUsers: ((totalUsersResult?.count || 0) + 4).toString(), // Include 4 demo premium users
+      totalUsers: totalUsersCount.toString(),
       totalPlants: (totalPlantsResult?.count || 0).toString(),
-      premiumUsers: ((premiumUsersResult?.count || 0) + 4).toString(), // Include 4 demo premium users  
+      premiumUsers: premiumUsersCount.toString(),
       monthlyGrowth: `${Math.round((monthlyGrowthResult?.count || 0) / (totalUsersResult?.count || 1) * 100)}%`
     };
+    
+    console.log('Analytics response:', analytics);
 
     res.json(analytics);
   } catch (error) {
