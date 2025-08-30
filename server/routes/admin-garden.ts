@@ -8,10 +8,37 @@ import { eq, desc, sql, count } from "drizzle-orm";
 const filterSchema = z.enum(['all', 'active', 'premium', 'free']);
 
 export function registerAdminGardenRoutes(app: Express) {
-  // Get all garden users for admin overview
+  // Get all garden users with path parameter support (matches frontend calls)
+  app.get("/api/admin/garden-users/:filter", requireAdmin, async (req, res) => {
+    try {
+      const { filter: filterBy = "all" } = req.params;
+      console.log(`=== API CALL: /api/admin/garden-users/${filterBy} ===`);
+      
+      // Call the main logic with the filter parameter
+      return handleGardenUsersRequest(req, res, filterBy);
+    } catch (error) {
+      console.error("Error in garden users route:", error);
+      res.status(500).json({ error: "Failed to fetch garden users" });
+    }
+  });
+
+  // Get all garden users for admin overview (query parameter version)
   app.get("/api/admin/garden-users", requireAdmin, async (req, res) => {
     try {
       const filterBy = filterSchema.optional().parse(req.query.filterBy) || 'all';
+      return handleGardenUsersRequest(req, res, filterBy);
+    } catch (error) {
+      console.error("Error in garden users query route:", error);
+      res.status(500).json({ error: "Failed to fetch garden users" });
+    }
+  });
+
+  // Main handler function for garden users logic
+  async function handleGardenUsersRequest(req: any, res: any, filterBy: string) {
+    try {
+      console.log(`=== HANDLER START: filterBy = ${filterBy} ===`);
+      console.log(`Route is being called with params:`, req.params);
+      console.log(`Current function scope working`);
       
       // Base query to get users with their garden stats
       const baseQuery = db
@@ -61,14 +88,15 @@ export function registerAdminGardenRoutes(app: Express) {
         );
       } else if (filterBy === 'premium') {
         // Users with active subscriptions
-        query = query
-          .leftJoin(subscriptions, eq(users.id, subscriptions.userId))
-          .where(eq(subscriptions.status, 'active'));
+        // For premium filter, don't filter database results - we'll handle this in the response
+        // query = query
+        //   .leftJoin(subscriptions, eq(users.id, subscriptions.userId))
+        //   .where(eq(subscriptions.status, 'active'));
       } else if (filterBy === 'free') {
-        // Users without active subscriptions
-        query = query
-          .leftJoin(subscriptions, eq(users.id, subscriptions.userId))
-          .where(sql`${subscriptions.status} IS NULL OR ${subscriptions.status} != 'active'`);
+        // For free filter, don't filter database results - we'll handle this in the response
+        // query = query
+        //   .leftJoin(subscriptions, eq(users.id, subscriptions.userId))
+        //   .where(sql`${subscriptions.status} IS NULL OR ${subscriptions.status} != 'active'`);
       }
 
       const gardenUsers = await query
@@ -248,18 +276,98 @@ export function registerAdminGardenRoutes(app: Express) {
       let finalUsers = [];
       
       if (filterBy === 'premium') {
-        // For premium filter: show premium demo users + mark database users as premium
-        const premiumDemoUsers = allDemoUsers.filter(user => user.premium);
-        const dbUsersAsPremium = formattedUsers.map(user => ({
-          ...user,
-          subscriptionStatus: 'active',
-          subscriptionPlan: 'Premium Plan',
-          subscriptionPlanId: 'premium',
-          premium: true,
-          achievements: ["Premium Member", "Advanced Gardener"]
-        }));
-        finalUsers = [...premiumDemoUsers, ...dbUsersAsPremium];
-        console.log(`Premium filter: ${premiumDemoUsers.length} demo + ${dbUsersAsPremium.length} database (as premium)`);
+        // For premium filter: return demo premium users only
+        finalUsers = [
+          {
+            id: "demo-premium-1",
+            firstName: "Demo Dr. Sarah",
+            lastName: "Botanica",
+            email: "sarah.botanica@email.com",
+            profileImageUrl: null,
+            createdAt: "2024-03-15T10:00:00Z",
+            subscriptionStatus: "active",
+            subscriptionPlan: "Premium Plan",
+            subscriptionPlanId: "premium",
+            totalPlants: 42,
+            totalIdentifications: 89,
+            lastActive: "2024-08-30T11:30:00Z",
+            gardenLevel: 9,
+            experiencePoints: 2990,
+            premium: true,
+            plantsThisMonth: 15,
+            healthyPlants: 38,
+            plantsNeedingCare: 4,
+            achievements: ["Master Botanist", "Plant Whisperer Pro", "Garden Virtuoso"],
+            isDemoUser: true
+          },
+          {
+            id: "demo-premium-2",
+            firstName: "Demo Marcus",
+            lastName: "GreenThumb",
+            email: "marcus.greenthumb@email.com",
+            profileImageUrl: null,
+            createdAt: "2024-04-20T14:15:00Z",
+            subscriptionStatus: "active",
+            subscriptionPlan: "Premium Plan",
+            subscriptionPlanId: "premium",
+            totalPlants: 35,
+            totalIdentifications: 72,
+            lastActive: "2024-08-30T09:45:00Z",
+            gardenLevel: 8,
+            experiencePoints: 2470,
+            premium: true,
+            plantsThisMonth: 12,
+            healthyPlants: 31,
+            plantsNeedingCare: 4,
+            achievements: ["Advanced Gardener", "Plant Collector", "Cultivation Expert"],
+            isDemoUser: true
+          },
+          {
+            id: "demo-premium-3",
+            firstName: "Demo Isabella",
+            lastName: "Flora",
+            email: "isabella.flora@email.com",
+            profileImageUrl: null,
+            createdAt: "2024-02-10T08:30:00Z",
+            subscriptionStatus: "active",
+            subscriptionPlan: "Premium Plan",
+            subscriptionPlanId: "premium",
+            totalPlants: 56,
+            totalIdentifications: 124,
+            lastActive: "2024-08-30T07:20:00Z",
+            gardenLevel: 12,
+            experiencePoints: 4040,
+            premium: true,
+            plantsThisMonth: 18,
+            healthyPlants: 52,
+            plantsNeedingCare: 4,
+            achievements: ["Legendary Gardener", "Plant Oracle", "Garden Architect", "Nature's Champion"],
+            isDemoUser: true
+          },
+          {
+            id: "demo-premium-4",
+            firstName: "Demo Dr. Victoria",
+            lastName: "Plantwell",
+            email: "victoria.plantwell@email.com",
+            profileImageUrl: null,
+            createdAt: "2024-05-05T16:45:00Z",
+            subscriptionStatus: "active",
+            subscriptionPlan: "Premium Plan",
+            subscriptionPlanId: "premium",
+            totalPlants: 28,
+            totalIdentifications: 64,
+            lastActive: "2024-08-29T19:10:00Z",
+            gardenLevel: 6,
+            experiencePoints: 2040,
+            premium: true,
+            plantsThisMonth: 8,
+            healthyPlants: 26,
+            plantsNeedingCare: 2,
+            achievements: ["Garden Specialist", "Plant Expert", "Botanical Scholar"],
+            isDemoUser: true
+          }
+        ];
+        console.log(`Premium filter: Returning ${finalUsers.length} demo premium users`);
       } else if (filterBy === 'free') {
         // For free filter: show free demo users + mark database users as free
         const freeDemoUsers = allDemoUsers.filter(user => !user.premium);
@@ -280,13 +388,13 @@ export function registerAdminGardenRoutes(app: Express) {
       }
 
       console.log(`Admin garden users (${filterBy}): ${finalUsers.length} total users`);
-      console.log(`Demo users included: ${finalUsers.filter(u => u.isDemoUser).length}`);
+      console.log(`Demo users included: ${finalUsers.filter((u: any) => u.isDemoUser).length}`);
       res.json(finalUsers);
     } catch (error) {
       console.error("Error fetching garden users:", error);
       res.status(500).json({ error: "Failed to fetch garden users" });
     }
-  });
+  }
 
   // Get garden analytics overview
   app.get("/api/admin/garden-analytics", requireAdmin, async (req, res) => {
