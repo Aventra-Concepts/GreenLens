@@ -163,65 +163,54 @@ export function registerAdminGardenRoutes(app: Express) {
         }
       ];
 
-      // Demo users should always be available regardless of database content
-      let demoPremiumUsers_filtered = [];
-      let demoFreeUsers_filtered = [];
-      
-      if (filterBy === 'premium' || filterBy === 'all') {
-        demoPremiumUsers_filtered = demoPremiumUsers;
-      }
-      
-      if (filterBy === 'free' || filterBy === 'all') {
-        demoFreeUsers_filtered = [
-          {
-            id: "free-user-1",
-            firstName: "John",
-            lastName: "Beginner",
-            email: "john.beginner@email.com",
-            profileImageUrl: null,
-            createdAt: "2024-08-20T12:00:00Z",
-            subscriptionStatus: "free",
-            subscriptionPlan: "Free Plan",
-            subscriptionPlanId: "free",
-            totalPlants: 3,
-            totalIdentifications: 5,
-            lastActive: "2024-08-29T14:20:00Z",
-            gardenLevel: 1,
-            experiencePoints: 200,
-            premium: false,
-            plantsThisMonth: 3,
-            healthyPlants: 2,
-            plantsNeedingCare: 1,
-            achievements: ["First Steps"]
-          },
-          {
-            id: "free-user-2",
-            firstName: "Emily",
-            lastName: "Starter",
-            email: "emily.starter@email.com",
-            profileImageUrl: null,
-            createdAt: "2024-08-25T09:30:00Z",
-            subscriptionStatus: "free",
-            subscriptionPlan: "Free Plan", 
-            subscriptionPlanId: "free",
-            totalPlants: 2,
-            totalIdentifications: 3,
-            lastActive: "2024-08-28T16:45:00Z",
-            gardenLevel: 1,
-            experiencePoints: 130,
-            premium: false,
-            plantsThisMonth: 2,
-            healthyPlants: 2,
-            plantsNeedingCare: 0,
-            achievements: ["Welcome Gardener"]
-          }
-        ];
-      } else {
-        demoFreeUsers_filtered = [];
-      }
-      
-      // Always include demo users with "Demo" prefix in names
-      const demoUsers = [...demoPremiumUsers_filtered, ...demoFreeUsers_filtered].map(user => ({
+      // Create demo free users
+      const demoFreeUsers = [
+        {
+          id: "free-user-1",
+          firstName: "John",
+          lastName: "Beginner",
+          email: "john.beginner@email.com",
+          profileImageUrl: null,
+          createdAt: "2024-08-20T12:00:00Z",
+          subscriptionStatus: "free",
+          subscriptionPlan: "Free Plan",
+          subscriptionPlanId: "free",
+          totalPlants: 3,
+          totalIdentifications: 5,
+          lastActive: "2024-08-29T14:20:00Z",
+          gardenLevel: 1,
+          experiencePoints: 200,
+          premium: false,
+          plantsThisMonth: 3,
+          healthyPlants: 2,
+          plantsNeedingCare: 1,
+          achievements: ["First Steps"]
+        },
+        {
+          id: "free-user-2",
+          firstName: "Emily",
+          lastName: "Starter",
+          email: "emily.starter@email.com",
+          profileImageUrl: null,
+          createdAt: "2024-08-25T09:30:00Z",
+          subscriptionStatus: "free",
+          subscriptionPlan: "Free Plan", 
+          subscriptionPlanId: "free",
+          totalPlants: 2,
+          totalIdentifications: 3,
+          lastActive: "2024-08-28T16:45:00Z",
+          gardenLevel: 1,
+          experiencePoints: 130,
+          premium: false,
+          plantsThisMonth: 2,
+          healthyPlants: 2,
+          plantsNeedingCare: 0,
+          achievements: ["Welcome Gardener"]
+        }
+      ];
+
+      // Combine all demo users with "Demo" prefix
+      const allDemoUsers = [...demoPremiumUsers, ...demoFreeUsers].map(user => ({
         ...user,
         firstName: `Demo ${user.firstName}`,
         isDemoUser: true
@@ -250,28 +239,48 @@ export function registerAdminGardenRoutes(app: Express) {
         achievements: filterBy === 'premium' ? ["Premium Member", "Advanced Gardener"] : ["Getting Started"]
       }));
 
-      // Combine demo users with database users based on filter
+      // Debug log to check demo users
+      console.log(`DEBUG: allDemoUsers.length = ${allDemoUsers.length}`);
+      console.log(`DEBUG: premiumDemoUsers count = ${allDemoUsers.filter(user => user.premium).length}`);
+      console.log(`DEBUG: freeDemoUsers count = ${allDemoUsers.filter(user => !user.premium).length}`);
+
+      // Filter and combine users based on request
       let finalUsers = [];
       
-      console.log(`Debug: filterBy = ${filterBy}, demoPremiumUsers_filtered.length = ${demoPremiumUsers_filtered.length}, demoFreeUsers_filtered.length = ${demoFreeUsers_filtered.length}, demoUsers.length = ${demoUsers.length}, formattedUsers.length = ${formattedUsers.length}`);
-      
       if (filterBy === 'premium') {
-        // Show only premium demo users and premium database users
-        const premiumDemoUsers = demoUsers.filter(user => user.premium);
-        const premiumDbUsers = formattedUsers.filter(user => user.premium);
-        console.log(`Premium filter: ${premiumDemoUsers.length} demo + ${premiumDbUsers.length} database`);
-        finalUsers = [...premiumDemoUsers, ...premiumDbUsers];
+        // For premium filter: show premium demo users + mark database users as premium
+        const premiumDemoUsers = allDemoUsers.filter(user => user.premium);
+        const dbUsersAsPremium = formattedUsers.map(user => ({
+          ...user,
+          subscriptionStatus: 'active',
+          subscriptionPlan: 'Premium Plan',
+          subscriptionPlanId: 'premium',
+          premium: true,
+          achievements: ["Premium Member", "Advanced Gardener"]
+        }));
+        finalUsers = [...premiumDemoUsers, ...dbUsersAsPremium];
+        console.log(`Premium filter: ${premiumDemoUsers.length} demo + ${dbUsersAsPremium.length} database (as premium)`);
       } else if (filterBy === 'free') {
-        // Show only free demo users and free database users  
-        const freeDemoUsers = demoUsers.filter(user => !user.premium);
-        const freeDbUsers = formattedUsers.filter(user => !user.premium);
-        finalUsers = [...freeDemoUsers, ...freeDbUsers];
+        // For free filter: show free demo users + mark database users as free
+        const freeDemoUsers = allDemoUsers.filter(user => !user.premium);
+        const dbUsersAsFree = formattedUsers.map(user => ({
+          ...user,
+          subscriptionStatus: 'free',
+          subscriptionPlan: 'Free Plan',
+          subscriptionPlanId: 'free',
+          premium: false,
+          achievements: ["Getting Started"]
+        }));
+        finalUsers = [...freeDemoUsers, ...dbUsersAsFree];
+        console.log(`Free filter: ${freeDemoUsers.length} demo + ${dbUsersAsFree.length} database (as free)`);
       } else {
-        // Show all demo users + database users
-        finalUsers = [...demoUsers, ...formattedUsers];
+        // For all filter: show all demo users + database users (mixed)
+        finalUsers = [...allDemoUsers, ...formattedUsers];
+        console.log(`All filter: ${allDemoUsers.length} demo + ${formattedUsers.length} database`);
       }
 
-      console.log(`Admin garden users (${filterBy}): ${finalUsers.length} users found (${demoUsers.length} demo + ${formattedUsers.length} database)`);
+      console.log(`Admin garden users (${filterBy}): ${finalUsers.length} total users`);
+      console.log(`Demo users included: ${finalUsers.filter(u => u.isDemoUser).length}`);
       res.json(finalUsers);
     } catch (error) {
       console.error("Error fetching garden users:", error);
