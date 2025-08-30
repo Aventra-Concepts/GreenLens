@@ -410,8 +410,8 @@ export function registerAdminGardenRoutes(app: Express) {
         .from(gardenPlants)
         .where(eq(gardenPlants.isActive, true));
 
-      // Get premium users count (mock for demo)
-      const premiumUsers = Math.floor(userCount.count * 0.15); // Assume 15% are premium
+      // Get premium users count (include demo users)
+      const premiumUsers = 4; // 4 demo premium users
 
       // Calculate monthly growth (mock calculation)
       const monthlyGrowth = '+12%';
@@ -434,6 +434,135 @@ export function registerAdminGardenRoutes(app: Express) {
   app.get("/api/admin/garden-user-data/:userId", requireAdmin, async (req, res) => {
     try {
       const userId = req.params.userId;
+      
+      // Handle demo premium users
+      if (userId.startsWith('demo-premium-')) {
+        const demoUsers = {
+          'demo-premium-1': {
+            id: "demo-premium-1",
+            firstName: "Demo Dr. Sarah",
+            lastName: "Botanica",
+            email: "sarah.botanica@email.com",
+            profileImageUrl: null,
+            createdAt: "2024-03-15T10:00:00Z",
+            subscriptionStatus: "active",
+            subscriptionPlan: "Premium Plan",
+            subscriptionPlanId: "premium",
+            totalPlants: 42,
+            totalIdentifications: 89,
+            lastActive: "2024-08-30T11:30:00Z",
+            gardenLevel: 9,
+            experiencePoints: 2990,
+            premium: true,
+            plantsThisMonth: 15,
+            healthyPlants: 38,
+            plantsNeedingCare: 4,
+            achievements: ["Master Botanist", "Plant Whisperer Pro", "Garden Virtuoso"],
+            plants: [
+              { id: 'demo-plant-1', species: 'Monstera deliciosa', primaryCommonName: 'Swiss Cheese Plant', confidence: '95%', createdAt: '2024-08-25T10:00:00Z', userId: userId },
+              { id: 'demo-plant-2', species: 'Ficus lyrata', primaryCommonName: 'Fiddle Leaf Fig', confidence: '92%', createdAt: '2024-08-20T14:30:00Z', userId: userId },
+              { id: 'demo-plant-3', species: 'Sansevieria trifasciata', primaryCommonName: 'Snake Plant', confidence: '98%', createdAt: '2024-08-15T09:15:00Z', userId: userId }
+            ]
+          },
+          'demo-premium-2': {
+            id: "demo-premium-2",
+            firstName: "Demo Marcus",
+            lastName: "GreenThumb",
+            email: "marcus.greenthumb@email.com",
+            profileImageUrl: null,
+            createdAt: "2024-04-20T14:15:00Z",
+            subscriptionStatus: "active",
+            subscriptionPlan: "Premium Plan", 
+            subscriptionPlanId: "premium",
+            totalPlants: 35,
+            totalIdentifications: 72,
+            lastActive: "2024-08-30T09:45:00Z",
+            gardenLevel: 8,
+            experiencePoints: 2470,
+            premium: true,
+            plantsThisMonth: 12,
+            healthyPlants: 31,
+            plantsNeedingCare: 4,
+            achievements: ["Advanced Gardener", "Plant Collector", "Cultivation Expert"],
+            plants: [
+              { id: 'demo-plant-4', species: 'Pothos aureus', primaryCommonName: 'Golden Pothos', confidence: '89%', createdAt: '2024-08-22T16:20:00Z', userId: userId },
+              { id: 'demo-plant-5', species: 'Spathiphyllum wallisii', primaryCommonName: 'Peace Lily', confidence: '94%', createdAt: '2024-08-18T11:45:00Z', userId: userId }
+            ]
+          },
+          'demo-premium-3': {
+            id: "demo-premium-3",
+            firstName: "Demo Isabella",
+            lastName: "Flora",
+            email: "isabella.flora@email.com", 
+            profileImageUrl: null,
+            createdAt: "2024-02-10T08:30:00Z",
+            subscriptionStatus: "active",
+            subscriptionPlan: "Premium Plan",
+            subscriptionPlanId: "premium", 
+            totalPlants: 56,
+            totalIdentifications: 124,
+            lastActive: "2024-08-30T07:20:00Z",
+            gardenLevel: 12,
+            experiencePoints: 4040,
+            premium: true,
+            plantsThisMonth: 18,
+            healthyPlants: 52,
+            plantsNeedingCare: 4,
+            achievements: ["Legendary Gardener", "Plant Oracle", "Garden Architect", "Nature's Champion"],
+            plants: [
+              { id: 'demo-plant-6', species: 'Alocasia amazonica', primaryCommonName: 'African Mask Plant', confidence: '91%', createdAt: '2024-08-28T13:10:00Z', userId: userId },
+              { id: 'demo-plant-7', species: 'Calathea orbifolia', primaryCommonName: 'Round-Leaf Calathea', confidence: '87%', createdAt: '2024-08-26T15:30:00Z', userId: userId }
+            ]
+          },
+          'demo-premium-4': {
+            id: "demo-premium-4",
+            firstName: "Demo Dr. Victoria", 
+            lastName: "Plantwell",
+            email: "victoria.plantwell@email.com",
+            profileImageUrl: null,
+            createdAt: "2024-05-05T16:45:00Z",
+            subscriptionStatus: "active",
+            subscriptionPlan: "Premium Plan",
+            subscriptionPlanId: "premium",
+            totalPlants: 28,
+            totalIdentifications: 64,
+            lastActive: "2024-08-29T19:10:00Z",
+            gardenLevel: 6,
+            experiencePoints: 2040,
+            premium: true,
+            plantsThisMonth: 8,
+            healthyPlants: 26,
+            plantsNeedingCare: 2,
+            achievements: ["Garden Specialist", "Plant Expert", "Botanical Scholar"],
+            plants: [
+              { id: 'demo-plant-8', species: 'Philodendron hederaceum', primaryCommonName: 'Heartleaf Philodendron', confidence: '96%', createdAt: '2024-08-24T12:00:00Z', userId: userId }
+            ]
+          }
+        };
+        
+        const demoUser = demoUsers[userId as keyof typeof demoUsers];
+        if (demoUser) {
+          return res.json({
+            user: demoUser,
+            plants: demoUser.plants,
+            plantIdentifications: demoUser.plants,
+            totalPlants: demoUser.totalPlants,
+            gardenLevel: demoUser.gardenLevel,
+            experiencePoints: demoUser.experiencePoints,
+            healthPredictions: {
+              overallHealth: 'Excellent',
+              diseaseRisk: 'Low'
+            },
+            achievements: {
+              level: demoUser.gardenLevel,
+              progress: ((demoUser.totalPlants % 5) / 5) * 100,
+              badges: Math.floor(demoUser.totalPlants / 3),
+              goals: Math.floor(demoUser.totalPlants / 2),
+              points: demoUser.experiencePoints
+            }
+          });
+        }
+      }
 
       // Get user details
       const [user] = await db
