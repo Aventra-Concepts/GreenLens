@@ -452,41 +452,39 @@ export default function AdminBlogCreate() {
             /* Preview Mode */
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
-                <Card>
-                  <CardHeader>
-                    <div className="space-y-2">
-                      {formData.categoryId && (
-                        <Badge variant="outline">
-                          {categories.find(c => c.id === formData.categoryId)?.name}
-                        </Badge>
-                      )}
-                      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                        {formData.title || "Untitled Post"}
-                      </h1>
-                      <p className="text-lg text-gray-600 dark:text-gray-300">
-                        {formData.excerpt || "No excerpt provided"}
-                      </p>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {formData.featuredImageUrl && (
-                      <img 
-                        src={formData.featuredImageUrl} 
-                        alt="Featured" 
-                        className="w-full h-64 object-cover rounded-lg mb-6"
-                      />
+                <div className="bg-white dark:bg-gray-800 rounded-lg border p-8">
+                  <div className="space-y-4 mb-8">
+                    {formData.categoryId && (
+                      <Badge variant="outline">
+                        {categories.find(c => c.id === formData.categoryId)?.name}
+                      </Badge>
                     )}
-                    <div className="prose max-w-none">
-                      {formData.content ? (
-                        <div className="whitespace-pre-wrap">
-                          {formData.content}
-                        </div>
-                      ) : (
-                        <p className="text-gray-500 italic">No content provided</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                      {formData.title || "Untitled Post"}
+                    </h1>
+                    <p className="text-lg text-gray-600 dark:text-gray-300">
+                      {formData.excerpt || "No excerpt provided"}
+                    </p>
+                  </div>
+                  
+                  {formData.featuredImageUrl && (
+                    <img 
+                      src={formData.featuredImageUrl} 
+                      alt="Featured" 
+                      className="w-full h-64 object-cover rounded-lg mb-8"
+                    />
+                  )}
+                  
+                  <div className="prose prose-lg max-w-none text-gray-900 dark:text-gray-100">
+                    {formData.content ? (
+                      <div className="whitespace-pre-wrap leading-relaxed">
+                        {formData.content}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 italic">No content provided</p>
+                    )}
+                  </div>
+                </div>
               </div>
               
               <div className="space-y-4">
