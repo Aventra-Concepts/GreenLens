@@ -9,8 +9,35 @@ import {
   insertTaxRecordSchema
 } from "@shared/schema";
 import { z } from "zod";
+import multer from "multer";
 
 const router = Router();
+
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept CSV and Excel files
+    const allowedTypes = [
+      'text/csv',
+      'application/csv',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
+    
+    if (allowedTypes.includes(file.mimetype) || 
+        file.originalname.endsWith('.csv') || 
+        file.originalname.endsWith('.xlsx') || 
+        file.originalname.endsWith('.xls')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only CSV and Excel files are allowed'));
+    }
+  }
+});
 
 // ============================================================================
 // MIDDLEWARE
@@ -603,6 +630,28 @@ router.get("/gateway-charges/comparison", requireAuth, async (req, res) => {
     res.json(comparison);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================================
+// BANK STATEMENT IMPORT
+// ============================================================================
+
+router.post("/import-bank-statement", requireAuth, upload.single('bankStatement'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const result = await financialService.importBankStatement(
+      req.file.buffer,
+      req.file.originalname
+    );
+
+    res.json(result);
+  } catch (error: any) {
+    console.error('Bank statement import error:', error);
+    res.status(500).json({ error: error.message || 'Failed to import bank statement' });
   }
 });
 

@@ -20,6 +20,9 @@ import {
   type InsertTaxRecord
 } from "@shared/schema";
 import { eq, and, between, sql, desc, sum, count } from "drizzle-orm";
+import * as XLSX from 'xlsx';
+import { Readable } from 'stream';
+import csv from 'csv-parser';
 
 export class FinancialService {
   // ============================================================================
@@ -808,6 +811,263 @@ export class FinancialService {
       .orderBy(desc(count()));
 
     return result;
+  }
+
+  // ============================================================================
+  // BANK STATEMENT IMPORT
+  // ============================================================================
+
+  async importBankStatement(fileBuffer: Buffer, fileName: string): Promise<{
+    transactionsCount: number;
+    categorizedCount: number;
+    transactions: FinancialTransaction[];
+  }> {
+    const transactions: any[] = [];
+    let categorizedCount = 0;
+
+    try {
+      // Parse file based on extension
+      if (fileName.endsWith('.csv')) {
+        transactions.push(...await this.parseCSVData(fileBuffer));
+      } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+        transactions.push(...await this.parseExcelData(fileBuffer));
+      } else {
+        throw new Error('Unsupported file format. Please use CSV or Excel files.');
+      }
+
+      // Process and categorize transactions
+      const processedTransactions: FinancialTransaction[] = [];
+      
+      for (const txn of transactions) {
+        const processedTxn = await this.categorizeBankTransaction(txn);
+        
+        // Create transaction in database
+        const createdTxn = await this.createTransaction({
+          description: processedTxn.description,
+          amount: processedTxn.amount.toString(),
+          type: processedTxn.type,
+          transactionDate: processedTxn.date,
+          categoryId: processedTxn.categoryId,
+          currency: 'INR',
+          paymentMethod: 'bank_transfer',
+          tags: processedTxn.tags ? JSON.stringify(processedTxn.tags) : null,
+          notes: `Imported from bank statement: ${fileName}`,
+          isGstApplicable: false,
+          gstRate: null,
+          gstAmount: null,
+          gatewayProvider: null,
+          gatewayCharges: null,
+          exchangeRate: null,
+          foreignAmount: null,
+          foreignCurrency: null,
+          status: 'active'
+        });
+
+        processedTransactions.push(createdTxn);
+        
+        if (processedTxn.categoryId) {
+          categorizedCount++;
+        }
+      }
+
+      return {
+        transactionsCount: processedTransactions.length,
+        categorizedCount,
+        transactions: processedTransactions
+      };
+
+    } catch (error) {
+      console.error('Error importing bank statement:', error);
+      throw error;
+    }
+  }
+
+  private async parseCSVData(fileBuffer: Buffer): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      const results: any[] = [];
+      const stream = Readable.from(fileBuffer.toString());
+      
+      stream
+        .pipe(csv())
+        .on('data', (data) => results.push(data))
+        .on('end', () => resolve(results))
+        .on('error', reject);
+    });
+  }
+
+  private async parseExcelData(fileBuffer: Buffer): Promise<any[]> {
+    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    
+    // Convert to JSON with header row
+    const data = XLSX.utils.sheet_to_json(worksheet, { 
+      header: 1,
+      defval: '',
+      blankrows: false
+    });
+
+    if (data.length < 2) {
+      throw new Error('Excel file must contain at least header row and one data row');
+    }
+
+    // Assume first row is headers
+    const headers = data[0] as string[];
+    const rows = data.slice(1) as any[][];
+
+    return rows.map(row => {
+      const obj: any = {};
+      headers.forEach((header, index) => {
+        obj[header] = row[index] || '';
+      });
+      return obj;
+    });
+  }
+
+  private async categorizeBankTransaction(transaction: any): Promise<{
+    description: string;
+    amount: number;
+    type: 'income' | 'expense';
+    date: string;
+    categoryId?: string;
+    tags?: string[];
+  }> {
+    // Common field mappings for different bank formats
+    const description = transaction.Description || transaction.description || 
+                       transaction.Narration || transaction.narration ||
+                       transaction.Details || transaction.details || 'Bank Transaction';
+    
+    const amount = Math.abs(parseFloat(
+      transaction.Amount || transaction.amount ||
+      transaction.Debit || transaction.debit ||
+      transaction.Credit || transaction.credit || '0'
+    ));
+
+    // Determine if credit (income) or debit (expense)
+    const isCredit = transaction.Credit || transaction.credit || 
+                     (transaction.Type && transaction.Type.toLowerCase().includes('credit')) ||
+                     (transaction.type && transaction.type.toLowerCase().includes('credit')) ||
+                     amount > 0;
+
+    const type: 'income' | 'expense' = isCredit ? 'income' : 'expense';
+
+    // Parse date
+    const dateStr = transaction.Date || transaction.date || 
+                   transaction['Transaction Date'] || transaction['Value Date'] ||
+                   new Date().toISOString().split('T')[0];
+    
+    const date = new Date(dateStr).toISOString().split('T')[0];
+
+    // Auto-categorize based on description
+    const { categoryId, tags } = await this.autoCategorizeTxn(description, type, amount);
+
+    return {
+      description,
+      amount,
+      type,
+      date,
+      categoryId,
+      tags
+    };
+  }
+
+  private async autoCategorizeTxn(description: string, type: 'income' | 'expense', amount: number): Promise<{
+    categoryId?: string;
+    tags?: string[];
+  }> {
+    const desc = description.toLowerCase();
+    const tags: string[] = [];
+
+    // Get existing categories
+    const categories = await this.getCategories(type);
+    const categoryMap = new Map(categories.map(c => [c.name.toLowerCase(), c.id]));
+
+    // Income categorization rules
+    if (type === 'income') {
+      if (desc.includes('salary') || desc.includes('payroll') || desc.includes('wages')) {
+        tags.push('salary', 'employment');
+        return { categoryId: categoryMap.get('salary') || await this.getOrCreateCategory('Salary', 'income'), tags };
+      }
+      
+      if (desc.includes('freelance') || desc.includes('consultant') || desc.includes('professional')) {
+        tags.push('freelance', 'business');
+        return { categoryId: categoryMap.get('business income') || await this.getOrCreateCategory('Business Income', 'income'), tags };
+      }
+      
+      if (desc.includes('interest') || desc.includes('savings')) {
+        tags.push('interest', 'savings');
+        return { categoryId: categoryMap.get('interest income') || await this.getOrCreateCategory('Interest Income', 'income'), tags };
+      }
+      
+      if (desc.includes('rent') || desc.includes('rental')) {
+        tags.push('rental', 'property');
+        return { categoryId: categoryMap.get('rental income') || await this.getOrCreateCategory('Rental Income', 'income'), tags };
+      }
+    }
+
+    // Expense categorization rules
+    if (type === 'expense') {
+      // Tax deductions
+      if (desc.includes('provident fund') || desc.includes('pf') || desc.includes('epf')) {
+        tags.push('pf', '80c', 'tax-deduction');
+        return { categoryId: categoryMap.get('provident fund') || await this.getOrCreateCategory('Provident Fund', 'expense'), tags };
+      }
+      
+      if (desc.includes('insurance') || desc.includes('lic') || desc.includes('health')) {
+        tags.push('insurance', '80d', 'tax-deduction');
+        return { categoryId: categoryMap.get('insurance') || await this.getOrCreateCategory('Insurance', 'expense'), tags };
+      }
+      
+      if (desc.includes('mutual fund') || desc.includes('sip') || desc.includes('elss')) {
+        tags.push('investment', '80c', 'tax-deduction');
+        return { categoryId: categoryMap.get('mutual funds') || await this.getOrCreateCategory('Mutual Funds', 'expense'), tags };
+      }
+      
+      if (desc.includes('education loan') || desc.includes('student loan')) {
+        tags.push('education', '80e', 'tax-deduction');
+        return { categoryId: categoryMap.get('education loan') || await this.getOrCreateCategory('Education Loan', 'expense'), tags };
+      }
+
+      // Business expenses
+      if (desc.includes('office') || desc.includes('supplies') || desc.includes('stationery')) {
+        tags.push('office', 'business');
+        return { categoryId: categoryMap.get('office expenses') || await this.getOrCreateCategory('Office Expenses', 'expense'), tags };
+      }
+      
+      if (desc.includes('travel') || desc.includes('uber') || desc.includes('taxi') || desc.includes('flight')) {
+        tags.push('travel', 'business');
+        return { categoryId: categoryMap.get('travel expenses') || await this.getOrCreateCategory('Travel Expenses', 'expense'), tags };
+      }
+      
+      if (desc.includes('software') || desc.includes('subscription') || desc.includes('saas')) {
+        tags.push('software', 'business');
+        return { categoryId: categoryMap.get('software') || await this.getOrCreateCategory('Software', 'expense'), tags };
+      }
+    }
+
+    return { tags };
+  }
+
+  private async getOrCreateCategory(name: string, type: 'income' | 'expense'): Promise<string> {
+    // Check if category exists
+    const categories = await this.getCategories(type);
+    const existing = categories.find(c => c.name.toLowerCase() === name.toLowerCase());
+    
+    if (existing) {
+      return existing.id;
+    }
+
+    // Create new category
+    const newCategory = await this.createCategory({
+      name,
+      type,
+      description: `Auto-created category for ${name}`,
+      icon: type === 'income' ? 'trending-up' : 'trending-down',
+      color: type === 'income' ? '#10b981' : '#ef4444',
+      isActive: true
+    });
+
+    return newCategory.id;
   }
 }
 

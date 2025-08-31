@@ -27,7 +27,8 @@ import {
   Filter,
   Calendar,
   PieChart,
-  BarChart3
+  BarChart3,
+  Upload
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -85,6 +86,8 @@ export default function FinancialDashboard() {
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
   const [showGenerateReceipt, setShowGenerateReceipt] = useState(false);
   const [showTaxCalculator, setShowTaxCalculator] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isProcessingFile, setIsProcessingFile] = useState(false);
   const [taxData, setTaxData] = useState({
     // Income Sources
     salary: '',
@@ -113,6 +116,7 @@ export default function FinancialDashboard() {
   });
   const [showGSTRecords, setShowGSTRecords] = useState(false);
   const [showGSTCalculator, setShowGSTCalculator] = useState(false);
+  const [showBankStatementUpload, setShowBankStatementUpload] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -279,12 +283,13 @@ export default function FinancialDashboard() {
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
           <TabsTrigger value="transactions" data-testid="tab-transactions">Transactions</TabsTrigger>
           <TabsTrigger value="invoices" data-testid="tab-invoices">Invoices</TabsTrigger>
           <TabsTrigger value="receipts" data-testid="tab-receipts">Receipts</TabsTrigger>
           <TabsTrigger value="taxes" data-testid="tab-taxes">Taxes</TabsTrigger>
+          <TabsTrigger value="bank-import" data-testid="tab-bank-import">Bank Import</TabsTrigger>
           <TabsTrigger value="reports" data-testid="tab-reports">Reports</TabsTrigger>
           <TabsTrigger value="settings" data-testid="tab-settings">Settings</TabsTrigger>
         </TabsList>
@@ -1122,6 +1127,178 @@ export default function FinancialDashboard() {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        {/* Bank Import Tab */}
+        <TabsContent value="bank-import" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* File Upload Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Upload Bank Statement</CardTitle>
+                <CardDescription>Upload Excel (.xlsx) or CSV files to import transactions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <input
+                      type="file"
+                      accept=".xlsx,.xls,.csv"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setUploadedFile(file);
+                          toast({
+                            title: "File Selected",
+                            description: `Selected: ${file.name}`,
+                          });
+                        }
+                      }}
+                      className="hidden"
+                      id="bank-statement-upload"
+                      data-testid="file-upload-input"
+                    />
+                    <label 
+                      htmlFor="bank-statement-upload" 
+                      className="cursor-pointer flex flex-col items-center"
+                    >
+                      <Upload className="h-12 w-12 text-gray-400 mb-4" />
+                      <p className="text-lg font-medium">Click to upload bank statement</p>
+                      <p className="text-sm text-muted-foreground">Supports Excel (.xlsx) and CSV files</p>
+                    </label>
+                  </div>
+                  
+                  {uploadedFile && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-green-800">File Ready to Process</p>
+                          <p className="text-sm text-green-600">{uploadedFile.name}</p>
+                        </div>
+                        <Button
+                          onClick={async () => {
+                            setIsProcessingFile(true);
+                            try {
+                              const formData = new FormData();
+                              formData.append('bankStatement', uploadedFile);
+                              
+                              const response = await apiRequest("POST", "/api/financial/import-bank-statement", formData);
+                              const result = await response.json();
+                              
+                              toast({
+                                title: "Import Successful",
+                                description: `Imported ${result.transactionsCount} transactions. ${result.categorizedCount} automatically categorized.`,
+                              });
+                              
+                              // Refresh transactions and summary
+                              queryClient.invalidateQueries({ queryKey: ["/api/financial/transactions"] });
+                              queryClient.invalidateQueries({ queryKey: ["/api/financial/dashboard/summary"] });
+                              
+                              setUploadedFile(null);
+                            } catch (error) {
+                              toast({
+                                title: "Import Failed",
+                                description: "Error processing bank statement. Please check file format.",
+                                variant: "destructive"
+                              });
+                            } finally {
+                              setIsProcessingFile(false);
+                            }
+                          }}
+                          disabled={isProcessingFile}
+                          data-testid="process-file-button"
+                        >
+                          {isProcessingFile ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <FileText className="h-4 w-4 mr-2" />
+                              Process File
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Auto-Categorization Guide */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Auto-Categorization</CardTitle>
+                <CardDescription>How we automatically categorize your transactions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="border rounded-lg p-4">
+                    <h4 className="font-semibold text-green-600 mb-2">Income Sources</h4>
+                    <ul className="text-sm space-y-1">
+                      <li>• Salary transfers → Salary Income</li>
+                      <li>• Freelance payments → Business Income</li>
+                      <li>• Interest credits → Interest Income</li>
+                      <li>• Rental income → House Property</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <h4 className="font-semibold text-red-600 mb-2">Tax Deductions</h4>
+                    <ul className="text-sm space-y-1">
+                      <li>• PF contributions → Section 80C</li>
+                      <li>• Insurance premiums → Section 80D</li>
+                      <li>• Mutual fund SIPs → Section 80C</li>
+                      <li>• Education loan EMI → Section 80E</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <h4 className="font-semibold text-blue-600 mb-2">Business Expenses</h4>
+                    <ul className="text-sm space-y-1">
+                      <li>• Office supplies → Business Expense</li>
+                      <li>• Travel expenses → Business Travel</li>
+                      <li>• Software subscriptions → Office Expense</li>
+                      <li>• Professional fees → Professional Service</li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Integration with Tax Calculator */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Tax Integration</CardTitle>
+              <CardDescription>Automatically populate tax calculator with imported data</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                <div>
+                  <p className="font-medium">Smart Tax Calculation</p>
+                  <p className="text-sm text-muted-foreground">
+                    Import your bank statements and we'll automatically populate your income tax calculator with categorized income and deductions
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => {
+                    setActiveTab("taxes");
+                    toast({
+                      title: "Switched to Tax Calculator",
+                      description: "Tax calculator will use your imported transaction data.",
+                    });
+                  }}
+                  variant="outline"
+                >
+                  <Calculator className="h-4 w-4 mr-2" />
+                  Go to Tax Calculator
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Reports Tab */}
