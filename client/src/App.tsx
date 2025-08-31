@@ -80,6 +80,8 @@ import DiseaseDiagnosis from '@/pages/disease-diagnosis';
 import CareersPage from '@/pages/careers';
 import DocumentationDownload from '@/pages/documentation-download';
 import AdminHRDashboard from '@/pages/admin-hr-dashboard';
+import AdminBlogCreate from '@/pages/admin-blog-create';
+import AdminBlogEdit from '@/pages/admin-blog-edit';
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -179,6 +181,8 @@ function Router() {
         {(params) => <UserGardenView />}
       </Route>
       <Route path="/admin/hr" component={AdminHRDashboard} />
+      <Route path="/admin/blog/create" component={AdminBlogCreate} />
+      <Route path="/admin/blog/edit/:id" component={AdminBlogEdit} />
       
       {/* Protected routes that require authentication */}
       {user && (

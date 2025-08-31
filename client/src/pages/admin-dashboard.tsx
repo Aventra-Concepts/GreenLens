@@ -1672,13 +1672,17 @@ export default function AdminDashboard() {
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Content Management</h2>
                 <p className="text-gray-600 dark:text-gray-300">Manage blog posts, pages, and media</p>
               </div>
-              <Button className="flex items-center gap-2">
+              <Button 
+                className="flex items-center gap-2"
+                onClick={() => setLocation("/admin/blog/create")}
+                data-testid="button-new-post"
+              >
                 <Plus className="w-4 h-4" />
                 New Post
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -1707,23 +1711,23 @@ export default function AdminDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Image className="w-5 h-5" />
-                    Media Library
+                    <Tag className="w-5 h-5" />
+                    Categories
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm">Images</span>
-                      <span className="font-medium">1,247</span>
+                      <span className="text-sm">Total Categories</span>
+                      <span className="font-medium">12</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm">Storage Used</span>
-                      <span className="font-medium">2.3 GB</span>
+                      <span className="text-sm">Active</span>
+                      <span className="font-medium">12</span>
                     </div>
                     <Button variant="outline" size="sm" className="w-full mt-2">
-                      <Upload className="w-3 h-3 mr-1" />
-                      Upload Media
+                      <Settings className="w-3 h-3 mr-1" />
+                      Manage Categories
                     </Button>
                   </div>
                 </CardContent>
@@ -1733,26 +1737,174 @@ export default function AdminDashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Globe className="w-5 h-5" />
-                    SEO Settings
+                    Content Analytics
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm">Meta Tags</span>
-                      <Badge className="bg-green-100 text-green-800">Complete</Badge>
+                      <span className="text-sm">Page Views (30d)</span>
+                      <span className="font-medium">24,567</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm">Sitemap</span>
-                      <Badge className="bg-green-100 text-green-800">Updated</Badge>
+                      <span className="text-sm">Avg. Read Time</span>
+                      <span className="font-medium">3.2 min</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm">SEO Score</span>
+                      <Badge className="bg-green-100 text-green-800">95/100</Badge>
                     </div>
                     <Button variant="outline" size="sm" className="w-full mt-2">
-                      Configure SEO
+                      <BarChart3 className="w-3 h-3 mr-1" />
+                      View Analytics
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2 h-auto p-4"
+                onClick={() => setLocation("/admin/blog/create")}
+              >
+                <Plus className="w-5 h-5" />
+                <div className="text-left">
+                  <p className="font-medium">New Post</p>
+                  <p className="text-xs text-gray-500">Create content</p>
+                </div>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2 h-auto p-4"
+              >
+                <Upload className="w-5 h-5" />
+                <div className="text-left">
+                  <p className="font-medium">Media Upload</p>
+                  <p className="text-xs text-gray-500">Add images</p>
+                </div>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2 h-auto p-4"
+              >
+                <Settings className="w-5 h-5" />
+                <div className="text-left">
+                  <p className="font-medium">Categories</p>
+                  <p className="text-xs text-gray-500">Manage topics</p>
+                </div>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2 h-auto p-4"
+              >
+                <BarChart3 className="w-5 h-5" />
+                <div className="text-left">
+                  <p className="font-medium">Analytics</p>
+                  <p className="text-xs text-gray-500">View insights</p>
+                </div>
+              </Button>
+            </div>
+
+            {/* Blog Posts Management Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Recent Blog Posts
+                </CardTitle>
+                <CardDescription>
+                  Manage and edit your blog content
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoadingBlogs ? (
+                  <div className="flex justify-center p-8">
+                    <div className="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full" />
+                  </div>
+                ) : blogPosts.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p className="mb-4">No blog posts found</p>
+                    <Button 
+                      onClick={() => setLocation("/admin/blog/create")}
+                      className="flex items-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Create Your First Post
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {blogPosts.slice(0, 5).map((post: BlogPost) => (
+                      <div key={post.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="font-medium text-gray-900 dark:text-white truncate max-w-md">
+                              {post.title}
+                            </h3>
+                            <Badge 
+                              variant={post.status === 'published' ? "default" : "secondary"}
+                              className={post.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
+                            >
+                              {post.status === 'published' ? 'Published' : 'Draft'}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-lg">
+                            {post.excerpt}
+                          </p>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                            <span>Created: {format(new Date(post.createdAt), 'MMM d, yyyy')}</span>
+                            {post.publishedAt && (
+                              <span>Published: {format(new Date(post.publishedAt), 'MMM d, yyyy')}</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 ml-4">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setLocation(`/admin/blog/edit/${post.id}`)}
+                            className="flex items-center gap-2"
+                            data-testid={`button-edit-post-${post.id}`}
+                          >
+                            <Edit className="w-3 h-3" />
+                            Edit
+                          </Button>
+                          {post.status === 'published' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => window.open(`/blog/${post.slug}`, '_blank')}
+                              className="flex items-center gap-2"
+                              data-testid={`button-view-post-${post.id}`}
+                            >
+                              <Eye className="w-3 h-3" />
+                              View
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {blogPosts.length > 5 && (
+                      <div className="pt-4 border-t">
+                        <p className="text-sm text-gray-500 text-center">
+                          Showing 5 of {blogPosts.length} posts
+                        </p>
+                        <div className="flex justify-center mt-2">
+                          <Button variant="outline" size="sm">
+                            View All Posts
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Analytics Tab */}
