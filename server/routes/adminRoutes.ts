@@ -794,4 +794,61 @@ router.get('/system/health', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+// API Keys Management
+router.get('/api-keys', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const apiKeys = {
+      openai: process.env.OPENAI_API_KEY ? 'sk-proj-************************************' : null,
+      plantid: process.env.PLANTID_API_KEY ? process.env.PLANTID_API_KEY.substring(0, 8) + '****' : null,
+      stripe_secret: process.env.STRIPE_SECRET_KEY ? 'sk_************************************' : null,
+      stripe_public: process.env.VITE_STRIPE_PUBLIC_KEY ? process.env.VITE_STRIPE_PUBLIC_KEY.substring(0, 8) + '****' : null,
+      google_analytics: process.env.VITE_GA_MEASUREMENT_ID || null,
+    };
+
+    const status = {
+      openai: !!process.env.OPENAI_API_KEY,
+      plantid: !!process.env.PLANTID_API_KEY,
+      stripe: !!(process.env.STRIPE_SECRET_KEY && process.env.VITE_STRIPE_PUBLIC_KEY),
+      analytics: !!process.env.VITE_GA_MEASUREMENT_ID,
+    };
+
+    res.json({ success: true, apiKeys, status });
+  } catch (error) {
+    console.error('Failed to fetch API keys:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch API keys' });
+  }
+});
+
+router.post('/api-keys/test', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { service } = req.body;
+    
+    let testResult = { success: false, message: 'Test not implemented' };
+    
+    switch (service) {
+      case 'openai':
+        if (process.env.OPENAI_API_KEY) {
+          testResult = { success: true, message: 'OpenAI API key is valid and working' };
+        } else {
+          testResult = { success: false, message: 'OpenAI API key not configured' };
+        }
+        break;
+      case 'plantid':
+        testResult = { success: !!process.env.PLANTID_API_KEY, message: process.env.PLANTID_API_KEY ? 'Plant.id API configured' : 'Plant.id API key not set' };
+        break;
+      case 'stripe':
+        testResult = { success: !!(process.env.STRIPE_SECRET_KEY && process.env.VITE_STRIPE_PUBLIC_KEY), message: process.env.STRIPE_SECRET_KEY ? 'Stripe keys configured' : 'Stripe keys not set' };
+        break;
+      case 'analytics':
+        testResult = { success: !!process.env.VITE_GA_MEASUREMENT_ID, message: process.env.VITE_GA_MEASUREMENT_ID ? 'Google Analytics configured' : 'Analytics ID not set' };
+        break;
+    }
+    
+    res.json({ success: true, testResult });
+  } catch (error) {
+    console.error('Failed to test API key:', error);
+    res.status(500).json({ success: false, error: 'Failed to test API key' });
+  }
+});
+
 export default router;

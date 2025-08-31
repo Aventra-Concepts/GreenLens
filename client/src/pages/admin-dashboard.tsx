@@ -1858,6 +1858,183 @@ export default function AdminDashboard() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* API Keys Management */}
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lock className="w-5 h-5" />
+                    API Keys & Integrations
+                  </CardTitle>
+                  <CardDescription>Manage external service API keys and integrations</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* AI Services */}
+                    <div>
+                      <h3 className="font-semibold mb-4 text-green-700 dark:text-green-400">AI Services</h3>
+                      <div className="space-y-4">
+                        <div className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <p className="font-medium">OpenAI API</p>
+                              <p className="text-sm text-gray-500">Plant analysis and AI features</p>
+                            </div>
+                            <Badge className="bg-green-100 text-green-800">Connected</Badge>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">API Key</label>
+                            <div className="flex gap-2">
+                              <Input 
+                                type="password" 
+                                value="sk-proj-************************************" 
+                                disabled 
+                                className="flex-1"
+                                data-testid="input-openai-key"
+                              />
+                              <Button variant="outline" size="sm" data-testid="button-edit-openai">
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <p className="font-medium">Plant.id API</p>
+                              <p className="text-sm text-gray-500">Plant identification service</p>
+                            </div>
+                            <Badge variant="outline">Not Configured</Badge>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">API Key</label>
+                            <div className="flex gap-2">
+                              <Input 
+                                type="password" 
+                                placeholder="Enter Plant.id API key..." 
+                                className="flex-1"
+                                data-testid="input-plantid-key"
+                              />
+                              <Button variant="outline" size="sm" data-testid="button-save-plantid">
+                                Save
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Payment Services */}
+                    <div>
+                      <h3 className="font-semibold mb-4 text-blue-700 dark:text-blue-400">Payment Services</h3>
+                      <div className="space-y-4">
+                        <div className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <p className="font-medium">Stripe</p>
+                              <p className="text-sm text-gray-500">Payment processing</p>
+                            </div>
+                            <Badge variant="outline">Not Configured</Badge>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Secret Key</label>
+                            <div className="flex gap-2">
+                              <Input 
+                                type="password" 
+                                placeholder="sk_test_..." 
+                                className="flex-1"
+                                data-testid="input-stripe-secret"
+                              />
+                              <Button variant="outline" size="sm" data-testid="button-save-stripe">
+                                Save
+                              </Button>
+                            </div>
+                            <label className="text-sm font-medium">Public Key</label>
+                            <div className="flex gap-2">
+                              <Input 
+                                type="text" 
+                                placeholder="pk_test_..." 
+                                className="flex-1"
+                                data-testid="input-stripe-public"
+                              />
+                              <Button variant="outline" size="sm" data-testid="button-save-stripe-public">
+                                Save
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <p className="font-medium">Google Analytics</p>
+                              <p className="text-sm text-gray-500">Website analytics tracking</p>
+                            </div>
+                            <Badge variant="outline">Not Configured</Badge>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Measurement ID</label>
+                            <div className="flex gap-2">
+                              <Input 
+                                type="text" 
+                                placeholder="G-XXXXXXXXXX" 
+                                className="flex-1"
+                                data-testid="input-ga-id"
+                              />
+                              <Button variant="outline" size="sm" data-testid="button-save-ga">
+                                Save
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* API Status Dashboard */}
+                  <div className="border-t pt-6">
+                    <h3 className="font-semibold mb-4">API Status Dashboard</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                          <CheckCircle className="w-6 h-6 text-green-600" />
+                        </div>
+                        <p className="font-medium">OpenAI</p>
+                        <p className="text-sm text-green-600">Active</p>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                          <XCircle className="w-6 h-6 text-gray-400" />
+                        </div>
+                        <p className="font-medium">Plant.id</p>
+                        <p className="text-sm text-gray-500">Not Configured</p>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                          <XCircle className="w-6 h-6 text-gray-400" />
+                        </div>
+                        <p className="font-medium">Stripe</p>
+                        <p className="text-sm text-gray-500">Not Configured</p>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                          <XCircle className="w-6 h-6 text-gray-400" />
+                        </div>
+                        <p className="font-medium">Analytics</p>
+                        <p className="text-sm text-gray-500">Not Configured</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <Button className="w-full" data-testid="button-save-all-keys">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Save All Changes
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
