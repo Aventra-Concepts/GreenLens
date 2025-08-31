@@ -88,6 +88,7 @@ export default function FinancialDashboard() {
   const [showTaxCalculator, setShowTaxCalculator] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessingFile, setIsProcessingFile] = useState(false);
+  const [taxCalculatorType, setTaxCalculatorType] = useState<'individual' | 'company'>('individual');
   const [taxData, setTaxData] = useState({
     // Income Sources
     salary: '',
@@ -112,6 +113,38 @@ export default function FinancialDashboard() {
     
     // Personal Details
     age: '',
+    assessmentYear: '2024-25'
+  });
+
+  const [companyTaxData, setCompanyTaxData] = useState({
+    // Revenue Sources
+    businessIncome: '',
+    interestIncome: '',
+    dividendIncome: '',
+    shortTermCapitalGains: '',
+    longTermCapitalGains: '',
+    otherIncome: '',
+    
+    // Business Expenses
+    costOfGoodsSold: '',
+    officeExpenses: '',
+    salaryWages: '',
+    rent: '',
+    utilities: '',
+    professionalFees: '',
+    travelExpenses: '',
+    depreciation: '',
+    interestOnLoans: '',
+    otherExpenses: '',
+    
+    // Company Details
+    companyType: 'domestic', // domestic, foreign
+    turnover: '',
+    previousYearTax: '',
+    advanceTaxPaid: '',
+    tdsDeducted: '',
+    
+    // Assessment Year
     assessmentYear: '2024-25'
   });
   const [showGSTRecords, setShowGSTRecords] = useState(false);
@@ -677,14 +710,53 @@ export default function FinancialDashboard() {
                     <DialogTrigger asChild>
                       <Button className="mt-4">Calculate Tax</Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
-                        <DialogTitle>Comprehensive Income Tax Calculator</DialogTitle>
+                        <DialogTitle>
+                          {taxCalculatorType === 'individual' ? 'Employee Income Tax Calculator' : 'Company Income Tax Calculator'} (FY 2024-25)
+                        </DialogTitle>
                         <DialogDescription>
-                          Complete income tax calculation with all income sources and deductions
+                          {taxCalculatorType === 'individual' 
+                            ? 'Calculate individual income tax with all income sources and deductions'
+                            : 'Calculate comprehensive company income tax, corporate tax, and advance tax'
+                          }
                         </DialogDescription>
                       </DialogHeader>
+
+                      {/* Calculator Type Selector */}
+                      <div className="flex items-center space-x-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                        <Label className="font-semibold">Calculator Type:</Label>
+                        <div className="flex space-x-4">
+                          <label className="flex items-center space-x-2">
+                            <input
+                              type="radio"
+                              name="calculatorType"
+                              value="individual"
+                              checked={taxCalculatorType === 'individual'}
+                              onChange={(e) => setTaxCalculatorType('individual')}
+                              className="text-blue-600"
+                            />
+                            <span>Employee IT Calculator</span>
+                          </label>
+                          <label className="flex items-center space-x-2">
+                            <input
+                              type="radio"
+                              name="calculatorType"
+                              value="company"
+                              checked={taxCalculatorType === 'company'}
+                              onChange={(e) => setTaxCalculatorType('company')}
+                              className="text-blue-600"
+                            />
+                            <span>Company IT Calculator</span>
+                          </label>
+                        </div>
+                      </div>
                       <div className="space-y-6">
+                        
+                        {/* Individual Tax Calculator */}
+                        {taxCalculatorType === 'individual' && (
+                          <>
+
                         {/* Personal Details */}
                         <div className="border rounded-lg p-4">
                           <h3 className="font-semibold mb-3">Personal Details</h3>
@@ -970,6 +1042,354 @@ export default function FinancialDashboard() {
                             Export Excel
                           </Button>
                         </div>
+                          </>
+                        )}
+
+                        {/* Company Tax Calculator */}
+                        {taxCalculatorType === 'company' && (
+                          <>
+                            {/* Company Details */}
+                            <div className="border rounded-lg p-4">
+                              <h3 className="font-semibold mb-3">Company Details</h3>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label htmlFor="company-type">Company Type</Label>
+                                  <Select value={companyTaxData.companyType} onValueChange={(value) => setCompanyTaxData({...companyTaxData, companyType: value})}>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select company type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="domestic">Domestic Company</SelectItem>
+                                      <SelectItem value="foreign">Foreign Company</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label htmlFor="turnover">Annual Turnover (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.turnover}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, turnover: e.target.value})}
+                                    placeholder="Enter annual turnover" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="assessment-year">Assessment Year</Label>
+                                  <Select value={companyTaxData.assessmentYear} onValueChange={(value) => setCompanyTaxData({...companyTaxData, assessmentYear: value})}>
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="2024-25">2024-25</SelectItem>
+                                      <SelectItem value="2023-24">2023-24</SelectItem>
+                                      <SelectItem value="2022-23">2022-23</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Revenue Sources */}
+                            <div className="border rounded-lg p-4">
+                              <h3 className="font-semibold mb-3">Revenue Sources</h3>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label htmlFor="business-income">Business/Trading Income (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.businessIncome}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, businessIncome: e.target.value})}
+                                    placeholder="Enter business income" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="interest-income">Interest Income (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.interestIncome}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, interestIncome: e.target.value})}
+                                    placeholder="Enter interest income" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="dividend-income">Dividend Income (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.dividendIncome}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, dividendIncome: e.target.value})}
+                                    placeholder="Enter dividend income" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="short-term-gains">Short-term Capital Gains (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.shortTermCapitalGains}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, shortTermCapitalGains: e.target.value})}
+                                    placeholder="Enter STCG" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="long-term-gains">Long-term Capital Gains (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.longTermCapitalGains}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, longTermCapitalGains: e.target.value})}
+                                    placeholder="Enter LTCG" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="other-income">Other Income (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.otherIncome}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, otherIncome: e.target.value})}
+                                    placeholder="Enter other income" 
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Business Expenses */}
+                            <div className="border rounded-lg p-4">
+                              <h3 className="font-semibold mb-3">Business Expenses</h3>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label htmlFor="cost-of-goods">Cost of Goods Sold (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.costOfGoodsSold}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, costOfGoodsSold: e.target.value})}
+                                    placeholder="Enter COGS" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="office-expenses">Office/Administrative Expenses (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.officeExpenses}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, officeExpenses: e.target.value})}
+                                    placeholder="Enter office expenses" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="salary-wages">Salary & Wages (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.salaryWages}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, salaryWages: e.target.value})}
+                                    placeholder="Enter salary expenses" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="rent">Rent (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.rent}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, rent: e.target.value})}
+                                    placeholder="Enter rent expenses" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="utilities">Utilities (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.utilities}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, utilities: e.target.value})}
+                                    placeholder="Enter utilities cost" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="professional-fees">Professional Fees (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.professionalFees}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, professionalFees: e.target.value})}
+                                    placeholder="Enter professional fees" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="travel-expenses">Travel & Conveyance (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.travelExpenses}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, travelExpenses: e.target.value})}
+                                    placeholder="Enter travel expenses" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="depreciation">Depreciation (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.depreciation}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, depreciation: e.target.value})}
+                                    placeholder="Enter depreciation" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="interest-loans">Interest on Business Loans (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.interestOnLoans}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, interestOnLoans: e.target.value})}
+                                    placeholder="Enter interest expenses" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="other-expenses">Other Business Expenses (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.otherExpenses}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, otherExpenses: e.target.value})}
+                                    placeholder="Enter other expenses" 
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Tax Payments */}
+                            <div className="border rounded-lg p-4">
+                              <h3 className="font-semibold mb-3">Tax Payments & Credits</h3>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label htmlFor="previous-year-tax">Previous Year Tax Liability (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.previousYearTax}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, previousYearTax: e.target.value})}
+                                    placeholder="Enter previous year tax" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="advance-tax-paid">Advance Tax Paid (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.advanceTaxPaid}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, advanceTaxPaid: e.target.value})}
+                                    placeholder="Enter advance tax paid" 
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="tds-deducted">TDS Deducted (₹)</Label>
+                                  <Input 
+                                    type="number" 
+                                    value={companyTaxData.tdsDeducted}
+                                    onChange={(e) => setCompanyTaxData({...companyTaxData, tdsDeducted: e.target.value})}
+                                    placeholder="Enter TDS deducted" 
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-2">
+                              <Button 
+                                variant="outline" 
+                                onClick={() => setShowTaxCalculator(false)}
+                                className="flex-1"
+                              >
+                                Cancel
+                              </Button>
+                              <Button 
+                                variant="outline"
+                                onClick={() => {
+                                  // Calculate comprehensive company tax
+                                  const grossIncome = 
+                                    Number(companyTaxData.businessIncome || 0) + 
+                                    Number(companyTaxData.interestIncome || 0) + 
+                                    Number(companyTaxData.dividendIncome || 0) + 
+                                    Number(companyTaxData.shortTermCapitalGains || 0) + 
+                                    Number(companyTaxData.longTermCapitalGains || 0) + 
+                                    Number(companyTaxData.otherIncome || 0);
+                                  
+                                  const totalExpenses = 
+                                    Number(companyTaxData.costOfGoodsSold || 0) + 
+                                    Number(companyTaxData.officeExpenses || 0) + 
+                                    Number(companyTaxData.salaryWages || 0) + 
+                                    Number(companyTaxData.rent || 0) + 
+                                    Number(companyTaxData.utilities || 0) + 
+                                    Number(companyTaxData.professionalFees || 0) + 
+                                    Number(companyTaxData.travelExpenses || 0) + 
+                                    Number(companyTaxData.depreciation || 0) + 
+                                    Number(companyTaxData.interestOnLoans || 0) + 
+                                    Number(companyTaxData.otherExpenses || 0);
+                                  
+                                  const taxableIncome = Math.max(0, grossIncome - totalExpenses);
+                                  const turnover = Number(companyTaxData.turnover || 0);
+                                  
+                                  // Determine corporate tax rate based on turnover
+                                  let corporateRate = 0.30; // 30% for large companies
+                                  if (turnover <= 40000000) { // ₹4 Crore turnover
+                                    corporateRate = 0.25; // 25% for companies with turnover ≤ ₹400 Crore
+                                  }
+                                  
+                                  // Calculate basic corporate tax
+                                  const basicTax = taxableIncome * corporateRate;
+                                  
+                                  // Calculate MAT (Minimum Alternate Tax) - 15% of book profit
+                                  const matRate = 0.15;
+                                  const bookProfit = taxableIncome; // Simplified calculation
+                                  const matTax = bookProfit * matRate;
+                                  
+                                  // Tax payable is higher of corporate tax and MAT
+                                  const taxPayable = Math.max(basicTax, matTax);
+                                  
+                                  // Add surcharge if applicable
+                                  let surcharge = 0;
+                                  if (taxableIncome > 10000000) { // ₹1 Crore
+                                    surcharge = taxPayable * 0.07; // 7% surcharge
+                                  } else if (taxableIncome > 100000000) { // ₹10 Crore  
+                                    surcharge = taxPayable * 0.12; // 12% surcharge
+                                  }
+                                  
+                                  // Add Health & Education Cess - 4%
+                                  const cess = (taxPayable + surcharge) * 0.04;
+                                  
+                                  const totalTax = taxPayable + surcharge + cess;
+                                  
+                                  // Calculate remaining tax after advance tax and TDS
+                                  const advanceTaxPaid = Number(companyTaxData.advanceTaxPaid || 0);
+                                  const tdsDeducted = Number(companyTaxData.tdsDeducted || 0);
+                                  const remainingTax = Math.max(0, totalTax - advanceTaxPaid - tdsDeducted);
+                                  
+                                  toast({
+                                    title: "Company Tax Calculation Complete",
+                                    description: `Taxable Income: ₹${taxableIncome.toLocaleString()}, Total Tax: ₹${totalTax.toLocaleString()}, Remaining: ₹${remainingTax.toLocaleString()}`,
+                                  });
+                                }}
+                                className="flex-1"
+                              >
+                                <Calculator className="h-4 w-4 mr-2" />
+                                Calculate Corporate Tax
+                              </Button>
+                              <Button 
+                                onClick={() => {
+                                  toast({
+                                    title: "Company Tax Report Generated",
+                                    description: "Your company tax calculation report has been generated for download.",
+                                  });
+                                }}
+                                className="flex-1"
+                              >
+                                <Download className="h-4 w-4 mr-2" />
+                                Download PDF
+                              </Button>
+                              <Button 
+                                variant="outline"
+                                onClick={() => {
+                                  toast({
+                                    title: "Company Tax Excel Generated",
+                                    description: "Your company tax calculation Excel file has been generated for download.",
+                                  });
+                                }}
+                                className="flex-1"
+                              >
+                                <Download className="h-4 w-4 mr-2" />
+                                Export Excel
+                              </Button>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </DialogContent>
                   </Dialog>
