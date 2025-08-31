@@ -17,8 +17,11 @@ import {
   BarChart3, FileText, LogOut, Database, Server, Activity, Globe, Image, BookOpen,
   TrendingUp, UserCheck, AlertTriangle, CheckCircle, XCircle, Plus, Edit, Trash2,
   Search, Filter, Download, Upload, Eye, ToggleLeft, ToggleRight, Monitor,
-  PieChart, LineChart, UserPlus, Zap, Layers, Lock, ArrowRight, Leaf, Share2, Star, Tag
+  PieChart, LineChart, UserPlus, Zap, Layers, Lock, ArrowRight, Leaf, Share2, Star, Tag,
+  Target
 } from "lucide-react";
+import AnalyticsDashboard from "@/components/admin/AnalyticsDashboard";
+import SEODashboard from "@/components/admin/SEODashboard";
 import { AdvancedPremiumDashboard } from "@/components/AdvancedPremiumDashboard";
 
 interface ConsultationRequest {
@@ -916,6 +919,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="analytics" className="flex items-center gap-1 px-2 py-2 text-xs">
               <TrendingUp className="w-3 h-3" />
               <span className="hidden sm:inline">Analytics</span>
+            </TabsTrigger>
+            <TabsTrigger value="seo" className="flex items-center gap-1 px-2 py-2 text-xs">
+              <Target className="w-3 h-3" />
+              <span className="hidden sm:inline">SEO</span>
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-1 px-2 py-2 text-xs">
               <Settings className="w-3 h-3" />
@@ -1909,62 +1916,12 @@ export default function AdminDashboard() {
 
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics & Reports</h2>
-              <p className="text-gray-600 dark:text-gray-300">Track performance metrics and generate reports</p>
-            </div>
+            <AnalyticsDashboard />
+          </TabsContent>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5" />
-                    Traffic Overview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Page Views (30 days)</span>
-                      <span className="text-2xl font-bold">124,567</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Unique Visitors</span>
-                      <span className="text-2xl font-bold">8,392</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Bounce Rate</span>
-                      <span className="text-2xl font-bold">34.2%</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="w-5 h-5" />
-                    Revenue Analytics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Monthly Revenue</span>
-                      <span className="text-2xl font-bold">${totalRevenue.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Conversion Rate</span>
-                      <span className="text-2xl font-bold">2.8%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Avg. Order Value</span>
-                      <span className="text-2xl font-bold">${(totalRevenue / Math.max(consultations?.length || 1, 1)).toFixed(2)}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          {/* SEO Tab */}
+          <TabsContent value="seo" className="space-y-6">
+            <SEODashboard />
           </TabsContent>
 
           {/* Settings Tab */}
