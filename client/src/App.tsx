@@ -189,6 +189,7 @@ function Router() {
       </Route>
       <Route path="/admin/hr" component={AdminHRDashboard} />
       <Route path="/admin/financial" component={AdminFinancialDashboard} />
+      <Route path="/admin/financial-dashboard" component={AdminFinancialDashboard} />
       <Route path="/financial-dashboard" component={FinancialDashboard} />
       <Route path="/admin/blog/create" component={AdminBlogCreate} />
       <Route path="/admin/blog/edit/:id" component={AdminBlogEdit} />
