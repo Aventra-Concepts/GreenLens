@@ -3,6 +3,10 @@ import { useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -37,7 +41,8 @@ import {
   Upload,
   Download,
   RefreshCw,
-  Leaf
+  Leaf,
+  Mail
 } from "lucide-react";
 
 // Import specialized admin components
@@ -87,6 +92,26 @@ export default function SuperAdminDashboard() {
   const queryClient = useQueryClient();
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Test subscription email notifications
+  const testSubscriptionEmailMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('POST', '/api/admin/system/test-subscription-email');
+    },
+    onSuccess: () => {
+      toast({
+        title: "Test Email Sent",
+        description: "Subscription reminder test email has been sent successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Test Email Failed",
+        description: error.message || "Failed to send test email",
+        variant: "destructive",
+      });
+    }
+  });
 
   // Check admin authentication
   useEffect(() => {
@@ -203,7 +228,7 @@ export default function SuperAdminDashboard() {
         {/* Dashboard Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-9">
+            <TabsList className="grid w-full grid-cols-10">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <BarChart3 className="w-4 h-4" />
                 Overview
@@ -235,6 +260,10 @@ export default function SuperAdminDashboard() {
               <TabsTrigger value="system" className="flex items-center gap-2">
                 <Settings className="w-4 h-4" />
                 System
+              </TabsTrigger>
+              <TabsTrigger value="email" className="flex items-center gap-2 bg-green-100 text-green-800 font-bold">
+                <Mail className="w-4 h-4" />
+                📧 Email
               </TabsTrigger>
               <TabsTrigger value="security" className="flex items-center gap-2">
                 <Shield className="w-4 h-4" />
@@ -421,6 +450,132 @@ export default function SuperAdminDashboard() {
             {/* System Settings Tab */}
             <TabsContent value="system">
               <SystemSettings />
+            </TabsContent>
+
+            {/* Email & Subscriptions Tab */}
+            <TabsContent value="email" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="w-5 h-5 text-green-600" />
+                    Email & Subscription Management
+                  </CardTitle>
+                  <CardDescription>
+                    Configure email notifications and subscription reminders
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Subscription Email Notifications */}
+                  <div className="space-y-4 p-4 border border-green-200 rounded-lg bg-green-50">
+                    <h3 className="text-lg font-semibold text-green-800">Subscription Email Notifications</h3>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <Label className="text-sm font-medium">15-Day Expiry Reminders</Label>
+                          <p className="text-xs text-gray-600">Send reminders 15 days before subscription expires</p>
+                        </div>
+                        <Switch data-testid="switch-15-day-reminders" />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <Label className="text-sm font-medium">7-Day Expiry Reminders</Label>
+                          <p className="text-xs text-gray-600">Send urgent reminders 7 days before expiry</p>
+                        </div>
+                        <Switch data-testid="switch-7-day-reminders" />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <Label className="text-sm font-medium">Renewal Confirmations</Label>
+                          <p className="text-xs text-gray-600">Send confirmation emails after payment renewal</p>
+                        </div>
+                        <Switch data-testid="switch-renewal-confirmations" />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <Label className="text-sm font-medium">SendGrid Status</Label>
+                          <p className="text-xs text-gray-600">Email service provider status</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                          <span className="text-xs text-red-600">Not Configured</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2 pt-4">
+                      <Button 
+                        variant="outline"
+                        onClick={() => testSubscriptionEmailMutation.mutate()}
+                        disabled={testSubscriptionEmailMutation.isPending}
+                        className="flex items-center gap-2"
+                        data-testid="test-subscription-email"
+                      >
+                        <Mail className="w-4 h-4" />
+                        {testSubscriptionEmailMutation.isPending ? "Sending..." : "Test Subscription Email"}
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        className="flex items-center gap-2"
+                        data-testid="save-email-settings"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Save Settings
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Email Configuration */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Email Configuration</h3>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Email Provider</Label>
+                        <Select>
+                          <SelectTrigger data-testid="select-email-provider">
+                            <SelectValue placeholder="Select provider" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="smtp">SMTP</SelectItem>
+                            <SelectItem value="sendgrid">SendGrid</SelectItem>
+                            <SelectItem value="mailgun">Mailgun</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="from-email">From Email</Label>
+                        <Input
+                          id="from-email"
+                          type="email"
+                          placeholder="noreply@greenlens.com"
+                          data-testid="input-from-email"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="from-name">From Name</Label>
+                        <Input
+                          id="from-name"
+                          placeholder="GreenLens"
+                          data-testid="input-from-name"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="smtp-host">SMTP Host</Label>
+                        <Input
+                          id="smtp-host"
+                          placeholder="smtp.gmail.com"
+                          data-testid="input-smtp-host"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             {/* Security Tab */}
