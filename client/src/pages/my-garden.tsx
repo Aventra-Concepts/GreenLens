@@ -1,6 +1,6 @@
 import { Layout } from "@/components/Layout";
 import MyGardenSection from "@/components/MyGardenSection";
-import { PremiumGardenDashboard } from "@/components/PremiumGardenDashboard";
+import { AdvancedPremiumDashboard } from "@/components/AdvancedPremiumDashboard";
 import { FreeTierGardenDashboard } from "@/components/FreeTierGardenDashboard";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ export default function MyGardenPage() {
                 </Button>
               </Link>
             </div>
-            <PremiumGardenDashboard />
+            <AdvancedPremiumDashboard />
           </div>
         </Layout>
       );
