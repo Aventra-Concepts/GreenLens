@@ -460,7 +460,10 @@ router.get("/tax/gst-summary", requireAuth, async (req, res) => {
       quarterYear: quarterYear as string
     };
     
-    const summary = await financialService.getGSTSummary(filters);
+    const summary = await financialService.getGSTSummary(
+      startDate as string,
+      endDate as string
+    );
     res.json(summary);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -497,9 +500,9 @@ router.get("/analytics/period", requireAuth, async (req, res) => {
     }
     
     const analytics = await financialService.getPeriodAnalytics(
-      period as any,
       startDate as string,
-      endDate as string
+      endDate as string,
+      period as 'day' | 'month' | 'year'
     );
     res.json(analytics);
   } catch (error: any) {
@@ -523,9 +526,9 @@ router.get("/analytics/categories", requireAuth, async (req, res) => {
 router.get("/analytics/monthly-trends", requireAuth, async (req, res) => {
   try {
     const { year } = req.query;
-    const trends = await financialService.getMonthlyTrends(
-      year ? parseInt(year as string) : undefined
-    );
+    const startDate = year ? `${year}-01-01` : '2024-01-01';
+    const endDate = year ? `${year}-12-31` : '2024-12-31';
+    const trends = await financialService.getMonthlyTrends(startDate, endDate);
     res.json(trends);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -553,10 +556,7 @@ router.get("/analytics/top-expense-categories", requireAuth, async (req, res) =>
 router.get("/international-transactions", requireAuth, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    const transactions = await financialService.getInternationalTransactions(
-      startDate as string,
-      endDate as string
-    );
+    const transactions = await financialService.getInternationalTransactions();
     res.json(transactions);
   } catch (error: any) {
     res.status(500).json({ error: error.message });

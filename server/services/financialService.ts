@@ -365,6 +365,31 @@ export class FinancialService {
     return invoice;
   }
 
+  async updateInvoiceStatus(id: string, status: string, paidAmount?: number): Promise<Invoice> {
+    const updateData: any = {
+      status,
+      updatedAt: new Date()
+    };
+    
+    if (paidAmount !== undefined) {
+      updateData.paidAmount = paidAmount.toString();
+      
+      // Calculate balance amount
+      const invoice = await this.getInvoiceById(id);
+      if (invoice) {
+        const totalAmount = Number(invoice.totalAmount);
+        updateData.balanceAmount = (totalAmount - paidAmount).toString();
+      }
+    }
+
+    const [invoice] = await db
+      .update(invoices)
+      .set(updateData)
+      .where(eq(invoices.id, id))
+      .returning();
+    return invoice;
+  }
+
   // ============================================================================
   // RECEIPTS
   // ============================================================================
@@ -498,6 +523,280 @@ export class FinancialService {
       totalAmount: amount + gstAmount,
       isInterState
     };
+  }
+
+  // Alias method for route compatibility
+  async getTransactionsByPeriod(period: 'day' | 'month' | 'year', startDate: string, endDate: string) {
+    return this.getPeriodAnalytics(startDate, endDate, period);
+  }
+
+  // Additional methods called by routes
+  async getTopExpenseCategories(limit: number = 10, startDate?: string, endDate?: string) {
+    let whereConditions = [
+      eq(financialTransactions.status, 'active'),
+      eq(financialTransactions.type, 'expense')
+    ];
+    
+    if (startDate && endDate) {
+      whereConditions.push(
+        between(financialTransactions.transactionDate, startDate, endDate)
+      );
+    }
+
+    const result = await db
+      .select({
+        categoryId: financialTransactions.categoryId,
+        categoryName: transactionCategories.name,
+        totalAmount: sum(financialTransactions.amount),
+        transactionCount: count()
+      })
+      .from(financialTransactions)
+      .innerJoin(transactionCategories, eq(financialTransactions.categoryId, transactionCategories.id))
+      .where(and(...whereConditions))
+      .groupBy(financialTransactions.categoryId, transactionCategories.name)
+      .orderBy(desc(sum(financialTransactions.amount)))
+      .limit(limit);
+
+    return result;
+  }
+
+  async getMonthlyTrends(startDate: string, endDate: string) {
+    const result = await db
+      .select({
+        month: sql`TO_CHAR(${financialTransactions.transactionDate}, 'YYYY-MM')`,
+        income: sql<number>`COALESCE(SUM(CASE WHEN ${financialTransactions.type} = 'income' THEN ${financialTransactions.amount} ELSE 0 END), 0)`,
+        expenses: sql<number>`COALESCE(SUM(CASE WHEN ${financialTransactions.type} = 'expense' THEN ${financialTransactions.amount} ELSE 0 END), 0)`,
+        transactionCount: count()
+      })
+      .from(financialTransactions)
+      .where(
+        and(
+          between(financialTransactions.transactionDate, startDate, endDate),
+          eq(financialTransactions.status, 'active')
+        )
+      )
+      .groupBy(sql`TO_CHAR(${financialTransactions.transactionDate}, 'YYYY-MM')`)
+      .orderBy(sql`TO_CHAR(${financialTransactions.transactionDate}, 'YYYY-MM')`);
+
+    return result.map(row => ({
+      ...row,
+      netProfit: Number(row.income) - Number(row.expenses)
+    }));
+  }
+
+  // ============================================================================
+  // TAX RECORDS
+  // ============================================================================
+
+  async createTaxRecord(data: InsertTaxRecord): Promise<TaxRecord> {
+    const [taxRecord] = await db
+      .insert(taxRecords)
+      .values(data)
+      .returning();
+    return taxRecord;
+  }
+
+  async getTaxRecords(filters?: { 
+    taxType?: string; 
+    assessmentYear?: string;
+    limit?: number; 
+    offset?: number;
+  }) {
+    let whereConditions = [];
+    
+    if (filters?.taxType) {
+      whereConditions.push(eq(taxRecords.taxType, filters.taxType));
+    }
+    
+    if (filters?.assessmentYear) {
+      whereConditions.push(eq(taxRecords.assessmentYear, filters.assessmentYear));
+    }
+
+    let query = db.select().from(taxRecords);
+    
+    if (whereConditions.length > 0) {
+      query = query.where(and(...whereConditions));
+    }
+    
+    query = query.orderBy(desc(taxRecords.createdAt));
+    
+    if (filters?.limit) {
+      query = query.limit(filters.limit);
+    }
+    
+    if (filters?.offset) {
+      query = query.offset(filters.offset);
+    }
+
+    return await query;
+  }
+
+  // ============================================================================
+  // PDF GENERATION (Stub methods - will need implementation)
+  // ============================================================================
+
+  async generateInvoicePDF(invoiceId: string): Promise<Buffer> {
+    // Placeholder - would use Puppeteer to generate PDF
+    const invoice = await this.getInvoiceById(invoiceId);
+    if (!invoice) {
+      throw new Error('Invoice not found');
+    }
+    
+    // For now, return empty buffer - full PDF implementation would be here
+    return Buffer.from('PDF content placeholder');
+  }
+
+  async generateReceiptPDF(receiptId: string): Promise<Buffer> {
+    // Placeholder - would use Puppeteer to generate PDF
+    const receipt = await this.getReceiptById(receiptId);
+    if (!receipt) {
+      throw new Error('Receipt not found');
+    }
+    
+    // For now, return empty buffer - full PDF implementation would be here
+    return Buffer.from('PDF content placeholder');
+  }
+
+  // ============================================================================
+  // GST RECORDS
+  // ============================================================================
+
+  async createGSTRecord(data: any) {
+    // Placeholder for GST record creation
+    return { id: 'gst-' + Date.now(), ...data };
+  }
+
+  async getGSTSummary(startDate?: string, endDate?: string) {
+    let whereConditions = [eq(financialTransactions.status, 'active')];
+    
+    if (startDate && endDate) {
+      whereConditions.push(
+        between(financialTransactions.transactionDate, startDate, endDate)
+      );
+    }
+
+    const [result] = await db
+      .select({
+        totalGST: sql<number>`COALESCE(SUM(${financialTransactions.gstAmount}), 0)`,
+        totalCGST: sql<number>`COALESCE(SUM(${financialTransactions.cgstAmount}), 0)`,
+        totalSGST: sql<number>`COALESCE(SUM(${financialTransactions.sgstAmount}), 0)`,
+        totalIGST: sql<number>`COALESCE(SUM(${financialTransactions.igstAmount}), 0)`,
+        transactionCount: count()
+      })
+      .from(financialTransactions)
+      .where(and(...whereConditions));
+
+    return {
+      totalGST: Number(result.totalGST),
+      totalCGST: Number(result.totalCGST),
+      totalSGST: Number(result.totalSGST),
+      totalIGST: Number(result.totalIGST),
+      transactionCount: result.transactionCount
+    };
+  }
+
+  // ============================================================================
+  // ADDITIONAL METHODS
+  // ============================================================================
+
+  async getFinancialSummary(startDate?: string, endDate?: string) {
+    return this.getDashboardSummary(startDate, endDate);
+  }
+
+  async getInternationalTransactions(filters?: { limit?: number; offset?: number }) {
+    let whereConditions = [
+      eq(financialTransactions.status, 'active'),
+      eq(financialTransactions.isInternational, true)
+    ];
+
+    let query = db.select().from(financialTransactions).where(and(...whereConditions));
+    
+    if (filters?.limit) {
+      query = query.limit(filters.limit);
+    }
+    
+    if (filters?.offset) {
+      query = query.offset(filters.offset);
+    }
+
+    return await query;
+  }
+
+  async getGatewayChargesSummary(startDate?: string, endDate?: string) {
+    let whereConditions = [eq(financialTransactions.status, 'active')];
+    
+    if (startDate && endDate) {
+      whereConditions.push(
+        between(financialTransactions.transactionDate, startDate, endDate)
+      );
+    }
+
+    const result = await db
+      .select({
+        gatewayProvider: financialTransactions.gatewayProvider,
+        totalCharges: sum(financialTransactions.gatewayCharges),
+        transactionCount: count()
+      })
+      .from(financialTransactions)
+      .where(and(...whereConditions))
+      .groupBy(financialTransactions.gatewayProvider)
+      .orderBy(desc(sum(financialTransactions.gatewayCharges)));
+
+    return result;
+  }
+
+  async getInternationalTransactionSummary(startDate?: string, endDate?: string) {
+    let whereConditions = [
+      eq(financialTransactions.status, 'active'),
+      eq(financialTransactions.isInternational, true)
+    ];
+    
+    if (startDate && endDate) {
+      whereConditions.push(
+        between(financialTransactions.transactionDate, startDate, endDate)
+      );
+    }
+
+    const [result] = await db
+      .select({
+        totalTransactions: count(),
+        totalAmount: sum(financialTransactions.amount),
+        totalForeignAmount: sum(financialTransactions.foreignAmount)
+      })
+      .from(financialTransactions)
+      .where(and(...whereConditions));
+
+    return {
+      totalTransactions: result.totalTransactions,
+      totalAmount: Number(result.totalAmount || 0),
+      totalForeignAmount: Number(result.totalForeignAmount || 0)
+    };
+  }
+
+  async getPaymentGatewayComparison(startDate?: string, endDate?: string) {
+    let whereConditions = [eq(financialTransactions.status, 'active')];
+    
+    if (startDate && endDate) {
+      whereConditions.push(
+        between(financialTransactions.transactionDate, startDate, endDate)
+      );
+    }
+
+    const result = await db
+      .select({
+        gatewayProvider: financialTransactions.gatewayProvider,
+        totalAmount: sum(financialTransactions.amount),
+        totalCharges: sum(financialTransactions.gatewayCharges),
+        transactionCount: count(),
+        avgTransactionAmount: sql`AVG(${financialTransactions.amount})`,
+        avgChargesPerTransaction: sql`AVG(${financialTransactions.gatewayCharges})`
+      })
+      .from(financialTransactions)
+      .where(and(...whereConditions))
+      .groupBy(financialTransactions.gatewayProvider)
+      .orderBy(desc(count()));
+
+    return result;
   }
 }
 
