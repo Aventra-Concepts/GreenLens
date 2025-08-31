@@ -145,7 +145,7 @@ interface SystemHealth {
 export default function SystemSettings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState('email');
   const [showSecrets, setShowSecrets] = useState(false);
 
   // Fetch system settings
@@ -400,9 +400,9 @@ export default function SystemSettings() {
             <Settings className="w-4 h-4" />
             General
           </TabsTrigger>
-          <TabsTrigger value="email" className="flex items-center gap-2">
+          <TabsTrigger value="email" className="flex items-center gap-2 font-semibold bg-green-50 hover:bg-green-100 border border-green-200 text-green-700">
             <Mail className="w-4 h-4" />
-            Email
+            📧 Email & Subscriptions
           </TabsTrigger>
           <TabsTrigger value="security" className="flex items-center gap-2">
             <Shield className="w-4 h-4" />
