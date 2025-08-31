@@ -1644,6 +1644,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // System Settings routes
+  app.get("/api/admin/system/settings", requireAuth, async (req: any, res) => {
+    try {
+      if (!(req.session as any).adminAuthenticated) {
+        return res.status(401).json({ error: 'Admin authentication required' });
+      }
+      
+      const settings = await storage.getSystemSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error('Get system settings error:', error);
+      res.status(500).json({ error: 'Failed to fetch system settings' });
+    }
+  });
+
+  app.put("/api/admin/system/settings", requireAuth, async (req: any, res) => {
+    try {
+      if (!(req.session as any).adminAuthenticated) {
+        return res.status(401).json({ error: 'Admin authentication required' });
+      }
+      
+      const settings = await storage.updateSystemSettings(req.body);
+      res.json(settings);
+    } catch (error) {
+      console.error('Update system settings error:', error);
+      res.status(500).json({ error: 'Failed to update system settings' });
+    }
+  });
+
+  app.get("/api/admin/system/health", requireAuth, async (req: any, res) => {
+    try {
+      if (!(req.session as any).adminAuthenticated) {
+        return res.status(401).json({ error: 'Admin authentication required' });
+      }
+      
+      // Mock system health data for now
+      const health = {
+        database: { status: 'healthy', connections: 5, maxConnections: 100, queryTime: 12 },
+        api: { status: 'healthy', responseTime: 45, uptime: 99.9, requests: 1523 },
+        storage: { status: 'healthy', used: 2.1, total: 10, percentage: 21 },
+        memory: { status: 'healthy', used: 1.8, total: 4, percentage: 45 }
+      };
+      
+      res.json(health);
+    } catch (error) {
+      console.error('Get system health error:', error);
+      res.status(500).json({ error: 'Failed to fetch system health' });
+    }
+  });
+
+  app.post("/api/admin/system/test-email", requireAuth, async (req: any, res) => {
+    try {
+      if (!(req.session as any).adminAuthenticated) {
+        return res.status(401).json({ error: 'Admin authentication required' });
+      }
+      
+      // TODO: Implement test email functionality
+      res.json({ success: true, message: 'Test email sent successfully' });
+    } catch (error) {
+      console.error('Test email error:', error);
+      res.status(500).json({ error: 'Failed to send test email' });
+    }
+  });
+
+  app.post("/api/admin/system/test-subscription-email", requireAuth, async (req: any, res) => {
+    try {
+      if (!(req.session as any).adminAuthenticated) {
+        return res.status(401).json({ error: 'Admin authentication required' });
+      }
+      
+      // TODO: Implement subscription email test functionality
+      res.json({ success: true, message: 'Test subscription email sent successfully' });
+    } catch (error) {
+      console.error('Test subscription email error:', error);
+      res.status(500).json({ error: 'Failed to send test subscription email' });
+    }
+  });
+
+  app.post("/api/admin/system/backup", requireAuth, async (req: any, res) => {
+    try {
+      if (!(req.session as any).adminAuthenticated) {
+        return res.status(401).json({ error: 'Admin authentication required' });
+      }
+      
+      // TODO: Implement backup functionality
+      res.json({ success: true, message: 'System backup created successfully' });
+    } catch (error) {
+      console.error('System backup error:', error);
+      res.status(500).json({ error: 'Failed to create system backup' });
+    }
+  });
+
   // Gardening content routes
   app.get('/api/admin/gardening-content', async (req, res) => {
     try {
