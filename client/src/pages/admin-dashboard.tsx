@@ -17,7 +17,7 @@ import {
   BarChart3, FileText, LogOut, Database, Server, Activity, Globe, Image, BookOpen,
   TrendingUp, UserCheck, AlertTriangle, CheckCircle, XCircle, Plus, Edit, Trash2,
   Search, Filter, Download, Upload, Eye, ToggleLeft, ToggleRight, Monitor,
-  PieChart, LineChart, UserPlus, Zap, Layers, Lock, ArrowRight, Leaf, Share2, Star
+  PieChart, LineChart, UserPlus, Zap, Layers, Lock, ArrowRight, Leaf, Share2, Star, Tag
 } from "lucide-react";
 import { AdvancedPremiumDashboard } from "@/components/AdvancedPremiumDashboard";
 
