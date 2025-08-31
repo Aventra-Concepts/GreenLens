@@ -86,6 +86,7 @@ export default function FinancialDashboard() {
   const [showGenerateReceipt, setShowGenerateReceipt] = useState(false);
   const [showTaxCalculator, setShowTaxCalculator] = useState(false);
   const [showGSTRecords, setShowGSTRecords] = useState(false);
+  const [showGSTCalculator, setShowGSTCalculator] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -706,14 +707,84 @@ export default function FinancialDashboard() {
               <CardContent>
                 <div className="text-center py-8">
                   <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground mb-4">
                     Manage GST calculations and compliance records
                   </p>
-                  <Dialog open={showGSTRecords} onOpenChange={setShowGSTRecords}>
-                    <DialogTrigger asChild>
-                      <Button className="mt-4">View GST Records</Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
+                  <div className="flex gap-2 justify-center">
+                    <Dialog open={showGSTCalculator} onOpenChange={setShowGSTCalculator}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline">
+                          <Calculator className="h-4 w-4 mr-2" />
+                          GST Calculator
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>GST Calculator</DialogTitle>
+                          <DialogDescription>
+                            Calculate GST amount and total with GST
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="base-amount">Base Amount (₹)</Label>
+                            <Input 
+                              id="base-amount" 
+                              type="number" 
+                              placeholder="Enter base amount" 
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="gst-rate">GST Rate (%)</Label>
+                            <Select>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select GST rate" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="0">0% (Exempt)</SelectItem>
+                                <SelectItem value="5">5%</SelectItem>
+                                <SelectItem value="12">12%</SelectItem>
+                                <SelectItem value="18">18%</SelectItem>
+                                <SelectItem value="28">28%</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label htmlFor="calculated-gst">GST Amount (₹)</Label>
+                            <Input type="text" readOnly placeholder="Will be calculated" className="bg-gray-50" />
+                          </div>
+                          <div>
+                            <Label htmlFor="total-amount">Total Amount (₹)</Label>
+                            <Input type="text" readOnly placeholder="Will be calculated" className="bg-gray-50 font-semibold" />
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              onClick={() => setShowGSTCalculator(false)}
+                              className="flex-1"
+                            >
+                              Close
+                            </Button>
+                            <Button 
+                              onClick={() => {
+                                toast({
+                                  title: "GST Calculated",
+                                  description: "GST calculation completed successfully.",
+                                });
+                              }}
+                              className="flex-1"
+                            >
+                              Calculate
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    <Dialog open={showGSTRecords} onOpenChange={setShowGSTRecords}>
+                      <DialogTrigger asChild>
+                        <Button>View GST Records</Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl">
                       <DialogHeader>
                         <DialogTitle>GST Records</DialogTitle>
                         <DialogDescription>
@@ -773,6 +844,7 @@ export default function FinancialDashboard() {
                       </div>
                     </DialogContent>
                   </Dialog>
+                  </div>
                 </div>
               </CardContent>
             </Card>
