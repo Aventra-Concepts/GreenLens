@@ -222,27 +222,13 @@ export class FinancialService {
   }
 
   async getPeriodAnalytics(startDate: string, endDate: string, period: 'day' | 'month' | 'year') {
-    let dateFormat = 'YYYY-MM-DD';
-    
-    switch (period) {
-      case 'day':
-        dateFormat = 'YYYY-MM-DD';
-        break;
-      case 'month':
-        dateFormat = 'YYYY-MM';
-        break;
-      case 'year':
-        dateFormat = 'YYYY';
-        break;
-    }
-
+    // Simple approach to avoid GROUP BY issues
     const result = await db
       .select({
-        period: sql`TO_CHAR(${financialTransactions.transactionDate}, ${dateFormat})`,
+        transactionDate: financialTransactions.transactionDate,
         type: financialTransactions.type,
-        totalAmount: sum(financialTransactions.amount),
-        transactionCount: count(),
-        totalGst: sum(financialTransactions.gstAmount)
+        amount: financialTransactions.amount,
+        gstAmount: financialTransactions.gstAmount
       })
       .from(financialTransactions)
       .where(
@@ -251,13 +237,38 @@ export class FinancialService {
           eq(financialTransactions.status, 'active')
         )
       )
-      .groupBy(
-        sql`TO_CHAR(${financialTransactions.transactionDate}, ${dateFormat})`,
-        financialTransactions.type
-      )
-      .orderBy(sql`TO_CHAR(${financialTransactions.transactionDate}, ${dateFormat})`);
+      .orderBy(financialTransactions.transactionDate);
 
-    return result;
+    // Group the results in JavaScript to avoid SQL GROUP BY issues
+    const grouped = result.reduce((acc: any, row) => {
+      let periodKey = row.transactionDate;
+      
+      if (period === 'month') {
+        periodKey = row.transactionDate.substring(0, 7); // YYYY-MM
+      } else if (period === 'year') {
+        periodKey = row.transactionDate.substring(0, 4); // YYYY
+      }
+      
+      const key = `${periodKey}-${row.type}`;
+      
+      if (!acc[key]) {
+        acc[key] = {
+          period: periodKey,
+          type: row.type,
+          totalAmount: 0,
+          transactionCount: 0,
+          totalGst: 0
+        };
+      }
+      
+      acc[key].totalAmount += Number(row.amount || 0);
+      acc[key].transactionCount += 1;
+      acc[key].totalGst += Number(row.gstAmount || 0);
+      
+      return acc;
+    }, {});
+
+    return Object.values(grouped);
   }
 
   async getCategoryWiseAnalytics(startDate?: string, endDate?: string) {

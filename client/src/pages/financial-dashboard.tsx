@@ -81,6 +81,11 @@ export default function FinancialDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
   const [selectedPeriod, setSelectedPeriod] = useState("month");
+  const [showAddTransaction, setShowAddTransaction] = useState(false);
+  const [showCreateInvoice, setShowCreateInvoice] = useState(false);
+  const [showGenerateReceipt, setShowGenerateReceipt] = useState(false);
+  const [showTaxCalculator, setShowTaxCalculator] = useState(false);
+  const [showGSTRecords, setShowGSTRecords] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -374,10 +379,79 @@ export default function FinancialDashboard() {
                   <Filter className="h-4 w-4 mr-2" />
                   Filter
                 </Button>
-                <Button size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Transaction
-                </Button>
+                <Dialog open={showAddTransaction} onOpenChange={setShowAddTransaction}>
+                  <DialogTrigger asChild>
+                    <Button size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Transaction
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Add New Transaction</DialogTitle>
+                      <DialogDescription>
+                        Create a new income or expense transaction
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="transaction-type">Transaction Type</Label>
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="income">Income</SelectItem>
+                            <SelectItem value="expense">Expense</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="amount">Amount</Label>
+                        <Input id="amount" type="number" placeholder="Enter amount" />
+                      </div>
+                      <div>
+                        <Label htmlFor="description">Description</Label>
+                        <Input id="description" placeholder="Transaction description" />
+                      </div>
+                      <div>
+                        <Label htmlFor="payment-method">Payment Method</Label>
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select payment method" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cash">Cash</SelectItem>
+                            <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                            <SelectItem value="credit_card">Credit Card</SelectItem>
+                            <SelectItem value="upi">UPI</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setShowAddTransaction(false)}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                        <Button 
+                          onClick={() => {
+                            toast({
+                              title: "Transaction Added",
+                              description: "Your transaction has been successfully recorded.",
+                            });
+                            setShowAddTransaction(false);
+                          }}
+                          className="flex-1"
+                        >
+                          Add Transaction
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardHeader>
             <CardContent>
@@ -401,10 +475,67 @@ export default function FinancialDashboard() {
                 <CardTitle>Invoice Management</CardTitle>
                 <CardDescription>Create and manage invoices for your clients</CardDescription>
               </div>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Invoice
-              </Button>
+              <Dialog open={showCreateInvoice} onOpenChange={setShowCreateInvoice}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Invoice
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Create New Invoice</DialogTitle>
+                    <DialogDescription>
+                      Generate a professional invoice for your client
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="client-name">Client Name</Label>
+                        <Input id="client-name" placeholder="Enter client name" />
+                      </div>
+                      <div>
+                        <Label htmlFor="invoice-date">Invoice Date</Label>
+                        <Input id="invoice-date" type="date" />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="client-email">Client Email</Label>
+                      <Input id="client-email" type="email" placeholder="client@example.com" />
+                    </div>
+                    <div>
+                      <Label htmlFor="invoice-amount">Amount</Label>
+                      <Input id="invoice-amount" type="number" placeholder="Enter invoice amount" />
+                    </div>
+                    <div>
+                      <Label htmlFor="invoice-description">Description</Label>
+                      <Textarea id="invoice-description" placeholder="Invoice description or items" />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setShowCreateInvoice(false)}
+                        className="flex-1"
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        onClick={() => {
+                          toast({
+                            title: "Invoice Created",
+                            description: "Your invoice has been successfully generated.",
+                          });
+                          setShowCreateInvoice(false);
+                        }}
+                        className="flex-1"
+                      >
+                        Create Invoice
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent>
               <div className="text-center py-12">
@@ -427,10 +558,61 @@ export default function FinancialDashboard() {
                 <CardTitle>Receipt Management</CardTitle>
                 <CardDescription>Generate receipts for received payments</CardDescription>
               </div>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Generate Receipt
-              </Button>
+              <Dialog open={showGenerateReceipt} onOpenChange={setShowGenerateReceipt}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Generate Receipt
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Generate Receipt</DialogTitle>
+                    <DialogDescription>
+                      Create a receipt for payment received
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="receipt-from">Received From</Label>
+                      <Input id="receipt-from" placeholder="Enter payer name" />
+                    </div>
+                    <div>
+                      <Label htmlFor="receipt-amount">Amount Received</Label>
+                      <Input id="receipt-amount" type="number" placeholder="Enter amount" />
+                    </div>
+                    <div>
+                      <Label htmlFor="receipt-date">Receipt Date</Label>
+                      <Input id="receipt-date" type="date" />
+                    </div>
+                    <div>
+                      <Label htmlFor="receipt-purpose">Purpose</Label>
+                      <Input id="receipt-purpose" placeholder="Payment for..." />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setShowGenerateReceipt(false)}
+                        className="flex-1"
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        onClick={() => {
+                          toast({
+                            title: "Receipt Generated",
+                            description: "Your receipt has been successfully created.",
+                          });
+                          setShowGenerateReceipt(false);
+                        }}
+                        className="flex-1"
+                      >
+                        Generate
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent>
               <div className="text-center py-12">
@@ -459,7 +641,59 @@ export default function FinancialDashboard() {
                   <p className="text-muted-foreground">
                     Enter your taxable income to calculate tax liability
                   </p>
-                  <Button className="mt-4">Calculate Tax</Button>
+                  <Dialog open={showTaxCalculator} onOpenChange={setShowTaxCalculator}>
+                    <DialogTrigger asChild>
+                      <Button className="mt-4">Calculate Tax</Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Income Tax Calculator</DialogTitle>
+                        <DialogDescription>
+                          Calculate your income tax based on current tax slabs
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="taxable-income">Taxable Income (₹)</Label>
+                          <Input id="taxable-income" type="number" placeholder="Enter your taxable income" />
+                        </div>
+                        <div>
+                          <Label htmlFor="assessment-year">Assessment Year</Label>
+                          <Select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select assessment year" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="2024-25">2024-25</SelectItem>
+                              <SelectItem value="2023-24">2023-24</SelectItem>
+                              <SelectItem value="2022-23">2022-23</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            onClick={() => setShowTaxCalculator(false)}
+                            className="flex-1"
+                          >
+                            Cancel
+                          </Button>
+                          <Button 
+                            onClick={() => {
+                              toast({
+                                title: "Tax Calculated",
+                                description: "Tax calculation completed successfully.",
+                              });
+                              setShowTaxCalculator(false);
+                            }}
+                            className="flex-1"
+                          >
+                            Calculate
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardContent>
             </Card>
@@ -475,7 +709,70 @@ export default function FinancialDashboard() {
                   <p className="text-muted-foreground">
                     Manage GST calculations and compliance records
                   </p>
-                  <Button className="mt-4">View GST Records</Button>
+                  <Dialog open={showGSTRecords} onOpenChange={setShowGSTRecords}>
+                    <DialogTrigger asChild>
+                      <Button className="mt-4">View GST Records</Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>GST Records</DialogTitle>
+                        <DialogDescription>
+                          View and manage your GST transactions and filings
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="gst-period">Period</Label>
+                            <Select>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select period" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="2024-q4">Q4 2024</SelectItem>
+                                <SelectItem value="2024-q3">Q3 2024</SelectItem>
+                                <SelectItem value="2024-q2">Q2 2024</SelectItem>
+                                <SelectItem value="2024-q1">Q1 2024</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label htmlFor="gst-status">Status</Label>
+                            <Select>
+                              <SelectTrigger>
+                                <SelectValue placeholder="All statuses" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All Statuses</SelectItem>
+                                <SelectItem value="filed">Filed</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="draft">Draft</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div className="border rounded-lg p-4">
+                          <div className="text-center py-8">
+                            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                            <p className="text-muted-foreground">No GST records found for the selected period</p>
+                            <p className="text-sm text-gray-500 mt-2">GST records will appear here once you have transactions with GST</p>
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => {
+                            toast({
+                              title: "GST Records",
+                              description: "GST records view updated.",
+                            });
+                            setShowGSTRecords(false);
+                          }}
+                          className="w-full"
+                        >
+                          Close
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardContent>
             </Card>
