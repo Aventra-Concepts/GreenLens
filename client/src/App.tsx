@@ -176,6 +176,7 @@ function Router() {
       </Route>
       
       {/* Admin routes - accessible with session-based auth */}
+      <Route path="/admin" component={Admin} />
       <Route path="/admin-dashboard" component={AdminDashboard} />
       <Route path="/super-admin-dashboard" component={SuperAdminDashboard} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
@@ -199,11 +200,6 @@ function Router() {
           <Route path="/garden-monitoring" component={GardenMonitoring} />
           <Route path="/garden/monitoring" component={GardenMonitoring} />
           <Route path="/garden/dashboard" component={PlantCareDashboard} />
-          {user.isAdmin && (
-            <>
-              <Route path="/admin" component={Admin} />
-            </>
-          )}
         </>
       )}
       
