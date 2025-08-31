@@ -869,4 +869,188 @@ router.post('/api-keys/test', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+// Payment Gateway Management
+router.get('/payment-providers', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const providers = [
+      {
+        id: 'stripe',
+        name: 'Stripe',
+        description: 'Global payment processing',
+        status: !!(process.env.STRIPE_SECRET_KEY && process.env.VITE_STRIPE_PUBLIC_KEY),
+        isPrimary: await storage.getAdminSetting('primary_payment_provider') === 'stripe',
+        isEnabled: await storage.getAdminSetting('payment_provider_stripe_enabled') !== 'false',
+        supportedCurrencies: ['USD', 'EUR', 'GBP', 'AUD', 'CAD', 'JPY'],
+        supportedRegions: ['US', 'EU', 'GB', 'AU', 'CA'],
+        configFields: ['STRIPE_SECRET_KEY', 'VITE_STRIPE_PUBLIC_KEY']
+      },
+      {
+        id: 'paypal',
+        name: 'PayPal',
+        description: 'PayPal payment processing',
+        status: !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET),
+        isPrimary: await storage.getAdminSetting('primary_payment_provider') === 'paypal',
+        isEnabled: await storage.getAdminSetting('payment_provider_paypal_enabled') !== 'false',
+        supportedCurrencies: ['USD', 'EUR', 'GBP', 'AUD', 'CAD', 'JPY'],
+        supportedRegions: ['US', 'EU', 'GB', 'AU', 'CA'],
+        configFields: ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET']
+      },
+      {
+        id: 'cashfree',
+        name: 'Cashfree',
+        description: 'Indian payment gateway',
+        status: !!(process.env.CASHFREE_CLIENT_ID && process.env.CASHFREE_CLIENT_SECRET),
+        isPrimary: await storage.getAdminSetting('primary_payment_provider') === 'cashfree',
+        isEnabled: await storage.getAdminSetting('payment_provider_cashfree_enabled') !== 'false',
+        supportedCurrencies: ['INR', 'USD'],
+        supportedRegions: ['IN', 'US', 'GB'],
+        configFields: ['CASHFREE_CLIENT_ID', 'CASHFREE_CLIENT_SECRET']
+      },
+      {
+        id: 'razorpay',
+        name: 'Razorpay',
+        description: 'Indian payment processing',
+        status: !!(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET),
+        isPrimary: await storage.getAdminSetting('primary_payment_provider') === 'razorpay',
+        isEnabled: await storage.getAdminSetting('payment_provider_razorpay_enabled') !== 'false',
+        supportedCurrencies: ['INR', 'USD'],
+        supportedRegions: ['IN', 'US'],
+        configFields: ['RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET']
+      }
+    ];
+
+    // Get provider priority order
+    const priorityOrder = await storage.getAdminSetting('payment_provider_priority') || 'stripe,paypal,cashfree,razorpay';
+    const orderedProviders = priorityOrder.split(',').map(id => 
+      providers.find(p => p.id === id)
+    ).filter(Boolean);
+
+    res.json({ success: true, providers: orderedProviders });
+  } catch (error) {
+    console.error('Failed to fetch payment providers:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch payment providers' });
+  }
+});
+
+router.post('/payment-providers/set-primary', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { providerId } = req.body;
+    
+    if (!['stripe', 'paypal', 'cashfree', 'razorpay'].includes(providerId)) {
+      return res.status(400).json({ success: false, error: 'Invalid payment provider' });
+    }
+
+    await storage.setAdminSetting('primary_payment_provider', providerId);
+    
+    // Log the action
+    await AdminAuthService.logAdminAction(
+      req.user!.id,
+      'payment_provider_primary_changed',
+      { newPrimary: providerId },
+      req.ip
+    );
+
+    res.json({ success: true, message: `${providerId} set as primary payment provider` });
+  } catch (error) {
+    console.error('Failed to set primary provider:', error);
+    res.status(500).json({ success: false, error: 'Failed to set primary provider' });
+  }
+});
+
+router.post('/payment-providers/toggle', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { providerId, enabled } = req.body;
+    
+    if (!['stripe', 'paypal', 'cashfree', 'razorpay'].includes(providerId)) {
+      return res.status(400).json({ success: false, error: 'Invalid payment provider' });
+    }
+
+    await storage.setAdminSetting(`payment_provider_${providerId}_enabled`, enabled.toString());
+    
+    // Log the action
+    await AdminAuthService.logAdminAction(
+      req.user!.id,
+      'payment_provider_toggled',
+      { provider: providerId, enabled },
+      req.ip
+    );
+
+    res.json({ 
+      success: true, 
+      message: `${providerId} ${enabled ? 'enabled' : 'disabled'} successfully` 
+    });
+  } catch (error) {
+    console.error('Failed to toggle provider:', error);
+    res.status(500).json({ success: false, error: 'Failed to toggle provider' });
+  }
+});
+
+router.post('/payment-providers/update-priority', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { priorityOrder } = req.body;
+    
+    if (!Array.isArray(priorityOrder) || priorityOrder.some(id => !['stripe', 'paypal', 'cashfree', 'razorpay'].includes(id))) {
+      return res.status(400).json({ success: false, error: 'Invalid priority order' });
+    }
+
+    await storage.setAdminSetting('payment_provider_priority', priorityOrder.join(','));
+    
+    // Log the action
+    await AdminAuthService.logAdminAction(
+      req.user!.id,
+      'payment_provider_priority_updated',
+      { newOrder: priorityOrder },
+      req.ip
+    );
+
+    res.json({ success: true, message: 'Payment provider priority updated successfully' });
+  } catch (error) {
+    console.error('Failed to update priority:', error);
+    res.status(500).json({ success: false, error: 'Failed to update priority' });
+  }
+});
+
+router.delete('/payment-providers/:providerId', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { providerId } = req.params;
+    
+    if (!['stripe', 'paypal', 'cashfree', 'razorpay'].includes(providerId)) {
+      return res.status(400).json({ success: false, error: 'Invalid payment provider' });
+    }
+
+    // Disable the provider instead of actually deleting it
+    await storage.setAdminSetting(`payment_provider_${providerId}_enabled`, 'false');
+    
+    // If this was the primary provider, set a new primary
+    const currentPrimary = await storage.getAdminSetting('primary_payment_provider');
+    if (currentPrimary === providerId) {
+      // Find first enabled provider as new primary
+      const providers = ['stripe', 'paypal', 'cashfree', 'razorpay'];
+      let newPrimary = null;
+      for (const provider of providers) {
+        if (provider !== providerId && await storage.getAdminSetting(`payment_provider_${provider}_enabled`) !== 'false') {
+          newPrimary = provider;
+          break;
+        }
+      }
+      if (newPrimary) {
+        await storage.setAdminSetting('primary_payment_provider', newPrimary);
+      }
+    }
+    
+    // Log the action
+    await AdminAuthService.logAdminAction(
+      req.user!.id,
+      'payment_provider_removed',
+      { provider: providerId },
+      req.ip
+    );
+
+    res.json({ success: true, message: `${providerId} payment provider disabled successfully` });
+  } catch (error) {
+    console.error('Failed to remove provider:', error);
+    res.status(500).json({ success: false, error: 'Failed to remove provider' });
+  }
+});
+
 export default router;

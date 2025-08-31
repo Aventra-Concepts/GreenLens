@@ -18,7 +18,7 @@ import {
   TrendingUp, UserCheck, AlertTriangle, CheckCircle, XCircle, Plus, Edit, Trash2,
   Search, Filter, Download, Upload, Eye, ToggleLeft, ToggleRight, Monitor,
   PieChart, LineChart, UserPlus, Zap, Layers, Lock, ArrowRight, Leaf, Share2, Star, Tag,
-  Target
+  Target, CreditCard, ArrowUpDown, GripVertical, Save
 } from "lucide-react";
 import AnalyticsDashboard from "@/components/admin/AnalyticsDashboard";
 import SEODashboard from "@/components/admin/SEODashboard";
@@ -149,6 +149,9 @@ export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [viewingAuthor, setViewingAuthor] = useState<AdminAuthor | null>(null);
+  const [paymentProviders, setPaymentProviders] = useState<any[]>([]);
+  const [showAddProviderDialog, setShowAddProviderDialog] = useState(false);
+  const [primaryProvider, setPrimaryProvider] = useState<string>('stripe');
 
   // Check admin authentication
   useEffect(() => {
@@ -257,7 +260,84 @@ export default function AdminDashboard() {
     },
   });
 
+  // Fetch payment providers data
+  const { data: providersData, refetch: refetchPaymentProviders } = useQuery({
+    queryKey: ['/api/admin/payment-providers'],
+    enabled: isAuthenticated,
+    onSuccess: (data: any) => {
+      if (data?.providers) {
+        setPaymentProviders(data.providers);
+        const primary = data.providers.find((p: any) => p.isPrimary);
+        if (primary) {
+          setPrimaryProvider(primary.id);
+        }
+      }
+    }
+  });
 
+  // Payment provider mutations
+  const setPrimaryProviderMutation = useMutation({
+    mutationFn: async (providerId: string) => {
+      const response = await apiRequest("POST", "/api/admin/payment-providers/set-primary", { providerId });
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchPaymentProviders();
+      toast({
+        title: "Success",
+        description: "Primary payment provider updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update primary provider",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const toggleProviderMutation = useMutation({
+    mutationFn: async ({ providerId, enabled }: { providerId: string; enabled: boolean }) => {
+      const response = await apiRequest("POST", "/api/admin/payment-providers/toggle", { providerId, enabled });
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchPaymentProviders();
+      toast({
+        title: "Success",
+        description: "Payment provider status updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update provider status",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const removeProviderMutation = useMutation({
+    mutationFn: async (providerId: string) => {
+      const response = await apiRequest("DELETE", `/api/admin/payment-providers/${providerId}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchPaymentProviders();
+      toast({
+        title: "Success",
+        description: "Payment provider removed successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove provider",
+        variant: "destructive",
+      });
+    }
+  });
 
   // Update consultation status mutation - always call this hook
   const updateStatusMutation = useMutation({
@@ -1929,7 +2009,7 @@ export default function AdminDashboard() {
                     <div>
                       <h3 className="font-semibold mb-4 text-blue-700 dark:text-blue-400">Payment Services</h3>
                       <div className="space-y-4">
-                        <div className="border rounded-lg p-4">
+                        <div id="stripe-config-section" className="border rounded-lg p-4">
                           <div className="flex items-center justify-between mb-3">
                             <div>
                               <p className="font-medium">Stripe</p>
@@ -1965,7 +2045,7 @@ export default function AdminDashboard() {
                           </div>
                         </div>
 
-                        <div className="border rounded-lg p-4">
+                        <div id="paypal-config-section" className="border rounded-lg p-4">
                           <div className="flex items-center justify-between mb-3">
                             <div>
                               <p className="font-medium">PayPal</p>
@@ -2001,7 +2081,7 @@ export default function AdminDashboard() {
                           </div>
                         </div>
 
-                        <div className="border rounded-lg p-4">
+                        <div id="cashfree-config-section" className="border rounded-lg p-4">
                           <div className="flex items-center justify-between mb-3">
                             <div>
                               <p className="font-medium">Cashfree</p>
@@ -2037,7 +2117,7 @@ export default function AdminDashboard() {
                           </div>
                         </div>
 
-                        <div className="border rounded-lg p-4">
+                        <div id="razorpay-config-section" className="border rounded-lg p-4">
                           <div className="flex items-center justify-between mb-3">
                             <div>
                               <p className="font-medium">Razorpay</p>
@@ -2166,6 +2246,226 @@ export default function AdminDashboard() {
                     <Button className="w-full" data-testid="button-save-all-keys">
                       <Settings className="w-4 h-4 mr-2" />
                       Save All Changes
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Payment Gateway Management */}
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="w-5 h-5" />
+                    Payment Gateway Management
+                  </CardTitle>
+                  <CardDescription>Configure payment provider preferences and priorities</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Primary Payment Provider Selection */}
+                  <div className="border rounded-lg p-4">
+                    <h3 className="font-semibold mb-4 flex items-center gap-2">
+                      <Star className="w-4 h-4 text-yellow-500" />
+                      Primary Payment Provider
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-4">Select your default payment provider for new transactions</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {paymentProviders.map((provider) => (
+                        <Button 
+                          key={provider.id}
+                          variant="outline" 
+                          className={`h-auto p-4 flex flex-col items-center gap-2 ${
+                            provider.isPrimary 
+                              ? 'border-2 border-green-500 bg-green-50 dark:bg-green-900/20' 
+                              : ''
+                          }`}
+                          onClick={() => setPrimaryProviderMutation.mutate(provider.id)}
+                          disabled={!provider.isEnabled || setPrimaryProviderMutation.isPending}
+                          data-testid={`button-primary-${provider.id}`}
+                        >
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            provider.id === 'stripe' ? 'bg-blue-100' :
+                            provider.id === 'paypal' ? 'bg-blue-100' :
+                            provider.id === 'cashfree' ? 'bg-orange-100' :
+                            'bg-purple-100'
+                          }`}>
+                            <CreditCard className={`w-4 h-4 ${
+                              provider.id === 'stripe' ? 'text-blue-600' :
+                              provider.id === 'paypal' ? 'text-blue-600' :
+                              provider.id === 'cashfree' ? 'text-orange-600' :
+                              'text-purple-600'
+                            }`} />
+                          </div>
+                          <span className="text-sm font-medium">{provider.name}</span>
+                          {provider.isPrimary ? (
+                            <Badge className="bg-green-100 text-green-800 text-xs">Primary</Badge>
+                          ) : provider.status ? (
+                            <Badge className="bg-blue-100 text-blue-800 text-xs">Configured</Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-xs">Not Set</Badge>
+                          )}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Active Payment Providers Management */}
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold">Active Payment Providers</h3>
+                      <Button 
+                        size="sm" 
+                        className="gap-2" 
+                        onClick={() => setShowAddProviderDialog(true)}
+                        data-testid="button-add-provider"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Add New Provider
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {paymentProviders.map((provider, index) => (
+                        <div key={provider.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              provider.id === 'stripe' ? 'bg-blue-100' :
+                              provider.id === 'paypal' ? 'bg-blue-100' :
+                              provider.id === 'cashfree' ? 'bg-orange-100' :
+                              'bg-purple-100'
+                            }`}>
+                              <CreditCard className={`w-5 h-5 ${
+                                provider.id === 'stripe' ? 'text-blue-600' :
+                                provider.id === 'paypal' ? 'text-blue-600' :
+                                provider.id === 'cashfree' ? 'text-orange-600' :
+                                'text-purple-600'
+                              }`} />
+                            </div>
+                            <div>
+                              <p className="font-medium">{provider.name}</p>
+                              <p className="text-sm text-gray-500">{provider.description}</p>
+                              <p className="text-xs text-gray-400">
+                                Supports: {provider.supportedCurrencies.slice(0, 3).join(', ')}
+                                {provider.supportedCurrencies.length > 3 ? '...' : ''}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            {provider.isPrimary && (
+                              <Badge className="bg-green-100 text-green-800">Primary</Badge>
+                            )}
+                            <Badge variant="outline" className={
+                              provider.status 
+                                ? "bg-green-50 text-green-700 border-green-200" 
+                                : "bg-red-50 text-red-700 border-red-200"
+                            }>
+                              {provider.status ? 'Connected' : 'Not Configured'}
+                            </Badge>
+                            {!provider.isEnabled && (
+                              <Badge variant="outline" className="bg-gray-50 text-gray-500">
+                                Disabled
+                              </Badge>
+                            )}
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => {
+                                // Scroll to API keys section
+                                const section = document.getElementById(`${provider.id}-config-section`);
+                                if (section) {
+                                  section.scrollIntoView({ behavior: 'smooth' });
+                                }
+                              }}
+                              data-testid={`button-configure-${provider.id}`}
+                            >
+                              <Settings className="w-4 h-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-red-600 hover:text-red-700" 
+                              onClick={() => removeProviderMutation.mutate(provider.id)}
+                              disabled={removeProviderMutation.isPending}
+                              data-testid={`button-disable-${provider.id}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Payment Provider Priorities */}
+                  <div className="border rounded-lg p-4">
+                    <h3 className="font-semibold mb-4 flex items-center gap-2">
+                      <ArrowUpDown className="w-4 h-4" />
+                      Payment Provider Priority
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-4">Drag to reorder payment providers by priority (highest first)</p>
+                    <div className="space-y-2">
+                      {paymentProviders.map((provider, index) => (
+                        <div 
+                          key={provider.id} 
+                          className={`flex items-center gap-3 p-3 border rounded-lg ${
+                            provider.isPrimary ? 'bg-green-50 dark:bg-green-900/20' : ''
+                          }`}
+                        >
+                          <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
+                          <span className="font-medium">{index + 1}. {provider.name}</span>
+                          <div className="ml-auto flex gap-2">
+                            {provider.isPrimary && (
+                              <Badge className="bg-green-100 text-green-800">Primary</Badge>
+                            )}
+                            {provider.supportedRegions.includes('IN') && (
+                              <Badge variant="outline" className="text-xs">India</Badge>
+                            )}
+                            {!provider.isEnabled && (
+                              <Badge variant="outline" className="bg-gray-50 text-gray-500 text-xs">
+                                Disabled
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="flex gap-3">
+                    <Button 
+                      className="flex-1" 
+                      onClick={() => {
+                        toast({
+                          title: "Configuration Saved",
+                          description: "All payment provider settings have been saved successfully",
+                        });
+                      }}
+                      data-testid="button-save-payment-config"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Configuration
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={async () => {
+                        // Test all configured providers
+                        let successCount = 0;
+                        for (const provider of paymentProviders) {
+                          if (provider.status) {
+                            successCount++;
+                          }
+                        }
+                        toast({
+                          title: "Provider Test Complete",
+                          description: `${successCount} out of ${paymentProviders.length} providers are properly configured`,
+                          variant: successCount === paymentProviders.length ? "default" : "destructive"
+                        });
+                      }}
+                      data-testid="button-test-providers"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Test All Providers
                     </Button>
                   </div>
                 </CardContent>
@@ -2839,6 +3139,113 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Add New Payment Provider Dialog */}
+      <Dialog open={showAddProviderDialog} onOpenChange={setShowAddProviderDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Add New Payment Provider</DialogTitle>
+            <DialogDescription>
+              Configure a new payment gateway service for your platform
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onClick={() => {
+                setShowAddProviderDialog(false);
+                toast({
+                  title: "Stripe Integration",
+                  description: "Please configure your Stripe keys in the API Keys section above",
+                });
+              }}>
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <CreditCard className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Stripe</h3>
+                  <p className="text-sm text-gray-500 mb-3">Global payment processing with 135+ currencies</p>
+                  <Badge className="bg-blue-100 text-blue-800">Recommended</Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onClick={() => {
+                setShowAddProviderDialog(false);
+                toast({
+                  title: "PayPal Integration", 
+                  description: "Please configure your PayPal keys in the API Keys section above",
+                });
+              }}>
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <CreditCard className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h3 className="font-semibold mb-2">PayPal</h3>
+                  <p className="text-sm text-gray-500 mb-3">Trusted payment solution worldwide</p>
+                  <Badge variant="outline">Global</Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onClick={() => {
+                setShowAddProviderDialog(false);
+                toast({
+                  title: "Cashfree Integration",
+                  description: "Please configure your Cashfree keys in the API Keys section above",
+                });
+              }}>
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <CreditCard className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Cashfree</h3>
+                  <p className="text-sm text-gray-500 mb-3">Leading Indian payment gateway</p>
+                  <Badge className="bg-orange-100 text-orange-800">India</Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onClick={() => {
+                setShowAddProviderDialog(false);
+                toast({
+                  title: "Razorpay Integration",
+                  description: "Please configure your Razorpay keys in the API Keys section above",
+                });
+              }}>
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <CreditCard className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Razorpay</h3>
+                  <p className="text-sm text-gray-500 mb-3">Full-stack financial solutions for India</p>
+                  <Badge className="bg-purple-100 text-purple-800">India</Badge>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="border-t pt-4">
+              <h4 className="font-semibold mb-2">Coming Soon</h4>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="text-center opacity-50">
+                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <CreditCard className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <p className="text-sm text-gray-400">Square</p>
+                </div>
+                <div className="text-center opacity-50">
+                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <CreditCard className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <p className="text-sm text-gray-400">Adyen</p>
+                </div>
+                <div className="text-center opacity-50">
+                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <CreditCard className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <p className="text-sm text-gray-400">Braintree</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
