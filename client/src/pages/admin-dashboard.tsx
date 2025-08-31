@@ -25,6 +25,7 @@ import AnalyticsDashboard from "@/components/admin/AnalyticsDashboard";
 import SEODashboard from "@/components/admin/SEODashboard";
 import ConsultationManagementDashboard from "@/components/admin/ConsultationManagementDashboard";
 import { AdvancedPremiumDashboard } from "@/components/AdvancedPremiumDashboard";
+import AdminFinancialDashboard from "./admin-financial-dashboard";
 
 interface ConsultationRequest {
   id: string;
@@ -986,6 +987,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="affiliate" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-orange-100 to-amber-100 border-2 border-orange-300">
               <DollarSign className="w-3 h-3 text-orange-600" />
               <span className="hidden sm:inline font-semibold text-orange-700">Affiliate</span>
+            </TabsTrigger>
+            <TabsTrigger value="financial" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-emerald-100 to-green-100 border-2 border-emerald-300">
+              <CreditCard className="w-3 h-3 text-emerald-600" />
+              <span className="hidden sm:inline font-semibold text-emerald-700">Financial</span>
             </TabsTrigger>
             <TabsTrigger 
               value="hr" 
@@ -3201,6 +3206,15 @@ export default function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Financial Dashboard */}
+          <TabsContent value="financial" className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Financial Dashboard</h2>
+              <p className="text-gray-600 dark:text-gray-300">Comprehensive financial management with income/expense tracking, tax calculations, and analytics</p>
+            </div>
+            <AdminFinancialDashboard />
           </TabsContent>
         </Tabs>
       </div>
