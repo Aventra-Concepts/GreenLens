@@ -277,17 +277,105 @@ export default function ConsultationManagementDashboard() {
         title: "Export Started",
         description: `Generating ${format.toUpperCase()} report...`,
       });
-      
-      // Simulate export delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const filename = `consultations-${new Date().toISOString().split('T')[0]}.${format}`;
-      
+
+      const dataToExport = filteredConsultations.length > 0 ? filteredConsultations : consultationRequests;
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `consultations-${timestamp}`;
+
+      if (format === 'csv') {
+        // Generate CSV
+        const headers = [
+          'ID', 'Name', 'Email', 'Phone', 'City', 'State', 'Country',
+          'Problem Description', 'Preferred Date', 'Time Slot', 'Status',
+          'Amount', 'Currency', 'Assigned Expert', 'Created At'
+        ];
+
+        const csvContent = [
+          headers.join(','),
+          ...dataToExport.map(consultation => [
+            consultation.id,
+            `"${consultation.name}"`,
+            consultation.email,
+            consultation.phoneNumber || '',
+            consultation.city,
+            consultation.state,
+            consultation.country,
+            `"${consultation.problemDescription.replace(/"/g, '""')}"`,
+            formatDate(consultation.preferredDate),
+            consultation.preferredTimeSlot,
+            consultation.status,
+            consultation.amount,
+            consultation.currency,
+            consultation.assignedExpertId || '',
+            formatDate(consultation.createdAt)
+          ].join(','))
+        ].join('\n');
+
+        // Create and download CSV file
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${filename}.csv`;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+
+      } else if (format === 'pdf') {
+        // Generate PDF using dynamic import
+        const { default: jsPDF } = await import('jspdf');
+        await import('jspdf-autotable');
+
+        const doc = new jsPDF();
+        
+        // Add title
+        doc.setFontSize(16);
+        doc.text('Consultation Requests Report', 20, 20);
+        
+        // Add generation date
+        doc.setFontSize(10);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 30);
+        doc.text(`Total Records: ${dataToExport.length}`, 20, 36);
+
+        // Prepare table data
+        const tableData = dataToExport.map(consultation => [
+          consultation.name,
+          consultation.email,
+          consultation.city,
+          consultation.status,
+          `${consultation.currency} ${consultation.amount}`,
+          formatDate(consultation.createdAt)
+        ]);
+
+        // Add table
+        (doc as any).autoTable({
+          head: [['Name', 'Email', 'City', 'Status', 'Amount', 'Created']],
+          body: tableData,
+          startY: 45,
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [34, 197, 94] },
+          columnStyles: {
+            0: { cellWidth: 30 },
+            1: { cellWidth: 40 },
+            2: { cellWidth: 25 },
+            3: { cellWidth: 25 },
+            4: { cellWidth: 25 },
+            5: { cellWidth: 35 }
+          }
+        });
+
+        // Save the PDF
+        doc.save(`${filename}.pdf`);
+      }
+
       toast({
         title: "Export Complete",
-        description: `${format.toUpperCase()} report generated: ${filename}`,
+        description: `${format.toUpperCase()} report downloaded successfully.`,
       });
+
     } catch (error) {
+      console.error('Export error:', error);
       toast({
         title: "Export Failed",
         description: "Unable to generate report. Please try again.",
