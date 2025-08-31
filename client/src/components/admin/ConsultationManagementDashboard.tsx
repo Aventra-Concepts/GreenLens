@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { format, parseISO, isValid } from "date-fns";
 import { 
-  Calendar, Clock, User, Mail, Phone, MessageSquare, DollarSign, Settings, Users, 
+  Calendar, Clock, User, Mail, Phone, MessageSquare, DollarSign, Users, 
   BarChart3, Search, Filter, Download, Upload, Eye, Edit, Trash2, Plus,
   TrendingUp, AlertTriangle, CheckCircle, XCircle, Star, Target, Globe,
   Activity, PieChart as PieChartIcon, LineChart as LineChartIcon, FileText, Send, Archive, RefreshCw,
