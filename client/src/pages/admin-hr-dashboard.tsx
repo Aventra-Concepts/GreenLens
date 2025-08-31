@@ -744,103 +744,7 @@ export default function AdminHRDashboard() {
 
           {/* Attendance Tab */}
           <TabsContent value="attendance" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Clock className="w-5 h-5" />
-                    Today's Attendance
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                      <div className="p-4 bg-green-50 rounded-lg">
-                        <p className="text-2xl font-bold text-green-700">89</p>
-                        <p className="text-sm text-green-600">Present</p>
-                      </div>
-                      <div className="p-4 bg-red-50 rounded-lg">
-                        <p className="text-2xl font-bold text-red-700">5</p>
-                        <p className="text-sm text-red-600">Absent</p>
-                      </div>
-                      <div className="p-4 bg-yellow-50 rounded-lg">
-                        <p className="text-2xl font-bold text-yellow-700">8</p>
-                        <p className="text-sm text-yellow-600">Late</p>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Recent Clock-ins</h4>
-                      <div className="space-y-2">
-                        {staffMembers.slice(0, 5).map((emp, idx) => (
-                          <div key={emp.id} className="flex items-center justify-between py-2 border-b">
-                            <div className="flex items-center space-x-3">
-                              <Avatar className="w-8 h-8">
-                                <AvatarFallback>{emp.firstName[0]}{emp.lastName[0]}</AvatarFallback>
-                              </Avatar>
-                              <span className="text-sm">{emp.firstName} {emp.lastName}</span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <PlayCircle className="w-4 h-4 text-green-500" />
-                              <span className="text-sm text-gray-600">9:{String(idx + 5).padStart(2, '0')} AM</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Timer className="w-5 h-5" />
-                    Attendance Stats
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm">On Time</span>
-                      <span className="font-semibold text-green-600">94.2%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Late Arrivals</span>
-                      <span className="font-semibold text-yellow-600">4.1%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Absent</span>
-                      <span className="font-semibold text-red-600">1.7%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Overtime Hours</span>
-                      <span className="font-semibold text-blue-600">247 hrs</span>
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-sm">Work Locations</h4>
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span>🏠 Remote</span>
-                        <span>45%</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>🏢 Office</span>
-                        <span>35%</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>🔄 Hybrid</span>
-                        <span>20%</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <AttendanceManagement />
           </TabsContent>
 
           {/* Leave Management Tab */}
@@ -1962,3 +1866,436 @@ export default function AdminHRDashboard() {
     </div>
   );
 }
+
+// Attendance Management Component
+const AttendanceManagement = () => {
+  const queryClient = useQueryClient();
+  const [selectedEmployee, setSelectedEmployee] = useState<string>('');
+  const [attendanceDate, setAttendanceDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [isRecordingLogin, setIsRecordingLogin] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<any>(null);
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [workLocation, setWorkLocation] = useState('office');
+  const [notes, setNotes] = useState('');
+
+  // Queries
+  const { data: attendanceRecords = [], isLoading: recordsLoading } = useQuery({
+    queryKey: ['/api/hr/attendance'],
+    retry: false,
+  });
+
+  const { data: staffMembers = [], isLoading: staffLoading } = useQuery({
+    queryKey: ['/api/hr/staff'],
+    retry: false,
+  });
+
+  const { data: todayAttendance = [] } = useQuery({
+    queryKey: ['/api/hr/attendance', { startDate: attendanceDate, endDate: attendanceDate }],
+    retry: false,
+  });
+
+  // Mutations
+  const recordLoginMutation = useMutation({
+    mutationFn: async ({ staffMemberId, workLocation, notes }: any) => {
+      return await apiRequest('/api/hr/attendance/login', {
+        method: 'POST',
+        body: JSON.stringify({ staffMemberId, workLocation, notes }),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Login Recorded",
+        description: "Employee login time has been recorded successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/hr/attendance'] });
+      setSelectedEmployee('');
+      setWorkLocation('office');
+      setNotes('');
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Login Failed",
+        description: error.message || "Failed to record login time.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const recordLogoutMutation = useMutation({
+    mutationFn: async ({ recordId, notes }: any) => {
+      return await apiRequest(`/api/hr/attendance/${recordId}/logout`, {
+        method: 'PUT',
+        body: JSON.stringify({ notes }),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Logout Recorded",
+        description: "Employee logout time has been recorded successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/hr/attendance'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Logout Failed",
+        description: error.message || "Failed to record logout time.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createManualRecordMutation = useMutation({
+    mutationFn: async (recordData: any) => {
+      return await apiRequest('/api/hr/attendance', {
+        method: 'POST',
+        body: JSON.stringify(recordData),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Attendance Record Created",
+        description: "Manual attendance record has been created successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/hr/attendance'] });
+      setIsManualModalOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Creation Failed",
+        description: error.message || "Failed to create attendance record.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleRecordLogin = () => {
+    if (!selectedEmployee) {
+      toast({
+        title: "Error",
+        description: "Please select an employee first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    recordLoginMutation.mutate({
+      staffMemberId: selectedEmployee,
+      workLocation,
+      notes,
+    });
+  };
+
+  const handleRecordLogout = (recordId: string) => {
+    recordLogoutMutation.mutate({
+      recordId,
+      notes: '',
+    });
+  };
+
+  // Get today's statistics
+  const todayStats = {
+    present: todayAttendance.filter((r: any) => r.status === 'present' || r.status === 'late').length,
+    absent: staffMembers.length - todayAttendance.length,
+    late: todayAttendance.filter((r: any) => r.isLate).length,
+    remote: todayAttendance.filter((r: any) => r.workLocation === 'remote').length,
+  };
+
+  if (recordsLoading || staffLoading) {
+    return <div className="flex justify-center p-8">Loading attendance data...</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header and Quick Actions */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Attendance Management</h2>
+          <p className="text-gray-600">Track employee login/logout times and manage attendance</p>
+        </div>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => setIsManualModalOpen(true)} 
+            variant="outline"
+            data-testid="button-create-manual-record"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Manual Record
+          </Button>
+          <Button 
+            onClick={() => window.location.reload()} 
+            variant="outline"
+            data-testid="button-refresh-attendance"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh
+          </Button>
+        </div>
+      </div>
+
+      {/* Login Recording Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <PlayCircle className="w-5 h-5" />
+            Record Login
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor="employee-select">Select Employee</Label>
+              <Select value={selectedEmployee} onValueChange={setSelectedEmployee}>
+                <SelectTrigger id="employee-select" data-testid="select-employee">
+                  <SelectValue placeholder="Choose employee..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {staffMembers.map((staff: any) => (
+                    <SelectItem key={staff.id} value={staff.id}>
+                      {staff.firstName} {staff.lastName} ({staff.employeeId})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="work-location">Work Location</Label>
+              <Select value={workLocation} onValueChange={setWorkLocation}>
+                <SelectTrigger id="work-location" data-testid="select-work-location">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="office">Office</SelectItem>
+                  <SelectItem value="remote">Remote</SelectItem>
+                  <SelectItem value="client_site">Client Site</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="notes">Notes (Optional)</Label>
+              <Input
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Any additional notes..."
+                data-testid="input-notes"
+              />
+            </div>
+            <div className="flex items-end">
+              <Button 
+                onClick={handleRecordLogin}
+                disabled={recordLoginMutation.isPending || !selectedEmployee}
+                className="w-full"
+                data-testid="button-record-login"
+              >
+                {recordLoginMutation.isPending ? (
+                  <Clock className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <PlayCircle className="w-4 h-4 mr-2" />
+                )}
+                Record Login
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Today's Attendance Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-green-600">Present</p>
+                <p className="text-2xl font-bold text-green-900">{todayStats.present}</p>
+              </div>
+              <CheckCircle className="w-8 h-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-red-600">Absent</p>
+                <p className="text-2xl font-bold text-red-900">{todayStats.absent}</p>
+              </div>
+              <X className="w-8 h-8 text-red-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-yellow-200 bg-yellow-50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-yellow-600">Late</p>
+                <p className="text-2xl font-bold text-yellow-900">{todayStats.late}</p>
+              </div>
+              <Clock className="w-8 h-8 text-yellow-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-600">Remote</p>
+                <p className="text-2xl font-bold text-blue-900">{todayStats.remote}</p>
+              </div>
+              <Home className="w-8 h-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Today's Attendance Records */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="w-5 h-5" />
+            Today's Attendance Records ({attendanceDate})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {todayAttendance.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No attendance records for today
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {todayAttendance.map((record: any) => {
+                const staff = staffMembers.find((s: any) => s.id === record.staffMemberId);
+                return (
+                  <div key={record.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-4">
+                      <Avatar className="w-10 h-10">
+                        <AvatarFallback>
+                          {staff ? `${staff.firstName[0]}${staff.lastName[0]}` : 'UK'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">
+                          {staff ? `${staff.firstName} ${staff.lastName}` : 'Unknown Employee'}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {staff?.employeeId} • {record.workLocation}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-right">
+                        <p className="text-sm">
+                          <span className="font-medium">In:</span> {
+                            record.loginTime ? new Date(record.loginTime).toLocaleTimeString() : 'Not recorded'
+                          }
+                        </p>
+                        <p className="text-sm">
+                          <span className="font-medium">Out:</span> {
+                            record.logoutTime ? new Date(record.logoutTime).toLocaleTimeString() : 'Not recorded'
+                          }
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant={record.isLate ? "destructive" : "secondary"}>
+                          {record.status}
+                        </Badge>
+                        {record.loginTime && !record.logoutTime && (
+                          <Button
+                            size="sm"
+                            onClick={() => handleRecordLogout(record.id)}
+                            disabled={recordLogoutMutation.isPending}
+                            data-testid={`button-logout-${record.id}`}
+                          >
+                            <PauseCircle className="w-4 h-4 mr-1" />
+                            Logout
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Manual Attendance Record Dialog */}
+      <Dialog open={isManualModalOpen} onOpenChange={setIsManualModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create Manual Attendance Record</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Employee</Label>
+              <Select value={selectedEmployee} onValueChange={setSelectedEmployee}>
+                <SelectTrigger data-testid="select-manual-employee">
+                  <SelectValue placeholder="Choose employee..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {staffMembers.map((staff: any) => (
+                    <SelectItem key={staff.id} value={staff.id}>
+                      {staff.firstName} {staff.lastName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Date</Label>
+              <Input
+                type="date"
+                value={attendanceDate}
+                onChange={(e) => setAttendanceDate(e.target.value)}
+                data-testid="input-manual-date"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Login Time</Label>
+                <Input type="time" data-testid="input-login-time" />
+              </div>
+              <div>
+                <Label>Logout Time</Label>
+                <Input type="time" data-testid="input-logout-time" />
+              </div>
+            </div>
+            <div>
+              <Label>Status</Label>
+              <Select defaultValue="present">
+                <SelectTrigger data-testid="select-manual-status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="present">Present</SelectItem>
+                  <SelectItem value="late">Late</SelectItem>
+                  <SelectItem value="absent">Absent</SelectItem>
+                  <SelectItem value="half_day">Half Day</SelectItem>
+                  <SelectItem value="remote">Remote</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsManualModalOpen(false)}
+                data-testid="button-cancel-manual"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => {/* Handle manual record creation */}}
+                data-testid="button-create-manual"
+              >
+                Create Record
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};

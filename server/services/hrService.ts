@@ -7,6 +7,7 @@ import {
   employeeRecords,
   leaveRequests,
   salaryAdvances,
+  attendanceRecords,
   type StaffMember,
   type StaffRole,
   type JobPosting,
@@ -14,6 +15,7 @@ import {
   type EmployeeRecord,
   type LeaveRequest,
   type SalaryAdvance,
+  type AttendanceRecord,
   type InsertStaffMember,
   type InsertStaffRole,
   type InsertJobPosting,
@@ -21,6 +23,7 @@ import {
   type InsertEmployeeRecord,
   type InsertLeaveRequest,
   type InsertSalaryAdvance,
+  type InsertAttendanceRecord,
 } from "../../shared/schema";
 import { eq, desc, count, and, or, ilike, sql } from "drizzle-orm";
 
@@ -454,6 +457,224 @@ export class HRService {
       .orderBy(desc(count(staffMembers.id)));
     
     return results;
+  }
+
+  // Attendance Management
+  async getAllAttendanceRecords(): Promise<AttendanceRecord[]> {
+    return db
+      .select()
+      .from(attendanceRecords)
+      .orderBy(desc(attendanceRecords.attendanceDate), desc(attendanceRecords.loginTime));
+  }
+
+  async getAttendanceRecordById(id: string): Promise<AttendanceRecord | null> {
+    const [record] = await db.select().from(attendanceRecords).where(eq(attendanceRecords.id, id));
+    return record || null;
+  }
+
+  async getAttendanceByStaffAndDateRange(
+    staffMemberId: string, 
+    startDate: string, 
+    endDate: string
+  ): Promise<AttendanceRecord[]> {
+    return db
+      .select()
+      .from(attendanceRecords)
+      .where(
+        and(
+          eq(attendanceRecords.staffMemberId, staffMemberId),
+          sql`${attendanceRecords.attendanceDate} >= ${startDate}`,
+          sql`${attendanceRecords.attendanceDate} <= ${endDate}`
+        )
+      )
+      .orderBy(desc(attendanceRecords.attendanceDate));
+  }
+
+  async getAttendanceByStaffAndMonth(
+    staffMemberId: string, 
+    month: number, 
+    year: number
+  ): Promise<AttendanceRecord[]> {
+    return db
+      .select()
+      .from(attendanceRecords)
+      .where(
+        and(
+          eq(attendanceRecords.staffMemberId, staffMemberId),
+          sql`EXTRACT(MONTH FROM ${attendanceRecords.attendanceDate}) = ${month}`,
+          sql`EXTRACT(YEAR FROM ${attendanceRecords.attendanceDate}) = ${year}`
+        )
+      )
+      .orderBy(desc(attendanceRecords.attendanceDate));
+  }
+
+  async getAttendanceByDateRange(startDate: string, endDate: string): Promise<AttendanceRecord[]> {
+    return db
+      .select()
+      .from(attendanceRecords)
+      .where(
+        and(
+          sql`${attendanceRecords.attendanceDate} >= ${startDate}`,
+          sql`${attendanceRecords.attendanceDate} <= ${endDate}`
+        )
+      )
+      .orderBy(desc(attendanceRecords.attendanceDate), desc(attendanceRecords.loginTime));
+  }
+
+  async recordLogin(staffMemberId: string, loginData: {
+    workLocation?: string;
+    notes?: string;
+    ipAddress?: string;
+    deviceInfo?: string;
+  }): Promise<AttendanceRecord> {
+    const today = new Date().toISOString().split('T')[0]; // Get YYYY-MM-DD format
+    const now = new Date();
+    
+    // Check if there's already a record for today
+    const existingRecord = await db
+      .select()
+      .from(attendanceRecords)
+      .where(
+        and(
+          eq(attendanceRecords.staffMemberId, staffMemberId),
+          eq(attendanceRecords.attendanceDate, today)
+        )
+      );
+    
+    if (existingRecord.length > 0) {
+      throw new Error('Login already recorded for today');
+    }
+    
+    // Calculate if late (assuming 9 AM is start time)
+    const startOfDay = new Date(now);
+    startOfDay.setHours(9, 0, 0, 0);
+    const isLate = now > startOfDay;
+    const lateMinutes = isLate ? Math.floor((now.getTime() - startOfDay.getTime()) / (1000 * 60)) : 0;
+    
+    const [record] = await db
+      .insert(attendanceRecords)
+      .values({
+        staffMemberId,
+        attendanceDate: today,
+        loginTime: now,
+        workLocation: loginData.workLocation || 'office',
+        notes: loginData.notes,
+        ipAddress: loginData.ipAddress,
+        deviceInfo: loginData.deviceInfo,
+        status: isLate ? 'late' : 'present',
+        isLate,
+        lateMinutes
+      })
+      .returning();
+    
+    return record;
+  }
+
+  async recordLogout(id: string, logoutData: { notes?: string }): Promise<AttendanceRecord | null> {
+    const now = new Date();
+    
+    // Get the existing record
+    const existingRecord = await this.getAttendanceRecordById(id);
+    if (!existingRecord || !existingRecord.loginTime) {
+      throw new Error('No login record found');
+    }
+    
+    if (existingRecord.logoutTime) {
+      throw new Error('Logout already recorded');
+    }
+    
+    // Calculate total hours
+    const loginTime = new Date(existingRecord.loginTime);
+    const totalMilliseconds = now.getTime() - loginTime.getTime();
+    const totalHours = (totalMilliseconds / (1000 * 60 * 60)).toFixed(2);
+    
+    // Check if overtime (assuming 8 hours is standard)
+    const standardHours = 8;
+    const isOvertime = parseFloat(totalHours) > standardHours;
+    const overtimeHours = isOvertime ? (parseFloat(totalHours) - standardHours).toFixed(2) : '0';
+    
+    const [updated] = await db
+      .update(attendanceRecords)
+      .set({
+        logoutTime: now,
+        totalHours,
+        isOvertime,
+        overtimeHours,
+        notes: logoutData.notes || existingRecord.notes,
+        updatedAt: new Date()
+      })
+      .where(eq(attendanceRecords.id, id))
+      .returning();
+    
+    return updated || null;
+  }
+
+  async createAttendanceRecord(recordData: InsertAttendanceRecord): Promise<AttendanceRecord> {
+    const [record] = await db.insert(attendanceRecords).values(recordData).returning();
+    return record;
+  }
+
+  async updateAttendanceRecord(id: string, updates: Partial<InsertAttendanceRecord>): Promise<AttendanceRecord | null> {
+    const [updated] = await db
+      .update(attendanceRecords)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(attendanceRecords.id, id))
+      .returning();
+    return updated || null;
+  }
+
+  async approveAttendanceRecord(id: string, approvedBy: string): Promise<AttendanceRecord | null> {
+    const [updated] = await db
+      .update(attendanceRecords)
+      .set({
+        managerApproved: true,
+        approvedBy,
+        approvedAt: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(attendanceRecords.id, id))
+      .returning();
+    return updated || null;
+  }
+
+  async getAttendanceSummary(staffMemberId: string, month?: number, year?: number) {
+    const currentDate = new Date();
+    const targetMonth = month || currentDate.getMonth() + 1;
+    const targetYear = year || currentDate.getFullYear();
+    
+    const records = await this.getAttendanceByStaffAndMonth(staffMemberId, targetMonth, targetYear);
+    
+    const summary = {
+      totalDays: records.length,
+      presentDays: records.filter(r => r.status === 'present' || r.status === 'late').length,
+      absentDays: records.filter(r => r.status === 'absent').length,
+      lateDays: records.filter(r => r.isLate).length,
+      halfDays: records.filter(r => r.status === 'half_day').length,
+      remoteDays: records.filter(r => r.workLocation === 'remote').length,
+      totalHours: records.reduce((sum, r) => sum + (parseFloat(r.totalHours || '0')), 0),
+      overtimeHours: records.reduce((sum, r) => sum + (parseFloat(r.overtimeHours || '0')), 0),
+      averageLoginTime: this.calculateAverageLoginTime(records),
+      month: targetMonth,
+      year: targetYear
+    };
+    
+    return summary;
+  }
+
+  private calculateAverageLoginTime(records: AttendanceRecord[]): string {
+    const loginRecords = records.filter(r => r.loginTime);
+    if (loginRecords.length === 0) return '00:00';
+    
+    const totalMinutes = loginRecords.reduce((sum, record) => {
+      const loginTime = new Date(record.loginTime!);
+      return sum + (loginTime.getHours() * 60 + loginTime.getMinutes());
+    }, 0);
+    
+    const avgMinutes = Math.round(totalMinutes / loginRecords.length);
+    const hours = Math.floor(avgMinutes / 60);
+    const minutes = avgMinutes % 60;
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
 }
 

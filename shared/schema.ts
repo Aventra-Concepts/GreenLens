@@ -2404,6 +2404,30 @@ export const salaryAdvances = pgTable("salary_advances", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Attendance Records - Daily login/logout tracking
+export const attendanceRecords = pgTable("attendance_records", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  staffMemberId: varchar("staff_member_id").references(() => staffMembers.id).notNull(),
+  attendanceDate: date("attendance_date").notNull(),
+  loginTime: timestamp("login_time"),
+  logoutTime: timestamp("logout_time"),
+  totalHours: decimal("total_hours", { precision: 4, scale: 2 }),
+  status: varchar("status").default('present').notNull(), // 'present', 'absent', 'late', 'half_day', 'remote'
+  isLate: boolean("is_late").default(false),
+  lateMinutes: integer("late_minutes").default(0),
+  isOvertime: boolean("is_overtime").default(false),
+  overtimeHours: decimal("overtime_hours", { precision: 4, scale: 2 }).default('0'),
+  workLocation: varchar("work_location").default('office'), // 'office', 'remote', 'client_site'
+  notes: text("notes"), // Optional notes about the attendance
+  ipAddress: varchar("ip_address"), // Track login IP for security
+  deviceInfo: text("device_info"), // Track device used for login
+  managerApproved: boolean("manager_approved").default(false),
+  approvedBy: varchar("approved_by"), // Reference to staff_members.id
+  approvedAt: timestamp("approved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // HR Management Type Exports
 export type StaffRole = typeof staffRoles.$inferSelect;
 export type StaffMember = typeof staffMembers.$inferSelect;
@@ -2412,6 +2436,7 @@ export type JobApplication = typeof jobApplications.$inferSelect;
 export type EmployeeRecord = typeof employeeRecords.$inferSelect;
 export type LeaveRequest = typeof leaveRequests.$inferSelect;
 export type SalaryAdvance = typeof salaryAdvances.$inferSelect;
+export type AttendanceRecord = typeof attendanceRecords.$inferSelect;
 
 // Insert schemas for forms
 export const insertStaffRoleSchema = createInsertSchema(staffRoles).omit({
@@ -2472,6 +2497,16 @@ export const insertSalaryAdvanceSchema = createInsertSchema(salaryAdvances).omit
   updatedAt: true,
 });
 
+export const insertAttendanceRecordSchema = createInsertSchema(attendanceRecords).omit({
+  id: true,
+  totalHours: true,
+  managerApproved: true,
+  approvedBy: true,
+  approvedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Insert type exports
 export type InsertStaffRole = z.infer<typeof insertStaffRoleSchema>;
 export type InsertStaffMember = z.infer<typeof insertStaffMemberSchema>;
@@ -2480,3 +2515,4 @@ export type InsertJobApplication = z.infer<typeof insertJobApplicationSchema>;
 export type InsertEmployeeRecord = z.infer<typeof insertEmployeeRecordSchema>;
 export type InsertLeaveRequest = z.infer<typeof insertLeaveRequestSchema>;
 export type InsertSalaryAdvance = z.infer<typeof insertSalaryAdvanceSchema>;
+export type InsertAttendanceRecord = z.infer<typeof insertAttendanceRecordSchema>;

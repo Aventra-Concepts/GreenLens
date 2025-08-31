@@ -8,6 +8,7 @@ import {
   insertEmployeeRecordSchema,
   insertLeaveRequestSchema,
   insertSalaryAdvanceSchema,
+  insertAttendanceRecordSchema,
 } from "../../shared/schema";
 import { isAuthenticated } from "../auth";
 
@@ -548,6 +549,168 @@ router.get("/departments/stats", isAuthenticated, requireHRAccess, async (req, r
   } catch (error) {
     console.error("Error fetching department statistics:", error);
     res.status(500).json({ message: "Failed to fetch department statistics" });
+  }
+});
+
+// ============================================================================
+// ATTENDANCE MANAGEMENT
+// ============================================================================
+
+// Get attendance records
+router.get("/attendance", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { staffMemberId, startDate, endDate, month, year } = req.query;
+    
+    let attendance;
+    if (staffMemberId && startDate && endDate) {
+      attendance = await hrService.getAttendanceByStaffAndDateRange(
+        staffMemberId as string, 
+        startDate as string, 
+        endDate as string
+      );
+    } else if (staffMemberId && month && year) {
+      attendance = await hrService.getAttendanceByStaffAndMonth(
+        staffMemberId as string, 
+        parseInt(month as string), 
+        parseInt(year as string)
+      );
+    } else if (startDate && endDate) {
+      attendance = await hrService.getAttendanceByDateRange(startDate as string, endDate as string);
+    } else {
+      attendance = await hrService.getAllAttendanceRecords();
+    }
+    
+    res.json(attendance);
+  } catch (error) {
+    console.error("Error fetching attendance records:", error);
+    res.status(500).json({ message: "Failed to fetch attendance records" });
+  }
+});
+
+// Get attendance record by ID
+router.get("/attendance/:id", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const attendance = await hrService.getAttendanceRecordById(id);
+    
+    if (!attendance) {
+      return res.status(404).json({ message: "Attendance record not found" });
+    }
+    
+    res.json(attendance);
+  } catch (error) {
+    console.error("Error fetching attendance record:", error);
+    res.status(500).json({ message: "Failed to fetch attendance record" });
+  }
+});
+
+// Record login time
+router.post("/attendance/login", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { staffMemberId, workLocation, notes } = req.body;
+    const ipAddress = req.ip;
+    const deviceInfo = req.headers['user-agent'];
+    
+    const attendance = await hrService.recordLogin(staffMemberId, {
+      workLocation,
+      notes,
+      ipAddress,
+      deviceInfo
+    });
+    
+    res.status(201).json(attendance);
+  } catch (error) {
+    console.error("Error recording login:", error);
+    res.status(400).json({ message: "Failed to record login", error: error.message });
+  }
+});
+
+// Record logout time
+router.put("/attendance/:id/logout", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notes } = req.body;
+    
+    const attendance = await hrService.recordLogout(id, { notes });
+    
+    if (!attendance) {
+      return res.status(404).json({ message: "Attendance record not found" });
+    }
+    
+    res.json(attendance);
+  } catch (error) {
+    console.error("Error recording logout:", error);
+    res.status(500).json({ message: "Failed to record logout" });
+  }
+});
+
+// Create manual attendance record
+router.post("/attendance", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const validatedData = insertAttendanceRecordSchema.parse({
+      ...req.body,
+      ipAddress: req.ip,
+      deviceInfo: req.headers['user-agent']
+    });
+    const attendance = await hrService.createAttendanceRecord(validatedData);
+    res.status(201).json(attendance);
+  } catch (error) {
+    console.error("Error creating attendance record:", error);
+    res.status(400).json({ message: "Invalid attendance data", error: error.message });
+  }
+});
+
+// Update attendance record
+router.put("/attendance/:id", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = insertAttendanceRecordSchema.partial().parse(req.body);
+    const attendance = await hrService.updateAttendanceRecord(id, updates);
+    
+    if (!attendance) {
+      return res.status(404).json({ message: "Attendance record not found" });
+    }
+    
+    res.json(attendance);
+  } catch (error) {
+    console.error("Error updating attendance record:", error);
+    res.status(400).json({ message: "Invalid attendance data", error: error.message });
+  }
+});
+
+// Approve attendance record
+router.put("/attendance/:id/approve", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const attendance = await hrService.approveAttendanceRecord(id, req.user.id);
+    
+    if (!attendance) {
+      return res.status(404).json({ message: "Attendance record not found" });
+    }
+    
+    res.json(attendance);
+  } catch (error) {
+    console.error("Error approving attendance record:", error);
+    res.status(500).json({ message: "Failed to approve attendance record" });
+  }
+});
+
+// Get attendance summary for a staff member
+router.get("/attendance/summary/:staffMemberId", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { staffMemberId } = req.params;
+    const { month, year } = req.query;
+    
+    const summary = await hrService.getAttendanceSummary(
+      staffMemberId,
+      month ? parseInt(month as string) : undefined,
+      year ? parseInt(year as string) : undefined
+    );
+    
+    res.json(summary);
+  } catch (error) {
+    console.error("Error fetching attendance summary:", error);
+    res.status(500).json({ message: "Failed to fetch attendance summary" });
   }
 });
 
