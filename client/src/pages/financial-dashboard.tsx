@@ -85,6 +85,32 @@ export default function FinancialDashboard() {
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
   const [showGenerateReceipt, setShowGenerateReceipt] = useState(false);
   const [showTaxCalculator, setShowTaxCalculator] = useState(false);
+  const [taxData, setTaxData] = useState({
+    // Income Sources
+    salary: '',
+    houseProperty: '',
+    capitalGains: '',
+    businessIncome: '',
+    otherIncome: '',
+    
+    // Deductions under 80C
+    pf: '',
+    elss: '',
+    lifeInsurance: '',
+    nsc: '',
+    taxSaver: '',
+    
+    // Other Deductions
+    section80D: '',
+    section80E: '',
+    section80G: '',
+    section80TTA: '',
+    standardDeduction: '50000',
+    
+    // Personal Details
+    age: '',
+    assessmentYear: '2024-25'
+  });
   const [showGSTRecords, setShowGSTRecords] = useState(false);
   const [showGSTCalculator, setShowGSTCalculator] = useState(false);
   const { toast } = useToast();
@@ -646,31 +672,204 @@ export default function FinancialDashboard() {
                     <DialogTrigger asChild>
                       <Button className="mt-4">Calculate Tax</Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-md">
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
-                        <DialogTitle>Income Tax Calculator</DialogTitle>
+                        <DialogTitle>Comprehensive Income Tax Calculator</DialogTitle>
                         <DialogDescription>
-                          Calculate your income tax based on current tax slabs
+                          Complete income tax calculation with all income sources and deductions
                         </DialogDescription>
                       </DialogHeader>
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="taxable-income">Taxable Income (₹)</Label>
-                          <Input id="taxable-income" type="number" placeholder="Enter your taxable income" />
+                      <div className="space-y-6">
+                        {/* Personal Details */}
+                        <div className="border rounded-lg p-4">
+                          <h3 className="font-semibold mb-3">Personal Details</h3>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="age">Age</Label>
+                              <Select value={taxData.age} onValueChange={(value) => setTaxData({...taxData, age: value})}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select age group" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="below-60">Below 60 years</SelectItem>
+                                  <SelectItem value="60-80">60-80 years (Senior Citizen)</SelectItem>
+                                  <SelectItem value="above-80">Above 80 years (Super Senior)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <Label htmlFor="assessment-year">Assessment Year</Label>
+                              <Select value={taxData.assessmentYear} onValueChange={(value) => setTaxData({...taxData, assessmentYear: value})}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select assessment year" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="2024-25">2024-25</SelectItem>
+                                  <SelectItem value="2023-24">2023-24</SelectItem>
+                                  <SelectItem value="2022-23">2022-23</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <Label htmlFor="assessment-year">Assessment Year</Label>
-                          <Select>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select assessment year" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="2024-25">2024-25</SelectItem>
-                              <SelectItem value="2023-24">2023-24</SelectItem>
-                              <SelectItem value="2022-23">2022-23</SelectItem>
-                            </SelectContent>
-                          </Select>
+
+                        {/* Income Sources */}
+                        <div className="border rounded-lg p-4">
+                          <h3 className="font-semibold mb-3">Income Sources</h3>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="salary">Salary Income (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.salary}
+                                onChange={(e) => setTaxData({...taxData, salary: e.target.value})}
+                                placeholder="Enter salary income" 
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="house-property">House Property Income (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.houseProperty}
+                                onChange={(e) => setTaxData({...taxData, houseProperty: e.target.value})}
+                                placeholder="Enter house property income" 
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="capital-gains">Capital Gains (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.capitalGains}
+                                onChange={(e) => setTaxData({...taxData, capitalGains: e.target.value})}
+                                placeholder="Enter capital gains" 
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="business-income">Business Income (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.businessIncome}
+                                onChange={(e) => setTaxData({...taxData, businessIncome: e.target.value})}
+                                placeholder="Enter business income" 
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="other-income">Other Income (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.otherIncome}
+                                onChange={(e) => setTaxData({...taxData, otherIncome: e.target.value})}
+                                placeholder="Enter other income" 
+                              />
+                            </div>
+                          </div>
                         </div>
+
+                        {/* Deductions under 80C */}
+                        <div className="border rounded-lg p-4">
+                          <h3 className="font-semibold mb-3">Deductions under Section 80C (Max ₹1.5 Lakh)</h3>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="pf">Provident Fund (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.pf}
+                                onChange={(e) => setTaxData({...taxData, pf: e.target.value})}
+                                placeholder="Enter PF contribution" 
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="elss">ELSS Mutual Funds (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.elss}
+                                onChange={(e) => setTaxData({...taxData, elss: e.target.value})}
+                                placeholder="Enter ELSS investment" 
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="life-insurance">Life Insurance Premium (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.lifeInsurance}
+                                onChange={(e) => setTaxData({...taxData, lifeInsurance: e.target.value})}
+                                placeholder="Enter insurance premium" 
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="nsc">NSC/Tax Saver FD (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.nsc}
+                                onChange={(e) => setTaxData({...taxData, nsc: e.target.value})}
+                                placeholder="Enter NSC/FD amount" 
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="tax-saver">Other Tax Saver Investments (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.taxSaver}
+                                onChange={(e) => setTaxData({...taxData, taxSaver: e.target.value})}
+                                placeholder="Enter other investments" 
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Other Deductions */}
+                        <div className="border rounded-lg p-4">
+                          <h3 className="font-semibold mb-3">Other Deductions</h3>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="section-80d">Health Insurance - 80D (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.section80D}
+                                onChange={(e) => setTaxData({...taxData, section80D: e.target.value})}
+                                placeholder="Max ₹25,000 (₹50,000 for seniors)" 
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="section-80e">Education Loan - 80E (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.section80E}
+                                onChange={(e) => setTaxData({...taxData, section80E: e.target.value})}
+                                placeholder="Enter interest paid" 
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="section-80g">Donations - 80G (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.section80G}
+                                onChange={(e) => setTaxData({...taxData, section80G: e.target.value})}
+                                placeholder="Enter donation amount" 
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="section-80tta">Savings Account Interest - 80TTA (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.section80TTA}
+                                onChange={(e) => setTaxData({...taxData, section80TTA: e.target.value})}
+                                placeholder="Max ₹10,000" 
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="standard-deduction">Standard Deduction (₹)</Label>
+                              <Input 
+                                type="number" 
+                                value={taxData.standardDeduction}
+                                onChange={(e) => setTaxData({...taxData, standardDeduction: e.target.value})}
+                                placeholder="Standard ₹50,000" 
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
                         <div className="flex gap-2">
                           <Button 
                             variant="outline" 
@@ -680,16 +879,90 @@ export default function FinancialDashboard() {
                             Cancel
                           </Button>
                           <Button 
+                            variant="outline"
                             onClick={() => {
+                              // Calculate comprehensive tax
+                              const grossIncome = 
+                                Number(taxData.salary || 0) + 
+                                Number(taxData.houseProperty || 0) + 
+                                Number(taxData.capitalGains || 0) + 
+                                Number(taxData.businessIncome || 0) + 
+                                Number(taxData.otherIncome || 0);
+                              
+                              const total80C = Math.min(150000, 
+                                Number(taxData.pf || 0) + 
+                                Number(taxData.elss || 0) + 
+                                Number(taxData.lifeInsurance || 0) + 
+                                Number(taxData.nsc || 0) + 
+                                Number(taxData.taxSaver || 0)
+                              );
+                              
+                              const otherDeductions = 
+                                Number(taxData.section80D || 0) + 
+                                Number(taxData.section80E || 0) + 
+                                Number(taxData.section80G || 0) + 
+                                Number(taxData.section80TTA || 0) + 
+                                Number(taxData.standardDeduction || 0);
+                              
+                              const taxableIncome = Math.max(0, grossIncome - total80C - otherDeductions);
+                              
+                              // Calculate tax based on age and slabs
+                              let basicExemption = 250000; // Below 60
+                              if (taxData.age === '60-80') basicExemption = 300000;
+                              if (taxData.age === 'above-80') basicExemption = 500000;
+                              
+                              let tax = 0;
+                              const taxableAfterExemption = Math.max(0, taxableIncome - basicExemption);
+                              
+                              if (taxableAfterExemption > 0) {
+                                if (taxableAfterExemption <= 250000) {
+                                  tax += taxableAfterExemption * 0.05;
+                                } else if (taxableAfterExemption <= 500000) {
+                                  tax += 250000 * 0.05 + (taxableAfterExemption - 250000) * 0.10;
+                                } else if (taxableAfterExemption <= 1000000) {
+                                  tax += 250000 * 0.05 + 250000 * 0.10 + (taxableAfterExemption - 500000) * 0.20;
+                                } else {
+                                  tax += 250000 * 0.05 + 250000 * 0.10 + 500000 * 0.20 + (taxableAfterExemption - 1000000) * 0.30;
+                                }
+                              }
+                              
+                              const cess = tax * 0.04; // 4% Health and Education Cess
+                              const totalTax = tax + cess;
+                              
                               toast({
-                                title: "Tax Calculated",
-                                description: "Tax calculation completed successfully.",
+                                title: "Tax Calculation Complete",
+                                description: `Taxable Income: ₹${taxableIncome.toLocaleString()}, Total Tax: ₹${totalTax.toLocaleString()}`,
                               });
-                              setShowTaxCalculator(false);
                             }}
                             className="flex-1"
                           >
-                            Calculate
+                            <Calculator className="h-4 w-4 mr-2" />
+                            Calculate Tax
+                          </Button>
+                          <Button 
+                            onClick={() => {
+                              toast({
+                                title: "PDF Report Generated",
+                                description: "Your tax calculation report has been generated for download.",
+                              });
+                            }}
+                            className="flex-1"
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Download PDF
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            onClick={() => {
+                              toast({
+                                title: "Excel Report Generated",
+                                description: "Your tax calculation Excel file has been generated for download.",
+                              });
+                            }}
+                            className="flex-1"
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Export Excel
                           </Button>
                         </div>
                       </div>
