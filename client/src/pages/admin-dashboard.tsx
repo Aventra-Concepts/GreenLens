@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import AnalyticsDashboard from "@/components/admin/AnalyticsDashboard";
 import SEODashboard from "@/components/admin/SEODashboard";
+import ConsultationManagementDashboard from "@/components/admin/ConsultationManagementDashboard";
 import { AdvancedPremiumDashboard } from "@/components/AdvancedPremiumDashboard";
 
 interface ConsultationRequest {
@@ -1537,139 +1538,7 @@ export default function AdminDashboard() {
 
           {/* Consultations Tab */}
           <TabsContent value="consultations" className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Consultation Management</h2>
-              <p className="text-gray-600 dark:text-gray-300">Manage expert consultation requests and assignments</p>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Consultation Requests</CardTitle>
-                    <CardDescription>Track and manage all consultation requests</CardDescription>
-                  </div>
-                  <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                    <SelectTrigger className="w-48">
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Requests</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="payment_pending">Payment Pending</SelectItem>
-                      <SelectItem value="paid">Paid</SelectItem>
-                      <SelectItem value="expert_assigned">Expert Assigned</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {filteredConsultations.length === 0 ? (
-                  <div className="text-center py-8">
-                    <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No consultations</h3>
-                    <p className="mt-1 text-sm text-gray-500">No consultation requests found for the selected filter.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {filteredConsultations.map((consultation: ConsultationRequest) => (
-                      <Card key={consultation.id} className="border-l-4 border-l-blue-500">
-                        <CardContent className="p-4">
-                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                            {/* Customer Info */}
-                            <div className="space-y-3">
-                              <div className="flex items-center gap-2">
-                                <User className="h-4 w-4 text-gray-500" />
-                                <span className="font-medium text-gray-900 dark:text-white">
-                                  {consultation.name}
-                                </span>
-                                <Badge className={getStatusColor(consultation.status)}>
-                                  {consultation.status.replace('_', ' ')}
-                                </Badge>
-                              </div>
-                              
-                              <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
-                                <div className="flex items-center gap-2">
-                                  <Mail className="h-3 w-3" />
-                                  {consultation.email}
-                                </div>
-                                {consultation.phoneNumber && (
-                                  <div className="flex items-center gap-2">
-                                    <Phone className="h-3 w-3" />
-                                    {consultation.phoneNumber}
-                                  </div>
-                                )}
-                                <div className="flex items-center gap-2">
-                                  <Calendar className="h-3 w-3" />
-                                  {format(new Date(consultation.preferredDate), 'MMM d, yyyy')} at {consultation.preferredTimeSlot}
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Problem Description */}
-                            <div className="space-y-2">
-                              <h4 className="font-medium text-gray-900 dark:text-white">Problem Description</h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                                {consultation.problemDescription}
-                              </p>
-                              <div className="text-xs text-gray-500">
-                                Address: {consultation.address}
-                              </div>
-                            </div>
-
-                            {/* Actions */}
-                            <div className="space-y-3">
-                              <div className="text-sm">
-                                <span className="font-medium">Amount: </span>
-                                <span className="text-green-600">${consultation.amount} {consultation.currency}</span>
-                              </div>
-                              
-                              <div className="space-y-2">
-                                <Select 
-                                  value={consultation.status} 
-                                  onValueChange={(value) => handleStatusUpdate(consultation.id, value)}
-                                  disabled={updateStatusMutation.isPending}
-                                >
-                                  <SelectTrigger className="w-full">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="pending">Pending</SelectItem>
-                                    <SelectItem value="payment_pending">Payment Pending</SelectItem>
-                                    <SelectItem value="paid">Paid</SelectItem>
-                                    <SelectItem value="expert_assigned">Expert Assigned</SelectItem>
-                                    <SelectItem value="completed">Completed</SelectItem>
-                                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                
-                                {consultation.status === 'paid' && (
-                                  <Button 
-                                    size="sm" 
-                                    className="w-full"
-                                    onClick={() => handleExpertAssignment(consultation.id, 'expert_001')}
-                                    disabled={updateStatusMutation.isPending}
-                                    data-testid={`assign-expert-${consultation.id}`}
-                                  >
-                                    Assign Expert
-                                  </Button>
-                                )}
-                              </div>
-                              
-                              <div className="text-xs text-gray-500">
-                                Created: {format(new Date(consultation.createdAt), 'MMM d, yyyy HH:mm')}
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <ConsultationManagementDashboard />
           </TabsContent>
 
           {/* Content Tab */}
