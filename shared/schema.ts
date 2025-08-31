@@ -2772,6 +2772,142 @@ export const insertPayrollAdjustmentSchema = createInsertSchema(payrollAdjustmen
   createdAt: true,
 });
 
+// ============================================================================
+// PERFORMANCE MANAGEMENT SYSTEM
+// ============================================================================
+
+// Performance Report Templates
+export const performanceReportTemplates = pgTable("performance_report_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  type: varchar("type").notNull(), // 'monthly', 'quarterly', 'annual'
+  description: text("description"),
+  departments: jsonb("departments").default("[]"), // Array of departments this applies to
+  categories: jsonb("categories").default("[]"), // Performance categories/areas
+  ratingScale: varchar("rating_scale").default("1-5"), // "1-5", "1-10", "percentage"
+  maxScore: integer("max_score").default(5),
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Performance Reports (Individual Reports for each employee)
+export const performanceReports = pgTable("performance_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  staffMemberId: varchar("staff_member_id").references(() => staffMembers.id).notNull(),
+  templateId: varchar("template_id").references(() => performanceReportTemplates.id).notNull(),
+  reportType: varchar("report_type").notNull(), // 'monthly', 'quarterly', 'annual'
+  reviewPeriod: varchar("review_period").notNull(), // "January 2024", "Q1 2024", "2024"
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  
+  // Overall Performance Metrics
+  overallScore: decimal("overall_score", { precision: 5, scale: 2 }),
+  overallRating: varchar("overall_rating"), // 'excellent', 'good', 'satisfactory', 'needs_improvement', 'unsatisfactory'
+  confidenceLevel: varchar("confidence_level"), // 'very_high', 'high', 'moderate', 'low', 'very_low'
+  
+  // Reporting Structure
+  reviewerId: varchar("reviewer_id").references(() => users.id), // Department head/manager
+  reviewerName: varchar("reviewer_name"),
+  reviewerTitle: varchar("reviewer_title"),
+  reviewerDepartment: varchar("reviewer_department"),
+  
+  // Report Status
+  status: varchar("status").default('draft').notNull(), // 'draft', 'submitted', 'under_review', 'approved', 'published'
+  submittedAt: timestamp("submitted_at"),
+  submittedBy: varchar("submitted_by").references(() => users.id),
+  approvedAt: timestamp("approved_at"),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  
+  // Comments and Feedback
+  reviewerComments: text("reviewer_comments"),
+  employeeComments: text("employee_comments"),
+  hrComments: text("hr_comments"),
+  developmentPlan: text("development_plan"),
+  goals: jsonb("goals").default("[]"), // Array of goals for next period
+  achievements: jsonb("achievements").default("[]"), // Key achievements this period
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Performance Evaluations (Detailed category-wise evaluations)
+export const performanceEvaluations = pgTable("performance_evaluations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  reportId: varchar("report_id").references(() => performanceReports.id, { onDelete: "cascade" }).notNull(),
+  category: varchar("category").notNull(), // 'productivity', 'quality', 'teamwork', 'communication', 'leadership', etc.
+  categoryDescription: text("category_description"),
+  score: decimal("score", { precision: 5, scale: 2 }).notNull(),
+  maxScore: integer("max_score").default(5),
+  rating: varchar("rating"), // 'excellent', 'good', 'satisfactory', 'needs_improvement', 'unsatisfactory'
+  comments: text("comments"),
+  evidence: text("evidence"), // Supporting evidence for the rating
+  weight: decimal("weight", { precision: 3, scale: 2 }).default("1.00"), // Weight for this category in overall score
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Performance Improvement Plans
+export const performanceImprovementPlans = pgTable("performance_improvement_plans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  reportId: varchar("report_id").references(() => performanceReports.id).notNull(),
+  staffMemberId: varchar("staff_member_id").references(() => staffMembers.id).notNull(),
+  title: varchar("title").notNull(),
+  description: text("description"),
+  objectives: jsonb("objectives").default("[]"), // Array of specific objectives
+  targetDate: date("target_date"),
+  status: varchar("status").default('active'), // 'active', 'completed', 'cancelled'
+  progress: integer("progress").default(0), // Percentage completion
+  reviewDate: date("review_date"),
+  reviewNotes: text("review_notes"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Performance Goals
+export const performanceGoals = pgTable("performance_goals", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  staffMemberId: varchar("staff_member_id").references(() => staffMembers.id).notNull(),
+  reportId: varchar("report_id").references(() => performanceReports.id),
+  title: varchar("title").notNull(),
+  description: text("description"),
+  category: varchar("category"), // 'skill_development', 'productivity', 'leadership', 'innovation'
+  targetDate: date("target_date"),
+  priority: varchar("priority").default('medium'), // 'low', 'medium', 'high', 'critical'
+  status: varchar("status").default('active'), // 'active', 'completed', 'cancelled', 'overdue'
+  progress: integer("progress").default(0),
+  measurableOutcome: text("measurable_outcome"),
+  resources: jsonb("resources").default("[]"), // Resources needed to achieve goal
+  milestones: jsonb("milestones").default("[]"), // Key milestones
+  setBy: varchar("set_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Performance Analytics and Metrics
+export const performanceMetrics = pgTable("performance_metrics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  staffMemberId: varchar("staff_member_id").references(() => staffMembers.id).notNull(),
+  metricType: varchar("metric_type").notNull(), // 'productivity', 'quality', 'attendance', 'customer_satisfaction'
+  metricName: varchar("metric_name").notNull(),
+  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  unit: varchar("unit"), // 'percentage', 'count', 'hours', 'rating'
+  period: varchar("period").notNull(), // Date period this metric applies to
+  benchmark: decimal("benchmark", { precision: 10, scale: 2 }), // Target/benchmark value
+  source: varchar("source"), // Where the metric came from
+  recordedAt: timestamp("recorded_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Export types for Performance Management
+export type PerformanceReportTemplate = typeof performanceReportTemplates.$inferSelect;
+export type PerformanceReport = typeof performanceReports.$inferSelect;
+export type PerformanceEvaluation = typeof performanceEvaluations.$inferSelect;
+export type PerformanceImprovementPlan = typeof performanceImprovementPlans.$inferSelect;
+export type PerformanceGoal = typeof performanceGoals.$inferSelect;
+export type PerformanceMetric = typeof performanceMetrics.$inferSelect;
+
 // Insert type exports
 export type InsertStaffRole = z.infer<typeof insertStaffRoleSchema>;
 export type InsertStaffMember = z.infer<typeof insertStaffMemberSchema>;
@@ -2787,3 +2923,50 @@ export type InsertTaxSlab = z.infer<typeof insertTaxSlabSchema>;
 export type InsertStatutoryRate = z.infer<typeof insertStatutoryRateSchema>;
 export type InsertPayrollRecord = z.infer<typeof insertPayrollRecordSchema>;
 export type InsertPayrollAdjustment = z.infer<typeof insertPayrollAdjustmentSchema>;
+
+// Performance Management Insert Schemas
+export const insertPerformanceReportTemplateSchema = createInsertSchema(performanceReportTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPerformanceReportSchema = createInsertSchema(performanceReports).omit({
+  id: true,
+  overallScore: true,
+  submittedAt: true,
+  approvedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPerformanceEvaluationSchema = createInsertSchema(performanceEvaluations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPerformanceImprovementPlanSchema = createInsertSchema(performanceImprovementPlans).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPerformanceGoalSchema = createInsertSchema(performanceGoals).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPerformanceMetricSchema = createInsertSchema(performanceMetrics).omit({
+  id: true,
+  recordedAt: true,
+  createdAt: true,
+});
+
+// Performance Management Insert Types
+export type InsertPerformanceReportTemplate = z.infer<typeof insertPerformanceReportTemplateSchema>;
+export type InsertPerformanceReport = z.infer<typeof insertPerformanceReportSchema>;
+export type InsertPerformanceEvaluation = z.infer<typeof insertPerformanceEvaluationSchema>;
+export type InsertPerformanceImprovementPlan = z.infer<typeof insertPerformanceImprovementPlanSchema>;
+export type InsertPerformanceGoal = z.infer<typeof insertPerformanceGoalSchema>;
+export type InsertPerformanceMetric = z.infer<typeof insertPerformanceMetricSchema>;

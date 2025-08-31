@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { hrService } from "../services/hrService";
+import { performanceService } from "../services/performanceService";
 import { 
   insertStaffRoleSchema,
   insertStaffMemberSchema,
@@ -14,6 +15,10 @@ import {
   insertTaxSlabSchema,
   insertStatutoryRateSchema,
   insertPayrollRecordSchema,
+  insertPerformanceReportTemplateSchema,
+  insertPerformanceReportSchema,
+  insertPerformanceEvaluationSchema,
+  insertPerformanceGoalSchema,
 } from "../../shared/schema";
 import { payrollCalculationService } from "../services/payrollCalculationService";
 import { isAuthenticated } from "../auth";
@@ -951,6 +956,363 @@ router.get("/payroll/analytics", isAuthenticated, requireHRAccess, async (req, r
   } catch (error) {
     console.error("Error fetching payroll analytics:", error);
     res.status(500).json({ message: "Failed to fetch payroll analytics" });
+  }
+});
+
+// ============================================================================
+// PERFORMANCE MANAGEMENT
+// ============================================================================
+
+// Performance Report Templates
+router.get("/performance/templates", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { type, isActive } = req.query;
+    const templates = await performanceService.getTemplates(
+      type as string, 
+      isActive === 'true' ? true : isActive === 'false' ? false : undefined
+    );
+    res.json(templates);
+  } catch (error) {
+    console.error("Error fetching performance templates:", error);
+    res.status(500).json({ message: "Failed to fetch performance templates" });
+  }
+});
+
+router.post("/performance/templates", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const validatedData = insertPerformanceReportTemplateSchema.parse(req.body);
+    const template = await performanceService.createTemplate(validatedData);
+    res.status(201).json(template);
+  } catch (error) {
+    console.error("Error creating performance template:", error);
+    res.status(400).json({ message: "Invalid template data", error: error.message });
+  }
+});
+
+router.get("/performance/templates/:id", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const template = await performanceService.getTemplateById(id);
+    if (!template) {
+      return res.status(404).json({ message: "Template not found" });
+    }
+    res.json(template);
+  } catch (error) {
+    console.error("Error fetching performance template:", error);
+    res.status(500).json({ message: "Failed to fetch performance template" });
+  }
+});
+
+router.put("/performance/templates/:id", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = insertPerformanceReportTemplateSchema.partial().parse(req.body);
+    const template = await performanceService.updateTemplate(id, updates);
+    if (!template) {
+      return res.status(404).json({ message: "Template not found" });
+    }
+    res.json(template);
+  } catch (error) {
+    console.error("Error updating performance template:", error);
+    res.status(400).json({ message: "Invalid template data", error: error.message });
+  }
+});
+
+router.delete("/performance/templates/:id", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await performanceService.deleteTemplate(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Template not found" });
+    }
+    res.json({ message: "Template deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting performance template:", error);
+    res.status(500).json({ message: "Failed to delete performance template" });
+  }
+});
+
+// Performance Reports
+router.get("/performance/reports", isAuthenticated, async (req, res) => {
+  try {
+    const user = req.user;
+    const { staffMemberId, reportType, status, reviewerId, startDate, endDate, department } = req.query;
+    
+    let filters: any = {};
+    
+    // If user is not admin/HR, they can only see their own reports or reports they review
+    if (!user.isAdmin && !user.isSuperAdmin) {
+      if (staffMemberId && staffMemberId !== user.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      filters.staffMemberId = staffMemberId || user.id;
+    } else {
+      // Admin/HR can filter as needed
+      if (staffMemberId) filters.staffMemberId = staffMemberId as string;
+      if (reportType) filters.reportType = reportType as string;
+      if (status) filters.status = status as string;
+      if (reviewerId) filters.reviewerId = reviewerId as string;
+      if (startDate) filters.startDate = startDate as string;
+      if (endDate) filters.endDate = endDate as string;
+    }
+    
+    let reports;
+    if (department && (user.isAdmin || user.isSuperAdmin)) {
+      reports = await performanceService.getReportsByDepartment(department as string, reportType as string);
+    } else {
+      reports = await performanceService.getReports(filters);
+    }
+    
+    res.json(reports);
+  } catch (error) {
+    console.error("Error fetching performance reports:", error);
+    res.status(500).json({ message: "Failed to fetch performance reports" });
+  }
+});
+
+router.post("/performance/reports", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const validatedData = insertPerformanceReportSchema.parse(req.body);
+    const report = await performanceService.createReport(validatedData);
+    res.status(201).json(report);
+  } catch (error) {
+    console.error("Error creating performance report:", error);
+    res.status(400).json({ message: "Invalid report data", error: error.message });
+  }
+});
+
+router.get("/performance/reports/:id", isAuthenticated, async (req, res) => {
+  try {
+    const user = req.user;
+    const { id } = req.params;
+    const report = await performanceService.getReportById(id);
+    
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+    
+    // Check access permissions
+    if (!user.isAdmin && !user.isSuperAdmin && 
+        report.staffMemberId !== user.id && 
+        report.reviewerId !== user.id) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    
+    res.json(report);
+  } catch (error) {
+    console.error("Error fetching performance report:", error);
+    res.status(500).json({ message: "Failed to fetch performance report" });
+  }
+});
+
+router.put("/performance/reports/:id", isAuthenticated, async (req, res) => {
+  try {
+    const user = req.user;
+    const { id } = req.params;
+    const updates = insertPerformanceReportSchema.partial().parse(req.body);
+    
+    // Get the report to check permissions
+    const existingReport = await performanceService.getReportById(id);
+    if (!existingReport) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+    
+    // Check access permissions
+    if (!user.isAdmin && !user.isSuperAdmin && 
+        existingReport.reviewerId !== user.id) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    
+    const report = await performanceService.updateReport(id, updates);
+    res.json(report);
+  } catch (error) {
+    console.error("Error updating performance report:", error);
+    res.status(400).json({ message: "Invalid report data", error: error.message });
+  }
+});
+
+// Submit performance report with evaluations
+router.post("/performance/reports/:id/submit", isAuthenticated, async (req, res) => {
+  try {
+    const user = req.user;
+    const { id } = req.params;
+    const { evaluations } = req.body;
+    
+    // Get the report to check permissions
+    const existingReport = await performanceService.getReportById(id);
+    if (!existingReport) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+    
+    // Check access permissions
+    if (!user.isAdmin && !user.isSuperAdmin && 
+        existingReport.reviewerId !== user.id) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    
+    // Validate evaluations
+    const validatedEvaluations = evaluations.map((evaluation: any) => 
+      insertPerformanceEvaluationSchema.parse(evaluation)
+    );
+    
+    const result = await performanceService.submitReport(id, user.id, validatedEvaluations);
+    res.json(result);
+  } catch (error) {
+    console.error("Error submitting performance report:", error);
+    res.status(400).json({ message: "Failed to submit report", error: error.message });
+  }
+});
+
+// Approve performance report
+router.post("/performance/reports/:id/approve", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const user = req.user;
+    const { id } = req.params;
+    
+    const report = await performanceService.approveReport(id, user.id);
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+    
+    res.json(report);
+  } catch (error) {
+    console.error("Error approving performance report:", error);
+    res.status(500).json({ message: "Failed to approve report" });
+  }
+});
+
+// Generate monthly reports
+router.post("/performance/generate/monthly", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { staffMemberId, templateId, reviewPeriod, reviewerId } = req.body;
+    
+    const report = await performanceService.generateMonthlyReport(
+      staffMemberId, 
+      templateId, 
+      reviewPeriod, 
+      reviewerId
+    );
+    
+    res.status(201).json(report);
+  } catch (error) {
+    console.error("Error generating monthly report:", error);
+    res.status(400).json({ message: "Failed to generate monthly report", error: error.message });
+  }
+});
+
+// Generate annual reports
+router.post("/performance/generate/annual", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { staffMemberId, templateId, year, reviewerId } = req.body;
+    
+    const report = await performanceService.generateAnnualReport(
+      staffMemberId, 
+      templateId, 
+      year, 
+      reviewerId
+    );
+    
+    res.status(201).json(report);
+  } catch (error) {
+    console.error("Error generating annual report:", error);
+    res.status(400).json({ message: "Failed to generate annual report", error: error.message });
+  }
+});
+
+// Bulk generate monthly reports
+router.post("/performance/generate/bulk-monthly", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { departmentIds, templateId, reviewPeriod, reviewerId } = req.body;
+    
+    const result = await performanceService.generateBulkMonthlyReports(
+      departmentIds, 
+      templateId, 
+      reviewPeriod, 
+      reviewerId
+    );
+    
+    res.json(result);
+  } catch (error) {
+    console.error("Error generating bulk monthly reports:", error);
+    res.status(400).json({ message: "Failed to generate bulk reports", error: error.message });
+  }
+});
+
+// Performance Analytics
+router.get("/performance/analytics", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { department, reportType, startDate, endDate } = req.query;
+    
+    const filters: any = {};
+    if (department) filters.department = department as string;
+    if (reportType) filters.reportType = reportType as string;
+    if (startDate) filters.startDate = startDate as string;
+    if (endDate) filters.endDate = endDate as string;
+    
+    const analytics = await performanceService.getPerformanceAnalytics(filters);
+    res.json(analytics);
+  } catch (error) {
+    console.error("Error fetching performance analytics:", error);
+    res.status(500).json({ message: "Failed to fetch performance analytics" });
+  }
+});
+
+// Department performance summary
+router.get("/performance/department/:department/summary", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { department } = req.params;
+    const summary = await performanceService.getDepartmentPerformanceSummary(department);
+    res.json(summary);
+  } catch (error) {
+    console.error("Error fetching department performance summary:", error);
+    res.status(500).json({ message: "Failed to fetch department summary" });
+  }
+});
+
+// Performance Goals
+router.get("/performance/goals/:staffMemberId", isAuthenticated, async (req, res) => {
+  try {
+    const user = req.user;
+    const { staffMemberId } = req.params;
+    
+    // Check access permissions
+    if (!user.isAdmin && !user.isSuperAdmin && staffMemberId !== user.id) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    
+    const goals = await performanceService.getGoalsByStaffMember(staffMemberId);
+    res.json(goals);
+  } catch (error) {
+    console.error("Error fetching performance goals:", error);
+    res.status(500).json({ message: "Failed to fetch performance goals" });
+  }
+});
+
+router.post("/performance/goals", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const validatedData = insertPerformanceGoalSchema.parse(req.body);
+    const goal = await performanceService.createGoal(validatedData);
+    res.status(201).json(goal);
+  } catch (error) {
+    console.error("Error creating performance goal:", error);
+    res.status(400).json({ message: "Invalid goal data", error: error.message });
+  }
+});
+
+router.put("/performance/goals/:id/progress", isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { progress, notes } = req.body;
+    
+    const goal = await performanceService.updateGoalProgress(id, progress, notes);
+    if (!goal) {
+      return res.status(404).json({ message: "Goal not found" });
+    }
+    
+    res.json(goal);
+  } catch (error) {
+    console.error("Error updating goal progress:", error);
+    res.status(400).json({ message: "Failed to update goal progress", error: error.message });
   }
 });
 

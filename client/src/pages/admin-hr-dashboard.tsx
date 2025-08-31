@@ -20,6 +20,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
+import { PerformanceManagement } from "@/components/PerformanceManagement";
 import { 
   Plus, Edit, Eye, Trash2, Users, Briefcase, Calendar, MapPin, DollarSign, FileText,
   Mail, Phone, ExternalLink, Download, Check, X, Clock, Filter, Search, 
@@ -182,7 +183,6 @@ export default function AdminHRDashboard() {
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isAdvanceModalOpen, setIsAdvanceModalOpen] = useState(false);
-  const [isPerformanceModalOpen, setIsPerformanceModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const queryClient = useQueryClient();
@@ -885,120 +885,7 @@ export default function AdminHRDashboard() {
 
           {/* Performance Tab */}
           <TabsContent value="performance" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Performance Management</h2>
-                <p className="text-gray-600">Track employee performance and development</p>
-              </div>
-              <Button onClick={() => setIsPerformanceModalOpen(true)} className="bg-indigo-600 hover:bg-indigo-700">
-                <Target className="w-4 h-4 mr-2" />
-                New Performance Review
-              </Button>
-            </div>
-
-            {/* Performance Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Star className="w-5 h-5 text-yellow-500" />
-                    Top Performers
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {staffMembers.slice(0, 5).map((emp, idx) => (
-                      <div key={emp.id} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <span className="text-sm font-bold text-yellow-600">#{idx + 1}</span>
-                          <Avatar className="w-8 h-8">
-                            <AvatarFallback>{emp.firstName[0]}{emp.lastName[0]}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-medium">{emp.firstName} {emp.lastName}</p>
-                            <p className="text-xs text-gray-500">{emp.department}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                          <span className="text-sm font-semibold">{(9.2 - idx * 0.3).toFixed(1)}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="w-5 h-5 text-blue-500" />
-                    Goals Progress
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Q4 2025 Goals</span>
-                        <span>78%</span>
-                      </div>
-                      <Progress value={78} className="h-2" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Individual Goals</span>
-                        <span>85%</span>
-                      </div>
-                      <Progress value={85} className="h-2" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Team Goals</span>
-                        <span>72%</span>
-                      </div>
-                      <Progress value={72} className="h-2" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Development Plans</span>
-                        <span>91%</span>
-                      </div>
-                      <Progress value={91} className="h-2" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <GraduationCap className="w-5 h-5 text-green-500" />
-                    Training & Development
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Completed Training</span>
-                      <span className="font-semibold text-green-600">47</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">In Progress</span>
-                      <span className="font-semibold text-blue-600">12</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Certifications</span>
-                      <span className="font-semibold text-purple-600">23</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Skills Assessments</span>
-                      <span className="font-semibold text-orange-600">8</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <PerformanceManagement />
           </TabsContent>
 
           {/* Recruitment Tab */}
