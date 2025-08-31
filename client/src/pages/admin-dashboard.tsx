@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -1016,6 +1017,9 @@ export default function AdminDashboard() {
             <TabsTrigger value="tools" className="flex items-center gap-1 px-2 py-2 text-xs">
               <Zap className="w-3 h-3" />
               <span className="hidden sm:inline">Tools</span>
+            </TabsTrigger>
+            <TabsTrigger value="email" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300">
+              📧 <span className="hidden sm:inline font-semibold text-green-700">Email & Subscriptions</span>
             </TabsTrigger>
             <TabsTrigger 
               value="hr" 
@@ -2651,6 +2655,142 @@ export default function AdminDashboard() {
                     <p>• 300+ Pages Complete Guide</p>
                     <p>• All APIs & Database Schema</p>
                     <p>• Technical Architecture</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Email & Subscriptions Tab */}
+          <TabsContent value="email" className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">📧 Email & Subscriptions</h2>
+              <p className="text-gray-600 dark:text-gray-300">Manage subscription email notifications and reminders</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Subscription Email Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="w-5 h-5 text-green-600" />
+                    Subscription Email Settings
+                  </CardTitle>
+                  <CardDescription>
+                    Configure automated subscription email notifications
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium">15-Day Expiry Reminders</p>
+                        <p className="text-sm text-gray-500">Send reminders 15 days before subscription expires</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-green-600 border-green-300"
+                        data-testid="toggle-15day-reminders"
+                      >
+                        ✅ Enabled
+                      </Button>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium">7-Day Expiry Reminders</p>
+                        <p className="text-sm text-gray-500">Send reminders 7 days before subscription expires</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-green-600 border-green-300"
+                        data-testid="toggle-7day-reminders"
+                      >
+                        ✅ Enabled
+                      </Button>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium">Renewal Confirmations</p>
+                        <p className="text-sm text-gray-500">Send confirmation emails after successful renewals</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-green-600 border-green-300"
+                        data-testid="toggle-renewal-confirmations"
+                      >
+                        ✅ Enabled
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2 pt-4">
+                    <Button 
+                      variant="outline"
+                      className="flex items-center gap-2"
+                      data-testid="test-subscription-email"
+                    >
+                      <Mail className="w-4 h-4" />
+                      Test Email System
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      className="flex items-center gap-2"
+                      data-testid="save-email-settings"
+                    >
+                      <Save className="w-4 h-4" />
+                      Save Settings
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Email Status & Configuration */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Server className="w-5 h-5 text-blue-600" />
+                    Email Service Status
+                  </CardTitle>
+                  <CardDescription>
+                    SendGrid email service configuration and status
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div>
+                        <p className="font-medium text-yellow-800">SendGrid Status</p>
+                        <p className="text-sm text-yellow-600">API key not configured</p>
+                      </div>
+                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                        ⚠️ Not Configured
+                      </Badge>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="sendgrid-api-key">SendGrid API Key</Label>
+                      <Input
+                        id="sendgrid-api-key"
+                        type="password"
+                        placeholder="SG.xxxxxxxxxxxxxxxx"
+                        data-testid="input-sendgrid-api-key"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="from-email">From Email Address</Label>
+                      <Input
+                        id="from-email"
+                        type="email"
+                        placeholder="noreply@greenlens.ai"
+                        data-testid="input-from-email"
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
