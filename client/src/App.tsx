@@ -15,6 +15,7 @@ import Admin from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import SuperAdminDashboard from "@/pages/super-admin-dashboard";
+import SuperAdminLogin from "@/pages/super-admin-login";
 import AdminBlogManager from "@/pages/admin-blog-manager";
 import AdminSocialMedia from "@/pages/admin-social-media";
 import ExpertsRegister from "@/pages/experts-register";
@@ -167,6 +168,9 @@ function Router() {
       {/* Admin login should be public - accessible before logging in */}
       <Route path="/admin-login">
         {() => <AdminLogin />}
+      </Route>
+      <Route path="/super-admin-login">
+        {() => <SuperAdminLogin />}
       </Route>
       
       {/* Admin routes - accessible with session-based auth */}

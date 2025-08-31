@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 
 interface LoginForm {
-  email: string;
+  username: string;
   password: string;
   totpCode: string;
   backupCode: string;
@@ -48,7 +48,7 @@ export default function SuperAdminLogin() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [formData, setFormData] = useState<LoginForm>({
-    email: '',
+    username: '',
     password: '',
     totpCode: '',
     backupCode: ''
@@ -70,13 +70,14 @@ export default function SuperAdminLogin() {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async (credentials: Partial<LoginForm>) => {
-      const response = await apiRequest('POST', '/api/admin/auth/login', credentials);
+      const response = await apiRequest('POST', '/api/admin/login', credentials);
       return await response.json() as LoginResponse;
     },
     onSuccess: (data) => {
-      if (data.success && data.token && data.user) {
-        // Store authentication data
-        sessionStorage.setItem("adminToken", data.token);
+      if (data.success && data.user) {
+        // Store authentication data - create a simple token from timestamp
+        const token = `admin-session-${Date.now()}`;
+        sessionStorage.setItem("adminToken", token);
         sessionStorage.setItem("adminUser", JSON.stringify(data.user));
         
         toast({
@@ -115,17 +116,17 @@ export default function SuperAdminLogin() {
   const handleCredentialsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.email || !formData.password) {
+    if (!formData.username || !formData.password) {
       toast({
         title: "Missing Information",
-        description: "Please enter both email and password",
+        description: "Please enter both username and password",
         variant: "destructive",
       });
       return;
     }
     
     loginMutation.mutate({
-      email: formData.email,
+      username: formData.username,
       password: formData.password
     });
   };
@@ -152,7 +153,7 @@ export default function SuperAdminLogin() {
     }
     
     loginMutation.mutate({
-      email: formData.email,
+      username: formData.username,
       password: formData.password,
       totpCode: useBackupCode ? undefined : formData.totpCode,
       backupCode: useBackupCode ? formData.backupCode : undefined
@@ -212,18 +213,18 @@ export default function SuperAdminLogin() {
             {loginStep === 'credentials' && (
               <form onSubmit={handleCredentialsSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-200">Email Address</Label>
+                  <Label htmlFor="username" className="text-gray-200">Username</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
-                      id="email"
-                      type="email"
-                      placeholder="admin@greenlens.com"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      id="username"
+                      type="text"
+                      placeholder="admin"
+                      value={formData.username}
+                      onChange={(e) => handleInputChange('username', e.target.value)}
                       className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                       disabled={loginMutation.isPending}
-                      data-testid="input-admin-email"
+                      data-testid="input-admin-username"
                     />
                   </div>
                 </div>
