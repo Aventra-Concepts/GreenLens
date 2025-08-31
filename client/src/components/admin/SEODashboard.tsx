@@ -42,6 +42,19 @@ import {
   Activity
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+// Dynamic imports to avoid SSR issues
+const loadPDFLibraries = async () => {
+  const [jsPDF, autoTable] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable')
+  ]);
+  return { jsPDF: jsPDF.default, autoTable: autoTable.default };
+};
+
+const loadXLSX = async () => {
+  const XLSX = await import('xlsx');
+  return XLSX;
+};
 
 interface SEOData {
   overview: {
@@ -256,24 +269,200 @@ export default function SEODashboard() {
     }
   });
 
+  const generatePDFReport = async (data: SEOData) => {
+    const { jsPDF, autoTable } = await loadPDFLibraries();
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 20;
+    
+    // Title
+    doc.setFontSize(20);
+    doc.setTextColor(34, 197, 94); // Green color
+    doc.text('GreenLens SEO Analytics Report', margin, 30);
+    
+    // Date
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, margin, 45);
+    
+    // SEO Overview
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text('SEO Overview', margin, 65);
+    
+    const overviewData = [
+      ['Metric', 'Value', 'Status'],
+      ['SEO Score', `${data.overview.seoScore}/100`, data.overview.seoScore >= 80 ? 'Excellent' : data.overview.seoScore >= 60 ? 'Good' : 'Needs Improvement'],
+      ['Organic Traffic', formatNumber(data.overview.organicTraffic), 'Monthly'],
+      ['Keyword Rankings', formatNumber(data.overview.keywordRankings), 'Total Keywords'],
+      ['Backlinks', formatNumber(data.overview.backlinks), 'Total Links'],
+      ['Technical Issues', data.overview.technicalIssues.toString(), data.overview.technicalIssues === 0 ? 'No Issues' : 'Needs Attention'],
+      ['Content Score', `${data.overview.contentScore}/100`, data.overview.contentScore >= 80 ? 'Excellent' : 'Good']
+    ];
+    
+    autoTable(doc, {
+      head: [overviewData[0]],
+      body: overviewData.slice(1),
+      startY: 75,
+      theme: 'grid',
+      headStyles: { fillColor: [34, 197, 94] },
+      margin: { left: margin, right: margin }
+    });
+    
+    // Technical Audit
+    const finalY = (doc as any).lastAutoTable.finalY || 140;
+    doc.setFontSize(16);
+    doc.text('Technical Audit', margin, finalY + 20);
+    
+    const technicalData = [
+      ['Metric', 'Score', 'Status'],
+      ['Page Speed', `${data.technicalAudit.pageSpeed}/100`, data.technicalAudit.pageSpeed >= 90 ? 'Excellent' : data.technicalAudit.pageSpeed >= 70 ? 'Good' : 'Poor'],
+      ['Mobile Optimization', `${data.technicalAudit.mobileOptimization}/100`, data.technicalAudit.mobileOptimization >= 90 ? 'Excellent' : 'Good'],
+      ['Crawlability', `${data.technicalAudit.crawlability}/100`, data.technicalAudit.crawlability >= 90 ? 'Excellent' : 'Good'],
+      ['SSL/HTTPS', data.technicalAudit.httpsStatus ? 'Enabled' : 'Disabled', data.technicalAudit.httpsStatus ? 'Secure' : 'Needs SSL'],
+      ['XML Sitemap', data.technicalAudit.xmlSitemap ? 'Found' : 'Missing', data.technicalAudit.xmlSitemap ? 'Good' : 'Add Sitemap']
+    ];
+    
+    autoTable(doc, {
+      head: [technicalData[0]],
+      body: technicalData.slice(1),
+      startY: finalY + 30,
+      theme: 'grid',
+      headStyles: { fillColor: [59, 130, 246] },
+      margin: { left: margin, right: margin }
+    });
+    
+    // Top Keywords
+    const finalY2 = (doc as any).lastAutoTable.finalY || 200;
+    if (finalY2 + 50 < doc.internal.pageSize.height - 20) {
+      doc.setFontSize(16);
+      doc.text('Top Keywords (Sample)', margin, finalY2 + 20);
+      
+      const keywordData = [
+        ['Keyword', 'Position', 'Volume', 'Trend'],
+        ...data.keywords.slice(0, 5).map(k => [
+          k.keyword,
+          k.position.toString(),
+          formatNumber(k.volume),
+          k.trend.charAt(0).toUpperCase() + k.trend.slice(1)
+        ])
+      ];
+      
+      autoTable(doc, {
+        head: [keywordData[0]],
+        body: keywordData.slice(1),
+        startY: finalY2 + 30,
+        theme: 'grid',
+        headStyles: { fillColor: [245, 158, 11] },
+        margin: { left: margin, right: margin }
+      });
+    }
+    
+    return doc;
+  };
+  
+  const generateExcelReport = async (data: SEOData) => {
+    const XLSX = await loadXLSX();
+    const workbook = XLSX.utils.book_new();
+    
+    // Overview Sheet
+    const overviewData = [
+      ['SEO Analytics Report - ' + new Date().toLocaleDateString()],
+      [],
+      ['Metric', 'Value', 'Status'],
+      ['SEO Score', data.overview.seoScore + '/100', data.overview.seoScore >= 80 ? 'Excellent' : data.overview.seoScore >= 60 ? 'Good' : 'Needs Improvement'],
+      ['Organic Traffic', formatNumber(data.overview.organicTraffic), 'Monthly Visitors'],
+      ['Keyword Rankings', formatNumber(data.overview.keywordRankings), 'Total Keywords'],
+      ['Backlinks', formatNumber(data.overview.backlinks), 'Total Links'],
+      ['Technical Issues', data.overview.technicalIssues, data.overview.technicalIssues === 0 ? 'No Issues' : 'Needs Attention'],
+      ['Content Score', data.overview.contentScore + '/100', data.overview.contentScore >= 80 ? 'Excellent' : 'Good']
+    ];
+    
+    const overviewSheet = XLSX.utils.aoa_to_sheet(overviewData);
+    XLSX.utils.book_append_sheet(workbook, overviewSheet, 'Overview');
+    
+    // Technical Audit Sheet
+    const technicalData = [
+      ['Technical Audit Results'],
+      [],
+      ['Metric', 'Score', 'Status'],
+      ['Page Speed', data.technicalAudit.pageSpeed + '/100', data.technicalAudit.pageSpeed >= 90 ? 'Excellent' : data.technicalAudit.pageSpeed >= 70 ? 'Good' : 'Poor'],
+      ['Mobile Optimization', data.technicalAudit.mobileOptimization + '/100', data.technicalAudit.mobileOptimization >= 90 ? 'Excellent' : 'Good'],
+      ['Crawlability', data.technicalAudit.crawlability + '/100', data.technicalAudit.crawlability >= 90 ? 'Excellent' : 'Good'],
+      ['SSL/HTTPS', data.technicalAudit.httpsStatus ? 'Enabled' : 'Disabled', data.technicalAudit.httpsStatus ? 'Secure' : 'Needs SSL'],
+      ['XML Sitemap', data.technicalAudit.xmlSitemap ? 'Found' : 'Missing', data.technicalAudit.xmlSitemap ? 'Good' : 'Add Sitemap']
+    ];
+    
+    const technicalSheet = XLSX.utils.aoa_to_sheet(technicalData);
+    XLSX.utils.book_append_sheet(workbook, technicalSheet, 'Technical Audit');
+    
+    // Keywords Sheet
+    const keywordData = [
+      ['Keyword Performance'],
+      [],
+      ['Keyword', 'Position', 'Volume', 'Difficulty', 'Trend', 'URL']
+    ];
+    
+    data.keywords.forEach(keyword => {
+      keywordData.push([
+        keyword.keyword,
+        keyword.position.toString(),
+        keyword.volume.toString(),
+        keyword.difficulty.toString(),
+        keyword.trend.charAt(0).toUpperCase() + keyword.trend.slice(1),
+        keyword.url
+      ]);
+    });
+    
+    const keywordSheet = XLSX.utils.aoa_to_sheet(keywordData);
+    XLSX.utils.book_append_sheet(workbook, keywordSheet, 'Keywords');
+    
+    // Opportunities Sheet
+    const opportunitiesData = [
+      ['SEO Opportunities'],
+      [],
+      ['Type', 'Title', 'Impact', 'Effort', 'Priority']
+    ];
+    
+    data.opportunities.forEach(opp => {
+      opportunitiesData.push([
+        opp.type.charAt(0).toUpperCase() + opp.type.slice(1),
+        opp.title,
+        opp.impact.charAt(0).toUpperCase() + opp.impact.slice(1),
+        opp.effort.charAt(0).toUpperCase() + opp.effort.slice(1),
+        opp.priority.toString()
+      ]);
+    });
+    
+    const opportunitiesSheet = XLSX.utils.aoa_to_sheet(opportunitiesData);
+    XLSX.utils.book_append_sheet(workbook, opportunitiesSheet, 'Opportunities');
+    
+    return { workbook, XLSX };
+  };
+  
   const exportMutation = useMutation({
-    mutationFn: async (format: 'pdf' | 'excel' | 'csv') => {
-      // Simulate report generation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      return { format, url: `/reports/seo-report-${Date.now()}.${format}` };
+    mutationFn: async (format: 'pdf' | 'excel') => {
+      // Small delay for UX
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const currentData = seoData || mockSEOData;
+      const timestamp = new Date().toISOString().split('T')[0];
+      
+      if (format === 'pdf') {
+        const doc = await generatePDFReport(currentData);
+        doc.save(`SEO-Report-${timestamp}.pdf`);
+        return { format: 'PDF', filename: `SEO-Report-${timestamp}.pdf` };
+      } else {
+        const { workbook, XLSX } = await generateExcelReport(currentData);
+        XLSX.writeFile(workbook, `SEO-Report-${timestamp}.xlsx`);
+        return { format: 'Excel', filename: `SEO-Report-${timestamp}.xlsx` };
+      }
     },
     onSuccess: (data) => {
       toast({
-        title: "Report Generated",
-        description: `SEO report in ${data.format.toUpperCase()} format has been generated and downloaded.`,
+        title: "Report Downloaded",
+        description: `${data.format} report (${data.filename}) has been generated and downloaded successfully.`,
       });
-      // Simulate file download
-      const link = document.createElement('a');
-      link.href = data.url;
-      link.download = `seo-report-${new Date().toISOString().split('T')[0]}.${data.format}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     },
     onError: () => {
       toast({
@@ -328,7 +517,7 @@ export default function SEODashboard() {
     }
   };
 
-  const exportReport = async (format: 'pdf' | 'excel' | 'csv') => {
+  const exportReport = async (format: 'pdf' | 'excel') => {
     await exportMutation.mutateAsync(format);
   };
 
