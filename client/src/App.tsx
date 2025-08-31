@@ -81,6 +81,8 @@ import DiseaseDiagnosis from '@/pages/disease-diagnosis';
 import CareersPage from '@/pages/careers';
 import DocumentationDownload from '@/pages/documentation-download';
 import AdminHRDashboard from '@/pages/admin-hr-dashboard';
+import FinancialDashboard from '@/pages/financial-dashboard';
+import AdminFinancialDashboard from '@/pages/admin-financial-dashboard';
 import AdminBlogCreate from '@/pages/admin-blog-create';
 import AdminBlogEdit from '@/pages/admin-blog-edit';
 
@@ -185,6 +187,8 @@ function Router() {
         {(params) => <UserGardenView />}
       </Route>
       <Route path="/admin/hr" component={AdminHRDashboard} />
+      <Route path="/admin/financial" component={AdminFinancialDashboard} />
+      <Route path="/financial-dashboard" component={FinancialDashboard} />
       <Route path="/admin/blog/create" component={AdminBlogCreate} />
       <Route path="/admin/blog/edit/:id" component={AdminBlogEdit} />
       

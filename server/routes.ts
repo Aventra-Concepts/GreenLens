@@ -43,6 +43,7 @@ import dashboardFeaturesRoutes from "./routes/dashboard-features";
 import hrRoutes from "./routes/hrRoutes";
 import { registerAdminGardenRoutes } from "./routes/admin-garden";
 import { registerGardenDashboardRoutes } from "./routes/garden-dashboard";
+import { financialRoutes } from "./routes/financialRoutes";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -508,6 +509,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register HR management routes
   app.use('/api/hr', hrRoutes);
+  
+  // Register financial management routes
+  app.use('/api/financial', financialRoutes);
   
   // Register admin garden management routes
   registerAdminGardenRoutes(app);

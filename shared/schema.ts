@@ -2970,3 +2970,269 @@ export type InsertPerformanceEvaluation = z.infer<typeof insertPerformanceEvalua
 export type InsertPerformanceImprovementPlan = z.infer<typeof insertPerformanceImprovementPlanSchema>;
 export type InsertPerformanceGoal = z.infer<typeof insertPerformanceGoalSchema>;
 export type InsertPerformanceMetric = z.infer<typeof insertPerformanceMetricSchema>;
+
+// ============================================================================
+// FINANCIAL DASHBOARD SYSTEM
+// ============================================================================
+
+// Transaction Categories for Income and Expenses
+export const transactionCategories = pgTable("transaction_categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  type: varchar("type").notNull(), // 'income', 'expense'
+  description: text("description"),
+  parentCategoryId: varchar("parent_category_id").references(() => transactionCategories.id),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Financial Transactions - Main transaction table
+export const financialTransactions = pgTable("financial_transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  transactionDate: date("transaction_date").notNull(),
+  amount: decimal("amount", { precision: 15, scale: 2 }).notNull(),
+  type: varchar("type").notNull(), // 'income', 'expense'
+  categoryId: varchar("category_id").references(() => transactionCategories.id).notNull(),
+  description: text("description").notNull(),
+  reference: varchar("reference"), // Invoice number, receipt number, etc.
+  
+  // Payment details
+  paymentMethod: varchar("payment_method").notNull(), // 'cash', 'bank_transfer', 'credit_card', 'debit_card', 'upi', 'cheque'
+  bankAccount: varchar("bank_account"),
+  gatewayProvider: varchar("gateway_provider"), // 'stripe', 'razorpay', 'payu', 'paypal'
+  gatewayCharges: decimal("gateway_charges", { precision: 10, scale: 2 }).default('0'),
+  gatewayTransactionId: varchar("gateway_transaction_id"),
+  
+  // Tax details
+  isGstApplicable: boolean("is_gst_applicable").default(false),
+  gstRate: decimal("gst_rate", { precision: 5, scale: 2 }).default('0'),
+  gstAmount: decimal("gst_amount", { precision: 10, scale: 2 }).default('0'),
+  cgstAmount: decimal("cgst_amount", { precision: 10, scale: 2 }).default('0'),
+  sgstAmount: decimal("sgst_amount", { precision: 10, scale: 2 }).default('0'),
+  igstAmount: decimal("igst_amount", { precision: 10, scale: 2 }).default('0'),
+  cessAmount: decimal("cess_amount", { precision: 10, scale: 2 }).default('0'),
+  
+  // International transaction details
+  isInternational: boolean("is_international").default(false),
+  baseCurrency: varchar("base_currency", { length: 3 }).default('INR'),
+  foreignCurrency: varchar("foreign_currency", { length: 3 }),
+  exchangeRate: decimal("exchange_rate", { precision: 10, scale: 6 }),
+  foreignAmount: decimal("foreign_amount", { precision: 15, scale: 2 }),
+  
+  // Additional details
+  contactPersonName: varchar("contact_person_name"),
+  contactPersonEmail: varchar("contact_person_email"),
+  contactPersonPhone: varchar("contact_person_phone"),
+  notes: text("notes"),
+  attachments: jsonb("attachments").default("[]"), // File URLs
+  
+  // Linking
+  invoiceId: varchar("invoice_id").references(() => invoices.id),
+  receiptId: varchar("receipt_id").references(() => receipts.id),
+  
+  // Metadata
+  createdBy: varchar("created_by").references(() => users.id),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  status: varchar("status").default('active'), // 'active', 'deleted', 'pending_approval'
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Invoices
+export const invoices = pgTable("invoices", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceNumber: varchar("invoice_number").notNull().unique(),
+  invoiceDate: date("invoice_date").notNull(),
+  dueDate: date("due_date"),
+  
+  // Client details
+  clientName: varchar("client_name").notNull(),
+  clientEmail: varchar("client_email"),
+  clientPhone: varchar("client_phone"),
+  clientAddress: text("client_address"),
+  clientGstin: varchar("client_gstin"),
+  
+  // Company details
+  companyName: varchar("company_name").notNull(),
+  companyAddress: text("company_address").notNull(),
+  companyGstin: varchar("company_gstin"),
+  companyPhone: varchar("company_phone"),
+  companyEmail: varchar("company_email"),
+  
+  // Financial details
+  subtotal: decimal("subtotal", { precision: 15, scale: 2 }).notNull(),
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).default('0'),
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).default('0'),
+  totalAmount: decimal("total_amount", { precision: 15, scale: 2 }).notNull(),
+  paidAmount: decimal("paid_amount", { precision: 15, scale: 2 }).default('0'),
+  balanceAmount: decimal("balance_amount", { precision: 15, scale: 2 }).notNull(),
+  
+  // Tax details
+  isGstApplicable: boolean("is_gst_applicable").default(false),
+  placeOfSupply: varchar("place_of_supply"),
+  
+  // Status and metadata
+  status: varchar("status").default('draft'), // 'draft', 'sent', 'paid', 'overdue', 'cancelled'
+  currency: varchar("currency", { length: 3 }).default('INR'),
+  notes: text("notes"),
+  termsAndConditions: text("terms_and_conditions"),
+  
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Invoice Items
+export const invoiceItems = pgTable("invoice_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceId: varchar("invoice_id").references(() => invoices.id, { onDelete: "cascade" }).notNull(),
+  description: text("description").notNull(),
+  quantity: decimal("quantity", { precision: 10, scale: 3 }).notNull(),
+  unitPrice: decimal("unit_price", { precision: 15, scale: 2 }).notNull(),
+  amount: decimal("amount", { precision: 15, scale: 2 }).notNull(),
+  
+  // Tax details for each item
+  hsnCode: varchar("hsn_code"),
+  gstRate: decimal("gst_rate", { precision: 5, scale: 2 }).default('0'),
+  gstAmount: decimal("gst_amount", { precision: 10, scale: 2 }).default('0'),
+  cgstAmount: decimal("cgst_amount", { precision: 10, scale: 2 }).default('0'),
+  sgstAmount: decimal("sgst_amount", { precision: 10, scale: 2 }).default('0'),
+  igstAmount: decimal("igst_amount", { precision: 10, scale: 2 }).default('0'),
+  cessAmount: decimal("cess_amount", { precision: 10, scale: 2 }).default('0'),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Receipts
+export const receipts = pgTable("receipts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  receiptNumber: varchar("receipt_number").notNull().unique(),
+  receiptDate: date("receipt_date").notNull(),
+  
+  // Payment details
+  paymentMethod: varchar("payment_method").notNull(),
+  amount: decimal("amount", { precision: 15, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default('INR'),
+  
+  // Client details
+  clientName: varchar("client_name").notNull(),
+  clientEmail: varchar("client_email"),
+  clientPhone: varchar("client_phone"),
+  
+  // References
+  invoiceId: varchar("invoice_id").references(() => invoices.id),
+  transactionId: varchar("transaction_id").references(() => financialTransactions.id),
+  
+  // Gateway details
+  gatewayProvider: varchar("gateway_provider"),
+  gatewayTransactionId: varchar("gateway_transaction_id"),
+  gatewayCharges: decimal("gateway_charges", { precision: 10, scale: 2 }).default('0'),
+  
+  // Additional details
+  description: text("description"),
+  notes: text("notes"),
+  
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Tax Records for compliance tracking
+export const taxRecords = pgTable("tax_records", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  taxType: varchar("tax_type").notNull(), // 'gst', 'income_tax', 'tds', 'professional_tax'
+  taxPeriod: varchar("tax_period").notNull(), // 'monthly', 'quarterly', 'annual'
+  periodStart: date("period_start").notNull(),
+  periodEnd: date("period_end").notNull(),
+  
+  // Calculated amounts
+  taxableAmount: decimal("taxable_amount", { precision: 15, scale: 2 }).notNull(),
+  taxAmount: decimal("tax_amount", { precision: 15, scale: 2 }).notNull(),
+  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }),
+  
+  // Payment details
+  isPaid: boolean("is_paid").default(false),
+  paidDate: date("paid_date"),
+  paidAmount: decimal("paid_amount", { precision: 15, scale: 2 }),
+  challanNumber: varchar("challan_number"),
+  
+  // Additional details specific to tax type
+  gstDetails: jsonb("gst_details"), // CGST, SGST, IGST breakup
+  assessmentYear: varchar("assessment_year"), // For income tax
+  filingStatus: varchar("filing_status"), // 'pending', 'filed', 'processed'
+  filingDate: date("filing_date"),
+  
+  notes: text("notes"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Financial Settings and Configuration
+export const financialSettings = pgTable("financial_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  settingKey: varchar("setting_key").notNull().unique(),
+  settingValue: jsonb("setting_value").notNull(),
+  description: text("description"),
+  isActive: boolean("is_active").default(true),
+  updatedBy: varchar("updated_by").references(() => users.id),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Financial Dashboard Export Types
+export type TransactionCategory = typeof transactionCategories.$inferSelect;
+export type FinancialTransaction = typeof financialTransactions.$inferSelect;
+export type Invoice = typeof invoices.$inferSelect;
+export type InvoiceItem = typeof invoiceItems.$inferSelect;
+export type Receipt = typeof receipts.$inferSelect;
+export type TaxRecord = typeof taxRecords.$inferSelect;
+export type FinancialSetting = typeof financialSettings.$inferSelect;
+
+// Financial Dashboard Insert Schemas
+export const insertTransactionCategorySchema = createInsertSchema(transactionCategories).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertFinancialTransactionSchema = createInsertSchema(financialTransactions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertInvoiceSchema = createInsertSchema(invoices).omit({
+  id: true,
+  balanceAmount: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertInvoiceItemSchema = createInsertSchema(invoiceItems).omit({
+  id: true,
+  amount: true,
+  createdAt: true,
+});
+
+export const insertReceiptSchema = createInsertSchema(receipts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertTaxRecordSchema = createInsertSchema(taxRecords).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertFinancialSettingSchema = createInsertSchema(financialSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+// Financial Dashboard Insert Types
+export type InsertTransactionCategory = z.infer<typeof insertTransactionCategorySchema>;
+export type InsertFinancialTransaction = z.infer<typeof insertFinancialTransactionSchema>;
+export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
+export type InsertInvoiceItem = z.infer<typeof insertInvoiceItemSchema>;
+export type InsertReceipt = z.infer<typeof insertReceiptSchema>;
+export type InsertTaxRecord = z.infer<typeof insertTaxRecordSchema>;
+export type InsertFinancialSetting = z.infer<typeof insertFinancialSettingSchema>;
