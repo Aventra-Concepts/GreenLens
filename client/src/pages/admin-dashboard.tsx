@@ -967,70 +967,70 @@ export default function AdminDashboard() {
           {/* Admin Navigation Tabs */}
           <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 grid-rows-2 bg-white dark:bg-gray-800 p-1 h-auto gap-1">
             {/* First Row - 8 tabs */}
-            <TabsTrigger value="overview" className="flex items-center gap-1 px-2 py-2 text-xs">
-              <BarChart3 className="w-3 h-3" />
-              <span className="hidden sm:inline">Overview</span>
+            <TabsTrigger value="overview" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-slate-100 to-gray-100 border-2 border-slate-300">
+              <BarChart3 className="w-3 h-3 text-slate-600" />
+              <span className="hidden sm:inline font-semibold text-slate-700">Overview</span>
             </TabsTrigger>
             <TabsTrigger value="premium-view" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-emerald-100 to-green-100 border-2 border-emerald-300">
               <Leaf className="w-3 h-3 text-emerald-600" />
               <span className="hidden sm:inline font-semibold text-emerald-700">Premium</span>
             </TabsTrigger>
-            <TabsTrigger value="authors" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300">
+            <TabsTrigger value="authors" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-green-100 to-lime-100 border-2 border-green-300">
               <UserCheck className="w-3 h-3 text-green-600" />
               <span className="hidden sm:inline font-semibold text-green-700">Authors</span>
             </TabsTrigger>
-            <TabsTrigger value="ebooks" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-purple-100 to-blue-100 border-2 border-purple-300">
+            <TabsTrigger value="ebooks" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-purple-100 to-violet-100 border-2 border-purple-300">
               <BookOpen className="w-3 h-3 text-purple-600" />
               <span className="hidden sm:inline font-semibold text-purple-700">E-Books</span>
             </TabsTrigger>
-            <TabsTrigger value="affiliate" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-orange-100 to-yellow-100 border-2 border-orange-300">
+            <TabsTrigger value="affiliate" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-orange-100 to-amber-100 border-2 border-orange-300">
               <DollarSign className="w-3 h-3 text-orange-600" />
               <span className="hidden sm:inline font-semibold text-orange-700">Affiliate</span>
             </TabsTrigger>
             <TabsTrigger 
               value="hr" 
-              className="flex items-center gap-1 px-2 py-2 text-xs cursor-pointer hover:bg-blue-50 bg-gradient-to-r from-blue-100 to-cyan-100 border-2 border-blue-300" 
+              className="flex items-center gap-1 px-2 py-2 text-xs cursor-pointer hover:bg-blue-50 bg-gradient-to-r from-blue-100 to-sky-100 border-2 border-blue-300" 
               onClick={() => window.location.href = '/admin/hr'}
             >
               <Users className="w-3 h-3 text-blue-600" />
               <span className="hidden sm:inline text-blue-700 font-semibold">HR</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-1 px-2 py-2 text-xs">
-              <Users className="w-3 h-3" />
-              <span className="hidden sm:inline">Users</span>
+            <TabsTrigger value="users" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-indigo-100 to-blue-100 border-2 border-indigo-300">
+              <Users className="w-3 h-3 text-indigo-600" />
+              <span className="hidden sm:inline font-semibold text-indigo-700">Users</span>
             </TabsTrigger>
-            <TabsTrigger value="consultations" className="flex items-center gap-1 px-2 py-2 text-xs">
-              <MessageSquare className="w-3 h-3" />
-              <span className="hidden sm:inline">Consults</span>
+            <TabsTrigger value="consultations" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-teal-100 to-cyan-100 border-2 border-teal-300">
+              <MessageSquare className="w-3 h-3 text-teal-600" />
+              <span className="hidden sm:inline font-semibold text-teal-700">Consults</span>
             </TabsTrigger>
             
             {/* Second Row - 7 tabs */}
-            <TabsTrigger value="content" className="flex items-center gap-1 px-2 py-2 text-xs">
-              <FileText className="w-3 h-3" />
-              <span className="hidden sm:inline">Content</span>
+            <TabsTrigger value="content" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-rose-100 to-pink-100 border-2 border-rose-300">
+              <FileText className="w-3 h-3 text-rose-600" />
+              <span className="hidden sm:inline font-semibold text-rose-700">Content</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-1 px-2 py-2 text-xs">
-              <TrendingUp className="w-3 h-3" />
-              <span className="hidden sm:inline">Analytics</span>
+            <TabsTrigger value="analytics" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-yellow-100 to-amber-100 border-2 border-yellow-300">
+              <TrendingUp className="w-3 h-3 text-yellow-600" />
+              <span className="hidden sm:inline font-semibold text-yellow-700">Analytics</span>
             </TabsTrigger>
-            <TabsTrigger value="seo" className="flex items-center gap-1 px-2 py-2 text-xs">
-              <Target className="w-3 h-3" />
-              <span className="hidden sm:inline">SEO</span>
+            <TabsTrigger value="seo" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-red-100 to-rose-100 border-2 border-red-300">
+              <Target className="w-3 h-3 text-red-600" />
+              <span className="hidden sm:inline font-semibold text-red-700">SEO</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-1 px-2 py-2 text-xs">
-              <Settings className="w-3 h-3" />
-              <span className="hidden sm:inline">Settings</span>
+            <TabsTrigger value="settings" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-gray-100 to-slate-100 border-2 border-gray-300">
+              <Settings className="w-3 h-3 text-gray-600" />
+              <span className="hidden sm:inline font-semibold text-gray-700">Settings</span>
             </TabsTrigger>
-            <TabsTrigger value="system" className="flex items-center gap-1 px-2 py-2 text-xs">
-              <Server className="w-3 h-3" />
-              <span className="hidden sm:inline">System</span>
+            <TabsTrigger value="system" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-zinc-100 to-gray-100 border-2 border-zinc-300">
+              <Server className="w-3 h-3 text-zinc-600" />
+              <span className="hidden sm:inline font-semibold text-zinc-700">System</span>
             </TabsTrigger>
-            <TabsTrigger value="tools" className="flex items-center gap-1 px-2 py-2 text-xs">
-              <Zap className="w-3 h-3" />
-              <span className="hidden sm:inline">Tools</span>
+            <TabsTrigger value="tools" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-lime-100 to-green-100 border-2 border-lime-300">
+              <Zap className="w-3 h-3 text-lime-600" />
+              <span className="hidden sm:inline font-semibold text-lime-700">Tools</span>
             </TabsTrigger>
-            <TabsTrigger value="email" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300">
-              📧 <span className="hidden sm:inline font-semibold text-green-700">Email & Subscriptions</span>
+            <TabsTrigger value="email" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-emerald-100 to-teal-100 border-2 border-emerald-300">
+              📧 <span className="hidden sm:inline font-semibold text-emerald-700">Email & Subscriptions</span>
             </TabsTrigger>
           </TabsList>
 
