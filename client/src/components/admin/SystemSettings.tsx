@@ -145,7 +145,7 @@ interface SystemHealth {
 export default function SystemSettings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('email');
+  const [activeTab, setActiveTab] = useState('general');
   const [showSecrets, setShowSecrets] = useState(false);
 
   // Fetch system settings
@@ -395,28 +395,28 @@ export default function SystemSettings() {
 
       {/* Settings Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="general" className="flex items-center gap-2">
+        <TabsList className="flex w-full flex-wrap gap-1 h-auto p-1">
+          <TabsTrigger value="general" className="flex items-center gap-2 px-4 py-2">
             <Settings className="w-4 h-4" />
             General
           </TabsTrigger>
-          <TabsTrigger value="email" className="flex items-center gap-2 font-semibold bg-green-50 hover:bg-green-100 border border-green-200 text-green-700">
-            <Mail className="w-4 h-4" />
-            📧 Email & Subscriptions
+          <TabsTrigger value="email" className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold shadow-lg hover:from-green-600 hover:to-green-700 border-2 border-green-400">
+            <Mail className="w-5 h-5" />
+            📧 EMAIL & SUBSCRIPTIONS
           </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
+          <TabsTrigger value="security" className="flex items-center gap-2 px-4 py-2">
             <Shield className="w-4 h-4" />
             Security
           </TabsTrigger>
-          <TabsTrigger value="api" className="flex items-center gap-2">
+          <TabsTrigger value="api" className="flex items-center gap-2 px-4 py-2">
             <Key className="w-4 h-4" />
             API Keys
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
+          <TabsTrigger value="notifications" className="flex items-center gap-2 px-4 py-2">
             <Bell className="w-4 h-4" />
             Alerts
           </TabsTrigger>
-          <TabsTrigger value="backup" className="flex items-center gap-2">
+          <TabsTrigger value="backup" className="flex items-center gap-2 px-4 py-2">
             <Database className="w-4 h-4" />
             Backup
           </TabsTrigger>
