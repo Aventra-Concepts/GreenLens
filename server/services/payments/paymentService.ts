@@ -1,4 +1,6 @@
 import { CashfreeProvider } from './cashfreeProvider';
+import { PayPalProvider } from './paypalProvider';
+import { RazorpayProvider } from './razorpayProvider';
 import { 
   PaymentProvider, 
   CreateCheckoutParams, 
@@ -27,13 +29,31 @@ export class PaymentService {
       console.warn('Failed to initialize Cashfree provider:', (error as Error).message);
     }
 
-    // Set Cashfree as primary provider
+    try {
+      // Initialize PayPal provider
+      this.providers.push(new PayPalProvider());
+    } catch (error) {
+      console.warn('Failed to initialize PayPal provider:', (error as Error).message);
+    }
+
+    try {
+      // Initialize Razorpay provider
+      this.providers.push(new RazorpayProvider());
+    } catch (error) {
+      console.warn('Failed to initialize Razorpay provider:', (error as Error).message);
+    }
+
+    // Set primary provider based on configuration priority
     this.primaryProvider = this.providers.find(p => p.name === 'cashfree') || 
+                          this.providers.find(p => p.name === 'paypal') ||
+                          this.providers.find(p => p.name === 'razorpay') ||
                           this.providers[0] || 
                           null;
 
     if (!this.primaryProvider) {
       console.warn('No payment providers available. Please configure payment gateway credentials.');
+    } else {
+      console.log(`Payment service initialized with ${this.providers.length} providers. Primary: ${this.primaryProvider.name}`);
     }
   }
 

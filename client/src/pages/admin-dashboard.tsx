@@ -1968,6 +1968,120 @@ export default function AdminDashboard() {
                         <div className="border rounded-lg p-4">
                           <div className="flex items-center justify-between mb-3">
                             <div>
+                              <p className="font-medium">PayPal</p>
+                              <p className="text-sm text-gray-500">PayPal payment processing</p>
+                            </div>
+                            <Badge variant="outline">Not Configured</Badge>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Client ID</label>
+                            <div className="flex gap-2">
+                              <Input 
+                                type="password" 
+                                placeholder="PayPal Client ID..." 
+                                className="flex-1"
+                                data-testid="input-paypal-client-id"
+                              />
+                              <Button variant="outline" size="sm" data-testid="button-save-paypal-id">
+                                Save
+                              </Button>
+                            </div>
+                            <label className="text-sm font-medium">Client Secret</label>
+                            <div className="flex gap-2">
+                              <Input 
+                                type="password" 
+                                placeholder="PayPal Client Secret..." 
+                                className="flex-1"
+                                data-testid="input-paypal-secret"
+                              />
+                              <Button variant="outline" size="sm" data-testid="button-save-paypal-secret">
+                                Save
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <p className="font-medium">Cashfree</p>
+                              <p className="text-sm text-gray-500">Indian payment gateway</p>
+                            </div>
+                            <Badge variant="outline">Not Configured</Badge>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Client ID</label>
+                            <div className="flex gap-2">
+                              <Input 
+                                type="password" 
+                                placeholder="Cashfree Client ID..." 
+                                className="flex-1"
+                                data-testid="input-cashfree-client-id"
+                              />
+                              <Button variant="outline" size="sm" data-testid="button-save-cashfree-id">
+                                Save
+                              </Button>
+                            </div>
+                            <label className="text-sm font-medium">Client Secret</label>
+                            <div className="flex gap-2">
+                              <Input 
+                                type="password" 
+                                placeholder="Cashfree Client Secret..." 
+                                className="flex-1"
+                                data-testid="input-cashfree-secret"
+                              />
+                              <Button variant="outline" size="sm" data-testid="button-save-cashfree-secret">
+                                Save
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <p className="font-medium">Razorpay</p>
+                              <p className="text-sm text-gray-500">Indian payment processing</p>
+                            </div>
+                            <Badge variant="outline">Not Configured</Badge>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Key ID</label>
+                            <div className="flex gap-2">
+                              <Input 
+                                type="password" 
+                                placeholder="rzp_test_..." 
+                                className="flex-1"
+                                data-testid="input-razorpay-key"
+                              />
+                              <Button variant="outline" size="sm" data-testid="button-save-razorpay-key">
+                                Save
+                              </Button>
+                            </div>
+                            <label className="text-sm font-medium">Key Secret</label>
+                            <div className="flex gap-2">
+                              <Input 
+                                type="password" 
+                                placeholder="Razorpay Key Secret..." 
+                                className="flex-1"
+                                data-testid="input-razorpay-secret"
+                              />
+                              <Button variant="outline" size="sm" data-testid="button-save-razorpay-secret">
+                                Save
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Other Services */}
+                    <div>
+                      <h3 className="font-semibold mb-4 text-purple-700 dark:text-purple-400">Analytics & Tracking</h3>
+                      <div className="space-y-4">
+                        <div className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
                               <p className="font-medium">Google Analytics</p>
                               <p className="text-sm text-gray-500">Website analytics tracking</p>
                             </div>
@@ -1995,34 +2109,55 @@ export default function AdminDashboard() {
                   {/* API Status Dashboard */}
                   <div className="border-t pt-6">
                     <h3 className="font-semibold mb-4">API Status Dashboard</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
                       <div className="text-center p-4 border rounded-lg">
                         <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-2">
                           <CheckCircle className="w-6 h-6 text-green-600" />
                         </div>
-                        <p className="font-medium">OpenAI</p>
-                        <p className="text-sm text-green-600">Active</p>
+                        <p className="font-medium text-sm">OpenAI</p>
+                        <p className="text-xs text-green-600">Active</p>
                       </div>
                       <div className="text-center p-4 border rounded-lg">
                         <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
                           <XCircle className="w-6 h-6 text-gray-400" />
                         </div>
-                        <p className="font-medium">Plant.id</p>
-                        <p className="text-sm text-gray-500">Not Configured</p>
+                        <p className="font-medium text-sm">Plant.id</p>
+                        <p className="text-xs text-gray-500">Not Set</p>
                       </div>
                       <div className="text-center p-4 border rounded-lg">
                         <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
                           <XCircle className="w-6 h-6 text-gray-400" />
                         </div>
-                        <p className="font-medium">Stripe</p>
-                        <p className="text-sm text-gray-500">Not Configured</p>
+                        <p className="font-medium text-sm">Stripe</p>
+                        <p className="text-xs text-gray-500">Not Set</p>
                       </div>
                       <div className="text-center p-4 border rounded-lg">
                         <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
                           <XCircle className="w-6 h-6 text-gray-400" />
                         </div>
-                        <p className="font-medium">Analytics</p>
-                        <p className="text-sm text-gray-500">Not Configured</p>
+                        <p className="font-medium text-sm">PayPal</p>
+                        <p className="text-xs text-gray-500">Not Set</p>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                          <XCircle className="w-6 h-6 text-gray-400" />
+                        </div>
+                        <p className="font-medium text-sm">Cashfree</p>
+                        <p className="text-xs text-gray-500">Not Set</p>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                          <XCircle className="w-6 h-6 text-gray-400" />
+                        </div>
+                        <p className="font-medium text-sm">Razorpay</p>
+                        <p className="text-xs text-gray-500">Not Set</p>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                          <XCircle className="w-6 h-6 text-gray-400" />
+                        </div>
+                        <p className="font-medium text-sm">Analytics</p>
+                        <p className="text-xs text-gray-500">Not Set</p>
                       </div>
                     </div>
                   </div>

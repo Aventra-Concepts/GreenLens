@@ -802,6 +802,12 @@ router.get('/api-keys', requireAuth, requireAdmin, async (req, res) => {
       plantid: process.env.PLANTID_API_KEY ? process.env.PLANTID_API_KEY.substring(0, 8) + '****' : null,
       stripe_secret: process.env.STRIPE_SECRET_KEY ? 'sk_************************************' : null,
       stripe_public: process.env.VITE_STRIPE_PUBLIC_KEY ? process.env.VITE_STRIPE_PUBLIC_KEY.substring(0, 8) + '****' : null,
+      paypal_client_id: process.env.PAYPAL_CLIENT_ID ? process.env.PAYPAL_CLIENT_ID.substring(0, 8) + '****' : null,
+      paypal_client_secret: process.env.PAYPAL_CLIENT_SECRET ? 'paypal_************************************' : null,
+      cashfree_client_id: process.env.CASHFREE_CLIENT_ID ? process.env.CASHFREE_CLIENT_ID.substring(0, 8) + '****' : null,
+      cashfree_client_secret: process.env.CASHFREE_CLIENT_SECRET ? 'cashfree_************************************' : null,
+      razorpay_key_id: process.env.RAZORPAY_KEY_ID ? process.env.RAZORPAY_KEY_ID.substring(0, 8) + '****' : null,
+      razorpay_key_secret: process.env.RAZORPAY_KEY_SECRET ? 'razorpay_************************************' : null,
       google_analytics: process.env.VITE_GA_MEASUREMENT_ID || null,
     };
 
@@ -809,6 +815,9 @@ router.get('/api-keys', requireAuth, requireAdmin, async (req, res) => {
       openai: !!process.env.OPENAI_API_KEY,
       plantid: !!process.env.PLANTID_API_KEY,
       stripe: !!(process.env.STRIPE_SECRET_KEY && process.env.VITE_STRIPE_PUBLIC_KEY),
+      paypal: !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET),
+      cashfree: !!(process.env.CASHFREE_CLIENT_ID && process.env.CASHFREE_CLIENT_SECRET),
+      razorpay: !!(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET),
       analytics: !!process.env.VITE_GA_MEASUREMENT_ID,
     };
 
@@ -838,6 +847,15 @@ router.post('/api-keys/test', requireAuth, requireAdmin, async (req, res) => {
         break;
       case 'stripe':
         testResult = { success: !!(process.env.STRIPE_SECRET_KEY && process.env.VITE_STRIPE_PUBLIC_KEY), message: process.env.STRIPE_SECRET_KEY ? 'Stripe keys configured' : 'Stripe keys not set' };
+        break;
+      case 'paypal':
+        testResult = { success: !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET), message: process.env.PAYPAL_CLIENT_ID ? 'PayPal keys configured' : 'PayPal keys not set' };
+        break;
+      case 'cashfree':
+        testResult = { success: !!(process.env.CASHFREE_CLIENT_ID && process.env.CASHFREE_CLIENT_SECRET), message: process.env.CASHFREE_CLIENT_ID ? 'Cashfree keys configured' : 'Cashfree keys not set' };
+        break;
+      case 'razorpay':
+        testResult = { success: !!(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET), message: process.env.RAZORPAY_KEY_ID ? 'Razorpay keys configured' : 'Razorpay keys not set' };
         break;
       case 'analytics':
         testResult = { success: !!process.env.VITE_GA_MEASUREMENT_ID, message: process.env.VITE_GA_MEASUREMENT_ID ? 'Google Analytics configured' : 'Analytics ID not set' };
