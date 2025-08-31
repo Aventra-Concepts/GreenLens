@@ -147,13 +147,41 @@ export default function PricingSection() {
     },
     onSuccess: (data) => {
       if (data?.checkoutUrl) {
+        // Show demo mode notification if applicable
+        if (data.demo) {
+          toast({
+            title: "Demo Mode Active",
+            description: "Redirecting to explore premium features without payment.",
+            duration: 3000,
+          });
+        }
         window.location.href = data.checkoutUrl;
       }
     },
     onError: (error: Error) => {
+      console.error("Checkout error:", error);
+      
+      // Provide more helpful error messages based on error type
+      let title = "Checkout Failed";
+      let description = error.message;
+      
+      if (error.message?.includes('payment_config_error')) {
+        title = "Payment System Unavailable";
+        description = "Payment processing is temporarily unavailable. Please try again later or contact support.";
+      } else if (error.message?.includes('unavailable')) {
+        title = "Service Temporarily Unavailable";
+        description = "Our payment system is currently being updated. Please try again in a few minutes.";
+      } else if (error.message?.includes('sign in')) {
+        title = "Authentication Required";
+        description = "Please sign in to subscribe to a plan.";
+      } else if (error.message?.includes('currency')) {
+        title = "Currency Not Supported";
+        description = "The selected currency is not supported. Please try with a different currency.";
+      }
+      
       toast({
-        title: "Checkout Failed",
-        description: error.message,
+        title,
+        description,
         variant: "destructive",
       });
       setSelectedPlan(null);

@@ -964,13 +964,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Use garden subscription checkout for now as a placeholder
+      // Check if payment providers are configured
+      const hasStripe = !!process.env.STRIPE_SECRET_KEY;
+      const hasCashfree = !!(process.env.CASHFREE_CLIENT_ID && process.env.CASHFREE_CLIENT_SECRET);
+      
+      if (!hasStripe && !hasCashfree) {
+        // Demo mode - return a success URL without actual payment processing
+        console.log("🚀 Demo Mode: Payment providers not configured, simulating successful checkout");
+        return res.json({ 
+          checkoutUrl: `/subscription-success?plan=${planId}&demo=true&amount=${pricing.amount}&currency=${currency}`,
+          currency, 
+          amount: pricing.amount,
+          provider: 'demo',
+          formattedPrice: pricingService.formatPrice(pricing.amount, currency),
+          demo: true
+        });
+      }
+
+      // Use garden subscription checkout for actual payment processing
       const checkoutResponse = await paymentService.createGardenSubscriptionCheckout({
         customerEmail: user.email || '',
         customerName: `${user.firstName} ${user.lastName}`,
         currency,
-        returnUrl: `${process.env.BASE_URL || 'http://localhost:5000'}/success`,
-        cancelUrl: `${process.env.BASE_URL || 'http://localhost:5000'}/cancel`,
+        returnUrl: `${process.env.BASE_URL || 'http://localhost:5000'}/subscription-success?plan=${planId}`,
+        cancelUrl: `${process.env.BASE_URL || 'http://localhost:5000'}/pricing`,
       });
       
       const checkoutUrl = checkoutResponse.checkoutUrl;
@@ -985,7 +1002,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("Error creating checkout:", error);
-      res.status(500).json({ message: "Failed to create checkout session" });
+      
+      // If payment service fails, provide helpful error message
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isConfigError = errorMessage?.includes('not configured') || errorMessage?.includes('credentials');
+      
+      if (isConfigError) {
+        return res.status(503).json({ 
+          message: "Payment processing is currently unavailable. Please try again later or contact support.",
+          error: "payment_config_error"
+        });
+      }
+      
+      res.status(500).json({ 
+        message: "Unable to process payment at this time. Please try again.",
+        error: "checkout_failed"
+      });
     }
   });
 

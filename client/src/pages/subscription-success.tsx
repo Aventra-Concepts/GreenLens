@@ -9,14 +9,24 @@ import { confetti } from "@/lib/confetti";
 export default function SubscriptionSuccess() {
   const [location] = useLocation();
   const [planName, setPlanName] = useState("Premium Plan");
+  const [isDemo, setIsDemo] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [currency, setCurrency] = useState("USD");
   
   useEffect(() => {
     // Trigger confetti animation
     confetti();
     
-    // Extract plan from URL parameters
+    // Extract parameters from URL
     const urlParams = new URLSearchParams(window.location.search);
     const plan = urlParams.get('plan');
+    const demo = urlParams.get('demo') === 'true';
+    const amt = urlParams.get('amount') || '';
+    const curr = urlParams.get('currency') || 'USD';
+    
+    setIsDemo(demo);
+    setAmount(amt);
+    setCurrency(curr);
     
     if (plan === 'pro') {
       setPlanName("Pro Plan");
@@ -40,10 +50,13 @@ export default function SubscriptionSuccess() {
           </div>
           
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome to {planName}! 🎉
+            {isDemo ? `Exploring ${planName}! 🌟` : `Welcome to ${planName}! 🎉`}
           </h1>
           <p className="text-lg text-gray-600">
-            Your subscription is now active and ready to use
+            {isDemo 
+              ? 'You\'re now exploring premium features in demo mode' 
+              : 'Your subscription is now active and ready to use'
+            }
           </p>
         </div>
 
@@ -51,10 +64,22 @@ export default function SubscriptionSuccess() {
           <CardContent className="p-8">
             <div className="text-center space-y-4">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2">
-                  <Crown className="h-4 w-4 mr-2" />
-                  {planName} Active
-                </Badge>
+                {isDemo ? (
+                  <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    {planName} Demo Mode
+                  </Badge>
+                ) : (
+                  <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2">
+                    <Crown className="h-4 w-4 mr-2" />
+                    {planName} Active
+                  </Badge>
+                )}
+                {amount && (
+                  <Badge variant="outline" className="ml-2">
+                    {currency === 'USD' ? '$' : ''}{amount}{currency !== 'USD' ? ` ${currency}` : ''}/month
+                  </Badge>
+                )}
               </div>
               
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
@@ -136,23 +161,43 @@ export default function SubscriptionSuccess() {
           </Card>
         </div>
 
-        <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
-                💡
+        {isDemo ? (
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center">
+                  🎯
+                </div>
+                <h3 className="font-semibold text-blue-800">Demo Mode</h3>
               </div>
-              <h3 className="font-semibold text-yellow-800">Quick Tip</h3>
-            </div>
-            <p className="text-sm text-yellow-700 mb-4">
-              For the best plant identification results, take photos in good lighting from multiple angles. 
-              Your premium subscription includes unlimited attempts, so experiment freely!
-            </p>
-            <div className="text-xs text-yellow-600">
-              <strong>Need help?</strong> Visit our FAQ or contact our premium support team anytime.
-            </div>
-          </CardContent>
-        </Card>
+              <p className="text-sm text-blue-700 mb-4">
+                You're exploring all premium features without any payment. All functionality is available for testing. 
+                To activate real subscription billing and unlock full features, configure payment providers in admin settings.
+              </p>
+              <div className="text-xs text-blue-600">
+                <strong>Note:</strong> This is a demonstration mode - no actual subscription has been created.
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
+                  💡
+                </div>
+                <h3 className="font-semibold text-yellow-800">Quick Tip</h3>
+              </div>
+              <p className="text-sm text-yellow-700 mb-4">
+                For the best plant identification results, take photos in good lighting from multiple angles. 
+                Your premium subscription includes unlimited attempts, so experiment freely!
+              </p>
+              <div className="text-xs text-yellow-600">
+                <strong>Need help?</strong> Visit our FAQ or contact our premium support team anytime.
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="text-center mt-8">
           <p className="text-sm text-gray-500 mb-4">
