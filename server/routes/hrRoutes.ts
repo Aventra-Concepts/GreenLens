@@ -9,7 +9,13 @@ import {
   insertLeaveRequestSchema,
   insertSalaryAdvanceSchema,
   insertAttendanceRecordSchema,
+  insertPayrollPeriodSchema,
+  insertSalaryStructureSchema,
+  insertTaxSlabSchema,
+  insertStatutoryRateSchema,
+  insertPayrollRecordSchema,
 } from "../../shared/schema";
+import { payrollCalculationService } from "../services/payrollCalculationService";
 import { isAuthenticated } from "../auth";
 
 const router = Router();
@@ -711,6 +717,240 @@ router.get("/attendance/summary/:staffMemberId", isAuthenticated, requireHRAcces
   } catch (error) {
     console.error("Error fetching attendance summary:", error);
     res.status(500).json({ message: "Failed to fetch attendance summary" });
+  }
+});
+
+// ============================================================================
+// PAYROLL MANAGEMENT
+// ============================================================================
+
+// Get all payroll periods
+router.get("/payroll/periods", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const periods = await hrService.getAllPayrollPeriods();
+    res.json(periods);
+  } catch (error) {
+    console.error("Error fetching payroll periods:", error);
+    res.status(500).json({ message: "Failed to fetch payroll periods" });
+  }
+});
+
+// Create payroll period
+router.post("/payroll/periods", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const validatedData = insertPayrollPeriodSchema.parse(req.body);
+    const period = await hrService.createPayrollPeriod(validatedData);
+    res.status(201).json(period);
+  } catch (error) {
+    console.error("Error creating payroll period:", error);
+    res.status(400).json({ message: "Invalid payroll period data", error: error.message });
+  }
+});
+
+// Get salary structures
+router.get("/payroll/salary-structures", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { staffMemberId } = req.query;
+    const structures = await hrService.getSalaryStructures(staffMemberId as string);
+    res.json(structures);
+  } catch (error) {
+    console.error("Error fetching salary structures:", error);
+    res.status(500).json({ message: "Failed to fetch salary structures" });
+  }
+});
+
+// Create salary structure
+router.post("/payroll/salary-structures", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const validatedData = insertSalaryStructureSchema.parse(req.body);
+    // Calculate gross salary
+    const grossSalary = 
+      Number(validatedData.basicSalary) +
+      Number(validatedData.hra || 0) +
+      Number(validatedData.da || 0) +
+      Number(validatedData.conveyanceAllowance || 0) +
+      Number(validatedData.medicalAllowance || 0) +
+      Number(validatedData.specialAllowance || 0) +
+      Number(validatedData.performanceIncentive || 0) +
+      Number(validatedData.otherAllowances || 0);
+    
+    const structureData = {
+      ...validatedData,
+      grossSalary: grossSalary.toString(),
+      createdBy: req.user.id
+    };
+    
+    const structure = await hrService.createSalaryStructure(structureData);
+    res.status(201).json(structure);
+  } catch (error) {
+    console.error("Error creating salary structure:", error);
+    res.status(400).json({ message: "Invalid salary structure data", error: error.message });
+  }
+});
+
+// Get current statutory rates
+router.get("/payroll/statutory-rates", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const rates = await hrService.getCurrentStatutoryRates();
+    res.json(rates);
+  } catch (error) {
+    console.error("Error fetching statutory rates:", error);
+    res.status(500).json({ message: "Failed to fetch statutory rates" });
+  }
+});
+
+// Update statutory rates
+router.post("/payroll/statutory-rates", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const validatedData = insertStatutoryRateSchema.parse(req.body);
+    const rates = await hrService.createStatutoryRates(validatedData);
+    res.status(201).json(rates);
+  } catch (error) {
+    console.error("Error updating statutory rates:", error);
+    res.status(400).json({ message: "Invalid statutory rates data", error: error.message });
+  }
+});
+
+// Get tax slabs
+router.get("/payroll/tax-slabs", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { assessmentYear, regime } = req.query;
+    const slabs = await hrService.getTaxSlabs(
+      assessmentYear as string,
+      regime as 'old' | 'new'
+    );
+    res.json(slabs);
+  } catch (error) {
+    console.error("Error fetching tax slabs:", error);
+    res.status(500).json({ message: "Failed to fetch tax slabs" });
+  }
+});
+
+// Create/Update tax slabs
+router.post("/payroll/tax-slabs", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const validatedData = insertTaxSlabSchema.parse(req.body);
+    const slab = await hrService.createTaxSlab(validatedData);
+    res.status(201).json(slab);
+  } catch (error) {
+    console.error("Error creating tax slab:", error);
+    res.status(400).json({ message: "Invalid tax slab data", error: error.message });
+  }
+});
+
+// Calculate payroll for a period
+router.post("/payroll/calculate/:periodId", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { periodId } = req.params;
+    const { staffMemberIds } = req.body; // Optional: calculate for specific employees
+    
+    const result = await hrService.calculatePayrollForPeriod(periodId, req.user.id, staffMemberIds);
+    res.json(result);
+  } catch (error) {
+    console.error("Error calculating payroll:", error);
+    res.status(500).json({ message: "Failed to calculate payroll", error: error.message });
+  }
+});
+
+// Get payroll records for a period
+router.get("/payroll/records/:periodId", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { periodId } = req.params;
+    const records = await hrService.getPayrollRecords(periodId);
+    res.json(records);
+  } catch (error) {
+    console.error("Error fetching payroll records:", error);
+    res.status(500).json({ message: "Failed to fetch payroll records" });
+  }
+});
+
+// Get individual payroll record
+router.get("/payroll/record/:recordId", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { recordId } = req.params;
+    const record = await hrService.getPayrollRecord(recordId);
+    
+    if (!record) {
+      return res.status(404).json({ message: "Payroll record not found" });
+    }
+    
+    res.json(record);
+  } catch (error) {
+    console.error("Error fetching payroll record:", error);
+    res.status(500).json({ message: "Failed to fetch payroll record" });
+  }
+});
+
+// Approve payroll record
+router.put("/payroll/record/:recordId/approve", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { recordId } = req.params;
+    const record = await hrService.approvePayrollRecord(recordId, req.user.id);
+    
+    if (!record) {
+      return res.status(404).json({ message: "Payroll record not found" });
+    }
+    
+    res.json(record);
+  } catch (error) {
+    console.error("Error approving payroll record:", error);
+    res.status(500).json({ message: "Failed to approve payroll record" });
+  }
+});
+
+// Mark payroll as paid
+router.put("/payroll/record/:recordId/pay", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { recordId } = req.params;
+    const { paymentMode, paymentReference } = req.body;
+    
+    const record = await hrService.markPayrollAsPaid(
+      recordId, 
+      req.user.id, 
+      paymentMode, 
+      paymentReference
+    );
+    
+    if (!record) {
+      return res.status(404).json({ message: "Payroll record not found" });
+    }
+    
+    res.json(record);
+  } catch (error) {
+    console.error("Error marking payroll as paid:", error);
+    res.status(500).json({ message: "Failed to mark payroll as paid" });
+  }
+});
+
+// Generate salary slip
+router.get("/payroll/salary-slip/:recordId", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { recordId } = req.params;
+    const salarySlip = await hrService.generateSalarySlip(recordId);
+    
+    if (!salarySlip) {
+      return res.status(404).json({ message: "Payroll record not found" });
+    }
+    
+    res.json(salarySlip);
+  } catch (error) {
+    console.error("Error generating salary slip:", error);
+    res.status(500).json({ message: "Failed to generate salary slip" });
+  }
+});
+
+// Get payroll analytics
+router.get("/payroll/analytics", isAuthenticated, requireHRAccess, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const analytics = await hrService.getPayrollAnalytics(
+      startDate as string,
+      endDate as string
+    );
+    res.json(analytics);
+  } catch (error) {
+    console.error("Error fetching payroll analytics:", error);
+    res.status(500).json({ message: "Failed to fetch payroll analytics" });
   }
 });
 

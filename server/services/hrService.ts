@@ -8,6 +8,12 @@ import {
   leaveRequests,
   salaryAdvances,
   attendanceRecords,
+  payrollPeriods,
+  salaryStructures,
+  taxSlabs,
+  statutoryRates,
+  payrollRecords,
+  payrollAdjustments,
   type StaffMember,
   type StaffRole,
   type JobPosting,
@@ -16,6 +22,12 @@ import {
   type LeaveRequest,
   type SalaryAdvance,
   type AttendanceRecord,
+  type PayrollPeriod,
+  type SalaryStructure,
+  type TaxSlab,
+  type StatutoryRate,
+  type PayrollRecord,
+  type PayrollAdjustment,
   type InsertStaffMember,
   type InsertStaffRole,
   type InsertJobPosting,
@@ -24,7 +36,13 @@ import {
   type InsertLeaveRequest,
   type InsertSalaryAdvance,
   type InsertAttendanceRecord,
+  type InsertPayrollPeriod,
+  type InsertSalaryStructure,
+  type InsertTaxSlab,
+  type InsertStatutoryRate,
+  type InsertPayrollRecord,
 } from "../../shared/schema";
+import { payrollCalculationService } from "./payrollCalculationService";
 import { eq, desc, count, and, or, ilike, sql } from "drizzle-orm";
 
 export class HRService {
@@ -675,6 +693,384 @@ export class HRService {
     const minutes = avgMinutes % 60;
     
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }
+
+  // ============================================================================
+  // PAYROLL MANAGEMENT
+  // ============================================================================
+
+  // Payroll Period Management
+  async createPayrollPeriod(periodData: InsertPayrollPeriod): Promise<PayrollPeriod> {
+    const [period] = await db.insert(payrollPeriods).values(periodData).returning();
+    return period;
+  }
+
+  async getAllPayrollPeriods(): Promise<PayrollPeriod[]> {
+    return db.select().from(payrollPeriods).orderBy(desc(payrollPeriods.startDate));
+  }
+
+  async getPayrollPeriodById(id: string): Promise<PayrollPeriod | null> {
+    const [period] = await db.select().from(payrollPeriods).where(eq(payrollPeriods.id, id));
+    return period || null;
+  }
+
+  async updatePayrollPeriod(id: string, updates: Partial<InsertPayrollPeriod>): Promise<PayrollPeriod | null> {
+    const [updated] = await db
+      .update(payrollPeriods)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(payrollPeriods.id, id))
+      .returning();
+    return updated || null;
+  }
+
+  // Salary Structure Management
+  async createSalaryStructure(structureData: any): Promise<SalaryStructure> {
+    const [structure] = await db.insert(salaryStructures).values(structureData).returning();
+    return structure;
+  }
+
+  async getSalaryStructures(staffMemberId?: string): Promise<SalaryStructure[]> {
+    if (staffMemberId) {
+      return db
+        .select()
+        .from(salaryStructures)
+        .where(and(eq(salaryStructures.staffMemberId, staffMemberId), eq(salaryStructures.isActive, true)))
+        .orderBy(desc(salaryStructures.effectiveFrom));
+    }
+    return db.select().from(salaryStructures).orderBy(desc(salaryStructures.effectiveFrom));
+  }
+
+  async getActiveSalaryStructure(staffMemberId: string): Promise<SalaryStructure | null> {
+    const [structure] = await db
+      .select()
+      .from(salaryStructures)
+      .where(
+        and(
+          eq(salaryStructures.staffMemberId, staffMemberId),
+          eq(salaryStructures.isActive, true),
+          or(
+            eq(salaryStructures.effectiveTo, null),
+            sql`${salaryStructures.effectiveTo} >= CURRENT_DATE`
+          )
+        )
+      )
+      .orderBy(desc(salaryStructures.effectiveFrom))
+      .limit(1);
+    return structure || null;
+  }
+
+  // Statutory Rates Management
+  async createStatutoryRates(ratesData: InsertStatutoryRate): Promise<StatutoryRate> {
+    const [rates] = await db.insert(statutoryRates).values(ratesData).returning();
+    return rates;
+  }
+
+  async getCurrentStatutoryRates(): Promise<StatutoryRate | null> {
+    const [rates] = await db
+      .select()
+      .from(statutoryRates)
+      .where(
+        and(
+          eq(statutoryRates.isActive, true),
+          sql`${statutoryRates.effectiveFrom} <= CURRENT_DATE`,
+          or(
+            eq(statutoryRates.effectiveTo, null),
+            sql`${statutoryRates.effectiveTo} >= CURRENT_DATE`
+          )
+        )
+      )
+      .orderBy(desc(statutoryRates.effectiveFrom))
+      .limit(1);
+    return rates || null;
+  }
+
+  // Tax Slabs Management
+  async createTaxSlab(slabData: InsertTaxSlab): Promise<TaxSlab> {
+    const [slab] = await db.insert(taxSlabs).values(slabData).returning();
+    return slab;
+  }
+
+  async getTaxSlabs(assessmentYear?: string, regime?: 'old' | 'new'): Promise<TaxSlab[]> {
+    let query = db.select().from(taxSlabs).where(eq(taxSlabs.isActive, true));
+    
+    if (assessmentYear) {
+      query = query.where(eq(taxSlabs.assessmentYear, assessmentYear));
+    }
+    
+    if (regime) {
+      query = query.where(eq(taxSlabs.regime, regime));
+    }
+    
+    return query.orderBy(taxSlabs.slabFrom);
+  }
+
+  // Payroll Calculation and Processing
+  async calculatePayrollForPeriod(
+    periodId: string,
+    processedBy: string,
+    staffMemberIds?: string[]
+  ): Promise<{ success: boolean; processed: number; errors: string[] }> {
+    try {
+      const period = await this.getPayrollPeriodById(periodId);
+      if (!period) {
+        throw new Error('Payroll period not found');
+      }
+
+      // Get statutory rates and tax slabs
+      const statutoryRates = await this.getCurrentStatutoryRates();
+      if (!statutoryRates) {
+        throw new Error('No active statutory rates found');
+      }
+
+      const taxSlabs = await this.getTaxSlabs('2024-25', 'old'); // Current assessment year
+      if (taxSlabs.length === 0) {
+        throw new Error('No tax slabs found');
+      }
+
+      // Get staff members to process
+      let staffToProcess: StaffMember[];
+      if (staffMemberIds && staffMemberIds.length > 0) {
+        staffToProcess = await this.getStaffMembersByIds(staffMemberIds);
+      } else {
+        staffToProcess = await this.getActiveStaffMembers();
+      }
+
+      let processed = 0;
+      const errors: string[] = [];
+
+      for (const staff of staffToProcess) {
+        try {
+          // Get active salary structure
+          const salaryStructure = await this.getActiveSalaryStructure(staff.id);
+          if (!salaryStructure) {
+            errors.push(`No active salary structure found for ${staff.firstName} ${staff.lastName}`);
+            continue;
+          }
+
+          // Get attendance data for the period
+          const attendanceData = await this.getAttendanceForPeriod(staff.id, period.startDate, period.endDate);
+          
+          // Get salary advance deductions
+          const advanceDeductions = await this.getPendingAdvanceDeductions(staff.id, period.id);
+
+          // Calculate payroll
+          const payrollData = payrollCalculationService.calculatePayroll(
+            salaryStructure,
+            attendanceData,
+            statutoryRates,
+            taxSlabs,
+            advanceDeductions
+          );
+
+          // Validate calculation
+          const validation = payrollCalculationService.validatePayrollCalculation(payrollData);
+          if (!validation.isValid) {
+            errors.push(`Validation failed for ${staff.firstName} ${staff.lastName}: ${validation.errors.join(', ')}`);
+            continue;
+          }
+
+          // Save payroll record
+          await this.createPayrollRecord({
+            ...payrollData,
+            payrollPeriodId: periodId,
+            staffMemberId: staff.id,
+            salaryStructureId: salaryStructure.id,
+          });
+
+          processed++;
+        } catch (error) {
+          errors.push(`Error processing ${staff.firstName} ${staff.lastName}: ${error.message}`);
+        }
+      }
+
+      // Update period status
+      await this.updatePayrollPeriod(periodId, {
+        status: 'processing',
+        processedBy,
+        processedAt: new Date(),
+        totalEmployees: processed
+      });
+
+      return { success: true, processed, errors };
+    } catch (error) {
+      return { success: false, processed: 0, errors: [error.message] };
+    }
+  }
+
+  async createPayrollRecord(recordData: any): Promise<PayrollRecord> {
+    const [record] = await db.insert(payrollRecords).values(recordData).returning();
+    return record;
+  }
+
+  async getPayrollRecords(periodId: string): Promise<PayrollRecord[]> {
+    return db
+      .select()
+      .from(payrollRecords)
+      .where(eq(payrollRecords.payrollPeriodId, periodId))
+      .orderBy(payrollRecords.createdAt);
+  }
+
+  async getPayrollRecord(recordId: string): Promise<PayrollRecord | null> {
+    const [record] = await db.select().from(payrollRecords).where(eq(payrollRecords.id, recordId));
+    return record || null;
+  }
+
+  async approvePayrollRecord(recordId: string, approvedBy: string): Promise<PayrollRecord | null> {
+    const [updated] = await db
+      .update(payrollRecords)
+      .set({
+        status: 'approved',
+        approvedBy,
+        approvedAt: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(payrollRecords.id, recordId))
+      .returning();
+    return updated || null;
+  }
+
+  async markPayrollAsPaid(
+    recordId: string,
+    paidBy: string,
+    paymentMode: string,
+    paymentReference?: string
+  ): Promise<PayrollRecord | null> {
+    const [updated] = await db
+      .update(payrollRecords)
+      .set({
+        status: 'paid',
+        paidBy,
+        paidAt: new Date(),
+        paymentMode,
+        paymentReference,
+        updatedAt: new Date()
+      })
+      .where(eq(payrollRecords.id, recordId))
+      .returning();
+    return updated || null;
+  }
+
+  async generateSalarySlip(recordId: string): Promise<any> {
+    const record = await this.getPayrollRecord(recordId);
+    if (!record) return null;
+
+    const staff = await this.getStaffMemberById(record.staffMemberId);
+    const period = await this.getPayrollPeriodById(record.payrollPeriodId);
+    const structure = await this.getSalaryStructureById(record.salaryStructureId);
+
+    const summary = payrollCalculationService.generateSalarySummary(record);
+
+    return {
+      record,
+      staff,
+      period,
+      structure,
+      summary,
+      generatedAt: new Date()
+    };
+  }
+
+  async getPayrollAnalytics(startDate?: string, endDate?: string): Promise<any> {
+    // Basic payroll analytics - can be expanded
+    const totalRecords = await db
+      .select({ count: count() })
+      .from(payrollRecords);
+
+    const totalPaid = await db
+      .select({ 
+        total: sql<number>`SUM(CAST(${payrollRecords.netPay} AS DECIMAL))`,
+        count: count()
+      })
+      .from(payrollRecords)
+      .where(eq(payrollRecords.status, 'paid'));
+
+    return {
+      totalRecords: totalRecords[0]?.count || 0,
+      totalPaid: totalPaid[0]?.total || 0,
+      paidRecords: totalPaid[0]?.count || 0,
+      averagePayment: totalPaid[0]?.total && totalPaid[0]?.count 
+        ? Math.round(totalPaid[0].total / totalPaid[0].count) 
+        : 0
+    };
+  }
+
+  // Helper functions
+  private async getStaffMembersByIds(ids: string[]): Promise<StaffMember[]> {
+    return db.select().from(staffMembers).where(sql`${staffMembers.id} = ANY(${ids})`);
+  }
+
+  private async getAttendanceForPeriod(
+    staffMemberId: string, 
+    startDate: string, 
+    endDate: string
+  ): Promise<any> {
+    const records = await db
+      .select()
+      .from(attendanceRecords)
+      .where(
+        and(
+          eq(attendanceRecords.staffMemberId, staffMemberId),
+          sql`${attendanceRecords.attendanceDate} >= ${startDate}`,
+          sql`${attendanceRecords.attendanceDate} <= ${endDate}`
+        )
+      );
+
+    const workingDays = this.calculateWorkingDays(startDate, endDate);
+    const presentDays = records.filter(r => r.status === 'present' || r.status === 'late').length;
+    const absentDays = workingDays - presentDays;
+    const overtimeHours = records.reduce((sum, r) => sum + Number(r.overtimeHours || 0), 0);
+
+    return {
+      workingDays,
+      presentDays,
+      absentDays,
+      weeklyOffs: 0, // Calculate based on company policy
+      holidays: 0,   // Calculate based on holiday calendar
+      paidLeaves: 0, // Calculate from leave records
+      unpaidLeaves: 0,
+      overtimeHours
+    };
+  }
+
+  private async getPendingAdvanceDeductions(staffMemberId: string, periodId: string): Promise<number> {
+    // Get pending salary advances for this employee
+    const advances = await db
+      .select()
+      .from(salaryAdvances)
+      .where(
+        and(
+          eq(salaryAdvances.staffMemberId, staffMemberId),
+          eq(salaryAdvances.status, 'approved'),
+          eq(salaryAdvances.repaidAt, null)
+        )
+      );
+
+    // Calculate monthly deduction based on installments
+    return advances.reduce((total, advance) => {
+      const monthlyDeduction = Number(advance.requestedAmount) / advance.installments;
+      return total + monthlyDeduction;
+    }, 0);
+  }
+
+  private calculateWorkingDays(startDate: string, endDate: string): number {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    let workingDays = 0;
+
+    for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
+      const dayOfWeek = d.getDay();
+      // Exclude Sundays (0) - can be customized based on company policy
+      if (dayOfWeek !== 0) {
+        workingDays++;
+      }
+    }
+
+    return workingDays;
+  }
+
+  private async getSalaryStructureById(id: string): Promise<SalaryStructure | null> {
+    const [structure] = await db.select().from(salaryStructures).where(eq(salaryStructures.id, id));
+    return structure || null;
   }
 }
 

@@ -2428,6 +2428,213 @@ export const attendanceRecords = pgTable("attendance_records", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Payroll Management Tables
+
+// Payroll Periods - Monthly/Quarterly processing cycles
+export const payrollPeriods = pgTable("payroll_periods", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(), // "January 2024", "Q1 2024"
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  payDate: date("pay_date").notNull(),
+  periodType: varchar("period_type").default('monthly').notNull(), // 'monthly', 'quarterly', 'annual'
+  status: varchar("status").default('draft').notNull(), // 'draft', 'processing', 'approved', 'paid', 'locked'
+  totalEmployees: integer("total_employees").default(0),
+  totalGrossPay: decimal("total_gross_pay", { precision: 15, scale: 2 }).default('0'),
+  totalDeductions: decimal("total_deductions", { precision: 15, scale: 2 }).default('0'),
+  totalNetPay: decimal("total_net_pay", { precision: 15, scale: 2 }).default('0'),
+  processedBy: varchar("processed_by"), // Reference to staff_members.id
+  processedAt: timestamp("processed_at"),
+  approvedBy: varchar("approved_by"), // Reference to staff_members.id
+  approvedAt: timestamp("approved_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Salary Structures - Define salary components for each employee
+export const salaryStructures = pgTable("salary_structures", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  staffMemberId: varchar("staff_member_id").references(() => staffMembers.id).notNull(),
+  effectiveFrom: date("effective_from").notNull(),
+  effectiveTo: date("effective_to"),
+  
+  // Basic Salary Components
+  basicSalary: decimal("basic_salary", { precision: 12, scale: 2 }).notNull(),
+  hra: decimal("hra", { precision: 12, scale: 2 }).default('0'), // House Rent Allowance
+  da: decimal("da", { precision: 12, scale: 2 }).default('0'), // Dearness Allowance
+  conveyanceAllowance: decimal("conveyance_allowance", { precision: 12, scale: 2 }).default('0'),
+  medicalAllowance: decimal("medical_allowance", { precision: 12, scale: 2 }).default('0'),
+  specialAllowance: decimal("special_allowance", { precision: 12, scale: 2 }).default('0'),
+  performanceIncentive: decimal("performance_incentive", { precision: 12, scale: 2 }).default('0'),
+  otherAllowances: decimal("other_allowances", { precision: 12, scale: 2 }).default('0'),
+  
+  // Calculated Gross
+  grossSalary: decimal("gross_salary", { precision: 12, scale: 2 }).notNull(),
+  
+  // PF Settings
+  pfApplicable: boolean("pf_applicable").default(true),
+  pfEmployeeContribution: decimal("pf_employee_contribution", { precision: 5, scale: 2 }).default('12'), // Percentage
+  pfEmployerContribution: decimal("pf_employer_contribution", { precision: 5, scale: 2 }).default('12'),
+  voluntaryPfContribution: decimal("voluntary_pf_contribution", { precision: 12, scale: 2 }).default('0'),
+  
+  // ESI Settings
+  esiApplicable: boolean("esi_applicable").default(true),
+  esiEmployeeContribution: decimal("esi_employee_contribution", { precision: 5, scale: 2 }).default('0.75'),
+  esiEmployerContribution: decimal("esi_employer_contribution", { precision: 5, scale: 2 }).default('3.25'),
+  
+  // Tax Settings
+  taxRegime: varchar("tax_regime").default('old').notNull(), // 'old', 'new'
+  pan: varchar("pan"), // PAN for TDS
+  
+  // Insurance
+  groupHealthInsurance: decimal("group_health_insurance", { precision: 12, scale: 2 }).default('0'),
+  termInsurance: decimal("term_insurance", { precision: 12, scale: 2 }).default('0'),
+  
+  // Other Deductions
+  professionalTax: decimal("professional_tax", { precision: 12, scale: 2 }).default('0'),
+  
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by"), // Reference to staff_members.id
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Indian Tax Slabs - For TDS calculation
+export const taxSlabs = pgTable("tax_slabs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  assessmentYear: varchar("assessment_year").notNull(), // "2024-25"
+  regime: varchar("regime").notNull(), // 'old', 'new'
+  slabFrom: decimal("slab_from", { precision: 12, scale: 2 }).notNull(),
+  slabTo: decimal("slab_to", { precision: 12, scale: 2 }),
+  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull(), // Percentage
+  surcharge: decimal("surcharge", { precision: 5, scale: 2 }).default('0'),
+  cess: decimal("cess", { precision: 5, scale: 2 }).default('4'), // Education cess
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Statutory Rates - PF, ESI limits and rates
+export const statutoryRates = pgTable("statutory_rates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  effectiveFrom: date("effective_from").notNull(),
+  effectiveTo: date("effective_to"),
+  
+  // PF Rates and Limits
+  pfWageLimit: decimal("pf_wage_limit", { precision: 12, scale: 2 }).default('15000'), // Current limit ₹15,000
+  pfEmployeeRate: decimal("pf_employee_rate", { precision: 5, scale: 2 }).default('12'),
+  pfEmployerRate: decimal("pf_employer_rate", { precision: 5, scale: 2 }).default('12'),
+  epfRate: decimal("epf_rate", { precision: 5, scale: 2 }).default('8.33'), // Employee Pension Fund
+  edliRate: decimal("edli_rate", { precision: 5, scale: 2 }).default('0.5'), // Employee Deposit Linked Insurance
+  pfAdminCharges: decimal("pf_admin_charges", { precision: 5, scale: 2 }).default('1.1'),
+  
+  // ESI Rates and Limits
+  esiWageLimit: decimal("esi_wage_limit", { precision: 12, scale: 2 }).default('25000'), // Current limit ₹25,000
+  esiEmployeeRate: decimal("esi_employee_rate", { precision: 5, scale: 2 }).default('0.75'),
+  esiEmployerRate: decimal("esi_employer_rate", { precision: 5, scale: 2 }).default('3.25'),
+  
+  // Professional Tax Limits by State
+  ptMonthlyLimit: decimal("pt_monthly_limit", { precision: 12, scale: 2 }).default('200'), // Maharashtra, Karnataka
+  ptAnnualLimit: decimal("pt_annual_limit", { precision: 12, scale: 2 }).default('2500'),
+  
+  // Gratuity
+  gratuityLimit: decimal("gratuity_limit", { precision: 12, scale: 2 }).default('2000000'), // ₹20 Lakh
+  
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Payroll Records - Individual employee payroll for each period
+export const payrollRecords = pgTable("payroll_records", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  payrollPeriodId: varchar("payroll_period_id").references(() => payrollPeriods.id).notNull(),
+  staffMemberId: varchar("staff_member_id").references(() => staffMembers.id).notNull(),
+  salaryStructureId: varchar("salary_structure_id").references(() => salaryStructures.id).notNull(),
+  
+  // Attendance Data
+  workingDays: integer("working_days").notNull(),
+  presentDays: integer("present_days").notNull(),
+  absentDays: integer("absent_days").default(0),
+  weeklyOffs: integer("weekly_offs").default(0),
+  holidays: integer("holidays").default(0),
+  paidLeaves: integer("paid_leaves").default(0),
+  unpaidLeaves: integer("unpaid_leaves").default(0),
+  overtimeHours: decimal("overtime_hours", { precision: 5, scale: 2 }).default('0'),
+  overtimeRate: decimal("overtime_rate", { precision: 12, scale: 2 }).default('0'),
+  
+  // Salary Components (Earnings)
+  basicSalary: decimal("basic_salary", { precision: 12, scale: 2 }).notNull(),
+  hra: decimal("hra", { precision: 12, scale: 2 }).default('0'),
+  da: decimal("da", { precision: 12, scale: 2 }).default('0'),
+  conveyanceAllowance: decimal("conveyance_allowance", { precision: 12, scale: 2 }).default('0'),
+  medicalAllowance: decimal("medical_allowance", { precision: 12, scale: 2 }).default('0'),
+  specialAllowance: decimal("special_allowance", { precision: 12, scale: 2 }).default('0'),
+  performanceIncentive: decimal("performance_incentive", { precision: 12, scale: 2 }).default('0'),
+  overtimePay: decimal("overtime_pay", { precision: 12, scale: 2 }).default('0'),
+  arrears: decimal("arrears", { precision: 12, scale: 2 }).default('0'),
+  bonus: decimal("bonus", { precision: 12, scale: 2 }).default('0'),
+  leaveEncashment: decimal("leave_encashment", { precision: 12, scale: 2 }).default('0'),
+  otherEarnings: decimal("other_earnings", { precision: 12, scale: 2 }).default('0'),
+  grossEarnings: decimal("gross_earnings", { precision: 12, scale: 2 }).notNull(),
+  
+  // Statutory Deductions
+  pfEmployee: decimal("pf_employee", { precision: 12, scale: 2 }).default('0'),
+  pfEmployer: decimal("pf_employer", { precision: 12, scale: 2 }).default('0'),
+  epf: decimal("epf", { precision: 12, scale: 2 }).default('0'),
+  eps: decimal("eps", { precision: 12, scale: 2 }).default('0'),
+  edli: decimal("edli", { precision: 12, scale: 2 }).default('0'),
+  pfAdminCharges: decimal("pf_admin_charges", { precision: 12, scale: 2 }).default('0'),
+  voluntaryPf: decimal("voluntary_pf", { precision: 12, scale: 2 }).default('0'),
+  
+  esiEmployee: decimal("esi_employee", { precision: 12, scale: 2 }).default('0'),
+  esiEmployer: decimal("esi_employer", { precision: 12, scale: 2 }).default('0'),
+  
+  // Tax Deductions
+  tdsAmount: decimal("tds_amount", { precision: 12, scale: 2 }).default('0'),
+  professionalTax: decimal("professional_tax", { precision: 12, scale: 2 }).default('0'),
+  
+  // Insurance Deductions
+  groupHealthInsurance: decimal("group_health_insurance", { precision: 12, scale: 2 }).default('0'),
+  termInsurance: decimal("term_insurance", { precision: 12, scale: 2 }).default('0'),
+  
+  // Other Deductions
+  salaryAdvanceDeduction: decimal("salary_advance_deduction", { precision: 12, scale: 2 }).default('0'),
+  loanDeduction: decimal("loan_deduction", { precision: 12, scale: 2 }).default('0'),
+  otherDeductions: decimal("other_deductions", { precision: 12, scale: 2 }).default('0'),
+  totalDeductions: decimal("total_deductions", { precision: 12, scale: 2 }).notNull(),
+  
+  // Net Pay
+  netPay: decimal("net_pay", { precision: 12, scale: 2 }).notNull(),
+  
+  // Status and Processing
+  status: varchar("status").default('draft').notNull(), // 'draft', 'calculated', 'approved', 'paid'
+  calculatedAt: timestamp("calculated_at"),
+  approvedBy: varchar("approved_by"), // Reference to staff_members.id
+  approvedAt: timestamp("approved_at"),
+  paidBy: varchar("paid_by"), // Reference to staff_members.id
+  paidAt: timestamp("paid_at"),
+  paymentMode: varchar("payment_mode"), // 'bank_transfer', 'cash', 'cheque'
+  paymentReference: varchar("payment_reference"), // UTR, cheque number
+  
+  // Remarks
+  remarks: text("remarks"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Payroll Adjustments - Ad-hoc additions/deductions
+export const payrollAdjustments = pgTable("payroll_adjustments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  payrollRecordId: varchar("payroll_record_id").references(() => payrollRecords.id).notNull(),
+  adjustmentType: varchar("adjustment_type").notNull(), // 'earning', 'deduction'
+  component: varchar("component").notNull(), // Description of adjustment
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  reason: text("reason").notNull(),
+  addedBy: varchar("added_by"), // Reference to staff_members.id
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // HR Management Type Exports
 export type StaffRole = typeof staffRoles.$inferSelect;
 export type StaffMember = typeof staffMembers.$inferSelect;
@@ -2437,6 +2644,12 @@ export type EmployeeRecord = typeof employeeRecords.$inferSelect;
 export type LeaveRequest = typeof leaveRequests.$inferSelect;
 export type SalaryAdvance = typeof salaryAdvances.$inferSelect;
 export type AttendanceRecord = typeof attendanceRecords.$inferSelect;
+export type PayrollPeriod = typeof payrollPeriods.$inferSelect;
+export type SalaryStructure = typeof salaryStructures.$inferSelect;
+export type TaxSlab = typeof taxSlabs.$inferSelect;
+export type StatutoryRate = typeof statutoryRates.$inferSelect;
+export type PayrollRecord = typeof payrollRecords.$inferSelect;
+export type PayrollAdjustment = typeof payrollAdjustments.$inferSelect;
 
 // Insert schemas for forms
 export const insertStaffRoleSchema = createInsertSchema(staffRoles).omit({
@@ -2507,6 +2720,58 @@ export const insertAttendanceRecordSchema = createInsertSchema(attendanceRecords
   updatedAt: true,
 });
 
+export const insertPayrollPeriodSchema = createInsertSchema(payrollPeriods).omit({
+  id: true,
+  totalEmployees: true,
+  totalGrossPay: true,
+  totalDeductions: true,
+  totalNetPay: true,
+  processedBy: true,
+  processedAt: true,
+  approvedBy: true,
+  approvedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSalaryStructureSchema = createInsertSchema(salaryStructures).omit({
+  id: true,
+  grossSalary: true,
+  createdBy: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertTaxSlabSchema = createInsertSchema(taxSlabs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertStatutoryRateSchema = createInsertSchema(statutoryRates).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPayrollRecordSchema = createInsertSchema(payrollRecords).omit({
+  id: true,
+  grossEarnings: true,
+  totalDeductions: true,
+  netPay: true,
+  calculatedAt: true,
+  approvedBy: true,
+  approvedAt: true,
+  paidBy: true,
+  paidAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPayrollAdjustmentSchema = createInsertSchema(payrollAdjustments).omit({
+  id: true,
+  addedBy: true,
+  createdAt: true,
+});
+
 // Insert type exports
 export type InsertStaffRole = z.infer<typeof insertStaffRoleSchema>;
 export type InsertStaffMember = z.infer<typeof insertStaffMemberSchema>;
@@ -2516,3 +2781,9 @@ export type InsertEmployeeRecord = z.infer<typeof insertEmployeeRecordSchema>;
 export type InsertLeaveRequest = z.infer<typeof insertLeaveRequestSchema>;
 export type InsertSalaryAdvance = z.infer<typeof insertSalaryAdvanceSchema>;
 export type InsertAttendanceRecord = z.infer<typeof insertAttendanceRecordSchema>;
+export type InsertPayrollPeriod = z.infer<typeof insertPayrollPeriodSchema>;
+export type InsertSalaryStructure = z.infer<typeof insertSalaryStructureSchema>;
+export type InsertTaxSlab = z.infer<typeof insertTaxSlabSchema>;
+export type InsertStatutoryRate = z.infer<typeof insertStatutoryRateSchema>;
+export type InsertPayrollRecord = z.infer<typeof insertPayrollRecordSchema>;
+export type InsertPayrollAdjustment = z.infer<typeof insertPayrollAdjustmentSchema>;
