@@ -10,7 +10,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { 
   Shield, 
   Users, 
-  Analytics, 
+  BarChart, 
   Settings, 
   FileText, 
   Palette, 
@@ -36,7 +36,8 @@ import {
   Paintbrush,
   Upload,
   Download,
-  RefreshCw
+  RefreshCw,
+  Leaf
 } from "lucide-react";
 
 // Import specialized admin components
@@ -46,6 +47,7 @@ import ModerationCenter from "@/components/admin/ModerationCenter";
 import BrandingStudio from "@/components/admin/BrandingStudio";
 import UserManagement from "@/components/admin/UserManagement";
 import SystemSettings from "@/components/admin/SystemSettings";
+import { AdvancedPremiumDashboard } from "@/components/AdvancedPremiumDashboard";
 
 interface AdminUser {
   id: string;
@@ -191,10 +193,14 @@ export default function SuperAdminDashboard() {
         {/* Dashboard Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-8">
+            <TabsList className="grid w-full grid-cols-9">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <BarChart3 className="w-4 h-4" />
                 Overview
+              </TabsTrigger>
+              <TabsTrigger value="premium-view" className="flex items-center gap-2">
+                <Leaf className="w-4 h-4" />
+                Premium View
               </TabsTrigger>
               <TabsTrigger value="users" className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
@@ -205,7 +211,7 @@ export default function SuperAdminDashboard() {
                 Employees
               </TabsTrigger>
               <TabsTrigger value="analytics" className="flex items-center gap-2">
-                <Analytics className="w-4 h-4" />
+                <BarChart className="w-4 h-4" />
                 Analytics
               </TabsTrigger>
               <TabsTrigger value="moderation" className="flex items-center gap-2">
@@ -362,6 +368,19 @@ export default function SuperAdminDashboard() {
                   </div>
                 </>
               )}
+            </TabsContent>
+
+            {/* Premium User View Tab */}
+            <TabsContent value="premium-view" className="space-y-6">
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Premium User Experience</h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  This is exactly what your premium subscribers see when they access their dashboard.
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border">
+                <AdvancedPremiumDashboard />
+              </div>
             </TabsContent>
 
             {/* User Management Tab */}
