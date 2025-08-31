@@ -9,13 +9,13 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import { User } from "@shared/schema";
+import { User as DBUser } from "@shared/schema";
 import connectPg from "connect-pg-simple";
 import { authLimiter, validateEmail, validatePassword } from "./middleware/security";
 
 declare global {
   namespace Express {
-    interface User extends SelectUser {}
+    interface User extends DBUser {}
   }
 }
 
@@ -52,8 +52,7 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Configure OAuth strategies
-  setupOAuthStrategies();
+  // Configure OAuth strategies (set up in routes.ts)
 
   passport.use(
     new LocalStrategy(
