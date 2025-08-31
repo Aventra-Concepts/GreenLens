@@ -169,6 +169,16 @@ export default function SuperAdminDashboard() {
                 <Button
                   variant="outline"
                   size="sm"
+                  onClick={() => setLocation("/admin-dashboard")}
+                  className="flex items-center gap-2"
+                  data-testid="back-to-admin"
+                >
+                  <Shield className="w-4 h-4" />
+                  Back to Admin
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => refetchStats()}
                   className="flex items-center gap-2"
                   data-testid="refresh-dashboard"
