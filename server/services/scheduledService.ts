@@ -1,7 +1,9 @@
 import { StudentConversionService } from "./studentConversionService";
+import { subscriptionEmailService } from "./subscriptionEmailService";
 
 class ScheduledService {
   private conversionInterval: NodeJS.Timeout | null = null;
+  private emailInterval: NodeJS.Timeout | null = null;
   private isRunning: boolean = false;
 
   // Start the scheduled services
@@ -17,8 +19,14 @@ class ScheduledService {
     // Run student conversion check daily at 9:00 AM
     this.scheduleStudentConversion();
 
+    // Run subscription email checks daily at 10:00 AM
+    this.scheduleSubscriptionEmails();
+
     // Initial run to catch any pending conversions
     this.runStudentConversionCheck();
+    
+    // Initial run to catch any pending subscription emails
+    this.runSubscriptionEmailCheck();
   }
 
   // Stop the scheduled services
@@ -26,6 +34,10 @@ class ScheduledService {
     if (this.conversionInterval) {
       clearInterval(this.conversionInterval);
       this.conversionInterval = null;
+    }
+    if (this.emailInterval) {
+      clearInterval(this.emailInterval);
+      this.emailInterval = null;
     }
     this.isRunning = false;
     console.log('Scheduled services stopped');
@@ -59,6 +71,34 @@ class ScheduledService {
     console.log(`Student conversion scheduled for: ${next9AM.toLocaleString()}`);
   }
 
+  // Schedule daily subscription email check
+  private scheduleSubscriptionEmails(): void {
+    // Calculate milliseconds until next 10:00 AM
+    const now = new Date();
+    const next10AM = new Date();
+    next10AM.setHours(10, 0, 0, 0);
+    
+    // If it's already past 10 AM today, schedule for tomorrow
+    if (now.getTime() > next10AM.getTime()) {
+      next10AM.setDate(next10AM.getDate() + 1);
+    }
+    
+    const msUntil10AM = next10AM.getTime() - now.getTime();
+    
+    // Set timeout for first run at 10:00 AM
+    setTimeout(() => {
+      this.runSubscriptionEmailCheck();
+      
+      // Then set interval for every 24 hours
+      this.emailInterval = setInterval(() => {
+        this.runSubscriptionEmailCheck();
+      }, 24 * 60 * 60 * 1000); // 24 hours
+      
+    }, msUntil10AM);
+    
+    console.log(`Subscription email reminders scheduled for: ${next10AM.toLocaleString()}`);
+  }
+
   // Run the student conversion check
   private async runStudentConversionCheck(): Promise<void> {
     try {
@@ -81,9 +121,34 @@ class ScheduledService {
     }
   }
 
+  // Run the subscription email reminder check
+  private async runSubscriptionEmailCheck(): Promise<void> {
+    try {
+      console.log('Running scheduled subscription email check...');
+      
+      if (!subscriptionEmailService.isConfigured()) {
+        console.log('SendGrid not configured. Skipping subscription email reminders.');
+        return;
+      }
+      
+      const result = await subscriptionEmailService.processPendingReminders();
+      
+      console.log(`Subscription email check completed: ${result.sent} emails sent, ${result.failed} failed`);
+      
+    } catch (error) {
+      console.error('Error in scheduled subscription email check:', error);
+    }
+  }
+
+
   // Manual trigger for testing
   async triggerStudentConversion(): Promise<{ convertedCount: number; errors: string[] }> {
     return await StudentConversionService.runAutomaticConversion();
+  }
+
+  // Manual trigger for subscription emails
+  async triggerSubscriptionEmails(): Promise<{ sent: number; failed: number }> {
+    return await subscriptionEmailService.processPendingReminders();
   }
 
   // Check if services are running

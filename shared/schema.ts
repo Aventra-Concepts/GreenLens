@@ -1156,7 +1156,7 @@ export const subscriptionReminders = pgTable("subscription_reminders", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   subscriptionId: varchar("subscription_id").notNull().references(() => subscriptions.id, { onDelete: "cascade" }),
-  reminderType: varchar("reminder_type").notNull(), // 'renewal_due', 'payment_failed', 'trial_ending'
+  reminderType: varchar("reminder_type").notNull(), // 'renewal_due', 'payment_failed', 'trial_ending', '15_days_before_expiry', '7_days_before_expiry', 'renewal_confirmed'
   scheduledFor: timestamp("scheduled_for").notNull(),
   sent: boolean("sent").default(false),
   sentAt: timestamp("sent_at"),

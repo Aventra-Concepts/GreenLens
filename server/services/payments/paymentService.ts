@@ -11,6 +11,8 @@ import {
   PaymentError,
   PaymentErrors 
 } from './paymentTypes';
+import { subscriptionEmailService } from '../subscriptionEmailService';
+import { storage } from '../../storage';
 
 export class PaymentService {
   private providers: PaymentProvider[] = [];
@@ -165,7 +167,34 @@ export class PaymentService {
       );
     }
 
-    return provider.handleWebhook(body, signature);
+    const result = await provider.handleWebhook(body, signature);
+    
+    // Send renewal confirmation email if payment was successful
+    if (result.success && result.status === 'active' && result.customerId) {
+      try {
+        // Find the user by email or customer ID
+        const user = await storage.getUserByEmail(result.customerId);
+        
+        if (user && subscriptionEmailService.isConfigured()) {
+          await subscriptionEmailService.sendRenewalConfirmation(user.email || result.customerId, {
+            username: user.firstName || 'Valued Customer',
+            subscriptionType: 'Garden Premium',
+            renewalDate: new Date().toLocaleDateString(),
+            expiryDate: result.expiresAt ? new Date(result.expiresAt).toLocaleDateString() : 'One year from now',
+            amount: result.metadata?.amount || 'Your subscription amount',
+            currency: result.metadata?.currency || 'USD',
+            provider: providerName
+          });
+          
+          console.log(`Renewal confirmation email sent to ${user.email} for ${providerName} payment`);
+        }
+      } catch (emailError) {
+        console.error('Failed to send renewal confirmation email:', emailError);
+        // Don't fail the webhook for email issues
+      }
+    }
+
+    return result;
   }
 
   async getSubscriptionStatus(providerName: string, subscriptionId: string): Promise<SubscriptionStatus> {

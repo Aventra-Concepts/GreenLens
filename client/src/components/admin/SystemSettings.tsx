@@ -66,6 +66,9 @@ interface SystemSettings {
     fromName: string;
     enableEmailNotifications: boolean;
     enableWelcomeEmails: boolean;
+    enable15DayReminders: boolean;
+    enable7DayReminders: boolean;
+    enableRenewalConfirmations: boolean;
   };
   security: {
     sessionTimeout: number;
@@ -199,6 +202,29 @@ export default function SystemSettings() {
       toast({
         title: "Email Test Failed",
         description: error.message || "Failed to send test email",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Test subscription email notifications
+  const testSubscriptionEmailMutation = useMutation({
+    mutationFn: async () => {
+      const token = sessionStorage.getItem("adminToken");
+      return await apiRequest('POST', '/api/admin/system/test-subscription-email', {
+        adminToken: token
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Subscription Email Test Sent",
+        description: "Test subscription reminder email has been sent successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Subscription Email Test Failed",
+        description: error.message || "Failed to send test subscription email",
         variant: "destructive",
       });
     }
@@ -583,6 +609,32 @@ export default function SystemSettings() {
                 </div>
               </div>
 
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Email Notifications</Label>
+                    <p className="text-sm text-gray-600">Enable automatic email notifications</p>
+                  </div>
+                  <Switch
+                    checked={settings?.email.enableEmailNotifications || false}
+                    onCheckedChange={(checked) => handleSettingUpdate('email', 'enableEmailNotifications', checked)}
+                    data-testid="switch-email-notifications"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Welcome Emails</Label>
+                    <p className="text-sm text-gray-600">Send welcome emails to new users</p>
+                  </div>
+                  <Switch
+                    checked={settings?.email.enableWelcomeEmails || false}
+                    onCheckedChange={(checked) => handleSettingUpdate('email', 'enableWelcomeEmails', checked)}
+                    data-testid="switch-welcome-emails"
+                  />
+                </div>
+              </div>
+
               <div className="flex items-center justify-between">
                 <Button
                   variant="outline"
@@ -594,6 +646,83 @@ export default function SystemSettings() {
                   <Mail className="w-4 h-4" />
                   {testEmailMutation.isPending ? "Sending..." : "Send Test Email"}
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Subscription Email Notifications Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="w-5 h-5" />
+                Subscription Email Notifications
+              </CardTitle>
+              <CardDescription>
+                Configure automated subscription reminder and renewal emails
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>15-Day Expiry Reminders</Label>
+                    <p className="text-sm text-gray-600">Send reminders 15 days before subscription expires</p>
+                  </div>
+                  <Switch
+                    checked={settings?.email.enable15DayReminders !== false}
+                    onCheckedChange={(checked) => handleSettingUpdate('email', 'enable15DayReminders', checked)}
+                    data-testid="switch-15day-reminders"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>7-Day Expiry Reminders</Label>
+                    <p className="text-sm text-gray-600">Send reminders 7 days before subscription expires</p>
+                  </div>
+                  <Switch
+                    checked={settings?.email.enable7DayReminders !== false}
+                    onCheckedChange={(checked) => handleSettingUpdate('email', 'enable7DayReminders', checked)}
+                    data-testid="switch-7day-reminders"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Renewal Confirmations</Label>
+                    <p className="text-sm text-gray-600">Send confirmation emails when subscriptions are renewed</p>
+                  </div>
+                  <Switch
+                    checked={settings?.email.enableRenewalConfirmations !== false}
+                    onCheckedChange={(checked) => handleSettingUpdate('email', 'enableRenewalConfirmations', checked)}
+                    data-testid="switch-renewal-confirmations"
+                  />
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Email Service Status</Label>
+                    <p className="text-sm text-gray-600">SendGrid API configuration status</p>
+                  </div>
+                  <Badge variant={process.env.SENDGRID_API_KEY ? "default" : "destructive"}>
+                    {process.env.SENDGRID_API_KEY ? "Configured" : "Not Configured"}
+                  </Badge>
+                </div>
+                
+                <div className="mt-4 flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => testSubscriptionEmailMutation.mutate()}
+                    disabled={testSubscriptionEmailMutation.isPending}
+                    className="flex items-center gap-2"
+                    data-testid="test-subscription-email"
+                  >
+                    <Bell className="w-4 h-4" />
+                    {testSubscriptionEmailMutation.isPending ? "Sending..." : "Test Subscription Email"}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

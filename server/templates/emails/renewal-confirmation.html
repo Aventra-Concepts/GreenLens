@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Back! Your GreenLens Subscription is Renewed</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f0fdf4;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+            <td style="padding: 20px 0;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 30px; text-align: center; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px 8px 0 0;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">🌿 GreenLens</h1>
+                            <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Payment Confirmation</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px 30px;">
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <div style="display: inline-block; padding: 15px; background-color: #dcfce7; border-radius: 50px; margin-bottom: 20px;">
+                                    <span style="font-size: 40px;">✅</span>
+                                </div>
+                                <h2 style="color: #10b981; margin: 0; font-size: 24px; font-weight: bold;">Payment Successful!</h2>
+                            </div>
+                            
+                            <p style="color: #374151; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                                Hi <strong>{{firstName}}</strong>,
+                            </p>
+                            
+                            <p style="color: #374151; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                                Thank you for renewing your {{planType}} subscription! Your payment has been successfully processed and your premium access is now active.
+                            </p>
+                            
+                            <!-- Payment Details -->
+                            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; margin: 25px 0; border-radius: 8px;">
+                                <h3 style="color: #1e293b; margin: 0 0 15px 0; font-size: 18px;">Payment Details</h3>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #64748b; font-size: 14px; width: 140px;">Plan:</td>
+                                        <td style="padding: 8px 0; color: #1e293b; font-size: 14px; font-weight: 500;">{{planType}} Plan</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Amount:</td>
+                                        <td style="padding: 8px 0; color: #1e293b; font-size: 14px; font-weight: 500;">{{amount}} {{currency}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Payment Method:</td>
+                                        <td style="padding: 8px 0; color: #1e293b; font-size: 14px; font-weight: 500;">{{paymentProvider}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Renewal Date:</td>
+                                        <td style="padding: 8px 0; color: #1e293b; font-size: 14px; font-weight: 500;">{{nextRenewalDate}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Transaction ID:</td>
+                                        <td style="padding: 8px 0; color: #1e293b; font-size: 14px; font-weight: 500;">{{transactionId}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; margin: 25px 0;">
+                                <h3 style="color: #10b981; margin: 0 0 10px 0; font-size: 18px;">🌱 Your Premium Benefits:</h3>
+                                <ul style="color: #374151; margin: 0; padding-left: 20px; line-height: 1.6;">
+                                    <li>Unlimited AI plant identification and analysis</li>
+                                    <li>Advanced disease diagnosis with treatment plans</li>
+                                    <li>Personalized care schedules and reminders</li>
+                                    <li>Expert consultation booking (priority access)</li>
+                                    <li>Comprehensive garden monitoring and reports</li>
+                                    <li>Premium plant database with 10,000+ species</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{dashboardUrl}}" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);">
+                                    Access My Garden Dashboard
+                                </a>
+                            </div>
+                            
+                            <div style="background-color: #fef3c7; border: 1px solid #fbbf24; padding: 15px; margin: 25px 0; border-radius: 8px;">
+                                <p style="color: #92400e; margin: 0; font-size: 14px; text-align: center;">
+                                    💡 <strong>Pro Tip:</strong> Upload your plant photos now to get instant AI-powered care recommendations!
+                                </p>
+                            </div>
+                            
+                            <p style="color: #6b7280; font-size: 14px; line-height: 1.5; text-align: center; margin-top: 30px;">
+                                Need help getting started? <a href="mailto:support@greenlens.ai" style="color: #10b981; text-decoration: none;">Contact our support team</a>
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 20px 30px; background-color: #f9fafb; border-radius: 0 0 8px 8px; text-align: center;">
+                            <p style="color: #6b7280; font-size: 12px; margin: 0; line-height: 1.5;">
+                                © 2025 GreenLens. All rights reserved.<br>
+                                This is a payment confirmation for your subscription renewal.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

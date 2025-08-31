@@ -4,6 +4,7 @@ import { requireAuth } from "../middleware/auth";
 import { db } from "../db";
 import { users, subscriptions } from "@shared/schema";
 import { eq } from "drizzle-orm";
+import { subscriptionEmailService } from "../services/subscriptionEmailService";
 
 // Initialize Stripe only if secret key is available
 let stripe: Stripe | null = null;
@@ -325,6 +326,17 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
 
   const planType = subscription.metadata.planId === 'premium' ? 'premium' : 'pro';
 
+  // Get existing subscription to check if this is a renewal
+  const [existingSubscription] = await db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.userId, userId))
+    .limit(1);
+
+  const isRenewal = existingSubscription && 
+    subscription.status === 'active' && 
+    new Date(subscription.current_period_start * 1000) > new Date(existingSubscription.currentPeriodStart || 0);
+
   await db
     .update(subscriptions)
     .set({
@@ -335,6 +347,33 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       updatedAt: new Date(),
     })
     .where(eq(subscriptions.userId, userId));
+
+  // Send renewal confirmation email if this is a renewal
+  if (isRenewal && subscription.status === 'active') {
+    try {
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+      
+      if (user && user.email && subscriptionEmailService.isConfigured()) {
+        await subscriptionEmailService.sendRenewalConfirmation(user.email, {
+          username: user.firstName || 'Valued Customer',
+          subscriptionType: planType === 'premium' ? 'Premium Plan' : 'Pro Plan',
+          renewalDate: new Date().toLocaleDateString(),
+          expiryDate: new Date(subscription.current_period_end * 1000).toLocaleDateString(),
+          amount: `$${(subscription.items.data[0]?.price?.unit_amount ? subscription.items.data[0].price.unit_amount / 100 : 0).toFixed(2)}`,
+          currency: subscription.currency?.toUpperCase() || 'USD',
+          provider: 'Stripe'
+        });
+        
+        console.log(`Subscription renewal confirmation email sent to ${user.email}`);
+      }
+    } catch (emailError) {
+      console.error('Failed to send subscription renewal confirmation email:', emailError);
+    }
+  }
 }
 
 async function handleSubscriptionCancellation(subscription: Stripe.Subscription) {
@@ -351,8 +390,47 @@ async function handleSubscriptionCancellation(subscription: Stripe.Subscription)
 }
 
 async function handleSuccessfulPayment(invoice: Stripe.Invoice) {
-  // Handle successful payment (could send confirmation email, update records, etc.)
-  console.log('Payment succeeded for invoice:', invoice.id);
+  try {
+    console.log('Payment succeeded for invoice:', invoice.id);
+    
+    // Get subscription details to find the user
+    if (invoice.subscription && typeof invoice.subscription === 'string') {
+      const subscriptionId = invoice.subscription;
+      
+      if (stripe) {
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        const userId = subscription.metadata.userId;
+        
+        if (userId) {
+          // Get user details
+          const [user] = await db
+            .select()
+            .from(users)
+            .where(eq(users.id, userId))
+            .limit(1);
+          
+          if (user && user.email && subscriptionEmailService.isConfigured()) {
+            // Send renewal confirmation email
+            await subscriptionEmailService.sendRenewalConfirmation(user.email, {
+              username: user.firstName || 'Valued Customer',
+              subscriptionType: subscription.metadata.planId === 'premium' ? 'Premium Plan' : 'Pro Plan',
+              renewalDate: new Date().toLocaleDateString(),
+              expiryDate: new Date(subscription.current_period_end * 1000).toLocaleDateString(),
+              amount: `$${(invoice.amount_paid / 100).toFixed(2)}`,
+              currency: invoice.currency.toUpperCase(),
+              provider: 'Stripe'
+            });
+            
+            console.log(`Renewal confirmation email sent to ${user.email} for Stripe payment`);
+          }
+        }
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error sending renewal confirmation email:', error);
+    // Don't fail the webhook for email issues
+  }
 }
 
 async function handleFailedPayment(invoice: Stripe.Invoice) {

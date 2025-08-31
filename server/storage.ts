@@ -295,6 +295,10 @@ export interface IStorage {
   getGardenDashboardStats(userId: string): Promise<any>;
   generateGardenReport(userId: string, reportType: string, title: string): Promise<GardenReport>;
   getGardenReports(userId: string): Promise<GardenReport[]>;
+  
+  // System Settings operations
+  getSystemSettings(): Promise<any>;
+  updateSystemSettings(updates: any): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2327,6 +2331,112 @@ ${plants.map(plant => `- ${plant.name} (${plant.species}) - Status: ${plant.stat
     } catch (error) {
       console.error('Error getting diagnosis history:', error);
       return [];
+    }
+  }
+
+  // System Settings operations
+  async getSystemSettings(): Promise<any> {
+    try {
+      // Get all system-level admin settings
+      const settings = await db.select().from(adminSettings);
+      
+      // Transform into a structured object
+      const systemSettings = {
+        email: {
+          enableSubscriptionNotifications: true,
+          enableRenewalReminders: true,
+          reminderDaysBefore: 15,
+          sendRenewalConfirmations: true,
+          sendWelcomeEmails: true,
+        },
+        maintenance: {
+          enabled: false,
+          message: 'System under maintenance',
+        },
+        features: {
+          plantIdEnabled: true,
+          blogEnabled: true,
+          consultationEnabled: true,
+        }
+      };
+      
+      // Override with actual settings from database
+      settings.forEach(setting => {
+        if (setting.category === 'email') {
+          systemSettings.email[setting.settingKey] = setting.settingValue === 'true';
+        } else if (setting.category === 'maintenance') {
+          systemSettings.maintenance[setting.settingKey] = setting.settingValue;
+        } else if (setting.category === 'features') {
+          systemSettings.features[setting.settingKey] = setting.settingValue === 'true';
+        }
+      });
+      
+      return systemSettings;
+    } catch (error) {
+      console.error('Error getting system settings:', error);
+      return {
+        email: {
+          enableSubscriptionNotifications: true,
+          enableRenewalReminders: true,
+          reminderDaysBefore: 15,
+          sendRenewalConfirmations: true,
+          sendWelcomeEmails: true,
+        },
+        maintenance: { enabled: false, message: 'System under maintenance' },
+        features: { plantIdEnabled: true, blogEnabled: true, consultationEnabled: true }
+      };
+    }
+  }
+
+  async updateSystemSettings(updates: any): Promise<any> {
+    try {
+      // Update email settings
+      if (updates.email) {
+        for (const [key, value] of Object.entries(updates.email)) {
+          await this.setAdminSetting({
+            settingKey: key,
+            settingValue: String(value),
+            settingType: typeof value === 'boolean' ? 'boolean' : 'string',
+            category: 'email',
+            description: `Email notification setting: ${key}`,
+            lastUpdatedBy: 'system'
+          });
+        }
+      }
+      
+      // Update maintenance settings
+      if (updates.maintenance) {
+        for (const [key, value] of Object.entries(updates.maintenance)) {
+          await this.setAdminSetting({
+            settingKey: key,
+            settingValue: String(value),
+            settingType: typeof value === 'boolean' ? 'boolean' : 'string',
+            category: 'maintenance',
+            description: `Maintenance setting: ${key}`,
+            lastUpdatedBy: 'system'
+          });
+        }
+      }
+      
+      // Update feature settings
+      if (updates.features) {
+        for (const [key, value] of Object.entries(updates.features)) {
+          await this.setAdminSetting({
+            settingKey: key,
+            settingValue: String(value),
+            settingType: typeof value === 'boolean' ? 'boolean' : 'string',
+            category: 'features',
+            description: `Feature setting: ${key}`,
+            lastUpdatedBy: 'system'
+          });
+        }
+      }
+      
+      // Return updated settings
+      return await this.getSystemSettings();
+    } catch (error) {
+      console.error('Error updating system settings:', error);
+      throw error;
     }
   }
 }

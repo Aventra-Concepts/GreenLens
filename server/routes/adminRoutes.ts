@@ -529,6 +529,49 @@ router.post('/system/test-email', requireAuth, requireAdmin, async (req, res) =>
   }
 });
 
+// Test subscription email notifications
+router.post('/system/test-subscription-email', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { subscriptionEmailService } = require('../services/subscriptionEmailService');
+    
+    if (!subscriptionEmailService.isConfigured()) {
+      return res.status(400).json({ 
+        error: 'SendGrid not configured', 
+        message: 'Please configure SENDGRID_API_KEY in your environment variables' 
+      });
+    }
+    
+    // Send a test renewal confirmation email to the admin
+    const adminEmail = req.user!.email || 'admin@greenlens.ai';
+    
+    const result = await subscriptionEmailService.sendRenewalConfirmation(adminEmail, {
+      username: 'Admin',
+      subscriptionType: 'Premium Plan (Test)',
+      renewalDate: new Date().toLocaleDateString(),
+      expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString(), // 1 year from now
+      amount: '$19.00',
+      currency: 'USD',
+      provider: 'Test'
+    });
+    
+    await AdminAuthService.logAdminAction(
+      req.user!.id,
+      'test_subscription_email',
+      { recipient: adminEmail, result },
+      req.ip
+    );
+    
+    res.json({ 
+      success: result, 
+      message: result ? 'Test subscription email sent successfully' : 'Failed to send test email'
+    });
+    
+  } catch (error) {
+    console.error('Test subscription email error:', error);
+    res.status(500).json({ error: 'Failed to test subscription email notifications' });
+  }
+});
+
 router.post('/system/backup', requireAuth, requireAdmin, async (req, res) => {
   try {
     const backup = await AdminAuthService.createSystemBackup();
