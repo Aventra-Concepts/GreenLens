@@ -14,6 +14,7 @@ import Account from "@/pages/account";
 import Admin from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
+import SuperAdminDashboard from "@/pages/super-admin-dashboard";
 import AdminBlogManager from "@/pages/admin-blog-manager";
 import AdminSocialMedia from "@/pages/admin-social-media";
 import ExpertsRegister from "@/pages/experts-register";
@@ -168,6 +169,7 @@ function Router() {
       
       {/* Admin routes - accessible with session-based auth */}
       <Route path="/admin-dashboard" component={AdminDashboard} />
+      <Route path="/super-admin-dashboard" component={SuperAdminDashboard} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/blog" component={AdminBlogManager} />
       <Route path="/admin/social-media" component={AdminSocialMedia} />

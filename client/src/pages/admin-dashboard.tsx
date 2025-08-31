@@ -19,6 +19,7 @@ import {
   Search, Filter, Download, Upload, Eye, ToggleLeft, ToggleRight, Monitor,
   PieChart, LineChart, UserPlus, Zap, Layers, Lock, ArrowRight, Leaf, Share2, Star
 } from "lucide-react";
+import { AdvancedPremiumDashboard } from "@/components/AdvancedPremiumDashboard";
 
 interface ConsultationRequest {
   id: string;
@@ -879,10 +880,14 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Admin Navigation Tabs */}
-          <TabsList className="grid w-full grid-cols-7 lg:grid-cols-12 bg-white dark:bg-gray-800 p-1 h-auto">
+          <TabsList className="grid w-full grid-cols-7 lg:grid-cols-13 bg-white dark:bg-gray-800 p-1 h-auto">
             <TabsTrigger value="overview" className="flex items-center gap-1 px-2 py-2 text-xs">
               <BarChart3 className="w-3 h-3" />
               <span className="hidden sm:inline">Overview</span>
+            </TabsTrigger>
+            <TabsTrigger value="premium-view" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-emerald-100 to-green-100 border-2 border-emerald-300">
+              <Leaf className="w-3 h-3 text-emerald-600" />
+              <span className="hidden sm:inline font-semibold text-emerald-700">Premium</span>
             </TabsTrigger>
             <TabsTrigger value="authors" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300">
               <UserCheck className="w-3 h-3 text-green-600" />
@@ -1172,6 +1177,20 @@ export default function AdminDashboard() {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          </TabsContent>
+
+          {/* Premium User View Tab */}
+          <TabsContent value="premium-view" className="space-y-6">
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Premium User Dashboard Experience</h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                This is exactly what your premium subscribers ($9 Pro and $19 Premium plans) see when they access their advanced garden dashboard. 
+                Experience the full premium features your customers are paying for.
+              </p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border">
+              <AdvancedPremiumDashboard />
             </div>
           </TabsContent>
 
