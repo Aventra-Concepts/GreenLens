@@ -75,6 +75,30 @@ const salaryAdvanceSchema = z.object({
   repaymentPeriod: z.number().min(1).max(12, "Repayment period must be 1-12 months"),
 });
 
+// Job Posting Schema
+const jobPostingSchema = z.object({
+  title: z.string().min(1, "Job title is required"),
+  department: z.string().min(1, "Department is required"),
+  location: z.string().min(1, "Location is required"),
+  workType: z.enum(["remote", "office", "hybrid"]),
+  employmentType: z.enum(["full-time", "part-time", "contract", "intern"]),
+  description: z.string().min(50, "Description must be at least 50 characters"),
+  requirements: z.string().min(50, "Requirements must be at least 50 characters"),
+  responsibilities: z.string().min(50, "Responsibilities must be at least 50 characters"),
+  qualifications: z.string().optional(),
+  benefits: z.string().optional(),
+  salaryMin: z.number().min(0).optional(),
+  salaryMax: z.number().min(0).optional(),
+  currency: z.string().default("USD"),
+  salaryNegotiable: z.boolean().default(false),
+  experienceMin: z.number().min(0).optional(),
+  experienceMax: z.number().min(0).optional(),
+  applicationDeadline: z.string().optional(),
+  numberOfPositions: z.number().min(1).default(1),
+  applicationMethod: z.enum(["internal", "external", "both"]).default("internal"),
+  externalApplicationUrl: z.string().optional(),
+});
+
 // Performance Review Schema
 const performanceReviewSchema = z.object({
   staffMemberId: z.string().min(1, "Employee is required"),
@@ -183,6 +207,7 @@ export default function AdminHRDashboard() {
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isAdvanceModalOpen, setIsAdvanceModalOpen] = useState(false);
+  const [isJobModalOpen, setIsJobModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const queryClient = useQueryClient();
@@ -210,6 +235,12 @@ export default function AdminHRDashboard() {
   // Fetch salary advances
   const { data: salaryAdvances = [], isLoading: advancesLoading } = useQuery<SalaryAdvance[]>({
     queryKey: ['/api/hr/salary-advances'],
+  });
+
+  // Fetch Job Postings
+  const { data: jobPostings = [] } = useQuery({
+    queryKey: ['/api/hr/jobs'],
+    retry: false,
   });
 
   // Employee form
@@ -245,6 +276,33 @@ export default function AdminHRDashboard() {
   // Performance review form
   const performanceForm = useForm<PerformanceReviewFormData>({
     resolver: zodResolver(performanceReviewSchema),
+  });
+
+  // Job posting form
+  const jobForm = useForm({
+    resolver: zodResolver(jobPostingSchema),
+    defaultValues: {
+      title: '',
+      department: '',
+      location: '',
+      workType: 'office' as const,
+      employmentType: 'full-time' as const,
+      description: '',
+      requirements: '',
+      responsibilities: '',
+      qualifications: '',
+      benefits: '',
+      salaryMin: undefined,
+      salaryMax: undefined,
+      currency: 'USD',
+      salaryNegotiable: false,
+      experienceMin: undefined,
+      experienceMax: undefined,
+      applicationDeadline: '',
+      numberOfPositions: 1,
+      applicationMethod: 'internal' as const,
+      externalApplicationUrl: '',
+    }
   });
 
   // Create/Update employee
@@ -306,6 +364,29 @@ export default function AdminHRDashboard() {
       queryClient.invalidateQueries({ queryKey: ['/api/hr/salary-advances'] });
       setIsAdvanceModalOpen(false);
       advanceForm.reset();
+    },
+  });
+
+  // Create job posting
+  const createJobPosting = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest('/api/hr/jobs', 'POST', data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        description: "Job posting created successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/hr/jobs'] });
+      setIsJobModalOpen(false);
+      jobForm.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create job posting",
+        variant: "destructive",
+      });
     },
   });
 
@@ -895,7 +976,10 @@ export default function AdminHRDashboard() {
                 <h2 className="text-2xl font-bold text-gray-900">Recruitment Pipeline</h2>
                 <p className="text-gray-600">Manage job postings and hiring process</p>
               </div>
-              <Button className="bg-indigo-600 hover:bg-indigo-700">
+              <Button 
+                onClick={() => setIsJobModalOpen(true)}
+                className="bg-indigo-600 hover:bg-indigo-700"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Job Posting
               </Button>
@@ -906,7 +990,7 @@ export default function AdminHRDashboard() {
               <Card className="border-blue-200 bg-blue-50">
                 <CardContent className="p-4 text-center">
                   <Briefcase className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-blue-900">8</p>
+                  <p className="text-2xl font-bold text-blue-900">{jobPostings.filter((job: any) => job.status === 'published').length}</p>
                   <p className="text-sm text-blue-600">Open Positions</p>
                 </CardContent>
               </Card>
@@ -914,7 +998,7 @@ export default function AdminHRDashboard() {
               <Card className="border-yellow-200 bg-yellow-50">
                 <CardContent className="p-4 text-center">
                   <FileText className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-yellow-900">24</p>
+                  <p className="text-2xl font-bold text-yellow-900">{jobPostings.reduce((acc: number, job: any) => acc + (job.applicationCount || 0), 0)}</p>
                   <p className="text-sm text-yellow-600">Applications</p>
                 </CardContent>
               </Card>
@@ -954,27 +1038,45 @@ export default function AdminHRDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {['Senior React Developer', 'Marketing Manager', 'UI/UX Designer', 'Data Analyst', 'Customer Success Manager'].map((title, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                          <Briefcase className="w-5 h-5 text-white" />
+                  {jobPostings.length > 0 ? (
+                    jobPostings.map((job: any) => (
+                      <div key={job.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                            <Briefcase className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{job.title}</p>
+                            <p className="text-sm text-gray-600">
+                              {job.department} • {job.location} • {job.workType} • {job.employmentType}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Posted {new Date(job.createdAt).toLocaleDateString()} • {job.applicationCount || 0} applications
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium">{title}</p>
-                          <p className="text-sm text-gray-600">Engineering • Remote • Full-time</p>
-                          <p className="text-xs text-gray-500">Posted 2 days ago • {Math.floor(Math.random() * 20) + 5} applications</p>
+                        <div className="flex items-center space-x-2">
+                          <Badge className={job.status === 'published' ? 'bg-green-100 text-green-800' : job.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}>
+                            {job.status === 'published' ? 'Active' : job.status === 'draft' ? 'Draft' : 'Closed'}
+                          </Badge>
+                          <Button size="sm" variant="outline">
+                            <Eye className="w-4 h-4 mr-1" />
+                            View
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            <Edit className="w-4 h-4 mr-1" />
+                            Edit
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge className="bg-green-100 text-green-800">Active</Badge>
-                        <Button size="sm" variant="outline">
-                          <Eye className="w-4 h-4 mr-1" />
-                          View
-                        </Button>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <Briefcase className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                      <p>No job postings found</p>
+                      <p className="text-sm">Create your first job posting to get started</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -2601,6 +2703,391 @@ const PayrollManagement = () => {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Job Posting Modal */}
+      <Dialog open={isJobModalOpen} onOpenChange={setIsJobModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create Job Posting</DialogTitle>
+          </DialogHeader>
+          <Form {...jobForm}>
+            <form onSubmit={jobForm.handleSubmit((data) => createJobPosting.mutate(data))} className="space-y-6">
+              
+              {/* Basic Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={jobForm.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Job Title *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Senior React Developer" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={jobForm.control}
+                  name="department"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Department *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Engineering" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={jobForm.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., San Francisco, CA or Remote" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={jobForm.control}
+                  name="workType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Work Type *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select work type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="remote">Remote</SelectItem>
+                          <SelectItem value="office">Office</SelectItem>
+                          <SelectItem value="hybrid">Hybrid</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={jobForm.control}
+                  name="employmentType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Employment Type *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select employment type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="full-time">Full-time</SelectItem>
+                          <SelectItem value="part-time">Part-time</SelectItem>
+                          <SelectItem value="contract">Contract</SelectItem>
+                          <SelectItem value="intern">Intern</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={jobForm.control}
+                  name="numberOfPositions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Number of Positions</FormLabel>
+                      <FormControl>
+                        <Input type="number" min="1" {...field} onChange={(e) => field.onChange(parseInt(e.target.value) || 1)} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Experience and Salary */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={jobForm.control}
+                  name="experienceMin"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Min Experience (years)</FormLabel>
+                      <FormControl>
+                        <Input type="number" min="0" placeholder="0" {...field} onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={jobForm.control}
+                  name="experienceMax"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Max Experience (years)</FormLabel>
+                      <FormControl>
+                        <Input type="number" min="0" placeholder="10" {...field} onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={jobForm.control}
+                  name="applicationDeadline"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Application Deadline</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Salary Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Salary Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={jobForm.control}
+                    name="salaryMin"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Minimum Salary</FormLabel>
+                        <FormControl>
+                          <Input type="number" min="0" placeholder="50000" {...field} onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={jobForm.control}
+                    name="salaryMax"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Maximum Salary</FormLabel>
+                        <FormControl>
+                          <Input type="number" min="0" placeholder="80000" {...field} onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={jobForm.control}
+                    name="currency"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Currency</FormLabel>
+                        <FormControl>
+                          <Input placeholder="USD" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <FormField
+                  control={jobForm.control}
+                  name="salaryNegotiable"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={field.onChange}
+                          className="mt-1"
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Salary is negotiable</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Job Description Fields */}
+              <div className="space-y-4">
+                <FormField
+                  control={jobForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Job Description *</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Provide a detailed description of the role, company culture, and what makes this position unique..."
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={jobForm.control}
+                  name="responsibilities"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Key Responsibilities *</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="List the main responsibilities and duties for this role..."
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={jobForm.control}
+                  name="requirements"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Requirements *</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="List the required skills, experience, and qualifications..."
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={jobForm.control}
+                  name="qualifications"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nice-to-Have Qualifications</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Additional qualifications that would be beneficial..."
+                          className="min-h-[80px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={jobForm.control}
+                  name="benefits"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Benefits & Perks</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Health insurance, vacation time, remote work options, etc..."
+                          className="min-h-[80px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Application Method */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Application Settings</h3>
+                <FormField
+                  control={jobForm.control}
+                  name="applicationMethod"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Application Method</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select application method" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="internal">Internal (through our careers page)</SelectItem>
+                          <SelectItem value="external">External (redirect to external URL)</SelectItem>
+                          <SelectItem value="both">Both internal and external</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {jobForm.watch("applicationMethod") !== "internal" && (
+                  <FormField
+                    control={jobForm.control}
+                    name="externalApplicationUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>External Application URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://company.com/apply" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsJobModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={createJobPosting.isPending}
+                  className="bg-indigo-600 hover:bg-indigo-700"
+                >
+                  {createJobPosting.isPending ? "Creating..." : "Create Job Posting"}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>
