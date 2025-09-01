@@ -41,7 +41,7 @@ const navigationMessages: Record<string, NavigationMessage> = {
   },
   "/help-center": {
     title: "Help Center",
-    description: "Get support and learn how to use GreenLens features"
+    description: "Find answers and support for all GreenLens features"
   },
   "/community": {
     title: "GreenLens Community",

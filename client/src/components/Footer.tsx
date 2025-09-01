@@ -141,15 +141,6 @@ export default function Footer() {
                 <button 
                   onClick={() => navigateWithMessage("/faq")}
                   className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
-                  data-testid="link-faq"
-                >
-                  FAQ
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => navigateWithMessage("/help-center")}
-                  className="text-gray-300 hover:text-white transition-colors text-xs cursor-pointer" 
                   data-testid="link-help-center"
                 >
                   Help Center
