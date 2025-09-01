@@ -326,7 +326,7 @@ function setupOAuthStrategies() {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "/auth/google/callback"
-    }, async (accessToken, refreshToken, profile, done) => {
+    }, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
       try {
         // Check if user exists with Google ID
         let user = await storage.getUserByProviderId('google', profile.id);
@@ -367,7 +367,7 @@ function setupOAuthStrategies() {
       clientSecret: process.env.FACEBOOK_APP_SECRET,
       callbackURL: "/auth/facebook/callback",
       profileFields: ['id', 'emails', 'name', 'picture.type(large)']
-    }, async (accessToken, refreshToken, profile, done) => {
+    }, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
       try {
         let user = await storage.getUserByProviderId('facebook', profile.id);
         
@@ -403,7 +403,7 @@ function setupOAuthStrategies() {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       callbackURL: "/auth/github/callback"
-    }, async (accessToken, refreshToken, profile, done) => {
+    }, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
       try {
         let user = await storage.getUserByProviderId('github', profile.id);
         
@@ -440,7 +440,7 @@ function setupOAuthStrategies() {
       consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
       callbackURL: "/auth/twitter/callback",
       includeEmail: true
-    }, async (token, tokenSecret, profile, done) => {
+    }, async (token: string, tokenSecret: string, profile: any, done: any) => {
       try {
         let user = await storage.getUserByProviderId('twitter', profile.id);
         
