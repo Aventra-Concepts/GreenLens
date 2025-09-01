@@ -130,10 +130,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
 
   // OAuth Routes
+  // Check available OAuth providers
+  app.get('/api/auth/providers', (req, res) => {
+    const availableProviders = {
+      google: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
+      facebook: !!(process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET),
+      github: !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET),
+      twitter: !!(process.env.TWITTER_CONSUMER_KEY && process.env.TWITTER_CONSUMER_SECRET)
+    };
+    res.json(availableProviders);
+  });
+  
   // Google OAuth
-  app.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
-  );
+  app.get('/auth/google', (req, res, next) => {
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+      return res.redirect('/auth?error=google_not_configured');
+    }
+    passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+  });
 
   app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/login?error=google_auth_failed' }),
@@ -144,9 +158,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   // Facebook OAuth
-  app.get('/auth/facebook',
-    passport.authenticate('facebook', { scope: ['email'] })
-  );
+  app.get('/auth/facebook', (req, res, next) => {
+    if (!process.env.FACEBOOK_APP_ID || !process.env.FACEBOOK_APP_SECRET) {
+      return res.redirect('/auth?error=facebook_not_configured');
+    }
+    passport.authenticate('facebook', { scope: ['email'] })(req, res, next);
+  });
 
   app.get('/auth/facebook/callback',
     passport.authenticate('facebook', { failureRedirect: '/login?error=facebook_auth_failed' }),
@@ -156,9 +173,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   // GitHub OAuth
-  app.get('/auth/github',
-    passport.authenticate('github', { scope: ['user:email'] })
-  );
+  app.get('/auth/github', (req, res, next) => {
+    if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
+      return res.redirect('/auth?error=github_not_configured');
+    }
+    passport.authenticate('github', { scope: ['user:email'] })(req, res, next);
+  });
 
   app.get('/auth/github/callback',
     passport.authenticate('github', { failureRedirect: '/login?error=github_auth_failed' }),
@@ -168,9 +188,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   // Twitter OAuth
-  app.get('/auth/twitter',
-    passport.authenticate('twitter')
-  );
+  app.get('/auth/twitter', (req, res, next) => {
+    if (!process.env.TWITTER_CONSUMER_KEY || !process.env.TWITTER_CONSUMER_SECRET) {
+      return res.redirect('/auth?error=twitter_not_configured');
+    }
+    passport.authenticate('twitter')(req, res, next);
+  });
 
   app.get('/auth/twitter/callback',
     passport.authenticate('twitter', { failureRedirect: '/login?error=twitter_auth_failed' }),

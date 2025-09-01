@@ -79,6 +79,61 @@ export default function AuthPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
+  // Check for OAuth authentication errors
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    
+    if (error) {
+      let errorMessage = "";
+      let errorTitle = "Authentication Error";
+      
+      switch (error) {
+        case 'google_not_configured':
+          errorTitle = "Google Login Unavailable";
+          errorMessage = "Google login is currently not configured. Please use email/password to sign in.";
+          break;
+        case 'facebook_not_configured':
+          errorTitle = "Facebook Login Unavailable";
+          errorMessage = "Facebook login is currently not configured. Please use email/password to sign in.";
+          break;
+        case 'github_not_configured':
+          errorTitle = "GitHub Login Unavailable";
+          errorMessage = "GitHub login is currently not configured. Please use email/password to sign in.";
+          break;
+        case 'twitter_not_configured':
+          errorTitle = "Twitter Login Unavailable";
+          errorMessage = "Twitter login is currently not configured. Please use email/password to sign in.";
+          break;
+        case 'google_auth_failed':
+          errorMessage = "Google authentication failed. Please try again or use email/password login.";
+          break;
+        case 'facebook_auth_failed':
+          errorMessage = "Facebook authentication failed. Please try again or use email/password login.";
+          break;
+        case 'github_auth_failed':
+          errorMessage = "GitHub authentication failed. Please try again or use email/password login.";
+          break;
+        case 'twitter_auth_failed':
+          errorMessage = "Twitter authentication failed. Please try again or use email/password login.";
+          break;
+        default:
+          errorMessage = "Authentication failed. Please try again.";
+      }
+      
+      if (errorMessage) {
+        toast({
+          title: errorTitle,
+          description: errorMessage,
+          variant: "destructive",
+        });
+        
+        // Clear the error parameter from URL
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, [toast]);
+
   // Redirect if already authenticated
   useEffect(() => {
     if (!isLoading && user) {
