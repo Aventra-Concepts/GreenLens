@@ -227,7 +227,7 @@ export function setupAuth(app: Express) {
 
   // Login endpoint
   app.post("/api/login", authLimiter, (req, res, next) => {
-    passport.authenticate("local", (err: any, user: User | false, info: any) => {
+    passport.authenticate("local", (err: any, user: DBUser | false, info: any) => {
       if (err) {
         return res.status(500).json({ message: "Login failed" });
       }
@@ -355,7 +355,7 @@ function setupOAuthStrategies() {
         await storage.updateUserLastLogin(user.id);
         return done(null, user);
       } catch (error) {
-        return done(error, null);
+        return done(error, false);
       }
     }));
   }
@@ -392,7 +392,7 @@ function setupOAuthStrategies() {
         await storage.updateUserLastLogin(user.id);
         return done(null, user);
       } catch (error) {
-        return done(error, null);
+        return done(error, false);
       }
     }));
   }
@@ -428,7 +428,7 @@ function setupOAuthStrategies() {
         await storage.updateUserLastLogin(user.id);
         return done(null, user);
       } catch (error) {
-        return done(error, null);
+        return done(error, false);
       }
     }));
   }
@@ -465,7 +465,7 @@ function setupOAuthStrategies() {
         await storage.updateUserLastLogin(user.id);
         return done(null, user);
       } catch (error) {
-        return done(error, null);
+        return done(error, false);
       }
     }));
   }
