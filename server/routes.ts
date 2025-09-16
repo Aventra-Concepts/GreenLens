@@ -992,10 +992,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if payment providers are configured
-      const hasStripe = !!process.env.STRIPE_SECRET_KEY;
       const hasCashfree = !!(process.env.CASHFREE_CLIENT_ID && process.env.CASHFREE_CLIENT_SECRET);
+      const hasPayPal = !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
       
-      if (!hasStripe && !hasCashfree) {
+      if (!hasCashfree && !hasPayPal) {
         // Demo mode - return a success URL without actual payment processing
         console.log("🚀 Demo Mode: Payment providers not configured, simulating successful checkout");
         return res.json({ 

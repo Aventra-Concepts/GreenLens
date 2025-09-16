@@ -94,38 +94,6 @@ const SubscriptionUpgradeModal = ({ isOpen, onClose, onSuccess }: {
   onClose: () => void;
   onSuccess: () => void;
 }) => {
-  const [clientSecret, setClientSecret] = useState("");
-  const [isCreatingSubscription, setIsCreatingSubscription] = useState(false);
-  const { toast } = useToast();
-
-  const createSubscription = async () => {
-    setIsCreatingSubscription(true);
-    try {
-      const response = await apiRequest("POST", "/api/garden-monitoring/subscription/create");
-      const data = await response.json();
-      
-      if (data.clientSecret) {
-        setClientSecret(data.clientSecret);
-      } else {
-        throw new Error(data.message || "Failed to create subscription");
-      }
-    } catch (error: any) {
-      toast({
-        title: "Subscription Error",
-        description: error.message || "Failed to create subscription",
-        variant: "destructive",
-      });
-      onClose();
-    } finally {
-      setIsCreatingSubscription(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen && !clientSecret) {
-      createSubscription();
-    }
-  }, [isOpen]);
 
 
   return (
@@ -154,21 +122,7 @@ const SubscriptionUpgradeModal = ({ isOpen, onClose, onSuccess }: {
             </ul>
           </div>
 
-          {isCreatingSubscription ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <span className="ml-3">Setting up your subscription...</span>
-            </div>
-          ) : clientSecret ? (
-            <PremiumContactForm onSuccess={onSuccess} />
-          ) : (
-            <div className="text-center py-4">
-              <p>Unable to initialize payment. Please try again.</p>
-              <Button onClick={createSubscription} className="mt-2">
-                Retry
-              </Button>
-            </div>
-          )}
+          <PremiumContactForm onSuccess={onSuccess} />
         </div>
       </DialogContent>
     </Dialog>
