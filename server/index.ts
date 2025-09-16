@@ -1,6 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { registerStripeSubscriptionRoutes } from "./routes/stripe-subscriptions";
 import { setupVite, serveStatic, log } from "./vite";
 import { activityTracker } from "./middleware/activityTracker";
 import { scheduledService } from "./services/scheduledService";
@@ -91,8 +90,6 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
   
-  // Register Stripe subscription routes
-  registerStripeSubscriptionRoutes(app);
 
   // Use centralized error handler
   app.use(errorHandler);

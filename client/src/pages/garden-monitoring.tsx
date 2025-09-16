@@ -29,11 +29,7 @@ import {
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
 
-// Stripe setup
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
 
 interface GardenSubscriptionStatus {
   active: boolean;
@@ -47,68 +43,48 @@ interface GardenStats {
   completedThisWeek: number;
 }
 
-// Subscription Payment Form Component
-const SubscriptionPaymentForm = ({ onSuccess }: { onSuccess: () => void }) => {
-  const stripe = useStripe();
-  const elements = useElements();
+// Simple Contact Support Component for Premium Features
+const PremiumContactForm = ({ onSuccess }: { onSuccess: () => void }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!stripe || !elements) {
-      return;
-    }
-
+  const handleContactSupport = async () => {
     setIsLoading(true);
-
-    try {
-      const { error } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/garden-monitoring?success=true`,
-        },
-      });
-
-      if (error) {
-        toast({
-          title: "Payment Failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Payment Successful",
-          description: "Welcome to Garden Monitoring Premium!",
-        });
-        onSuccess();
-      }
-    } catch (error) {
-      toast({
-        title: "Payment Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
+    
+    // Open email client
+    window.open("mailto:support@example.com?subject=Garden Monitoring Premium&body=I'm interested in Garden Monitoring Premium subscription. Please help me set up payment.", "_blank");
+    
+    toast({
+      title: "Support Contacted",
+      description: "We'll get back to you within 24 hours to set up your premium subscription.",
+    });
+    
+    setTimeout(() => {
       setIsLoading(false);
-    }
+      onSuccess();
+    }, 2000);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-900">
-        <PaymentElement />
+    <div className="space-y-6">
+      <div className="p-6 border rounded-lg bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-center">
+        <Crown className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          Premium Setup in Progress
+        </h3>
+        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+          Payment processing is being set up. Our team will contact you to arrange your premium subscription.
+        </p>
       </div>
       <Button 
-        type="submit" 
-        disabled={!stripe || isLoading}
-        className="w-full"
-        data-testid="button-confirm-payment"
+        onClick={handleContactSupport}
+        disabled={isLoading}
+        className="w-full bg-blue-600 hover:bg-blue-700"
+        data-testid="button-contact-premium-support"
       >
-        {isLoading ? "Processing..." : "Confirm Payment - $95/year"}
+        {isLoading ? "Contacting Support..." : "Contact Support - $95/year"}
       </Button>
-    </form>
+    </div>
   );
 };
 
@@ -151,21 +127,6 @@ const SubscriptionUpgradeModal = ({ isOpen, onClose, onSuccess }: {
     }
   }, [isOpen]);
 
-  if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent data-testid="dialog-payment-config">
-          <DialogHeader>
-            <DialogTitle>Payment System Configuration</DialogTitle>
-            <DialogDescription>
-              Payment processing is being configured. Please try again shortly.
-            </DialogDescription>
-          </DialogHeader>
-          <Button onClick={onClose}>Close</Button>
-        </DialogContent>
-      </Dialog>
-    );
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -199,9 +160,7 @@ const SubscriptionUpgradeModal = ({ isOpen, onClose, onSuccess }: {
               <span className="ml-3">Setting up your subscription...</span>
             </div>
           ) : clientSecret ? (
-            <Elements stripe={stripePromise} options={{ clientSecret }}>
-              <SubscriptionPaymentForm onSuccess={onSuccess} />
-            </Elements>
+            <PremiumContactForm onSuccess={onSuccess} />
           ) : (
             <div className="text-center py-4">
               <p>Unable to initialize payment. Please try again.</p>

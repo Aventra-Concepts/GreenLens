@@ -2976,18 +2976,18 @@ export type InsertPerformanceMetric = z.infer<typeof insertPerformanceMetricSche
 // ============================================================================
 
 // Transaction Categories for Income and Expenses
-export const transactionCategories = pgTable("transaction_categories", {
+export const transactionCategories: any = pgTable("transaction_categories", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: varchar("name").notNull(),
   type: varchar("type").notNull(), // 'income', 'expense'
   description: text("description"),
-  parentCategoryId: varchar("parent_category_id").references(() => transactionCategories.id),
+  parentCategoryId: varchar("parent_category_id").references((): any => transactionCategories.id),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Financial Transactions - Main transaction table
-export const financialTransactions = pgTable("financial_transactions", {
+export const financialTransactions: any = pgTable("financial_transactions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   transactionDate: date("transaction_date").notNull(),
   amount: decimal("amount", { precision: 15, scale: 2 }).notNull(),
@@ -3028,7 +3028,7 @@ export const financialTransactions = pgTable("financial_transactions", {
   
   // Linking
   invoiceId: varchar("invoice_id").references(() => invoices.id),
-  receiptId: varchar("receipt_id").references(() => receipts.id),
+  receiptId: varchar("receipt_id").references((): any => receipts.id),
   
   // Metadata
   createdBy: varchar("created_by").references(() => users.id),
@@ -3104,7 +3104,7 @@ export const invoiceItems = pgTable("invoice_items", {
 });
 
 // Receipts
-export const receipts = pgTable("receipts", {
+export const receipts: any = pgTable("receipts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   receiptNumber: varchar("receipt_number").notNull().unique(),
   receiptDate: date("receipt_date").notNull(),
@@ -3121,7 +3121,7 @@ export const receipts = pgTable("receipts", {
   
   // References
   invoiceId: varchar("invoice_id").references(() => invoices.id),
-  transactionId: varchar("transaction_id").references(() => financialTransactions.id),
+  transactionId: varchar("transaction_id").references((): any => financialTransactions.id),
   
   // Gateway details
   gatewayProvider: varchar("gateway_provider"),

@@ -1,18 +1,11 @@
-import { useState, useEffect } from "react";
-import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { Loader2, Crown, Check, ArrowLeft } from "lucide-react";
+import { Crown, Check, ArrowLeft, CreditCard, Mail } from "lucide-react";
 import { Link } from "wouter";
-
-// Make sure to call `loadStripe` outside of a component's render to avoid
-// recreating the `Stripe` object on every render.
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
 
 interface SubscriptionPlan {
   planId: string;
@@ -58,187 +51,124 @@ const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   }
 ];
 
-const CheckoutForm = ({ selectedPlan }: { selectedPlan: SubscriptionPlan }) => {
-  const stripe = useStripe();
-  const elements = useElements();
+const ContactSupportForm = ({ selectedPlan }: { selectedPlan: SubscriptionPlan }) => {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
-    }
-
+  const handleContactSupport = async () => {
     setIsProcessing(true);
+    
+    const emailBody = encodeURIComponent(`Hi,
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/subscription/success?plan=${selectedPlan.planId}`,
-      },
+I'm interested in subscribing to the ${selectedPlan.name} at ${selectedPlan.formattedPrice}/month.
+
+Please help me set up payment for this subscription.
+
+Thank you!`);
+
+    window.open(`mailto:support@example.com?subject=Subscription Request - ${selectedPlan.name}&body=${emailBody}`, "_blank");
+    
+    toast({
+      title: "Support Contacted",
+      description: "We'll contact you within 24 hours to set up your subscription.",
     });
-
-    if (error) {
-      toast({
-        title: "Payment Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Payment Successful",
-        description: `Welcome to ${selectedPlan.name}!`,
-      });
-    }
-
-    setIsProcessing(false);
+    
+    setTimeout(() => {
+      setIsProcessing(false);
+    }, 2000);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-white rounded-lg border p-6">
-        <h3 className="text-lg font-semibold mb-4">Payment Information</h3>
-        <PaymentElement />
+    <div className="space-y-6">
+      <div className="p-6 border rounded-lg bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-center">
+        <CreditCard className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          Payment Setup in Progress
+        </h3>
+        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+          We're currently setting up secure payment processing. Our team will contact you directly to arrange payment.
+        </p>
       </div>
-      
       <Button 
-        type="submit" 
-        disabled={!stripe || isProcessing}
-        className="w-full bg-green-600 hover:bg-green-700 py-3"
-        size="lg"
+        onClick={handleContactSupport}
+        disabled={isProcessing}
+        className="w-full bg-blue-600 hover:bg-blue-700"
+        data-testid="button-contact-support"
       >
         {isProcessing ? (
-          <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Processing...
-          </>
+          <div className="flex items-center gap-2">
+            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+            Contacting Support...
+          </div>
         ) : (
-          <>
-            <Crown className="h-4 w-4 mr-2" />
-            Subscribe to {selectedPlan.name} - {selectedPlan.formattedPrice}/month
-          </>
+          <div className="flex items-center gap-2">
+            <Mail className="h-4 w-4" />
+            Contact Support - {selectedPlan.formattedPrice}/month
+          </div>
         )}
       </Button>
-      
-      <p className="text-xs text-gray-500 text-center">
-        Your subscription will automatically renew monthly. Cancel anytime from your account settings.
-      </p>
-    </form>
+    </div>
   );
 };
 
 export default function SubscriptionCheckout() {
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>(SUBSCRIPTION_PLANS[0]);
-  const [clientSecret, setClientSecret] = useState("");
-  const [isLoadingPayment, setIsLoadingPayment] = useState(false);
-  const { toast } = useToast();
-
-  const createSubscription = async (planId: string) => {
-    setIsLoadingPayment(true);
-    try {
-      const response = await apiRequest("POST", "/api/create-subscription", { planId });
-      const data = await response.json();
-      setClientSecret(data.clientSecret);
-    } catch (error) {
-      toast({
-        title: "Setup Failed",
-        description: "Unable to setup payment. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingPayment(false);
-    }
-  };
-
-  useEffect(() => {
-    createSubscription(selectedPlan.planId);
-  }, [selectedPlan.planId]);
-
-  if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-md mx-auto">
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-yellow-600 mb-4">⚠️</div>
-              <h3 className="text-lg font-semibold mb-2">Payment Setup Required</h3>
-              <p className="text-gray-600">
-                Stripe payment integration is not configured. Please contact support to enable subscriptions.
-              </p>
-              <Link href="/">
-                <Button className="mt-4" variant="outline">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Home
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
+  const [selectedPlanId, setSelectedPlanId] = useState<string>('premium');
+  const selectedPlan = SUBSCRIPTION_PLANS.find(plan => plan.planId === selectedPlanId) || SUBSCRIPTION_PLANS[0];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <Link href="/">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+        <div className="mb-8">
+          <Link href="/pricing">
+            <Button variant="outline" size="sm" className="mb-4 flex items-center gap-2" data-testid="button-back-pricing">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Pricing
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Choose Your Plan</h1>
-          <p className="text-gray-600 mt-2">Unlock the full potential of your garden with GreenLens Premium</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Complete Your Subscription</h1>
+          <p className="text-gray-600 dark:text-gray-300 mt-2">
+            Choose your plan and we'll help you get set up
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Plan Selection */}
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold mb-4">Select Plan</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Select Your Plan</h2>
+            
             {SUBSCRIPTION_PLANS.map((plan) => (
               <Card 
                 key={plan.planId} 
                 className={`cursor-pointer transition-all ${
-                  selectedPlan.planId === plan.planId 
-                    ? 'ring-2 ring-green-500 bg-green-50' 
-                    : 'hover:shadow-md'
-                } ${plan.popular ? 'border-yellow-400' : ''}`}
-                onClick={() => setSelectedPlan(plan)}
+                  selectedPlanId === plan.planId 
+                    ? 'ring-2 ring-blue-500 border-blue-500' 
+                    : 'hover:border-gray-400'
+                }`}
+                onClick={() => setSelectedPlanId(plan.planId)}
+                data-testid={`card-plan-${plan.planId}`}
               >
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        {plan.name}
-                        {plan.popular && (
-                          <Badge className="bg-yellow-400 text-yellow-900">Most Popular</Badge>
-                        )}
-                      </CardTitle>
-                      <div className="text-2xl font-bold text-green-600 mt-1">
-                        {plan.formattedPrice}<span className="text-sm font-normal text-gray-500">/month</span>
+                    <CardTitle className="flex items-center gap-2">
+                      {plan.popular && <Crown className="h-5 w-5 text-yellow-500" />}
+                      {plan.name}
+                      {plan.popular && <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">Popular</Badge>}
+                    </CardTitle>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {plan.formattedPrice}
                       </div>
-                    </div>
-                    <div className={`w-4 h-4 rounded-full border-2 ${
-                      selectedPlan.planId === plan.planId 
-                        ? 'bg-green-500 border-green-500' 
-                        : 'border-gray-300'
-                    }`}>
-                      {selectedPlan.planId === plan.planId && (
-                        <Check className="w-3 h-3 text-white ml-0.5 mt-0.5" />
-                      )}
+                      <div className="text-sm text-gray-500">per month</div>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
                     {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center text-sm">
-                        <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                        {feature}
+                      <li key={index} className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                        <span>{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -247,60 +177,55 @@ export default function SubscriptionCheckout() {
             ))}
           </div>
 
-          {/* Checkout Form */}
+          {/* Payment Section */}
           <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Complete Your Subscription</h2>
-              
-              {/* Order Summary */}
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle className="text-lg">Order Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center mb-2">
-                    <span>{selectedPlan.name}</span>
-                    <span className="font-semibold">{selectedPlan.formattedPrice}</span>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Payment Information</h2>
+            
+            {/* Order Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{selectedPlan.name}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">Monthly subscription</p>
                   </div>
-                  <Separator className="my-3" />
-                  <div className="flex justify-between items-center font-semibold">
-                    <span>Total per month</span>
-                    <span className="text-green-600">{selectedPlan.formattedPrice}</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Billed monthly. Cancel anytime from your account settings.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+                  <p className="text-lg font-semibold">{selectedPlan.formattedPrice}</p>
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between text-lg font-semibold">
+                  <span>Total</span>
+                  <span className="text-green-600">{selectedPlan.formattedPrice}/month</span>
+                </div>
+                
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  • Cancel anytime
+                  • 30-day money-back guarantee
+                  • Secure payment processing
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Stripe Payment Form */}
-            {isLoadingPayment ? (
-              <div className="text-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                <p>Setting up payment...</p>
-              </div>
-            ) : clientSecret ? (
-              <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <CheckoutForm selectedPlan={selectedPlan} />
-              </Elements>
-            ) : (
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-red-600 mb-4">⚠️</div>
-                  <h3 className="text-lg font-semibold mb-2">Payment Setup Failed</h3>
-                  <p className="text-gray-600 mb-4">
-                    Unable to initialize payment. Please try refreshing the page or contact support.
-                  </p>
-                  <Button 
-                    onClick={() => createSubscription(selectedPlan.planId)}
-                    variant="outline"
-                  >
-                    Try Again
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+            {/* Payment Form */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ContactSupportForm selectedPlan={selectedPlan} />
+                
+                <div className="mt-6 flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+                  <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <span>
+                    Your subscription request has been received. We'll contact you within 24 hours to set up secure payment processing.
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

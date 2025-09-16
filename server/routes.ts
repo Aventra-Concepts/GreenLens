@@ -1100,16 +1100,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/webhooks/stripe", async (req, res) => {
-    try {
-      const signature = req.headers['stripe-signature'] as string;
-      await paymentService.handleWebhook('stripe', req.body, signature);
-      res.json({ received: true });
-    } catch (error) {
-      console.error("Stripe webhook error:", error);
-      res.status(400).json({ message: "Webhook error" });
-    }
-  });
 
   app.post("/api/webhooks/razorpay", async (req, res) => {
     try {
