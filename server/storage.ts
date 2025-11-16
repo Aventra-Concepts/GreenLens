@@ -86,14 +86,31 @@ import {
   // Garden Monitoring types
   gardenPlants,
   careActivities,
+  plantDiseaseLogs,
   plantMeasurements,
   environmentalReadings,
   gardenReports,
   gardenSubscriptionPlans,
+  plantTimelineEntries,
+  plantPhotos,
+  microclimateLogs,
+  gardenBeds,
+  bedPlantAssignments,
+  cropRotationHistory,
+  plantingSchedules,
+  seedsInventory,
+  suppliesInventory,
+  gardenExpenses,
+  harvestLogs,
+  plantExpertTickets,
+  sharedPlantLinks,
+  emailDigestPreferences,
   type GardenPlant,
   type InsertGardenPlant,
   type CareActivity,
   type InsertCareActivity,
+  type PlantDiseaseLog,
+  type InsertPlantDiseaseLog,
   type PlantMeasurement,
   type InsertPlantMeasurement,
   type EnvironmentalReading,
@@ -101,6 +118,18 @@ import {
   type GardenReport,
   type InsertGardenReport,
   type GardenSubscriptionPlan,
+  type PlantTimelineEntry,
+  type InsertPlantTimelineEntry,
+  type PlantPhoto,
+  type InsertPlantPhoto,
+  type SeedsInventory,
+  type InsertSeedsInventory,
+  type SuppliesInventory,
+  type InsertSuppliesInventory,
+  type GardenExpense,
+  type InsertGardenExpense,
+  type HarvestLog,
+  type InsertHarvestLog,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, gt, lt, gte, lte, asc, desc, like, sql, ne, inArray, count, sum, isNull } from "drizzle-orm";
@@ -282,9 +311,12 @@ export interface IStorage {
 
   // Garden Monitoring operations
   getGardenPlants(userId: string): Promise<GardenPlant[]>;
+  getGardenPlant(plantId: string, userId: string): Promise<GardenPlant | null>;
   createGardenPlant(plant: InsertGardenPlant): Promise<GardenPlant>;
   updateGardenPlant(plantId: string, userId: string, updates: Partial<InsertGardenPlant>): Promise<GardenPlant | null>;
   deleteGardenPlant(plantId: string, userId: string): Promise<void>;
+  getPlantDiseaseLogs(plantId: string, userId: string): Promise<PlantDiseaseLog[]>;
+  createPlantDiseaseLog(log: InsertPlantDiseaseLog): Promise<PlantDiseaseLog>;
   getCareActivities(userId: string, plantId?: string, upcomingOnly?: boolean): Promise<CareActivity[]>;
   createCareActivity(activity: InsertCareActivity): Promise<CareActivity>;
   completeCareActivity(activityId: string, userId: string, notes?: string): Promise<CareActivity | null>;
@@ -295,6 +327,110 @@ export interface IStorage {
   getGardenDashboardStats(userId: string): Promise<any>;
   generateGardenReport(userId: string, reportType: string, title: string): Promise<GardenReport>;
   getGardenReports(userId: string): Promise<GardenReport[]>;
+  
+  // Plant Timeline operations
+  getPlantTimeline(plantId: string, userId: string): Promise<PlantTimelineEntry[]>;
+  createTimelineEntry(entry: InsertPlantTimelineEntry): Promise<PlantTimelineEntry>;
+  updateTimelineEntry(entryId: string, userId: string, updates: Partial<InsertPlantTimelineEntry>): Promise<PlantTimelineEntry | null>;
+  deleteTimelineEntry(entryId: string, userId: string): Promise<void>;
+  
+  // Plant Photo operations
+  getPlantPhotos(plantId: string, userId: string): Promise<PlantPhoto[]>;
+  createPlantPhoto(photo: InsertPlantPhoto): Promise<PlantPhoto>;
+  updatePlantPhoto(photoId: string, userId: string, updates: Partial<InsertPlantPhoto>): Promise<PlantPhoto | null>;
+  deletePlantPhoto(photoId: string, userId: string): Promise<void>;
+  setFeaturedPhoto(photoId: string, plantId: string, userId: string): Promise<void>;
+  
+  // Microclimate Tracking operations
+  getMicroclimateLogs(userId: string): Promise<any[]>;
+  createMicroclimateLog(log: any): Promise<any>;
+  
+  // Planning & Layout operations
+  getGardenBeds(userId: string): Promise<any[]>;
+  getGardenBed(bedId: string, userId: string): Promise<any | null>;
+  createGardenBed(bed: any): Promise<any>;
+  updateGardenBed(bedId: string, userId: string, updates: any): Promise<any | null>;
+  deleteGardenBed(bedId: string, userId: string): Promise<void>;
+  
+  getBedPlantAssignments(userId: string): Promise<any[]>;
+  getBedPlantAssignmentsByBed(bedId: string): Promise<any[]>;
+  createBedPlantAssignment(assignment: any): Promise<any>;
+  updateBedPlantAssignment(assignmentId: string, userId: string, updates: any): Promise<any | null>;
+  deleteBedPlantAssignment(assignmentId: string, userId: string): Promise<void>;
+  
+  getCropRotationHistory(userId: string): Promise<any[]>;
+  getCropRotationHistoryByBed(bedId: string): Promise<any[]>;
+  createCropRotationHistory(history: any): Promise<any>;
+  checkRotationConflict(bedId: string, plantFamily: string): Promise<any>;
+  
+  getPlantingSchedules(userId: string): Promise<any[]>;
+  getPlantingSchedule(scheduleId: string, userId: string): Promise<any | null>;
+  createPlantingSchedule(schedule: any): Promise<any>;
+  updatePlantingSchedule(scheduleId: string, userId: string, updates: any): Promise<any | null>;
+  deletePlantingSchedule(scheduleId: string, userId: string): Promise<void>;
+  
+  // Inventory & Costs operations
+  getSeedsInventory(userId: string): Promise<any[]>;
+  getSeedsItem(itemId: string, userId: string): Promise<any | null>;
+  createSeedsItem(item: any): Promise<any>;
+  updateSeedsItem(itemId: string, userId: string, updates: any): Promise<any | null>;
+  deleteSeedsItem(itemId: string, userId: string): Promise<void>;
+  
+  getSuppliesInventory(userId: string): Promise<any[]>;
+  getSuppliesItem(itemId: string, userId: string): Promise<any | null>;
+  createSuppliesItem(item: any): Promise<any>;
+  updateSuppliesItem(itemId: string, userId: string, updates: any): Promise<any | null>;
+  deleteSuppliesItem(itemId: string, userId: string): Promise<void>;
+  getLowStockSupplies(userId: string): Promise<any[]>;
+  
+  getGardenExpenses(userId: string): Promise<any[]>;
+  getGardenExpense(expenseId: string, userId: string): Promise<any | null>;
+  createGardenExpense(expense: any): Promise<any>;
+  updateGardenExpense(expenseId: string, userId: string, updates: any): Promise<any | null>;
+  deleteGardenExpense(expenseId: string, userId: string): Promise<void>;
+  getExpensesByDateRange(userId: string, startDate: string, endDate: string): Promise<any[]>;
+  
+  getHarvestLogs(userId: string): Promise<any[]>;
+  getHarvestLog(logId: string, userId: string): Promise<any | null>;
+  createHarvestLog(log: any): Promise<any>;
+  updateHarvestLog(logId: string, userId: string, updates: any): Promise<any | null>;
+  deleteHarvestLog(logId: string, userId: string): Promise<void>;
+  getHarvestsByDateRange(userId: string, startDate: string, endDate: string): Promise<any[]>;
+  getInventoryFinancials(userId: string): Promise<{ totalExpenses: number; totalRevenue: number; netProfit: number }>;
+  
+  // Analytics operations
+  getWateringFrequencyVsHealth(userId: string): Promise<any>;
+  getTasksOverdueHeatmap(userId: string): Promise<any>;
+  getHarvestAnalytics(userId: string, groupBy: 'plant' | 'month' | 'bed'): Promise<any>;
+  getSuccessRateByVariety(userId: string): Promise<any>;
+  getSuccessRateBySeason(userId: string): Promise<any>;
+  
+  // Social & Sharing - Plant Expert Tickets operations
+  createPlantExpertTicket(ticket: any): Promise<any>;
+  getPlantExpertTicket(ticketId: string, userId: string): Promise<any | null>;
+  getPlantExpertTickets(userId: string, status?: string): Promise<any[]>;
+  getPlantExpertTicketsByPlant(plantId: string, userId: string): Promise<any[]>;
+  updatePlantExpertTicket(ticketId: string, userId: string, updates: any): Promise<any | null>;
+  answerPlantExpertTicket(ticketId: string, expertAnswer: string, expertPhotoUrls?: string[]): Promise<any | null>;
+  getPendingExpertTickets(priorityOrder?: boolean): Promise<any[]>;
+  assignExpertTicket(ticketId: string, expertId: string): Promise<any | null>;
+  
+  // Social & Sharing - Shared Plant Links operations
+  createSharedPlantLink(link: any): Promise<any>;
+  getSharedPlantLink(linkId: string): Promise<any | null>;
+  getSharedPlantLinkByToken(token: string): Promise<any | null>;
+  getSharedPlantLinks(userId: string): Promise<any[]>;
+  updateSharedPlantLink(linkId: string, userId: string, updates: any): Promise<any | null>;
+  deleteSharedPlantLink(linkId: string, userId: string): Promise<void>;
+  incrementShareLinkView(token: string): Promise<void>;
+  incrementShareLinkShare(linkId: string, userId: string): Promise<void>;
+  
+  // Social & Sharing - Email Digest Preferences operations
+  getEmailDigestPreferences(userId: string): Promise<any | null>;
+  upsertEmailDigestPreferences(userId: string, preferences: any): Promise<any>;
+  updateEmailDigestPreferences(userId: string, updates: any): Promise<any | null>;
+  getUsersWithDigestEnabled(day?: string): Promise<any[]>;
+  updateLastDigestSent(userId: string): Promise<void>;
   
   // System Settings operations
   getSystemSettings(): Promise<any>;
@@ -2120,6 +2256,17 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(gardenPlants.createdAt));
   }
 
+  async getGardenPlant(plantId: string, userId: string): Promise<GardenPlant | null> {
+    const [result] = await db.select()
+      .from(gardenPlants)
+      .where(and(
+        eq(gardenPlants.id, plantId),
+        eq(gardenPlants.userId, userId),
+        eq(gardenPlants.isActive, true)
+      ));
+    return result || null;
+  }
+
   async createGardenPlant(plant: InsertGardenPlant): Promise<GardenPlant> {
     const [result] = await db
       .insert(gardenPlants)
@@ -2142,6 +2289,24 @@ export class DatabaseStorage implements IStorage {
       .update(gardenPlants)
       .set({ isActive: false, updatedAt: new Date() })
       .where(and(eq(gardenPlants.id, plantId), eq(gardenPlants.userId, userId)));
+  }
+
+  async getPlantDiseaseLogs(plantId: string, userId: string): Promise<PlantDiseaseLog[]> {
+    return await db.select()
+      .from(plantDiseaseLogs)
+      .where(and(
+        eq(plantDiseaseLogs.plantId, plantId),
+        eq(plantDiseaseLogs.userId, userId)
+      ))
+      .orderBy(desc(plantDiseaseLogs.detectionDate));
+  }
+
+  async createPlantDiseaseLog(log: InsertPlantDiseaseLog): Promise<PlantDiseaseLog> {
+    const [result] = await db
+      .insert(plantDiseaseLogs)
+      .values(log)
+      .returning();
+    return result;
   }
 
   async getCareActivities(userId: string, plantId?: string, upcomingOnly?: boolean): Promise<CareActivity[]> {
@@ -2299,6 +2464,756 @@ ${plants.map(plant => `- ${plant.name} (${plant.species}) - Status: ${plant.stat
       .orderBy(desc(gardenReports.generatedAt));
   }
 
+  // Plant Timeline implementations
+  async getPlantTimeline(plantId: string, userId: string): Promise<PlantTimelineEntry[]> {
+    return await db.select()
+      .from(plantTimelineEntries)
+      .where(and(
+        eq(plantTimelineEntries.plantId, plantId),
+        eq(plantTimelineEntries.userId, userId)
+      ))
+      .orderBy(desc(plantTimelineEntries.entryDate));
+  }
+
+  async createTimelineEntry(entry: InsertPlantTimelineEntry): Promise<PlantTimelineEntry> {
+    const [result] = await db
+      .insert(plantTimelineEntries)
+      .values(entry)
+      .returning();
+    return result;
+  }
+
+  async updateTimelineEntry(entryId: string, userId: string, updates: Partial<InsertPlantTimelineEntry>): Promise<PlantTimelineEntry | null> {
+    const [result] = await db
+      .update(plantTimelineEntries)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(and(
+        eq(plantTimelineEntries.id, entryId),
+        eq(plantTimelineEntries.userId, userId)
+      ))
+      .returning();
+    return result || null;
+  }
+
+  async deleteTimelineEntry(entryId: string, userId: string): Promise<void> {
+    await db
+      .delete(plantTimelineEntries)
+      .where(and(
+        eq(plantTimelineEntries.id, entryId),
+        eq(plantTimelineEntries.userId, userId)
+      ));
+  }
+
+  // Plant Photo implementations
+  async getPlantPhotos(plantId: string, userId: string): Promise<PlantPhoto[]> {
+    return await db.select()
+      .from(plantPhotos)
+      .where(and(
+        eq(plantPhotos.plantId, plantId),
+        eq(plantPhotos.userId, userId)
+      ))
+      .orderBy(desc(plantPhotos.captureDate), asc(plantPhotos.displayOrder));
+  }
+
+  async createPlantPhoto(photo: InsertPlantPhoto): Promise<PlantPhoto> {
+    const [result] = await db
+      .insert(plantPhotos)
+      .values(photo)
+      .returning();
+    return result;
+  }
+
+  async updatePlantPhoto(photoId: string, userId: string, updates: Partial<InsertPlantPhoto>): Promise<PlantPhoto | null> {
+    const [result] = await db
+      .update(plantPhotos)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(and(
+        eq(plantPhotos.id, photoId),
+        eq(plantPhotos.userId, userId)
+      ))
+      .returning();
+    return result || null;
+  }
+
+  async deletePlantPhoto(photoId: string, userId: string): Promise<void> {
+    await db
+      .delete(plantPhotos)
+      .where(and(
+        eq(plantPhotos.id, photoId),
+        eq(plantPhotos.userId, userId)
+      ));
+  }
+
+  async setFeaturedPhoto(photoId: string, plantId: string, userId: string): Promise<void> {
+    // First, unset any existing featured photo for this plant
+    await db
+      .update(plantPhotos)
+      .set({ isFeatured: false })
+      .where(and(
+        eq(plantPhotos.plantId, plantId),
+        eq(plantPhotos.userId, userId)
+      ));
+
+    // Then set the new featured photo
+    await db
+      .update(plantPhotos)
+      .set({ isFeatured: true })
+      .where(and(
+        eq(plantPhotos.id, photoId),
+        eq(plantPhotos.userId, userId)
+      ));
+  }
+
+  // Microclimate Tracking implementations
+  async getMicroclimateLogs(userId: string): Promise<any[]> {
+    const logs = await db
+      .select()
+      .from(microclimateLogs)
+      .where(eq(microclimateLogs.userId, userId))
+      .orderBy(desc(microclimateLogs.readingDate))
+      .limit(50);
+    
+    return logs;
+  }
+
+  async createMicroclimateLog(log: any): Promise<any> {
+    const [result] = await db
+      .insert(microclimateLogs)
+      .values(log)
+      .returning();
+    
+    return result;
+  }
+
+  // Planning & Layout implementations
+  async getGardenBeds(userId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(gardenBeds)
+      .where(eq(gardenBeds.userId, userId))
+      .orderBy(desc(gardenBeds.createdAt));
+  }
+
+  async getGardenBed(bedId: string, userId: string): Promise<any | null> {
+    const [bed] = await db
+      .select()
+      .from(gardenBeds)
+      .where(and(
+        eq(gardenBeds.id, bedId),
+        eq(gardenBeds.userId, userId)
+      ));
+    return bed || null;
+  }
+
+  async createGardenBed(bed: any): Promise<any> {
+    const [result] = await db
+      .insert(gardenBeds)
+      .values(bed)
+      .returning();
+    return result;
+  }
+
+  async updateGardenBed(bedId: string, userId: string, updates: any): Promise<any | null> {
+    const [result] = await db
+      .update(gardenBeds)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(and(
+        eq(gardenBeds.id, bedId),
+        eq(gardenBeds.userId, userId)
+      ))
+      .returning();
+    return result || null;
+  }
+
+  async deleteGardenBed(bedId: string, userId: string): Promise<void> {
+    await db
+      .delete(gardenBeds)
+      .where(and(
+        eq(gardenBeds.id, bedId),
+        eq(gardenBeds.userId, userId)
+      ));
+  }
+
+  async getBedPlantAssignments(userId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(bedPlantAssignments)
+      .where(eq(bedPlantAssignments.userId, userId))
+      .orderBy(desc(bedPlantAssignments.plantedDate));
+  }
+
+  async getBedPlantAssignmentsByBed(bedId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(bedPlantAssignments)
+      .where(eq(bedPlantAssignments.bedId, bedId))
+      .orderBy(desc(bedPlantAssignments.plantedDate));
+  }
+
+  async createBedPlantAssignment(assignment: any): Promise<any> {
+    const [result] = await db
+      .insert(bedPlantAssignments)
+      .values(assignment)
+      .returning();
+    return result;
+  }
+
+  async updateBedPlantAssignment(assignmentId: string, userId: string, updates: any): Promise<any | null> {
+    const [result] = await db
+      .update(bedPlantAssignments)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(and(
+        eq(bedPlantAssignments.id, assignmentId),
+        eq(bedPlantAssignments.userId, userId)
+      ))
+      .returning();
+    return result || null;
+  }
+
+  async deleteBedPlantAssignment(assignmentId: string, userId: string): Promise<void> {
+    await db
+      .delete(bedPlantAssignments)
+      .where(and(
+        eq(bedPlantAssignments.id, assignmentId),
+        eq(bedPlantAssignments.userId, userId)
+      ));
+  }
+
+  async getCropRotationHistory(userId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(cropRotationHistory)
+      .where(eq(cropRotationHistory.userId, userId))
+      .orderBy(desc(cropRotationHistory.plantedDate));
+  }
+
+  async getCropRotationHistoryByBed(bedId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(cropRotationHistory)
+      .where(eq(cropRotationHistory.bedId, bedId))
+      .orderBy(desc(cropRotationHistory.plantedDate));
+  }
+
+  async createCropRotationHistory(history: any): Promise<any> {
+    const [result] = await db
+      .insert(cropRotationHistory)
+      .values(history)
+      .returning();
+    return result;
+  }
+
+  async checkRotationConflict(bedId: string, plantFamily: string): Promise<any> {
+    const recentHistory = await db
+      .select()
+      .from(cropRotationHistory)
+      .where(and(
+        eq(cropRotationHistory.bedId, bedId),
+        eq(cropRotationHistory.plantFamily, plantFamily)
+      ))
+      .orderBy(desc(cropRotationHistory.plantedDate))
+      .limit(1);
+    
+    if (recentHistory.length === 0) {
+      return { hasConflict: false, message: 'No previous planting of this family in this bed.' };
+    }
+    
+    const lastPlanting = recentHistory[0];
+    const lastPlantedDate = new Date(lastPlanting.plantedDate);
+    const currentDate = new Date();
+    const monthsSinceLastPlanting = (currentDate.getTime() - lastPlantedDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
+    
+    const recommendedWaitMonths = 12;
+    
+    if (monthsSinceLastPlanting < recommendedWaitMonths) {
+      return {
+        hasConflict: true,
+        message: `Warning: ${plantFamily} was planted here ${Math.floor(monthsSinceLastPlanting)} months ago. Recommended to wait ${recommendedWaitMonths} months between plantings of the same family to prevent disease and pest buildup.`,
+        lastPlanting: lastPlanting,
+        monthsSince: Math.floor(monthsSinceLastPlanting)
+      };
+    }
+    
+    return {
+      hasConflict: false,
+      message: 'Sufficient time has passed since last planting of this family.',
+      lastPlanting: lastPlanting,
+      monthsSince: Math.floor(monthsSinceLastPlanting)
+    };
+  }
+
+  async getPlantingSchedules(userId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(plantingSchedules)
+      .where(eq(plantingSchedules.userId, userId))
+      .orderBy(desc(plantingSchedules.createdAt));
+  }
+
+  async getPlantingSchedule(scheduleId: string, userId: string): Promise<any | null> {
+    const [schedule] = await db
+      .select()
+      .from(plantingSchedules)
+      .where(and(
+        eq(plantingSchedules.id, scheduleId),
+        eq(plantingSchedules.userId, userId)
+      ));
+    return schedule || null;
+  }
+
+  async createPlantingSchedule(schedule: any): Promise<any> {
+    const [result] = await db
+      .insert(plantingSchedules)
+      .values(schedule)
+      .returning();
+    return result;
+  }
+
+  async updatePlantingSchedule(scheduleId: string, userId: string, updates: any): Promise<any | null> {
+    const [result] = await db
+      .update(plantingSchedules)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(and(
+        eq(plantingSchedules.id, scheduleId),
+        eq(plantingSchedules.userId, userId)
+      ))
+      .returning();
+    return result || null;
+  }
+
+  async deletePlantingSchedule(scheduleId: string, userId: string): Promise<void> {
+    await db
+      .delete(plantingSchedules)
+      .where(and(
+        eq(plantingSchedules.id, scheduleId),
+        eq(plantingSchedules.userId, userId)
+      ));
+  }
+
+  // Inventory & Costs operations
+  async getSeedsInventory(userId: string): Promise<any[]> {
+    const seeds = await db
+      .select()
+      .from(seedsInventory)
+      .where(eq(seedsInventory.userId, userId))
+      .orderBy(desc(seedsInventory.createdAt));
+    return seeds;
+  }
+
+  async getSeedsItem(itemId: string, userId: string): Promise<any | null> {
+    const [item] = await db
+      .select()
+      .from(seedsInventory)
+      .where(and(
+        eq(seedsInventory.id, itemId),
+        eq(seedsInventory.userId, userId)
+      ));
+    return item || null;
+  }
+
+  async createSeedsItem(item: any): Promise<any> {
+    const [result] = await db
+      .insert(seedsInventory)
+      .values(item)
+      .returning();
+    return result;
+  }
+
+  async updateSeedsItem(itemId: string, userId: string, updates: any): Promise<any | null> {
+    const [result] = await db
+      .update(seedsInventory)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(and(
+        eq(seedsInventory.id, itemId),
+        eq(seedsInventory.userId, userId)
+      ))
+      .returning();
+    return result || null;
+  }
+
+  async deleteSeedsItem(itemId: string, userId: string): Promise<void> {
+    await db
+      .delete(seedsInventory)
+      .where(and(
+        eq(seedsInventory.id, itemId),
+        eq(seedsInventory.userId, userId)
+      ));
+  }
+
+  async getSuppliesInventory(userId: string): Promise<any[]> {
+    const supplies = await db
+      .select()
+      .from(suppliesInventory)
+      .where(eq(suppliesInventory.userId, userId))
+      .orderBy(desc(suppliesInventory.createdAt));
+    return supplies;
+  }
+
+  async getSuppliesItem(itemId: string, userId: string): Promise<any | null> {
+    const [item] = await db
+      .select()
+      .from(suppliesInventory)
+      .where(and(
+        eq(suppliesInventory.id, itemId),
+        eq(suppliesInventory.userId, userId)
+      ));
+    return item || null;
+  }
+
+  async createSuppliesItem(item: any): Promise<any> {
+    // Check if quantity is below threshold to set low stock flag
+    const isLowStock = Number(item.quantity) <= Number(item.lowStockThreshold || 0);
+    
+    const [result] = await db
+      .insert(suppliesInventory)
+      .values({ ...item, isLowStock })
+      .returning();
+    return result;
+  }
+
+  async updateSuppliesItem(itemId: string, userId: string, updates: any): Promise<any | null> {
+    // Check if quantity is below threshold to update low stock flag
+    let isLowStock = undefined;
+    if (updates.quantity !== undefined || updates.lowStockThreshold !== undefined) {
+      const [currentItem] = await db
+        .select()
+        .from(suppliesInventory)
+        .where(and(
+          eq(suppliesInventory.id, itemId),
+          eq(suppliesInventory.userId, userId)
+        ));
+      
+      if (currentItem) {
+        const quantity = updates.quantity !== undefined ? updates.quantity : currentItem.quantity;
+        const threshold = updates.lowStockThreshold !== undefined ? updates.lowStockThreshold : currentItem.lowStockThreshold;
+        isLowStock = Number(quantity) <= Number(threshold || 0);
+      }
+    }
+
+    const [result] = await db
+      .update(suppliesInventory)
+      .set({ 
+        ...updates, 
+        ...(isLowStock !== undefined ? { isLowStock } : {}),
+        updatedAt: new Date() 
+      })
+      .where(and(
+        eq(suppliesInventory.id, itemId),
+        eq(suppliesInventory.userId, userId)
+      ))
+      .returning();
+    return result || null;
+  }
+
+  async deleteSuppliesItem(itemId: string, userId: string): Promise<void> {
+    await db
+      .delete(suppliesInventory)
+      .where(and(
+        eq(suppliesInventory.id, itemId),
+        eq(suppliesInventory.userId, userId)
+      ));
+  }
+
+  async getLowStockSupplies(userId: string): Promise<any[]> {
+    const supplies = await db
+      .select()
+      .from(suppliesInventory)
+      .where(and(
+        eq(suppliesInventory.userId, userId),
+        eq(suppliesInventory.isLowStock, true)
+      ))
+      .orderBy(desc(suppliesInventory.updatedAt));
+    return supplies;
+  }
+
+  async getGardenExpenses(userId: string): Promise<any[]> {
+    const expenses = await db
+      .select()
+      .from(gardenExpenses)
+      .where(eq(gardenExpenses.userId, userId))
+      .orderBy(desc(gardenExpenses.expenseDate));
+    return expenses;
+  }
+
+  async getGardenExpense(expenseId: string, userId: string): Promise<any | null> {
+    const [expense] = await db
+      .select()
+      .from(gardenExpenses)
+      .where(and(
+        eq(gardenExpenses.id, expenseId),
+        eq(gardenExpenses.userId, userId)
+      ));
+    return expense || null;
+  }
+
+  async createGardenExpense(expense: any): Promise<any> {
+    const [result] = await db
+      .insert(gardenExpenses)
+      .values(expense)
+      .returning();
+    return result;
+  }
+
+  async updateGardenExpense(expenseId: string, userId: string, updates: any): Promise<any | null> {
+    const [result] = await db
+      .update(gardenExpenses)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(and(
+        eq(gardenExpenses.id, expenseId),
+        eq(gardenExpenses.userId, userId)
+      ))
+      .returning();
+    return result || null;
+  }
+
+  async deleteGardenExpense(expenseId: string, userId: string): Promise<void> {
+    await db
+      .delete(gardenExpenses)
+      .where(and(
+        eq(gardenExpenses.id, expenseId),
+        eq(gardenExpenses.userId, userId)
+      ));
+  }
+
+  async getExpensesByDateRange(userId: string, startDate: string, endDate: string): Promise<any[]> {
+    const expenses = await db
+      .select()
+      .from(gardenExpenses)
+      .where(and(
+        eq(gardenExpenses.userId, userId),
+        gte(gardenExpenses.expenseDate, startDate),
+        lte(gardenExpenses.expenseDate, endDate)
+      ))
+      .orderBy(desc(gardenExpenses.expenseDate));
+    return expenses;
+  }
+
+  async getHarvestLogs(userId: string): Promise<any[]> {
+    const logs = await db
+      .select()
+      .from(harvestLogs)
+      .where(eq(harvestLogs.userId, userId))
+      .orderBy(desc(harvestLogs.harvestDate));
+    return logs;
+  }
+
+  async getHarvestLog(logId: string, userId: string): Promise<any | null> {
+    const [log] = await db
+      .select()
+      .from(harvestLogs)
+      .where(and(
+        eq(harvestLogs.id, logId),
+        eq(harvestLogs.userId, userId)
+      ));
+    return log || null;
+  }
+
+  async createHarvestLog(log: any): Promise<any> {
+    const [result] = await db
+      .insert(harvestLogs)
+      .values(log)
+      .returning();
+    return result;
+  }
+
+  async updateHarvestLog(logId: string, userId: string, updates: any): Promise<any | null> {
+    const [result] = await db
+      .update(harvestLogs)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(and(
+        eq(harvestLogs.id, logId),
+        eq(harvestLogs.userId, userId)
+      ))
+      .returning();
+    return result || null;
+  }
+
+  async deleteHarvestLog(logId: string, userId: string): Promise<void> {
+    await db
+      .delete(harvestLogs)
+      .where(and(
+        eq(harvestLogs.id, logId),
+        eq(harvestLogs.userId, userId)
+      ));
+  }
+
+  async getHarvestsByDateRange(userId: string, startDate: string, endDate: string): Promise<any[]> {
+    const logs = await db
+      .select()
+      .from(harvestLogs)
+      .where(and(
+        eq(harvestLogs.userId, userId),
+        gte(harvestLogs.harvestDate, startDate),
+        lte(harvestLogs.harvestDate, endDate)
+      ))
+      .orderBy(desc(harvestLogs.harvestDate));
+    return logs;
+  }
+
+  async getInventoryFinancials(userId: string): Promise<{ totalExpenses: number; totalRevenue: number; netProfit: number }> {
+    // Get total expenses
+    const expensesResult = await db
+      .select({ total: sum(gardenExpenses.amount) })
+      .from(gardenExpenses)
+      .where(eq(gardenExpenses.userId, userId));
+    
+    // Get total revenue
+    const revenueResult = await db
+      .select({ total: sum(harvestLogs.revenue) })
+      .from(harvestLogs)
+      .where(eq(harvestLogs.userId, userId));
+    
+    const totalExpenses = Number(expensesResult[0]?.total || 0);
+    const totalRevenue = Number(revenueResult[0]?.total || 0);
+    const netProfit = totalRevenue - totalExpenses;
+
+    return {
+      totalExpenses,
+      totalRevenue,
+      netProfit
+    };
+  }
+
+  // Analytics operations
+  async getWateringFrequencyVsHealth(userId: string): Promise<any> {
+    const wateringActivities = await db
+      .select({
+        plantId: careActivities.plantId,
+        date: careActivities.completedDate,
+        plantName: gardenPlants.name
+      })
+      .from(careActivities)
+      .leftJoin(gardenPlants, eq(careActivities.plantId, gardenPlants.id))
+      .where(and(
+        eq(careActivities.userId, userId),
+        eq(careActivities.activityType, 'watering'),
+        eq(careActivities.isCompleted, true)
+      ))
+      .orderBy(asc(careActivities.completedDate));
+
+    const healthEvents = await db
+      .select({
+        plantId: plantDiseaseLogs.plantId,
+        date: plantDiseaseLogs.detectedDate,
+        severity: plantDiseaseLogs.severity,
+        plantName: gardenPlants.name
+      })
+      .from(plantDiseaseLogs)
+      .leftJoin(gardenPlants, eq(plantDiseaseLogs.plantId, gardenPlants.id))
+      .where(eq(plantDiseaseLogs.userId, userId))
+      .orderBy(asc(plantDiseaseLogs.detectedDate));
+
+    return { wateringActivities, healthEvents };
+  }
+
+  async getTasksOverdueHeatmap(userId: string): Promise<any> {
+    const tasks = await db
+      .select({
+        id: careActivities.id,
+        plantName: gardenPlants.name,
+        activityType: careActivities.activityType,
+        scheduledDate: careActivities.scheduledDate,
+        completedDate: careActivities.completedDate,
+        isCompleted: careActivities.isCompleted,
+        daysOverdue: sql<number>`CASE WHEN ${careActivities.isCompleted} = false AND ${careActivities.scheduledDate} < NOW() THEN EXTRACT(DAY FROM NOW() - ${careActivities.scheduledDate})::int ELSE 0 END`
+      })
+      .from(careActivities)
+      .leftJoin(gardenPlants, eq(careActivities.plantId, gardenPlants.id))
+      .where(eq(careActivities.userId, userId))
+      .orderBy(desc(careActivities.scheduledDate));
+
+    return tasks;
+  }
+
+  async getHarvestAnalytics(userId: string, groupBy: 'plant' | 'month' | 'bed'): Promise<any> {
+    if (groupBy === 'plant') {
+      const harvestsByPlant = await db
+        .select({
+          plantName: harvestLogs.plantName,
+          variety: harvestLogs.variety,
+          totalYield: sum(harvestLogs.yieldWeight),
+          totalRevenue: sum(harvestLogs.revenue),
+          harvestCount: count(harvestLogs.id)
+        })
+        .from(harvestLogs)
+        .where(eq(harvestLogs.userId, userId))
+        .groupBy(harvestLogs.plantName, harvestLogs.variety);
+      return harvestsByPlant;
+    } else if (groupBy === 'month') {
+      const harvestsByMonth = await db
+        .select({
+          month: sql<string>`TO_CHAR(${harvestLogs.harvestDate}, 'YYYY-MM')`,
+          totalYield: sum(harvestLogs.yieldWeight),
+          totalRevenue: sum(harvestLogs.revenue),
+          harvestCount: count(harvestLogs.id)
+        })
+        .from(harvestLogs)
+        .where(eq(harvestLogs.userId, userId))
+        .groupBy(sql`TO_CHAR(${harvestLogs.harvestDate}, 'YYYY-MM')`)
+        .orderBy(sql`TO_CHAR(${harvestLogs.harvestDate}, 'YYYY-MM')`);
+      return harvestsByMonth;
+    } else if (groupBy === 'bed') {
+      // Join with bed plant assignments to get bed info
+      const harvestsByBed = await db
+        .select({
+          bedName: gardenBeds.name,
+          totalYield: sum(harvestLogs.yieldWeight),
+          totalRevenue: sum(harvestLogs.revenue),
+          harvestCount: count(harvestLogs.id)
+        })
+        .from(harvestLogs)
+        .leftJoin(gardenPlants, eq(sql`${gardenPlants.name}`, harvestLogs.plantName))
+        .leftJoin(bedPlantAssignments, eq(bedPlantAssignments.plantId, gardenPlants.id))
+        .leftJoin(gardenBeds, eq(bedPlantAssignments.bedId, gardenBeds.id))
+        .where(and(
+          eq(harvestLogs.userId, userId),
+          ne(gardenBeds.name, sql`NULL`)
+        ))
+        .groupBy(gardenBeds.name);
+      return harvestsByBed;
+    }
+    return [];
+  }
+
+  async getSuccessRateByVariety(userId: string): Promise<any> {
+    const plants = await db
+      .select({
+        variety: gardenPlants.variety,
+        species: gardenPlants.species,
+        totalPlants: count(gardenPlants.id),
+        healthyPlants: sql<number>`SUM(CASE WHEN ${gardenPlants.status} = 'healthy' THEN 1 ELSE 0 END)`,
+        avgHealthScore: sql<number>`AVG(${gardenPlants.aiHealthScore})`,
+        successRate: sql<number>`ROUND((SUM(CASE WHEN ${gardenPlants.status} = 'healthy' THEN 1 ELSE 0 END)::decimal / COUNT(${gardenPlants.id})::decimal) * 100, 2)`
+      })
+      .from(gardenPlants)
+      .where(and(
+        eq(gardenPlants.userId, userId),
+        eq(gardenPlants.isActive, true),
+        ne(gardenPlants.variety, sql`NULL`)
+      ))
+      .groupBy(gardenPlants.variety, gardenPlants.species);
+    return plants;
+  }
+
+  async getSuccessRateBySeason(userId: string): Promise<any> {
+    const plants = await db
+      .select({
+        season: gardenPlants.season,
+        totalPlants: count(gardenPlants.id),
+        healthyPlants: sql<number>`SUM(CASE WHEN ${gardenPlants.status} = 'healthy' THEN 1 ELSE 0 END)`,
+        avgHealthScore: sql<number>`AVG(${gardenPlants.aiHealthScore})`,
+        successRate: sql<number>`ROUND((SUM(CASE WHEN ${gardenPlants.status} = 'healthy' THEN 1 ELSE 0 END)::decimal / COUNT(${gardenPlants.id})::decimal) * 100, 2)`
+      })
+      .from(gardenPlants)
+      .where(and(
+        eq(gardenPlants.userId, userId),
+        eq(gardenPlants.isActive, true),
+        ne(gardenPlants.season, sql`NULL`)
+      ))
+      .groupBy(gardenPlants.season);
+    return plants;
+  }
+
   // Disease Diagnosis methods (simplified for now to avoid storage issues)
   async getUserDiseaseUsage(userId: string): Promise<number> {
     try {
@@ -2438,6 +3353,197 @@ ${plants.map(plant => `- ${plant.name} (${plant.species}) - Status: ${plant.stat
       console.error('Error updating system settings:', error);
       throw error;
     }
+  }
+
+  // Social & Sharing - Plant Expert Tickets operations
+  async createPlantExpertTicket(ticket: any): Promise<any> {
+    const [created] = await db.insert(plantExpertTickets).values(ticket).returning();
+    return created;
+  }
+
+  async getPlantExpertTicket(ticketId: string, userId: string): Promise<any | null> {
+    const [ticket] = await db
+      .select()
+      .from(plantExpertTickets)
+      .where(and(eq(plantExpertTickets.id, ticketId), eq(plantExpertTickets.userId, userId)));
+    return ticket || null;
+  }
+
+  async getPlantExpertTickets(userId: string, status?: string): Promise<any[]> {
+    let query = db.select().from(plantExpertTickets).where(eq(plantExpertTickets.userId, userId));
+    if (status) {
+      query = query.where(and(eq(plantExpertTickets.userId, userId), eq(plantExpertTickets.status, status)));
+    }
+    const tickets = await query.orderBy(desc(plantExpertTickets.priority), desc(plantExpertTickets.createdAt));
+    return tickets;
+  }
+
+  async getPlantExpertTicketsByPlant(plantId: string, userId: string): Promise<any[]> {
+    const tickets = await db
+      .select()
+      .from(plantExpertTickets)
+      .where(and(eq(plantExpertTickets.plantId, plantId), eq(plantExpertTickets.userId, userId)))
+      .orderBy(desc(plantExpertTickets.createdAt));
+    return tickets;
+  }
+
+  async updatePlantExpertTicket(ticketId: string, userId: string, updates: any): Promise<any | null> {
+    const [updated] = await db
+      .update(plantExpertTickets)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(and(eq(plantExpertTickets.id, ticketId), eq(plantExpertTickets.userId, userId)))
+      .returning();
+    return updated || null;
+  }
+
+  async answerPlantExpertTicket(ticketId: string, expertAnswer: string, expertPhotoUrls?: string[]): Promise<any | null> {
+    const [answered] = await db
+      .update(plantExpertTickets)
+      .set({
+        expertAnswer,
+        expertPhotoUrls: expertPhotoUrls || [],
+        answeredAt: new Date(),
+        status: 'answered',
+        updatedAt: new Date()
+      })
+      .where(eq(plantExpertTickets.id, ticketId))
+      .returning();
+    return answered || null;
+  }
+
+  async getPendingExpertTickets(priorityOrder = true): Promise<any[]> {
+    let query = db
+      .select()
+      .from(plantExpertTickets)
+      .where(eq(plantExpertTickets.status, 'pending'));
+    
+    if (priorityOrder) {
+      query = query.orderBy(desc(plantExpertTickets.priority), desc(plantExpertTickets.createdAt));
+    } else {
+      query = query.orderBy(desc(plantExpertTickets.createdAt));
+    }
+    
+    return await query;
+  }
+
+  async assignExpertTicket(ticketId: string, expertId: string): Promise<any | null> {
+    const [assigned] = await db
+      .update(plantExpertTickets)
+      .set({
+        assignedExpertId: expertId,
+        status: 'assigned',
+        updatedAt: new Date()
+      })
+      .where(eq(plantExpertTickets.id, ticketId))
+      .returning();
+    return assigned || null;
+  }
+
+  // Social & Sharing - Shared Plant Links operations
+  async createSharedPlantLink(link: any): Promise<any> {
+    const [created] = await db.insert(sharedPlantLinks).values(link).returning();
+    return created;
+  }
+
+  async getSharedPlantLink(linkId: string): Promise<any | null> {
+    const [link] = await db
+      .select()
+      .from(sharedPlantLinks)
+      .where(eq(sharedPlantLinks.id, linkId));
+    return link || null;
+  }
+
+  async getSharedPlantLinkByToken(token: string): Promise<any | null> {
+    const [link] = await db
+      .select()
+      .from(sharedPlantLinks)
+      .where(eq(sharedPlantLinks.shareToken, token));
+    return link || null;
+  }
+
+  async getSharedPlantLinks(userId: string): Promise<any[]> {
+    const links = await db
+      .select()
+      .from(sharedPlantLinks)
+      .where(eq(sharedPlantLinks.userId, userId))
+      .orderBy(desc(sharedPlantLinks.createdAt));
+    return links;
+  }
+
+  async updateSharedPlantLink(linkId: string, userId: string, updates: any): Promise<any | null> {
+    const [updated] = await db
+      .update(sharedPlantLinks)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(and(eq(sharedPlantLinks.id, linkId), eq(sharedPlantLinks.userId, userId)))
+      .returning();
+    return updated || null;
+  }
+
+  async deleteSharedPlantLink(linkId: string, userId: string): Promise<void> {
+    await db
+      .delete(sharedPlantLinks)
+      .where(and(eq(sharedPlantLinks.id, linkId), eq(sharedPlantLinks.userId, userId)));
+  }
+
+  async incrementShareLinkView(token: string): Promise<void> {
+    await db
+      .update(sharedPlantLinks)
+      .set({ viewCount: sql`${sharedPlantLinks.viewCount} + 1` })
+      .where(eq(sharedPlantLinks.shareToken, token));
+  }
+
+  async incrementShareLinkShare(linkId: string, userId: string): Promise<void> {
+    await db
+      .update(sharedPlantLinks)
+      .set({ shareCount: sql`${sharedPlantLinks.shareCount} + 1` })
+      .where(and(eq(sharedPlantLinks.id, linkId), eq(sharedPlantLinks.userId, userId)));
+  }
+
+  // Social & Sharing - Email Digest Preferences operations
+  async getEmailDigestPreferences(userId: string): Promise<any | null> {
+    const [prefs] = await db
+      .select()
+      .from(emailDigestPreferences)
+      .where(eq(emailDigestPreferences.userId, userId));
+    return prefs || null;
+  }
+
+  async upsertEmailDigestPreferences(userId: string, preferences: any): Promise<any> {
+    const [created] = await db
+      .insert(emailDigestPreferences)
+      .values({ userId, ...preferences })
+      .onConflictDoUpdate({
+        target: emailDigestPreferences.userId,
+        set: { ...preferences, updatedAt: new Date() }
+      })
+      .returning();
+    return created;
+  }
+
+  async updateEmailDigestPreferences(userId: string, updates: any): Promise<any | null> {
+    const [updated] = await db
+      .update(emailDigestPreferences)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(emailDigestPreferences.userId, userId))
+      .returning();
+    return updated || null;
+  }
+
+  async getUsersWithDigestEnabled(day?: string): Promise<any[]> {
+    let query = db.select().from(emailDigestPreferences).where(eq(emailDigestPreferences.weeklyDigestEnabled, true));
+    
+    if (day) {
+      query = query.where(and(eq(emailDigestPreferences.weeklyDigestEnabled, true), eq(emailDigestPreferences.digestDay, day)));
+    }
+    
+    return await query;
+  }
+
+  async updateLastDigestSent(userId: string): Promise<void> {
+    await db
+      .update(emailDigestPreferences)
+      .set({ lastDigestSent: new Date(), updatedAt: new Date() })
+      .where(eq(emailDigestPreferences.userId, userId));
   }
 }
 

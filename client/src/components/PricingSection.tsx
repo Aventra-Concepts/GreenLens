@@ -79,34 +79,14 @@ export default function PricingSection() {
       features: [
         { name: 'Unlimited plant identifications', included: true },
         { name: 'Advanced care plans', included: true },
+        { name: 'Pro My Garden access', included: true },
+        { name: 'Priority expert consultation', included: true },
         { name: 'Health assessment', included: true },
-        { name: 'PDF reports', included: true },
-        { name: 'Priority support', included: true },
-        { name: 'Advanced features', included: false }
+        { name: 'PDF reports', included: true }
       ],
       isPopular: true,
       isActive: true,
       displayOrder: 2
-    },
-    {
-      id: 'premium',
-      planId: 'premium',
-      name: 'Premium',
-      price: getPlanPrice('premium')?.formattedPrice || '...',
-      currency: selectedCurrency,
-      billingInterval: 'month',
-      description: 'For professional gardeners and landscapers',
-      features: [
-        { name: 'Everything in Pro', included: true },
-        { name: 'Expert consultations', included: true },
-        { name: 'Advanced plant database', included: true },
-        { name: 'Commercial license', included: true },
-        { name: 'Custom integrations', included: true },
-        { name: 'White-label options', included: true }
-      ],
-      isPopular: false,
-      isActive: true,
-      displayOrder: 3
     }
   ];
 
@@ -278,7 +258,7 @@ export default function PricingSection() {
               </div>
             </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
           {sortedPlans.map((plan: PricingPlan) => (
             <Card
               key={plan.id}

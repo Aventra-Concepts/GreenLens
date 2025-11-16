@@ -356,8 +356,7 @@ export default function Identify() {
                     </div>
                   ) : (
                     <div 
-                      className="h-full flex flex-col items-center justify-center text-center cursor-pointer group"
-                      onClick={() => document.getElementById(`file-input-${index}`)?.click()}
+                      className="h-full flex flex-col items-center justify-center text-center group"
                     >
                       <input
                         id={`file-input-${index}`}
@@ -375,6 +374,7 @@ export default function Identify() {
                       <div className="flex gap-1 justify-center">
                         <Button
                           size="sm"
+                          onClick={() => document.getElementById(`file-input-${index}`)?.click()}
                           className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1"
                           data-testid={`upload-file-${index}`}
                         >
@@ -383,10 +383,7 @@ export default function Identify() {
                         </Button>
                         <Button
                           size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openCamera(index);
-                          }}
+                          onClick={() => openCamera(index)}
                           className="text-xs bg-green-700 hover:bg-green-800 text-white px-2 py-1"
                           data-testid={`camera-${index}`}
                         >

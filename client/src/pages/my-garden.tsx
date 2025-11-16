@@ -1,6 +1,7 @@
 import { Layout } from "@/components/Layout";
 import MyGardenSection from "@/components/MyGardenSection";
-import { AdvancedPremiumDashboard } from "@/components/AdvancedPremiumDashboard";
+import { RealDataGardenDashboard } from "@/components/RealDataGardenDashboard";
+import { PremiumGardenDashboard } from "@/components/PremiumGardenDashboard";
 import { FreeTierGardenDashboard } from "@/components/FreeTierGardenDashboard";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -18,46 +19,53 @@ export default function MyGardenPage() {
     );
   }
 
-  // Check if user is authenticated and has premium subscription
+  // Check if user is authenticated and determine dashboard to show
   if (user) {
     const isAdmin = user.email === 'admin' || user.id === 'admin-system' || user.isAdmin;
-    const isPremium = user.subscriptionPlanId === 'premium' || user.subscriptionPlanId === 'pro' || isAdmin;
+    const subscriptionTier = user.subscriptionPlanId || 'free';
+    const hasActiveSubscription = user.subscriptionStatus === 'active';
+    const hasGardenMonitoring = user.gardenMonitoringActive || isAdmin;
     
-    if (isPremium) {
+    // Determine which dashboard to show based on subscription tier FIRST
+    const isPremiumTier = (subscriptionTier === 'premium' || subscriptionTier === 'pro') && (hasActiveSubscription || isAdmin);
+    
+    // Premium/Pro users get premium dashboard (Garden Monitoring shown as add-on inside)
+    if (isPremiumTier) {
       return (
         <Layout showImageBanner={false} showSidebarAds={false}>
           <div className="min-h-screen">
-            {/* Back Button for Premium Users */}
+            {/* Back Button */}
             <div className="absolute top-4 left-4 z-10">
               <Link href="/">
-                <Button variant="outline" size="sm" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hover:border-gray-300">
+                <Button variant="outline" size="sm" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hover:border-gray-300" data-testid="button-back-home">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Home
                 </Button>
               </Link>
             </div>
-            <AdvancedPremiumDashboard />
+            <PremiumGardenDashboard />
           </div>
         </Layout>
       );
-    } else {
-      return (
-        <Layout showImageBanner={false} showSidebarAds={true}>
-          <div className="min-h-screen">
-            {/* Back Button for Free Users */}
-            <div className="px-4 sm:px-6 lg:px-8 pt-2">
-              <Link href="/">
-                <Button variant="outline" size="sm" className="flex items-center space-x-1 bg-green-50 border-green-200 hover:bg-green-100 hover:border-green-300 text-green-700">
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Back to Home</span>
-                </Button>
-              </Link>
-            </div>
-            <FreeTierGardenDashboard />
+    } 
+    
+    // Free tier users get free dashboard with upgrade prompts
+    return (
+      <Layout showImageBanner={false} showSidebarAds={true}>
+        <div className="min-h-screen">
+          {/* Back Button */}
+          <div className="px-4 sm:px-6 lg:px-8 pt-2">
+            <Link href="/">
+              <Button variant="outline" size="sm" className="flex items-center space-x-1 bg-green-50 border-green-200 hover:bg-green-100 hover:border-green-300 text-green-700" data-testid="button-back-home">
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to Home</span>
+              </Button>
+            </Link>
           </div>
-        </Layout>
-      );
-    }
+          <FreeTierGardenDashboard />
+        </div>
+      </Layout>
+    );
   }
 
   return (

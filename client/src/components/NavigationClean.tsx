@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import { UserAccountDropdown } from "@/components/UserAccountDropdown";
 import { 
   Menu, 
   BookOpen, 
@@ -73,7 +74,24 @@ export default function NavigationClean() {
           {/* Right - Desktop and Mobile Menu */}
           <div className="flex-shrink-0">
             {/* Desktop version */}
-            <div className="hidden lg:flex items-center space-x-3">              
+            <div className="hidden lg:flex items-center space-x-3">
+              {/* User Account Dropdown (Desktop only - logged in users) */}
+              {isAuthenticated && <UserAccountDropdown />}
+              
+              {/* Get Started (Desktop only - not logged in) */}
+              {!isAuthenticated && (
+                <Link href="/auth">
+                  <Button 
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    data-testid="desktop-get-started"
+                  >
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Get Started
+                  </Button>
+                </Link>
+              )}
+              
               {/* Hamburger Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}

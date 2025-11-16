@@ -1,68 +1,7 @@
 # GreenLens - AI Plant Identification & Care Platform
 
 ## Overview
-GreenLens is a production-grade web application that leverages AI technology for plant identification through photo uploads and provides comprehensive care recommendations. The platform integrates multiple AI services and plant databases to deliver accurate species identification, personalized care plans, disease diagnosis, and generates detailed PDF reports for users to track their plant collection. Key capabilities include an e-commerce platform for e-books and gardening tools, an expert consultation system, automated blog generation, and a robust user management system with multi-currency payment support.
-
-**Status**: ALL CRITICAL ISSUES PERMANENTLY RESOLVED - Registration system 100% operational, database schema fully synchronized, frontend runtime errors eliminated, logout functionality completely fixed, **OpenAI API migration successfully completed**, **layout balance issues resolved**, **login error 500 completely fixed**, and **comprehensive security enhancements implemented**. **Author Dashboard with Kindle-style workflow completed** - Secure author-only access with e-book submission and review system. Platform ready for production deployment with comprehensive AI functionality and enterprise-grade security.
-
-**RECENT UI IMPROVEMENTS**: Cookie consent banner repositioned to bottom-right corner with compact design for better user experience. Added comprehensive Contact Us page with sample email (support@greenlens.ai) that can be updated by admins later.
-
-**NAVIGATION FIXES COMPLETE**: Successfully resolved all navigation issues by properly integrating Layout component across all pages. Navigation alignment perfected with centered brand name and menu buttons using responsive padding (pl-4 lg:pl-8 and pr-4 lg:pr-8).
-
-**PAGE LAYOUT OPTIMIZATION COMPLETE**: Enhanced My Garden and Identify Plant pages with streamlined layouts:
-- Added consistent "Back to Home" buttons with green highlighting on both pages
-- Significantly reduced padding and spacing throughout both pages for compact layouts
-- Moved content closer to navigation bars with minimal spacing
-- Replaced GoogleID references with gmail field across database and authentication system
-
-**UI TERMINOLOGY UPDATES**: Renamed "E-book Marketplace" to "E-Books" throughout the application per user preference for cleaner, more concise terminology.
-
-**COMPREHENSIVE USA SEO OPTIMIZATION COMPLETE**: Application now fully optimized for US users and Google rankings with:
-- **SEO Meta Tags**: Complete HTML meta tags with USA geo-targeting, structured data, Open Graph, and Twitter Cards
-- **Content Optimization**: USA-specific content throughout including "American Gardens", "US Growing Zones", regional plant recommendations
-- **Geolocation Enhancement**: Default USA detection, gardening tools now available to US users alongside India
-- **Regional Coverage**: Complete coverage across all 50 states with zone-specific advice for Northeast, Southeast, Midwest, Southwest, West Coast
-- **Trust Signals**: Added USA-focused testimonials, statistics (50,000+ American users), and regional FAQ section
-- **Local SEO**: ICBM coordinates, geo.region meta tags, and "en-US" language targeting for better Google rankings
-
-**MIGRATION COMPLETE**: Successfully migrated from Google Gemini to OpenAI API across all AI services including plant identification, care planning, disease diagnosis, and blog generation.
-
-**AUTHOR DASHBOARD IMPLEMENTATION COMPLETE**:
-- Renamed "Publisher Dashboard" to "Author's Dashboard" per user requirements
-- Implemented secure author-only access with authentication checks
-- Removed dashboard link from menu bar - only accessible to verified authors
-- Integrated with author registration workflow via "Go to Author Dashboard" button
-- Added comprehensive e-book management with Kindle-style submission process
-- Created complete approval workflow: author submits → admin reviews → marketplace publication
-- Dashboard includes real-time stats tracking, revenue analytics, and submission status management
-- Route changed from `/publisher-dashboard` to `/author-dashboard` with proper access controls
-
-**HR MANAGEMENT SYSTEM COMPLETE**:
-- Full HR management system with job postings, applications, and staff foundation
-- Public careers page at /careers with job listings and application forms
-- Admin HR dashboard at /admin/hr with complete job and application management
-- HR tab added to main admin dashboard for easy navigation
-- "Careers" link added to footer Company column above Contact link
-- Comprehensive backend API with hrService.ts and hrRoutes.ts integration
-
-**PAGE CLEANUP COMPLETE**: 
-- Removed "Advanced Neural Networks" section from PoweredBySection 
-- Completely eliminated all "Gardening Tools Marketplace" components from home page
-- Removed "No products found!" affiliate section and "Demo Mode" text
-- Fixed "Powered by GreenLens AI Technology" section layout and spacing
-- Moved affiliate disclosure from main page to footer under "Amazon Affiliate"
-- Added comprehensive soil preparation and testing sections
-- Clean, educational home page: Hero → AI Technology → E-books → Buy Tools → Soil Prep → Soil Testing → My Garden
-
-**SECURITY ENHANCEMENTS COMPLETE**: 
-- Comprehensive input sanitization using DOMPurify to prevent XSS attacks
-- Enhanced authentication rate limiting (10 attempts per 15 minutes)
-- SQL injection prevention with pattern detection
-- Stronger password validation (8+ chars, mixed case, numbers)
-- File upload security validation with type and size restrictions
-- XSS protection headers and CSRF safeguards
-- Enhanced email validation with RFC compliance
-- Error messages sanitized - detailed AI API errors only visible to admins
+GreenLens is a production-grade web application for AI-powered plant identification and comprehensive care recommendations. It enables users to identify plants via photo upload, receive personalized care plans, get disease diagnoses, and generate detailed PDF reports. The platform also features an e-commerce platform for digital and physical gardening products, an expert consultation system, automated blog generation, and a robust user management system with multi-currency payment support. The subscription model uses a **2-tier system (Free and Pro plans)**, with Pro plan features fully editable by admins through the admin dashboard. The project aims to provide a comprehensive and user-friendly experience for plant enthusiasts.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -70,59 +9,62 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Frontend Architecture
-The frontend is built with **React 18 and TypeScript**, utilizing a modern component-based architecture with functional components and hooks. **Wouter** handles client-side routing, and **TanStack Query** manages server state, caching, and background updates. The design system uses **shadcn/ui + Tailwind CSS** for consistent styling. Form handling is managed by **React Hook Form**, and **Vite** provides a fast development server and build tool. The UI/UX features a light and dark green color theme, a restored banner, and a dedicated 3-slot image upload interface. Plant analysis requires user login.
-
-**Performance Features**: LazyImage components for optimized image loading, VirtualizedList for large datasets, debounced search functionality, intersection observer hooks, and real-time performance metrics monitoring in development mode.
-
-**Design Features**: Elegant top navigation with refined typography, smaller buttons and icons, improved spacing, subtle hover effects, and polished visual hierarchy for a professional appearance. **Hero section typography optimized** - reduced font size by 3 points for desktop with proportionally adjusted spacing and tagline sizing.
+The frontend is built with **React 18 and TypeScript**, using functional components and hooks. **Wouter** handles routing, and **TanStack Query** manages server state. The design system uses **shadcn/ui + Tailwind CSS** for consistent styling with a light and dark green theme. **React Hook Form** is used for form management, and **Vite** for development and builds. Key features include optimized image loading, virtualized lists, debounced search, and a dedicated 3-slot image upload interface. UI/UX emphasizes a professional appearance with refined typography, smaller components, and improved spacing. The My Garden dashboard has been redesigned with 8 tabbed sections:
+- **Overview**: Dashboard stats and plant overview
+- **Plant Diary**: Individual plant management and care tracking
+- **Smart Assistant**: AI-powered features (Disease & Pest Detection, Nutrient Deficiency Checker, Expert Q&A, Companion Planting, Variety Recommendations)
+- **Environment & Automation**: Weather Dashboard, Microclimate Tracking, Irrigation Scheduling, Moon Phase Calendar
+- **Planning & Layout**: Garden Map with bed/container management, Crop Rotation Tracker with family-based rotation warnings, Planting Schedule Generator with frost date calculations
+- **Inventory & Costs**: Seeds Inventory with viability tracking, Supplies & Materials with low-stock alerts, Expenses tracking, Harvest Logs with yield/revenue
+- **Analytics**: Dynamic data visualizations using Recharts (watering frequency vs health, task heatmaps, harvest analysis, variety success rates)
+- **Social & Sharing**: Care sheet export, shareable plant links, Ask an Expert ticket system with priority for Pro users ($4.99 discounted vs $9.99 regular), weekly email digest, **WhatsApp sharing for Pro users only** (sends to registered phone number)
+- **Calendar**: Care schedules and reminders (coming soon)
+- **Reports**: Analytics and PDF generation (coming soon)
 
 ### Backend Architecture
-The backend is an **Express.js with TypeScript** RESTful API server. It features a custom email/password authentication system with bcrypt hashing and session management, replacing Replit Auth. **Drizzle ORM** is used for type-safe PostgreSQL queries. A service-oriented architecture facilitates modularity, especially for external API integrations. **Multer** handles file uploads. Admin management includes role-based access control and a dashboard for user and student lifecycle management, including automated conversion processes and discount systems. An automated blog generation system with AI image integration is also implemented.
-
-**Performance Features**: Compression middleware with gzip optimization, HTTP caching with ETags and Cache-Control headers, API rate limiting with memory-based tracking, static asset caching, and memory cache for expensive operations with TTL-based cleanup.
+The backend is an **Express.js with TypeScript** RESTful API server. It features a custom email/password authentication system with bcrypt and session management. **Drizzle ORM** manages PostgreSQL queries. A service-oriented architecture is used for modularity. **Multer** handles file uploads. Admin management includes role-based access control and a dashboard for user and content management. An automated AI-powered blog generation system is implemented. Performance features include compression middleware, HTTP caching, API rate limiting, and memory caching. An HR management system with job postings and application management is also integrated.
 
 ### Database Design
-**PostgreSQL with Neon** serves as the cloud-hosted database. Core entities include Users, Subscriptions, PlantResults, BlogPosts, CatalogCache, and Sessions. The Users table includes authentication fields, admin flags, location, and fields for tracking free tier usage. PlantResults stores localized species information. A TTL-based caching strategy is implemented for the plant catalog. New tables support e-commerce (products, cart_items, orders), consultations (consultation_requests), and multi-currency transactions.
-
-**US Optimization Fields**: Users table now includes preferredCurrency (default: 'USD'), timezone (default: 'America/New_York'), and region (default: 'US') for localized experience.
+**PostgreSQL with Neon** serves as the cloud-hosted database. Core entities include Users, Subscriptions, PlantResults, BlogPosts, CatalogCache, and Sessions. The Users table stores authentication details, admin flags, location, and free tier usage. PlantResults stores localized species information. A TTL-based caching strategy is implemented for the plant catalog. New tables support e-commerce (products, cart_items, orders), consultations (consultation_requests), multi-currency transactions, environment automation (microclimate_logs), garden planning (garden_beds, bed_plant_assignments, crop_rotation_history, planting_schedules), and inventory management (seeds_inventory with viability tracking, supplies_inventory with low-stock alerts, garden_expenses for cost tracking, harvest_logs for yield/revenue). User profiles include `preferredCurrency`, `timezone`, and `region` for localization, optimized for USA users.
 
 ### AI Integration Pipeline
-The AI pipeline involves **OpenAI API** for image quality assessment, care plan synthesis, disease treatment advice, and structured content generation. **Plant.id API v3** is the primary service for species identification and health assessment. Structured output schemas ensure consistent JSON responses from AI services.
-
-**Migration Complete**: Successfully migrated from Google Gemini to OpenAI API across all core services including plantAnalysisService, carePlanner, autoBlogService, and API routes.
-
-**Rate Limiting**: Intelligent quota management and graceful error handling for API quota scenarios.
-
-**Error Handling**: Comprehensive error sanitization system where detailed API errors are logged for admin debugging but users receive friendly, actionable error messages. Error codes include SERVICE_QUOTA_EXCEEDED, AI_SERVICE_ERROR for proper categorization.
+The AI pipeline utilizes the **OpenAI API** for image quality assessment, care plan synthesis, disease treatment advice, and structured content generation. **Plant.id API v3** is used for primary species identification and health assessment. Structured output schemas ensure consistent JSON responses. The system includes intelligent quota management, graceful error handling for API quotas, and comprehensive error sanitization.
 
 ### Amazon Affiliate Integration
-The system features a comprehensive **Amazon Affiliate marketplace** with multi-region support (US, India, UK). It includes intelligent product search, curated product categories (hand tools, watering, soil care, protective gear), market-specific pricing, and automated affiliate link generation. The system handles API fallbacks and includes proper FTC disclosure compliance.
+A comprehensive **Amazon Affiliate marketplace** is integrated, supporting multi-region (US, India, UK) product searches, curated categories, market-specific pricing, and automated affiliate link generation. It includes API fallbacks and FTC disclosure compliance.
 
 ### Content Management
-Content management includes a Markdown-based blog system, **Puppeteer** for PDF report generation (e.g., detailed plant care reports), and **Google Cloud Storage** for uploaded images and PDFs. A `PlantNamesService` provides multilingual plant names in 12 languages.
+Content management includes a Markdown-based blog system, **Puppeteer** for PDF report generation, and **Google Cloud Storage** for uploaded images and PDFs. A `PlantNamesService` provides multilingual plant names.
 
 ## External Dependencies
 
 ### AI and Machine Learning Services
 - **Plant.id API v3**: Plant identification and health assessment.
-- **Google Gemini AI**: Image quality assessment, care plan synthesis, and disease advice generation.
+- **OpenAI API**: AI services for content generation, analysis, and recommendations.
 
 ### Plant Information APIs
 - **Perenual API**: Primary plant catalog.
 - **Trefle API**: Fallback plant database.
+
+### Weather and Environmental APIs
+- **Open-Meteo API**: Free weather forecasting service (10,000 calls/day, no API key required).
+- **Nominatim (OpenStreetMap)**: Free geocoding service for location coordinates.
 
 ### Payment Providers
 - **Stripe**: Primary payment processor.
 - **Razorpay**: Indian market payment processing.
 - **Cashfree**: Additional Indian payment gateway.
 
+### Subscription System
+- **2-Tier Pricing Model**: Free and Pro plans only
+- **Free Plan**: 3 plant identifications, basic care recommendations, community access
+- **Pro Plan**: Unlimited identifications, Pro My Garden dashboard access, priority expert consultation ($4.99 vs $9.99 regular), health assessment, PDF reports
+- **Admin-Editable Features**: Pro plan features are fully configurable via Admin Dashboard at `/admin` → "Pricing Plans" tab
+
+### Communication Services
+- **Twilio WhatsApp API**: WhatsApp messaging for Pro users (sends to verified phone number only). Requires: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_NUMBER.
+
 ### Infrastructure Services
 - **Neon PostgreSQL**: Serverless database.
 - **Google Cloud Storage**: Scalable file storage.
 - **Puppeteer**: Headless browser for PDF generation.
-
-### Development and Deployment
-- **TypeScript**: Language for type safety.
-- **ESBuild**: Fast production bundling.
-- **Vite**: Development server and optimized builds.
-- **Drizzle Kit**: Database migration and schema management.

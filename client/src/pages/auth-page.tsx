@@ -186,7 +186,7 @@ export default function AuthPage() {
         return;
       }
 
-      await registerMutation.mutateAsync({
+      const result = await registerMutation.mutateAsync({
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
@@ -195,11 +195,19 @@ export default function AuthPage() {
         password: data.password,
         ageVerified: true,
       });
+      
+      // Show success message and switch to login tab
       toast({
-        title: "Registration Successful",
-        description: "Welcome to GreenLens! You can now identify plants and get care recommendations.",
+        title: "Registration Successful!",
+        description: "Please verify your email and then log in to continue.",
       });
-      setLocation("/");
+      
+      // Switch to login tab and pre-fill email
+      setActiveTab("login");
+      loginForm.setValue("email", data.email);
+      
+      // Clear registration form
+      registerForm.reset();
     } catch (error) {
       console.error("Registration error:", error);
     }

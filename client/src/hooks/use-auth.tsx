@@ -15,7 +15,7 @@ type AuthContextType = {
   error: Error | null;
   loginMutation: UseMutationResult<SelectUser, Error, LoginUser>;
   logoutMutation: UseMutationResult<void, Error, void>;
-  registerMutation: UseMutationResult<SelectUser, Error, InsertUser>;
+  registerMutation: UseMutationResult<any, Error, InsertUser>;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -55,8 +55,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await apiRequest("POST", "/api/register", credentials);
       return await res.json();
     },
-    onSuccess: (user: SelectUser) => {
-      queryClient.setQueryData(["/api/user"], user);
+    onSuccess: (data: any) => {
+      // Registration no longer auto-logs in users
+      // They need to verify email and login manually
+      // No need to update queryClient here
     },
     onError: (error: Error) => {
       toast({
@@ -83,19 +85,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Optimistically clear user data immediately
       queryClient.setQueryData(["/api/user"], null);
     },
-    onSettled: () => {
-      console.log("🧹 Clearing all queries and forcing reload");
-      // Always clear everything after logout attempt (success or failure)
+    onSuccess: () => {
+      console.log("🧹 Clearing queries after successful logout");
+      // Clear all queries to reset application state
       queryClient.clear();
       
-      // Clear any potential cached authentication tokens or local storage
-      localStorage.clear();
+      // Clear session storage but preserve cookie consent in localStorage
       sessionStorage.clear();
       
-      // Force a complete page reload to reset all application state
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 100);
+      // Remove only auth-related items from localStorage if needed
+      // Preserve cookieConsent and other user preferences
+      const cookieConsent = localStorage.getItem('cookieConsent');
+      const otherPrefs = localStorage.getItem('theme'); // preserve theme if exists
+      
+      // Clear localStorage except for specific items
+      localStorage.clear();
+      
+      // Restore preserved items
+      if (cookieConsent) {
+        localStorage.setItem('cookieConsent', cookieConsent);
+      }
+      if (otherPrefs) {
+        localStorage.setItem('theme', otherPrefs);
+      }
+      
+      // Redirect to home page after logout
+      window.location.href = '/';
     },
   });
 

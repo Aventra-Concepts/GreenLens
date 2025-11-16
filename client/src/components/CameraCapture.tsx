@@ -20,6 +20,7 @@ export function CameraCapture({ onCapture, onClose, isOpen }: CameraCaptureProps
 
   const startCamera = useCallback(async () => {
     try {
+      console.log("Requesting camera access...");
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: facingMode,
@@ -28,15 +29,35 @@ export function CameraCapture({ onCapture, onClose, isOpen }: CameraCaptureProps
         }
       });
       
+      console.log("Camera stream obtained:", mediaStream);
       setStream(mediaStream);
+      
       if (videoRef.current) {
+        console.log("Setting video srcObject");
         videoRef.current.srcObject = mediaStream;
+        // Ensure video plays
+        videoRef.current.play().catch(err => {
+          console.error("Error playing video:", err);
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error accessing camera:", error);
+      console.error("Error name:", error?.name);
+      console.error("Error message:", error?.message);
+      
+      let description = "Unable to access camera. Please check permissions.";
+      
+      if (error?.name === "NotAllowedError" || error?.name === "PermissionDeniedError") {
+        description = "Camera permission denied. Please allow camera access and try again.";
+      } else if (error?.name === "NotFoundError" || error?.name === "DevicesNotFoundError") {
+        description = "No camera found. Please connect a camera and try again.";
+      } else if (error?.name === "NotReadableError" || error?.name === "TrackStartError") {
+        description = "Camera is in use by another app. Please close it and try again.";
+      }
+      
       toast({
         title: "Camera Error",
-        description: "Unable to access camera. Please check permissions.",
+        description,
         variant: "destructive",
       });
     }
@@ -115,24 +136,26 @@ export function CameraCapture({ onCapture, onClose, isOpen }: CameraCaptureProps
     onClose();
   }, [stopCamera, onClose]);
 
-  // Start camera when component opens
+  // Start camera when component opens or facing mode changes
   useEffect(() => {
-    if (isOpen && !stream) {
+    if (isOpen) {
       startCamera();
     }
+    
     return () => {
-      if (stream) {
-        stopCamera();
-      }
+      stopCamera();
     };
-  }, [isOpen, stream, startCamera, stopCamera]);
+  }, [isOpen, facingMode]);
 
-  // Update camera when facing mode changes
+  // Ensure video element plays when stream is available
   useEffect(() => {
-    if (isOpen && stream) {
-      startCamera();
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+      videoRef.current.play().catch(err => {
+        console.error("Error playing video:", err);
+      });
     }
-  }, [facingMode, isOpen, stream, startCamera]);
+  }, [stream]);
 
   if (!isOpen) return null;
 

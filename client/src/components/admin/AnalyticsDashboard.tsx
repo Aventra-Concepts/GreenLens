@@ -26,7 +26,8 @@ import {
   Target,
   FileSpreadsheet,
   Monitor,
-  Bell
+  Bell,
+  Settings
 } from "lucide-react";
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts';
 

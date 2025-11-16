@@ -23,12 +23,18 @@ export default function Footer() {
   };
   
   return (
-    <footer className="bg-slate-800 text-white mr-6 ml-6 sm:mr-8 sm:ml-8 lg:mr-52 lg:ml-56 xl:mr-64 xl:ml-72 rounded-2xl mb-6">
-      <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-4">
-        {/* Top Section - Logo, Description, and Social Media - Left Aligned */}
-        <div className="mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-col space-y-2 mb-4 sm:mb-0">
+    <footer className="mb-6">
+      <div className="flex">
+        {/* Left spacer to match sidebar layout */}
+        <div className="hidden lg:block w-64 flex-shrink-0"></div>
+        
+        <div className="flex-1">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-slate-800 text-white py-3 px-6 rounded-lg">
+        {/* Top Section - Logo, Description, and Social Media */}
+        <div className="mb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col space-y-1">
               {/* Logo and Brand Name */}
               <div className="flex items-center space-x-2">
                 <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center">
@@ -38,8 +44,8 @@ export default function Footer() {
               </div>
               
               {/* Tagline - Single Line */}
-              <p className="text-gray-300 text-xs">
-                AI-powered plant identification and care guidance for plant enthusiasts worldwide.
+              <p className="text-white text-xs">
+                AI-powered plant identification and care
               </p>
             </div>
             
@@ -53,7 +59,7 @@ export default function Footer() {
         </div>
         
         {/* Menu Columns - Compact */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-3 mb-3">
           {/* Product Column */}
           <div>
             <h3 className="font-semibold text-white mb-2 text-sm">Product</h3>
@@ -324,12 +330,11 @@ export default function Footer() {
             <p className="text-gray-300 text-xs mb-2 leading-tight">
               As an Amazon Associate, we earn from qualifying purchases. No extra cost to you.
             </p>
-
           </div>
         </div>
         
         {/* Bottom Section - Compact */}
-        <div className="border-t border-gray-600 pt-3 flex flex-col sm:flex-row justify-between items-center">
+        <div className="border-t border-gray-600 pt-2 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left">
           <p className="text-gray-400 text-xs" data-testid="text-copyright">
             © {new Date().getFullYear()} GreenLens. All rights reserved.
           </p>
@@ -337,7 +342,13 @@ export default function Footer() {
             Made with ❤️ for plant lovers everywhere
           </p>
         </div>
+          </div>
+        </div>
       </div>
-    </footer>
+      
+      {/* Right spacer to match sidebar layout */}
+      <div className="hidden lg:block w-64 flex-shrink-0"></div>
+    </div>
+  </footer>
   );
 }

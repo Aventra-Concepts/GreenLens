@@ -43,7 +43,12 @@ import dashboardFeaturesRoutes from "./routes/dashboard-features";
 import hrRoutes from "./routes/hrRoutes";
 import { registerAdminGardenRoutes } from "./routes/admin-garden";
 import { registerGardenDashboardRoutes } from "./routes/garden-dashboard";
+import { registerEnvironmentAutomationRoutes } from "./routes/environment-automation";
+import { registerPlanningLayoutRoutes } from "./routes/planning-layout";
+import { registerInventoryRoutes } from "./routes/inventory";
 import { financialRoutes } from "./routes/financialRoutes";
+import { createAnalyticsRouter } from "./routes/analytics";
+import { createSocialSharingRouter } from "./routes/social-sharing";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -211,10 +216,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create admin session
       (req.session as any).adminAuthenticated = true;
       (req.session as any).adminUser = {
-        id: "admin-system",
-        email: "admin@greenlens.com",
-        firstName: "System",
-        lastName: "Administrator",
+        id: "999",  // Use existing admin user ID from database
+        email: "admin@demo.com",
+        firstName: "Admin",
+        lastName: "User",
         isAdmin: true
       };
       
@@ -542,6 +547,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register garden dashboard routes
   registerGardenDashboardRoutes(app);
   
+  // Register environment & automation routes
+  registerEnvironmentAutomationRoutes(app);
+  
+  // Register planning & layout routes
+  registerPlanningLayoutRoutes(app);
+  
+  // Register inventory & costs routes
+  registerInventoryRoutes(app);
+  
+  // Register analytics routes
+  app.use('/api/analytics', createAnalyticsRouter(storage));
+  
+  // Register social & sharing routes
+  app.use('/api/social', createSocialSharingRouter());
+  
   // Geographic restrictions routes
   app.get('/api/geographic/check-product/:productId', async (req, res) => {
     try {
@@ -745,6 +765,121 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Payment Gateway Management Routes
+  app.get('/api/admin/payment-gateways', requireAdmin, async (req: any, res) => {
+    try {
+      const { paymentGatewayService } = await import('./services/paymentGatewayService');
+      const gateways = await paymentGatewayService.getAllGateways();
+      res.json(gateways);
+    } catch (error) {
+      console.error("Error fetching payment gateways:", error);
+      res.status(500).json({ message: "Failed to fetch payment gateways" });
+    }
+  });
+
+  app.get('/api/admin/payment-gateways/:provider', requireAdmin, async (req: any, res) => {
+    try {
+      const { provider } = req.params;
+      const { paymentGatewayService } = await import('./services/paymentGatewayService');
+      const stats = await paymentGatewayService.getGatewayStats(provider);
+      
+      if (!stats) {
+        return res.status(404).json({ message: "Payment gateway not found" });
+      }
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching gateway stats:", error);
+      res.status(500).json({ message: "Failed to fetch gateway statistics" });
+    }
+  });
+
+  app.put('/api/admin/payment-gateways/:provider', requireAdmin, async (req: any, res) => {
+    try {
+      const { provider } = req.params;
+      const { updatePaymentGatewaySchema } = await import('@shared/schema');
+      
+      // Validate request body
+      const validatedData = updatePaymentGatewaySchema.parse(req.body);
+      
+      const { paymentGatewayService } = await import('./services/paymentGatewayService');
+      
+      // Get admin user ID from various auth sources (order matters)
+      const adminUserId = 
+        (req as any).adminUser?.id ||           // Direct admin user object
+        req.session?.adminUser?.id ||           // Session-based admin
+        req.user?.id ||                         // Passport-based auth
+        '999';                                  // Fallback to existing admin user
+      
+      console.log('🔧 Payment gateway update debug:', {
+        provider,
+        validatedData,
+        adminUserId,
+        hasSession: !!req.session,
+        hasAdminUser: !!(req.session && req.session.adminUser),
+      });
+      
+      const updated = await paymentGatewayService.updateGateway(
+        provider,
+        validatedData,
+        adminUserId
+      );
+      
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating payment gateway:", error);
+      console.error("Error stack:", error.stack);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update payment gateway", error: error.message });
+    }
+  });
+
+  app.post('/api/admin/payment-gateways/:provider/refresh', requireAdmin, async (req: any, res) => {
+    try {
+      const { provider } = req.params;
+      const { paymentGatewayService } = await import('./services/paymentGatewayService');
+      
+      const updated = await paymentGatewayService.refreshGatewayStatus(provider);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error refreshing gateway status:", error);
+      res.status(500).json({ message: "Failed to refresh gateway status" });
+    }
+  });
+
+  app.post('/api/admin/payment-gateways/:provider/test', requireAdmin, async (req: any, res) => {
+    try {
+      const { provider } = req.params;
+      const { paymentGatewayService } = await import('./services/paymentGatewayService');
+      
+      const result = await paymentGatewayService.testConnection(provider);
+      res.json(result);
+    } catch (error) {
+      console.error("Error testing gateway connection:", error);
+      res.status(500).json({ message: "Failed to test gateway connection" });
+    }
+  });
+
+  app.get('/api/admin/payment-gateways/:provider/transactions', requireAdmin, async (req: any, res) => {
+    try {
+      const { provider } = req.params;
+      const { paymentGatewayService } = await import('./services/paymentGatewayService');
+      
+      const gateway = await paymentGatewayService.getGateway(provider);
+      if (!gateway) {
+        return res.status(404).json({ message: "Payment gateway not found" });
+      }
+      
+      const transactions = await paymentGatewayService.getTransactions(gateway.id, 100);
+      res.json(transactions);
+    } catch (error) {
+      console.error("Error fetching gateway transactions:", error);
+      res.status(500).json({ message: "Failed to fetch transactions" });
+    }
+  });
+
   // Plant identification endpoint
   app.post("/api/identify", requireAuth, upload.array('images', 3), async (req: any, res) => {
     try {
@@ -906,7 +1041,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Multi-currency pricing API with proper currency conversion
+  // Multi-currency pricing API with database-driven plans
   app.get("/api/pricing", async (req, res) => {
     try {
       const { currency = 'USD', location } = req.query;
@@ -925,31 +1060,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         selectedCurrency = 'USD'; // Fallback to USD if unsupported
       }
       
-      const pricingArray = pricingService.getAllPlanPricing(selectedCurrency);
+      // Fetch plans from database (active only)
+      const dbPlans = await storage.getPricingPlans(true);
       
       console.log('🔧 Pricing API Debug:', {
         requestedCurrency: currency,
         selectedCurrency,
-        pricingArrayLength: pricingArray.length,
-        pricingArraySample: pricingArray[0],
+        dbPlansCount: dbPlans.length,
         supportedCurrenciesLength: supportedCurrencies.length
       });
       
-      // Convert plans array to object format expected by frontend with proper currency formatting
-      const plansObject = pricingArray.reduce((acc, plan) => {
-        acc[plan.planId] = {
-          planId: plan.planId,
-          amount: plan.amount,
-          formattedPrice: pricingService.formatPrice(plan.amount, selectedCurrency),
-          supportedProviders: plan.supportedProviders
+      // Convert DB plans to frontend format with currency conversion
+      const plansObject = dbPlans.reduce((acc, dbPlan) => {
+        // Get base price (assume it's in USD if not specified)
+        const basePriceUSD = parseFloat(dbPlan.price);
+        const planCurrency = dbPlan.currency || 'USD';
+        
+        // Convert price to selected currency
+        let convertedAmount = basePriceUSD;
+        if (planCurrency !== selectedCurrency) {
+          // Get currency info for conversion
+          const fromCurrency = pricingService.getCurrencyInfo(planCurrency);
+          const toCurrency = pricingService.getCurrencyInfo(selectedCurrency);
+          
+          if (fromCurrency && toCurrency && fromCurrency.exchangeRate && toCurrency.exchangeRate) {
+            // Convert to USD first, then to target currency
+            const amountInUSD = basePriceUSD / fromCurrency.exchangeRate;
+            convertedAmount = amountInUSD * toCurrency.exchangeRate;
+          }
+        }
+        
+        // Get supported providers for this currency
+        const currencyInfo = pricingService.getCurrencyInfo(selectedCurrency);
+        const supportedProviders = currencyInfo?.supportedProviders || ['paypal'];
+        
+        acc[dbPlan.planId] = {
+          planId: dbPlan.planId,
+          name: dbPlan.name,
+          amount: Math.round(convertedAmount * 100) / 100,
+          formattedPrice: pricingService.formatPrice(convertedAmount, selectedCurrency),
+          supportedProviders,
+          billingInterval: dbPlan.billingInterval || 'monthly',
+          description: dbPlan.description,
+          features: typeof dbPlan.features === 'string' ? JSON.parse(dbPlan.features) : dbPlan.features,
+          isPopular: dbPlan.isPopular || false
         };
         return acc;
       }, {} as Record<string, any>);
       
       console.log('🔧 Final Response:', {
         currency: selectedCurrency,
-        plansObject,
-        supportedCurrencies: supportedCurrencies.slice(0, 5) + '...'
+        plansCount: Object.keys(plansObject).length,
+        planIds: Object.keys(plansObject)
       });
       
       res.json({
@@ -996,10 +1158,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hasPayPal = !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
       
       if (!hasCashfree && !hasPayPal) {
-        // Demo mode - return a success URL without actual payment processing
-        console.log("🚀 Demo Mode: Payment providers not configured, simulating successful checkout");
+        // Demo mode - redirect to demo payment page (DO NOT update subscription yet)
+        console.log("🚀 Demo Mode: Payment providers not configured, redirecting to demo payment page");
+        console.log(`📝 Demo mode: Will show payment page for plan "${planId}" to user ${userId}`);
+        
         return res.json({ 
-          checkoutUrl: `/subscription-success?plan=${planId}&demo=true&amount=${pricing.amount}&currency=${currency}`,
+          checkoutUrl: `/demo-payment?plan=${planId}&amount=${pricing.amount}&currency=${currency}`,
           currency, 
           amount: pricing.amount,
           provider: 'demo',
@@ -1013,7 +1177,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customerEmail: user.email || '',
         customerName: `${user.firstName} ${user.lastName}`,
         currency,
-        returnUrl: `${process.env.BASE_URL || 'http://localhost:5000'}/subscription-success?plan=${planId}`,
+        returnUrl: `${process.env.BASE_URL || 'http://localhost:5000'}/subscription/success?plan=${planId}`,
         cancelUrl: `${process.env.BASE_URL || 'http://localhost:5000'}/pricing`,
       });
       
@@ -1044,6 +1208,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         message: "Unable to process payment at this time. Please try again.",
         error: "checkout_failed"
+      });
+    }
+  });
+
+  // Demo payment completion endpoint
+  app.post("/api/demo-payment/complete", requireAuth, async (req: any, res) => {
+    try {
+      const { planId, amount, currency } = req.body;
+      const userId = req.user.id;
+      
+      if (!planId) {
+        return res.status(400).json({ message: "Plan ID is required" });
+      }
+      
+      console.log(`📝 Demo payment complete: Updating user ${userId} to plan "${planId}"`);
+      
+      // Update user's subscription after demo payment
+      const updatedUser = await storage.updateUser(userId, {
+        subscriptionPlanId: planId,
+        subscriptionPlan: planId === 'pro' ? 'Pro Plan' : 'Premium Plan',
+        subscriptionStatus: 'active'
+      });
+      
+      console.log(`✅ Demo payment: User updated successfully!`);
+      console.log(`   - User ID: ${updatedUser.id}`);
+      console.log(`   - New subscriptionPlanId: ${updatedUser.subscriptionPlanId}`);
+      console.log(`   - New subscriptionStatus: ${updatedUser.subscriptionStatus}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Subscription activated successfully",
+        redirectUrl: `/my-garden?subscribed=true`
+      });
+    } catch (error) {
+      console.error("❌ Error completing demo payment:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to activate subscription",
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   });
@@ -1262,14 +1465,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user subscription details for account dropdown
+  app.get("/api/user/subscription", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const subscription = await storage.getUserSubscription(userId);
+      
+      // Return null if no active subscription (Free plan)
+      if (!subscription || subscription.status !== 'active') {
+        return res.json(null);
+      }
+      
+      // Return formatted subscription data
+      res.json({
+        id: subscription.id,
+        planType: subscription.planType,
+        status: subscription.status,
+        amount: subscription.amount,
+        currency: subscription.currency,
+        endDate: subscription.endDate,
+        preferredProvider: subscription.preferredProvider,
+      });
+    } catch (error) {
+      console.error("Error fetching user subscription:", error);
+      res.json(null); // Return null instead of error to prevent UI breaks
+    }
+  });
+
   // Get current user info
   app.get("/api/user", requireAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
+      console.log(`👤 GET /api/user - Fetching user ${userId}`);
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
+      
+      console.log(`📊 GET /api/user - User found:`);
+      console.log(`   - subscriptionPlanId: ${user.subscriptionPlanId}`);
+      console.log(`   - subscriptionPlan: ${user.subscriptionPlan}`);
+      console.log(`   - subscriptionStatus: ${user.subscriptionStatus}`);
       
       // Remove sensitive information
       const { password, ...safeUser } = user;

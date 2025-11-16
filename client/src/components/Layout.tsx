@@ -9,13 +9,15 @@ interface LayoutProps {
   showImageBanner?: boolean;
   showSidebarAds?: boolean;
   className?: string;
+  fullWidth?: boolean;
 }
 
 function Layout({ 
   children, 
   showImageBanner = false, 
   showSidebarAds = false, 
-  className = "" 
+  className = "",
+  fullWidth = false
 }: LayoutProps) {
   // Fetch feature settings to control navigation visibility
   const { data: featureSettings } = useQuery<{
@@ -71,7 +73,7 @@ function Layout({
 
       {/* Image Upload Banner - Responsive height */}
       {showImageBanner && (
-        <div className="h-40 sm:h-48 lg:h-56 py-2 sm:py-4">
+        <div className="h-48 sm:h-56 lg:h-64 py-2 sm:py-4">
           <div className="flex">
             {/* Left Spacer to balance the right sidebar - only when sidebar is enabled */}
             {showSidebarAds && (
@@ -101,7 +103,7 @@ function Layout({
         
         {/* Main Content */}
         <main className="flex-1">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-6 lg:py-2">
+          <div className={fullWidth ? "py-3 sm:py-6 lg:py-2" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-6 lg:py-2"}>
             {children}
           </div>
         </main>

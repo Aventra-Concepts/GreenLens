@@ -469,11 +469,6 @@ export class MultiCurrencyPricingService {
       basePrice: 9.00,
       currencies: this.generateCurrencyPricing(9.00),
     },
-    premium: {
-      planId: 'premium',
-      basePrice: 19.00,
-      currencies: this.generateCurrencyPricing(19.00),
-    },
   };
 
   public static getInstance(): MultiCurrencyPricingService {

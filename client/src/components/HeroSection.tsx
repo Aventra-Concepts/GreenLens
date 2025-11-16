@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import PlantAnalysisResults from "./PlantAnalysisResults";
+import { CameraCapture } from "@/components/CameraCapture";
 import gardenImage from "@assets/image_1755326099673.png";
 
 interface UploadedImage {
@@ -22,6 +23,8 @@ export default function HeroSection() {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [showResults, setShowResults] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+  const [currentSlot, setCurrentSlot] = useState<number>(1);
   const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
   const analysisQueueMutation = useMutation({
@@ -151,13 +154,41 @@ export default function HeroSection() {
     setAnalysisResult(null);
   };
 
+  const openCamera = (slot: number) => {
+    setCurrentSlot(slot);
+    setShowCamera(true);
+  };
+
+  const handleCameraCapture = (file: File) => {
+    // Validate file size (100KB limit)
+    if (file.size > 100 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please capture a smaller image (under 100KB)",
+        variant: "destructive",
+      });
+      setShowCamera(false);
+      return;
+    }
+
+    const preview = URL.createObjectURL(file);
+    const newImage: UploadedImage = { file, preview, slot: currentSlot };
+
+    setUploadedImages(prev => {
+      const filtered = prev.filter(img => img.slot !== currentSlot);
+      return [...filtered, newImage];
+    });
+    
+    setShowCamera(false);
+  };
+
   return (
     <>
-      <section className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 py-6 sm:py-10 lg:py-14 xl:py-20">
+      <section className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 py-4 sm:py-6 lg:py-8">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <div className="space-y-5 sm:space-y-7">
-              <div className="space-y-3 sm:space-y-5">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="space-y-2 sm:space-y-3">
                 <h1 className="text-2xl sm:text-3xl lg:text-2xl xl:text-3xl 2xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight text-center px-2">
                   <div className="text-center">Discover Your Plant's</div>
                   <div className="text-center">Identity Through</div>
@@ -226,13 +257,7 @@ export default function HeroSection() {
                         <Button 
                           size="sm"
                           className="hero-upload-button"
-                          onClick={() => {
-                            const input = fileInputRefs[slot - 1].current;
-                            if (input) {
-                              input.setAttribute('capture', 'environment');
-                              input.click();
-                            }
-                          }}
+                          onClick={() => openCamera(slot)}
                           data-testid={`camera-image-${slot}-button`}
                         >
                           <Camera className="w-3 h-3 mr-1" />
@@ -312,6 +337,13 @@ export default function HeroSection() {
           onDownloadPDF={handleDownloadPDF}
         />
       )}
+
+      {/* Camera Capture Modal */}
+      <CameraCapture
+        isOpen={showCamera}
+        onCapture={handleCameraCapture}
+        onClose={() => setShowCamera(false)}
+      />
     </>
   );
 }

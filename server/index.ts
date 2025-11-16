@@ -43,7 +43,17 @@ app.use('/uploads', staticAssetCache);
 
 // API rate limiting and caching
 app.use('/api', apiRateLimit(500, 15 * 60 * 1000)); // 500 requests per 15 minutes for API
-app.use('/api', apiCache);
+// Exclude admin routes from caching (session-based authentication needs fresh responses)
+app.use('/api', (req, res, next) => {
+  if (req.path.startsWith('/admin')) {
+    // No caching for admin routes
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    return next();
+  }
+  return apiCache(req, res, next);
+});
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
@@ -118,6 +128,17 @@ app.use((req, res, next) => {
     // Start scheduled services for automatic student conversion
     scheduledService.start();
     log('Scheduled services started - automatic student conversion enabled');
+    
+    // Initialize payment gateways
+    (async () => {
+      try {
+        const { paymentGatewayService } = await import('./services/paymentGatewayService');
+        await paymentGatewayService.initializeGateways();
+        log('Payment gateways initialized');
+      } catch (error) {
+        console.error('Error initializing payment gateways:', error);
+      }
+    })();
     
     // Seed achievements for plant care dashboard
     (async () => {

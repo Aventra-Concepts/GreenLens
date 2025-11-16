@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Crown, ArrowRight, Sparkles } from "lucide-react";
 import { confetti } from "@/lib/confetti";
+import { queryClient } from "@/lib/queryClient";
 
 export default function SubscriptionSuccess() {
   const [location] = useLocation();
@@ -33,6 +34,11 @@ export default function SubscriptionSuccess() {
     } else if (plan === 'premium') {
       setPlanName("Premium Plan");
     }
+    
+    // Invalidate user cache to ensure fresh subscription status
+    // This is critical so that when user clicks "View My Garden", they see the premium dashboard
+    queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+    console.log("🔄 Invalidated user cache - fresh subscription status will be loaded");
   }, []);
 
   return (

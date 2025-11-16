@@ -119,6 +119,21 @@ interface AdminEbook {
   updatedAt: string;
 }
 
+interface PricingPlan {
+  id: string;
+  planId: string;
+  name: string;
+  price: number;
+  currency: string;
+  billingInterval: string;
+  description?: string;
+  features: string[];
+  isActive: boolean;
+  isPopular: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'pending': return 'bg-yellow-100 text-yellow-800';
@@ -154,6 +169,21 @@ export default function AdminDashboard() {
   const [paymentProviders, setPaymentProviders] = useState<any[]>([]);
   const [showAddProviderDialog, setShowAddProviderDialog] = useState(false);
   const [primaryProvider, setPrimaryProvider] = useState<string>('stripe');
+  
+  // Pricing Plans state
+  const [showPricingDialog, setShowPricingDialog] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<PricingPlan | null>(null);
+  const [planFormData, setPlanFormData] = useState({
+    planId: '',
+    name: '',
+    price: 0,
+    currency: 'USD',
+    billingInterval: 'monthly',
+    description: '',
+    features: '',
+    isActive: true,
+    isPopular: false,
+  });
 
   // Check admin authentication
   useEffect(() => {
@@ -341,6 +371,101 @@ export default function AdminDashboard() {
     }
   });
 
+  // Fetch pricing plans
+  const { data: pricingPlans = [], isLoading: isLoadingPricingPlans, refetch: refetchPricingPlans } = useQuery<PricingPlan[]>({
+    queryKey: ['/api/admin/pricing-plans'],
+    enabled: isAuthenticated,
+  });
+
+  // Pricing Plans mutations
+  const createPlanMutation = useMutation({
+    mutationFn: async (planData: any) => {
+      const response = await apiRequest("POST", "/api/admin/pricing-plans", planData);
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchPricingPlans();
+      setShowPricingDialog(false);
+      setPlanFormData({
+        planId: '',
+        name: '',
+        price: 0,
+        currency: 'USD',
+        billingInterval: 'monthly',
+        description: '',
+        features: '',
+        isActive: true,
+        isPopular: false,
+      });
+      toast({
+        title: "Success",
+        description: "Pricing plan created successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create pricing plan",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const updatePlanMutation = useMutation({
+    mutationFn: async ({ id, planData }: { id: string; planData: any }) => {
+      const response = await apiRequest("PUT", `/api/admin/pricing-plans/${id}`, planData);
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchPricingPlans();
+      setShowPricingDialog(false);
+      setEditingPlan(null);
+      setPlanFormData({
+        planId: '',
+        name: '',
+        price: 0,
+        currency: 'USD',
+        billingInterval: 'monthly',
+        description: '',
+        features: '',
+        isActive: true,
+        isPopular: false,
+      });
+      toast({
+        title: "Success",
+        description: "Pricing plan updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update pricing plan",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const deletePlanMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiRequest("DELETE", `/api/admin/pricing-plans/${id}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchPricingPlans();
+      toast({
+        title: "Success",
+        description: "Pricing plan deleted successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete pricing plan",
+        variant: "destructive",
+      });
+    }
+  });
+
   // Update consultation status mutation - always call this hook
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status, expertId }: { id: string; status: string; expertId?: string }) => {
@@ -385,6 +510,69 @@ export default function AdminDashboard() {
       status: 'expert_assigned', 
       expertId 
     });
+  };
+
+  // Pricing Plans handlers
+  const handleOpenPlanDialog = (plan?: PricingPlan) => {
+    if (plan) {
+      setEditingPlan(plan);
+      setPlanFormData({
+        planId: plan.planId,
+        name: plan.name,
+        price: plan.price,
+        currency: plan.currency,
+        billingInterval: plan.billingInterval,
+        description: plan.description || '',
+        features: plan.features.join('\n'),
+        isActive: plan.isActive,
+        isPopular: plan.isPopular,
+      });
+    } else {
+      setEditingPlan(null);
+      setPlanFormData({
+        planId: '',
+        name: '',
+        price: 0,
+        currency: 'USD',
+        billingInterval: 'monthly',
+        description: '',
+        features: '',
+        isActive: true,
+        isPopular: false,
+      });
+    }
+    setShowPricingDialog(true);
+  };
+
+  const handleSubmitPlan = () => {
+    const featuresArray = planFormData.features
+      .split('\n')
+      .map(f => f.trim())
+      .filter(f => f.length > 0);
+
+    const planData = {
+      planId: planFormData.planId,
+      name: planFormData.name,
+      price: Number(planFormData.price),
+      currency: planFormData.currency,
+      billingInterval: planFormData.billingInterval,
+      description: planFormData.description,
+      features: featuresArray,
+      isActive: planFormData.isActive,
+      isPopular: planFormData.isPopular,
+    };
+
+    if (editingPlan) {
+      updatePlanMutation.mutate({ id: editingPlan.id, planData });
+    } else {
+      createPlanMutation.mutate(planData);
+    }
+  };
+
+  const handleDeletePlan = (id: string) => {
+    if (confirm('Are you sure you want to delete this pricing plan?')) {
+      deletePlanMutation.mutate(id);
+    }
   };
 
   // Return early only after all hooks are called
@@ -545,7 +733,7 @@ export default function AdminDashboard() {
                           Commission: {(parseFloat(ebook.platformCommissionRate) * 100).toFixed(1)}%
                         </p>
                         <p className="text-xs text-green-600 dark:text-green-400 font-medium">
-                          Revenue: {ebook.currency} {ebook.actualAmount.toFixed(2)}
+                          Revenue: {ebook.currency} {(ebook.actualAmount || 0).toFixed(2)}
                         </p>
                       </div>
                     </td>
@@ -556,7 +744,7 @@ export default function AdminDashboard() {
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                           <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                          {ebook.ratingAverage.toFixed(1)} rating
+                          {(ebook.ratingAverage || 0).toFixed(1)} rating
                         </p>
                       </div>
                     </td>
@@ -966,8 +1154,8 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Admin Navigation Tabs */}
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 grid-rows-2 bg-white dark:bg-gray-800 p-1 h-auto gap-1">
-            {/* First Row - 8 tabs */}
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-9 grid-rows-2 bg-white dark:bg-gray-800 p-1 h-auto gap-1">
+            {/* First Row - 9 tabs */}
             <TabsTrigger value="overview" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-slate-100 to-gray-100 border-2 border-slate-300">
               <BarChart3 className="w-3 h-3 text-slate-600" />
               <span className="hidden sm:inline font-semibold text-slate-700">Overview</span>
@@ -993,6 +1181,14 @@ export default function AdminDashboard() {
               <span className="hidden sm:inline font-semibold text-emerald-700">Financial</span>
             </TabsTrigger>
             <TabsTrigger 
+              value="payment-gateways" 
+              className="flex items-center gap-1 px-2 py-2 text-xs cursor-pointer bg-gradient-to-r from-violet-100 to-purple-100 border-2 border-violet-300" 
+              onClick={() => setLocation('/admin/payment-gateways')}
+            >
+              <CreditCard className="w-3 h-3 text-violet-600" />
+              <span className="hidden sm:inline text-violet-700 font-semibold">Gateways</span>
+            </TabsTrigger>
+            <TabsTrigger 
               value="hr" 
               className="flex items-center gap-1 px-2 py-2 text-xs cursor-pointer hover:bg-blue-50 bg-gradient-to-r from-blue-100 to-sky-100 border-2 border-blue-300" 
               onClick={() => window.location.href = '/admin/hr'}
@@ -1004,12 +1200,12 @@ export default function AdminDashboard() {
               <Users className="w-3 h-3 text-indigo-600" />
               <span className="hidden sm:inline font-semibold text-indigo-700">Users</span>
             </TabsTrigger>
+            
+            {/* Second Row - 8 tabs */}
             <TabsTrigger value="consultations" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-teal-100 to-cyan-100 border-2 border-teal-300">
               <MessageSquare className="w-3 h-3 text-teal-600" />
               <span className="hidden sm:inline font-semibold text-teal-700">Consults</span>
             </TabsTrigger>
-            
-            {/* Second Row - 7 tabs */}
             <TabsTrigger value="content" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-rose-100 to-pink-100 border-2 border-rose-300">
               <FileText className="w-3 h-3 text-rose-600" />
               <span className="hidden sm:inline font-semibold text-rose-700">Content</span>
@@ -1035,7 +1231,12 @@ export default function AdminDashboard() {
               <span className="hidden sm:inline font-semibold text-lime-700">Tools</span>
             </TabsTrigger>
             <TabsTrigger value="email" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-emerald-100 to-teal-100 border-2 border-emerald-300">
-              📧 <span className="hidden sm:inline font-semibold text-emerald-700">Email & Subscriptions</span>
+              <Mail className="w-3 h-3 text-emerald-600" />
+              <span className="hidden sm:inline font-semibold text-emerald-700">Email</span>
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="flex items-center gap-1 px-2 py-2 text-xs bg-gradient-to-r from-sky-100 to-blue-100 border-2 border-sky-300">
+              <Download className="w-3 h-3 text-sky-600" />
+              <span className="hidden sm:inline font-semibold text-sky-700">Reports</span>
             </TabsTrigger>
           </TabsList>
 
@@ -2482,6 +2683,135 @@ export default function AdminDashboard() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Subscription Plans Management */}
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Tag className="w-5 h-5" />
+                    Subscription Plans Management
+                  </CardTitle>
+                  <CardDescription>Configure pricing, features, and billing for all subscription tiers</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-semibold">Pricing Plans</h3>
+                      <p className="text-sm text-gray-600">Manage subscription tiers and pricing</p>
+                    </div>
+                    <Button 
+                      onClick={() => handleOpenPlanDialog()} 
+                      className="gap-2"
+                      data-testid="button-add-plan"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add New Plan
+                    </Button>
+                  </div>
+
+                  {isLoadingPricingPlans ? (
+                    <div className="flex justify-center p-8">
+                      <div className="animate-spin w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full" />
+                    </div>
+                  ) : pricingPlans.length === 0 ? (
+                    <div className="text-center p-8 border rounded-lg bg-gray-50 dark:bg-gray-800">
+                      <Tag className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                      <p className="text-gray-600 dark:text-gray-400">No pricing plans configured yet</p>
+                      <Button 
+                        onClick={() => handleOpenPlanDialog()} 
+                        className="mt-4"
+                        variant="outline"
+                        data-testid="button-add-first-plan"
+                      >
+                        Create Your First Plan
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="border rounded-lg overflow-hidden">
+                      <table className="w-full" data-testid="table-pricing-plans">
+                        <thead className="bg-gray-50 dark:bg-gray-700">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                              Plan ID
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                              Name
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                              Price
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                              Billing
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+                          {pricingPlans.map((plan) => (
+                            <tr key={plan.id} className="hover:bg-gray-50 dark:hover:bg-gray-700" data-testid={`row-plan-${plan.planId}`}>
+                              <td className="px-4 py-3">
+                                <span className="font-mono text-sm" data-testid={`text-plan-id-${plan.planId}`}>{plan.planId}</span>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium" data-testid={`text-plan-name-${plan.planId}`}>{plan.name}</span>
+                                  {plan.isPopular && (
+                                    <Badge className="bg-yellow-100 text-yellow-800">Popular</Badge>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className="font-semibold" data-testid={`text-plan-price-${plan.planId}`}>
+                                  {plan.currency} {plan.price}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className="capitalize" data-testid={`text-plan-billing-${plan.planId}`}>
+                                  {plan.billingInterval}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3">
+                                <Badge 
+                                  className={plan.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
+                                  data-testid={`badge-plan-status-${plan.planId}`}
+                                >
+                                  {plan.isActive ? 'Active' : 'Inactive'}
+                                </Badge>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="flex gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleOpenPlanDialog(plan)}
+                                    data-testid={`button-edit-${plan.planId}`}
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-red-600 hover:text-red-700"
+                                    onClick={() => handleDeletePlan(plan.id)}
+                                    data-testid={`button-delete-${plan.planId}`}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
@@ -2800,6 +3130,172 @@ export default function AdminDashboard() {
                       />
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Reports Dashboard */}
+          <TabsContent value="reports" className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Reports & Downloads</h2>
+              <p className="text-gray-600 dark:text-gray-300">Generate and download comprehensive reports</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* User Reports */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-blue-600" />
+                    User Reports
+                  </CardTitle>
+                  <CardDescription>
+                    Export user data and activity reports
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    data-testid="download-users-csv"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download All Users (CSV)
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    data-testid="download-active-users"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Active Users
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    data-testid="download-premium-users"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Premium Subscribers
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Financial Reports */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="w-5 h-5 text-green-600" />
+                    Financial Reports
+                  </CardTitle>
+                  <CardDescription>
+                    Revenue and transaction reports
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    data-testid="download-transactions"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download All Transactions
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    data-testid="download-revenue-report"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Revenue Report
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    data-testid="download-subscription-report"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Subscription Report
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Content Reports */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-purple-600" />
+                    Content Reports
+                  </CardTitle>
+                  <CardDescription>
+                    Blog posts, E-books, and consultation reports
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    data-testid="download-blog-posts"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Blog Posts Report
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    data-testid="download-ebooks"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download E-books Report
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    data-testid="download-consultations"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Consultations Report
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* System Reports */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-orange-600" />
+                    System Reports
+                  </CardTitle>
+                  <CardDescription>
+                    System logs and performance metrics
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    data-testid="download-error-logs"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Error Logs
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    data-testid="download-api-usage"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download API Usage Report
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    data-testid="download-performance-metrics"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Performance Metrics
+                  </Button>
                 </CardContent>
               </Card>
             </div>
@@ -3218,6 +3714,169 @@ export default function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Pricing Plan Dialog */}
+      <Dialog open={showPricingDialog} onOpenChange={setShowPricingDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="dialog-pricing-plan">
+          <DialogHeader>
+            <DialogTitle>{editingPlan ? 'Edit Pricing Plan' : 'Add New Pricing Plan'}</DialogTitle>
+            <DialogDescription>
+              {editingPlan ? 'Update the pricing plan details' : 'Create a new subscription pricing plan'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="planId">Plan ID</Label>
+                <Input
+                  id="planId"
+                  placeholder="e.g., pro, premium, garden_monitoring"
+                  value={planFormData.planId}
+                  onChange={(e) => setPlanFormData({ ...planFormData, planId: e.target.value })}
+                  disabled={!!editingPlan}
+                  data-testid="input-plan-id"
+                />
+                <p className="text-xs text-gray-500 mt-1">Unique identifier for the plan</p>
+              </div>
+              <div>
+                <Label htmlFor="planName">Plan Name</Label>
+                <Input
+                  id="planName"
+                  placeholder="e.g., Pro Plan"
+                  value={planFormData.name}
+                  onChange={(e) => setPlanFormData({ ...planFormData, name: e.target.value })}
+                  data-testid="input-plan-name"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="price">Price</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  placeholder="9.99"
+                  value={planFormData.price}
+                  onChange={(e) => setPlanFormData({ ...planFormData, price: parseFloat(e.target.value) || 0 })}
+                  data-testid="input-plan-price"
+                />
+              </div>
+              <div>
+                <Label htmlFor="currency">Currency</Label>
+                <Select
+                  value={planFormData.currency}
+                  onValueChange={(value) => setPlanFormData({ ...planFormData, currency: value })}
+                >
+                  <SelectTrigger id="currency" data-testid="select-currency">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                    <SelectItem value="GBP">GBP</SelectItem>
+                    <SelectItem value="INR">INR</SelectItem>
+                    <SelectItem value="AUD">AUD</SelectItem>
+                    <SelectItem value="CAD">CAD</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="billingInterval">Billing Interval</Label>
+                <Select
+                  value={planFormData.billingInterval}
+                  onValueChange={(value) => setPlanFormData({ ...planFormData, billingInterval: value })}
+                >
+                  <SelectTrigger id="billingInterval" data-testid="select-billing-interval">
+                    <SelectValue placeholder="Select interval" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="yearly">Yearly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                placeholder="Enter plan description..."
+                value={planFormData.description}
+                onChange={(e) => setPlanFormData({ ...planFormData, description: e.target.value })}
+                rows={3}
+                data-testid="textarea-plan-description"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="features">Features (one per line)</Label>
+              <Textarea
+                id="features"
+                placeholder="Unlimited Plant IDs&#10;AI-Powered Diagnostics&#10;Expert Consultations"
+                value={planFormData.features}
+                onChange={(e) => setPlanFormData({ ...planFormData, features: e.target.value })}
+                rows={5}
+                data-testid="textarea-plan-features"
+              />
+              <p className="text-xs text-gray-500 mt-1">Enter each feature on a new line</p>
+            </div>
+
+            <div className="flex gap-6">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={planFormData.isActive}
+                  onChange={(e) => setPlanFormData({ ...planFormData, isActive: e.target.checked })}
+                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                  data-testid="checkbox-is-active"
+                />
+                <Label htmlFor="isActive" className="cursor-pointer">Is Active</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="isPopular"
+                  checked={planFormData.isPopular}
+                  onChange={(e) => setPlanFormData({ ...planFormData, isPopular: e.target.checked })}
+                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                  data-testid="checkbox-is-popular"
+                />
+                <Label htmlFor="isPopular" className="cursor-pointer">Is Popular (Show badge)</Label>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowPricingDialog(false);
+                  setEditingPlan(null);
+                }}
+                data-testid="button-cancel-plan"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmitPlan}
+                disabled={createPlanMutation.isPending || updatePlanMutation.isPending}
+                data-testid="button-save-plan"
+              >
+                {(createPlanMutation.isPending || updatePlanMutation.isPending) ? (
+                  <>
+                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                    Saving...
+                  </>
+                ) : (
+                  editingPlan ? 'Update Plan' : 'Create Plan'
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Author Details Modal */}
       <Dialog open={!!viewingAuthor} onOpenChange={() => setViewingAuthor(null)}>

@@ -27,9 +27,6 @@ export function CookieConsentBanner() {
   useEffect(() => {
     // Add delay to ensure proper rendering on all pages
     const timer = setTimeout(() => {
-      // For development/demo - always show banner (remove this line in production)
-      localStorage.removeItem('greenlens-cookie-consent');
-      
       const consent = localStorage.getItem('greenlens-cookie-consent');
       const gpcEnabled = (navigator as any).globalPrivacyControl;
       

@@ -23,7 +23,7 @@ export default function Home() {
   }
 
   return (
-    <Layout showImageBanner={true} showSidebarAds={true}>
+    <Layout showImageBanner={true} showSidebarAds={true} fullWidth={true}>
       <div className="space-y-2 sm:space-y-4 md:space-y-6 lg:space-y-8">
         <HeroSection />
         

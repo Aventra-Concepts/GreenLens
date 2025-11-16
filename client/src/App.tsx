@@ -83,8 +83,10 @@ import DocumentationDownload from '@/pages/documentation-download';
 import AdminHRDashboard from '@/pages/admin-hr-dashboard';
 import FinancialDashboard from '@/pages/financial-dashboard';
 import AdminFinancialDashboard from '@/pages/admin-financial-dashboard';
+import PaymentGatewaysPage from '@/pages/payment-gateways';
 import AdminBlogCreate from '@/pages/admin-blog-create';
 import AdminBlogEdit from '@/pages/admin-blog-edit';
+import DemoPayment from '@/pages/demo-payment';
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -111,6 +113,7 @@ function Router() {
       <Route path="/garden/subscription/success" component={GardenSubscriptionSuccess} />
       <Route path="/subscription/checkout" component={SubscriptionCheckout} />
       <Route path="/subscription/success" component={SubscriptionSuccess} />
+      <Route path="/demo-payment" component={DemoPayment} />
       <Route path="/expert-onboarding" component={ExpertOnboarding} />
       <Route path="/talk-to-expert" component={TalkToExpert} />
       <Route path="/payment/consultation/:id">
@@ -191,6 +194,7 @@ function Router() {
       <Route path="/admin/financial" component={AdminFinancialDashboard} />
       <Route path="/admin/financial-dashboard" component={AdminFinancialDashboard} />
       <Route path="/financial-dashboard" component={FinancialDashboard} />
+      <Route path="/admin/payment-gateways" component={PaymentGatewaysPage} />
       <Route path="/admin/blog/create" component={AdminBlogCreate} />
       <Route path="/admin/blog/edit/:id" component={AdminBlogEdit} />
       

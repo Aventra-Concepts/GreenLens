@@ -192,19 +192,14 @@ export function setupAuth(app: Express) {
 
       const user = await storage.createUser(userData);
 
-      // Auto-login the user
-      req.login(user, (err) => {
-        if (err) {
-          console.error('Auto-login error:', err);
-          return res.status(201).json({ 
-            message: "Registration successful, please login manually",
-            userId: user.id
-          });
-        }
-        
-        // Return user without password
-        const { password: _, ...userWithoutPassword } = user;
-        res.status(201).json(userWithoutPassword);
+      // Send email verification (if email service is configured)
+      // TODO: Implement email verification logic when SendGrid is configured
+      
+      // Return success message without auto-login
+      res.status(201).json({ 
+        message: "Registration successful! Please verify your email and then log in.",
+        requiresEmailVerification: true,
+        userId: user.id
       });
     } catch (error) {
       console.error('Registration error:', error);
@@ -227,19 +222,30 @@ export function setupAuth(app: Express) {
 
   // Login endpoint
   app.post("/api/login", authLimiter, (req, res, next) => {
+    console.log(`🔐 Login attempt for: ${req.body.email}`);
     passport.authenticate("local", (err: any, user: DBUser | false, info: any) => {
       if (err) {
+        console.error("❌ Login authentication error:", err);
+        console.error("   Error details:", {
+          message: err.message,
+          stack: err.stack,
+          code: err.code
+        });
         return res.status(500).json({ message: "Login failed" });
       }
       if (!user) {
+        console.log(`⚠️ Login failed for ${req.body.email}: ${info?.message}`);
         return res.status(401).json({ message: info?.message || "Invalid credentials" });
       }
       
+      console.log(`✅ User authenticated: ${user.email} (${user.id})`);
       req.login(user, (err) => {
         if (err) {
+          console.error("❌ Session login error:", err);
           return res.status(500).json({ message: "Login failed" });
         }
         
+        console.log(`🎉 Login successful for: ${user.email}`);
         // Return user without password
         const { password: _, ...userWithoutPassword } = user;
         res.json(userWithoutPassword);

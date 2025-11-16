@@ -72,11 +72,11 @@ export function FreeTierGardenDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:from-gray-900">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-green-950 dark:to-emerald-950">
         <div className="container mx-auto p-6">
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mx-auto mb-4"></div>
-            <p className="text-lg text-gray-600">Loading your garden dashboard...</p>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-600 border-t-transparent mx-auto mb-4"></div>
+            <p className="text-xl font-semibold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Loading your garden...</p>
           </div>
         </div>
       </div>
@@ -101,38 +101,40 @@ export function FreeTierGardenDashboard() {
   const usagePercentage = (gardenData.basicStats.freeUsageRemaining / gardenData.basicStats.freeUsageLimit) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-green-950 dark:to-emerald-950">
       <div className="container mx-auto p-4 lg:p-6 max-w-6xl">
         
-        {/* Free Tier Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border">
+        {/* Free Tier Header - Colorful gradient */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 dark:from-blue-700 dark:via-purple-700 dark:to-pink-700 rounded-2xl p-6 shadow-xl">
           <div className="flex items-center gap-4 mb-4 lg:mb-0">
-            <Avatar className="h-12 w-12">
+            <Avatar className="h-14 w-14 border-4 border-white/50">
               <AvatarImage src={gardenData.user.profileImageUrl || ''} />
-              <AvatarFallback className="bg-gray-100 dark:bg-gray-700">
+              <AvatarFallback className="bg-white/20 text-white font-bold">
                 {gardenData.user.firstName?.[0]}{gardenData.user.lastName?.[0]}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-bold text-white drop-shadow-md">
                 {gardenData.user.firstName}'s Garden
               </h1>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-gray-600">
+                <Badge className="bg-white/20 text-white border-white/30">
                   {gardenData.user.subscriptionPlan}
                 </Badge>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-white/90">
                   Member since {new Date(gardenData.user.joinDate).getFullYear()}
                 </span>
               </div>
             </div>
           </div>
-          <Link href="/pricing">
-            <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg">
-              <Crown className="h-4 w-4 mr-2" />
-              Upgrade to Premium
-            </Button>
-          </Link>
+          {gardenData.user.subscriptionPlanId !== 'pro' && gardenData.user.subscriptionPlanId !== 'premium' && (
+            <Link href="/pricing">
+              <Button className="bg-white text-purple-600 hover:bg-white/90 shadow-lg font-semibold" data-testid="button-upgrade-pro-premium">
+                <Crown className="h-4 w-4 mr-2" />
+                Upgrade to Pro/Premium
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Usage Limit Alert */}
@@ -162,28 +164,28 @@ export function FreeTierGardenDashboard() {
           {/* Basic Stats */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* Stats Cards */}
+            {/* Stats Cards - Colorful gradients */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Card className="shadow-md bg-white dark:bg-gray-800">
-                <CardContent className="p-4">
+              <Card className="shadow-lg bg-gradient-to-br from-green-500 to-emerald-600 dark:from-green-600 dark:to-emerald-700 border-0">
+                <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Total Plants</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{gardenData.basicStats.totalPlants}</p>
+                      <p className="text-sm text-green-100 font-medium">Total Plants</p>
+                      <p className="text-3xl font-bold text-white">{gardenData.basicStats.totalPlants}</p>
                     </div>
-                    <Leaf className="h-8 w-8 text-green-600" />
+                    <Leaf className="h-12 w-12 text-white opacity-30" />
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="shadow-md bg-white dark:bg-gray-800">
-                <CardContent className="p-4">
+              <Card className="shadow-lg bg-gradient-to-br from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 border-0">
+                <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Plants Identified</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{gardenData.basicStats.plantsIdentified}</p>
+                      <p className="text-sm text-blue-100 font-medium">Plants Identified</p>
+                      <p className="text-3xl font-bold text-white">{gardenData.basicStats.plantsIdentified}</p>
                     </div>
-                    <Eye className="h-8 w-8 text-blue-600" />
+                    <Eye className="h-12 w-12 text-white opacity-30" />
                   </div>
                 </CardContent>
               </Card>
@@ -238,61 +240,107 @@ export function FreeTierGardenDashboard() {
             </Card>
           </div>
 
-          {/* Premium Features Showcase */}
+          {/* Upgrade Sections */}
           <div className="space-y-6">
             
-            {/* Locked Features */}
-            <Card className="shadow-md bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-800">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
-                  <Lock className="h-5 w-5" />
-                  Premium Features
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2">
-                  {gardenData.limitations.advancedFeaturesLocked.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2 p-2 rounded bg-white/50 dark:bg-white/10">
-                      <Lock className="h-4 w-4 text-amber-600" />
-                      <span className="text-sm text-amber-800 dark:text-amber-200">{feature}</span>
+            {/* Section 1: Pro/Premium Plans - Show only if user doesn't have Pro/Premium */}
+            {gardenData.user.subscriptionPlanId !== 'pro' && gardenData.user.subscriptionPlanId !== 'premium' && (
+              <Card className="shadow-md bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-2 border-purple-200 dark:border-purple-800">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-purple-800 dark:text-purple-200">
+                    <Crown className="h-5 w-5" />
+                    Unlock Advanced Plant Care Features
+                  </CardTitle>
+                  <p className="text-sm text-purple-600 dark:text-purple-300">
+                    Pro/Premium Plans: $9-$19/month
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 p-2 rounded bg-white/50 dark:bg-white/10">
+                      <Sparkles className="h-4 w-4 text-purple-600" />
+                      <span className="text-sm text-purple-800 dark:text-purple-200">AI-powered plant diagnostics</span>
                     </div>
-                  ))}
-                </div>
-                <Link href="/pricing">
-                  <Button size="sm" className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white">
-                    <Crown className="h-4 w-4 mr-2" />
-                    Unlock All Features
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            {/* Premium Benefits */}
-            <Card className="shadow-md bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border border-emerald-200 dark:border-emerald-800">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-emerald-800 dark:text-emerald-200">
-                  <Sparkles className="h-5 w-5" />
-                  What You'll Get
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2">
-                  {gardenData.limitations.premiumBenefits.map((benefit, index) => (
-                    <div key={index} className="flex items-center gap-2 p-2 rounded bg-white/50 dark:bg-white/10">
-                      <CheckCircle className="h-4 w-4 text-emerald-600" />
-                      <span className="text-sm text-emerald-800 dark:text-emerald-200">{benefit}</span>
+                    <div className="flex items-center gap-2 p-2 rounded bg-white/50 dark:bg-white/10">
+                      <Sparkles className="h-4 w-4 text-purple-600" />
+                      <span className="text-sm text-purple-800 dark:text-purple-200">Professional PDF reports</span>
                     </div>
-                  ))}
-                </div>
-                <div className="pt-2 border-t border-emerald-200 dark:border-emerald-800">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-emerald-800 dark:text-emerald-200">Premium Plan</span>
-                    <span className="text-lg font-bold text-emerald-600">$19/mo</span>
+                    <div className="flex items-center gap-2 p-2 rounded bg-white/50 dark:bg-white/10">
+                      <Sparkles className="h-4 w-4 text-purple-600" />
+                      <span className="text-sm text-purple-800 dark:text-purple-200">Expert consultations</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded bg-white/50 dark:bg-white/10">
+                      <Sparkles className="h-4 w-4 text-purple-600" />
+                      <span className="text-sm text-purple-800 dark:text-purple-200">Priority support</span>
+                    </div>
                   </div>
                   <Link href="/pricing">
-                    <Button size="sm" className="w-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white">
-                      <Gift className="h-4 w-4 mr-2" />
-                      Start Free Trial
+                    <Button 
+                      size="sm" 
+                      className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
+                      data-testid="button-upgrade-pro-premium-sidebar"
+                    >
+                      <Crown className="h-4 w-4 mr-2" />
+                      Upgrade to Pro/Premium
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Section 2: Garden Monitoring Add-On - Always show */}
+            <Card className="shadow-md bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-green-800 dark:text-green-200">
+                  <Activity className="h-5 w-5" />
+                  Add Garden Monitoring Premium
+                </CardTitle>
+                <p className="text-sm text-green-600 dark:text-green-300 font-semibold">
+                  Separate subscription for advanced garden management with Plant Diary
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+                  <Info className="h-4 w-4 text-blue-600" />
+                  <AlertDescription className="text-blue-800 dark:text-blue-200 text-sm">
+                    Garden Monitoring is a separate add-on subscription
+                  </AlertDescription>
+                </Alert>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 p-2 rounded bg-white/50 dark:bg-white/10">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span className="text-sm text-green-800 dark:text-green-200">Real-time garden monitoring</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded bg-white/50 dark:bg-white/10">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span className="text-sm text-green-800 dark:text-green-200">Digital plant diary</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded bg-white/50 dark:bg-white/10">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span className="text-sm text-green-800 dark:text-green-200">IoT sensor integration</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded bg-white/50 dark:bg-white/10">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span className="text-sm text-green-800 dark:text-green-200">Microclimate tracking</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded bg-white/50 dark:bg-white/10">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span className="text-sm text-green-800 dark:text-green-200">AI growth predictions</span>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-green-200 dark:border-green-800">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium text-green-800 dark:text-green-200">Add-On Price</span>
+                    <span className="text-lg font-bold text-green-600">$95/year</span>
+                  </div>
+                  <Link href="/garden-monitoring">
+                    <Button 
+                      size="sm" 
+                      className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                      data-testid="button-get-garden-monitoring"
+                    >
+                      <Leaf className="h-4 w-4 mr-2" />
+                      Get Garden Monitoring
                     </Button>
                   </Link>
                 </div>
@@ -303,25 +351,25 @@ export function FreeTierGardenDashboard() {
             <Card className="shadow-md bg-white dark:bg-gray-800">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-blue-600" />
+                  <Zap className="h-5 w-5 text-blue-600" />
                   Quick Actions
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Link href="/identify">
-                  <Button size="sm" variant="outline" className="w-full justify-start">
+                  <Button size="sm" variant="outline" className="w-full justify-start" data-testid="button-identify-plant">
                     <Leaf className="h-4 w-4 mr-2" />
                     Identify a Plant
                   </Button>
                 </Link>
                 <Link href="/care-plans">
-                  <Button size="sm" variant="outline" className="w-full justify-start">
+                  <Button size="sm" variant="outline" className="w-full justify-start" data-testid="button-care-plans">
                     <Heart className="h-4 w-4 mr-2" />
                     Browse Care Plans
                   </Button>
                 </Link>
                 <Link href="/plant-database">
-                  <Button size="sm" variant="outline" className="w-full justify-start">
+                  <Button size="sm" variant="outline" className="w-full justify-start" data-testid="button-plant-database">
                     <Flower className="h-4 w-4 mr-2" />
                     Plant Database
                   </Button>
