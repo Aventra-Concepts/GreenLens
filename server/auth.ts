@@ -3,7 +3,6 @@ import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
 import { Strategy as GitHubStrategy } from "passport-github2";
-import { Strategy as TwitterStrategy } from "passport-twitter";
 import { Express } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
@@ -180,6 +179,8 @@ export function setupAuth(app: Express) {
         timezone: 'UTC',
         preferredCurrency: 'USD',
         region: 'US',
+        phoneNumber: null,
+        phoneVerifiedAt: null,
         stripeCustomerId: null,
         stripeSubscriptionId: null,
         gardenMonitoringSubscriptionId: null,
@@ -439,42 +440,7 @@ function setupOAuthStrategies() {
     }));
   }
 
-  // Twitter OAuth Strategy
-  if (process.env.TWITTER_CONSUMER_KEY && process.env.TWITTER_CONSUMER_SECRET) {
-    passport.use(new TwitterStrategy({
-      consumerKey: process.env.TWITTER_CONSUMER_KEY,
-      consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-      callbackURL: "/auth/twitter/callback",
-      includeEmail: true
-    }, async (token: string, tokenSecret: string, profile: any, done: any) => {
-      try {
-        let user = await storage.getUserByProviderId('twitter', profile.id);
-        
-        if (!user) {
-          const emailUser = await storage.getUserByEmail(profile.emails?.[0]?.value || '');
-          
-          if (emailUser) {
-            user = await storage.linkOAuthAccount(emailUser.id, 'twitter', profile.id);
-          } else {
-            user = await storage.createOAuthUser({
-              twitterId: profile.id,
-              email: profile.emails?.[0]?.value || '',
-              firstName: profile.displayName?.split(' ')[0] || '',
-              lastName: profile.displayName?.split(' ').slice(1).join(' ') || '',
-              profileImageUrl: profile.photos?.[0]?.value,
-              provider: 'twitter',
-              emailVerified: true
-            });
-          }
-        }
-        
-        await storage.updateUserLastLogin(user.id);
-        return done(null, user);
-      } catch (error) {
-        return done(error, false);
-      }
-    }));
-  }
+  // Twitter OAuth Strategy removed (security advisory GHSA-h6q6-9hqw-rwfv)
 }
 
 export { hashPassword, comparePasswords, setupOAuthStrategies };

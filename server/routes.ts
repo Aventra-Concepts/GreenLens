@@ -140,8 +140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const availableProviders = {
       google: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
       facebook: !!(process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET),
-      github: !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET),
-      twitter: !!(process.env.TWITTER_CONSUMER_KEY && process.env.TWITTER_CONSUMER_SECRET)
+      github: !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET)
     };
     res.json(availableProviders);
   });
@@ -187,21 +186,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/auth/github/callback',
     passport.authenticate('github', { failureRedirect: '/login?error=github_auth_failed' }),
-    (req, res) => {
-      res.redirect('/?welcome=true');
-    }
-  );
-
-  // Twitter OAuth
-  app.get('/auth/twitter', (req, res, next) => {
-    if (!process.env.TWITTER_CONSUMER_KEY || !process.env.TWITTER_CONSUMER_SECRET) {
-      return res.redirect('/auth?error=twitter_not_configured');
-    }
-    passport.authenticate('twitter')(req, res, next);
-  });
-
-  app.get('/auth/twitter/callback',
-    passport.authenticate('twitter', { failureRedirect: '/login?error=twitter_auth_failed' }),
     (req, res) => {
       res.redirect('/?welcome=true');
     }
